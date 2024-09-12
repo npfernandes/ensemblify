@@ -16,7 +16,7 @@ In a terminal window:
     ensemblify -p PARAMETERS_FILEPATH
 
 ## Setting up your parameters file
-An .html form (./docs/assets/parameters_form.html) is provided to aid you in building your parameters file.
+An [.html form](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_form.html) (./docs/assets/parameters_form.html) is provided to aid you in building your parameters file.
 <details open>  
   <summary><b>Parameters Form Preview</b></summary>
 
@@ -32,24 +32,21 @@ If you prefer to create your own parameters file from scratch, a template file (
 </summary>    
 
 ## Ensemblify Python Package
-<!-- It is heavily recommended to install Ensemblify in a dedicated virtual environment. You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`.
+It is heavily recommended to install Ensemblify in a dedicated virtual environment. You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).
 
-You can create a new environment named `ensemblify_env` directly by running:
+You can create a new environment named `ensemblify_env`, download the ensemblify source code from this repository and install it in your `ensemblify_env` environment by running:
 
-    conda env create ensemblify_env -->
-
-If you want to create a new `ensemblify_env` environment with Ensemblify and all its necessary python dependencies already installed you can use the provided conda environment file by running:
-
-    wget https://raw.githubusercontent.com/npfernandes/ensemblify/main/environment.yml
-    conda env create -f environment.yml
-
-Then, you can download the ensemblify source code from this repository and install it in your `ensemblify_env` environment by running:
-
+    conda env create ensemblify_env
     conda activate ensemblify_env
     wget https://github.com/npfernandes/ensemblify/archive/refs/heads/main.zip
     unzip main.zip
     cd ensemblify-main
     pip install -e .
+
+If you want to create a new `ensemblify_env` environment with Ensemblify and all its necessary python dependencies already installed you can use the provided conda environment file by running:
+
+    wget https://raw.githubusercontent.com/npfernandes/ensemblify/main/environment.yml
+    conda env create -f environment.yml
 
 <!-- The `ensemblify_env` environment should be activated before installing Ensemblify in the usual manner:
 

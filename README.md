@@ -211,9 +211,9 @@ For MacOS users run:
     curl -O Pepsi-SAXS-MacOS.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/MacOS/2.6/Pepsi-SAXS.zip
     unzip Pepsi-SAXS-MacOS.zip
 
-To register `pepsi-saxs` as an alias for your Pepsi-SAXS executable in your bash shell run:
+To register `pepsi_saxs` as an alias for your Pepsi-SAXS executable in your bash shell run:
 
-    echo "alias pepsi-saxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
+    echo "alias pepsi_saxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
 
 ### BIFT
 Bayesian indirect Fourier transformation (BIFT) of small-angle experimental data allows for an estimation of parameters that describe the data [[6]](#ref6). Larsen *et al.* show in [[7]](#ref7) that BIFT can identify whether the experimental error in small-angle scattering data is over or underestimated. Here we use their implementation of this method to make this determination and scale the error values accordingly.

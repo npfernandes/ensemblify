@@ -16,7 +16,7 @@ GLOBAL_CONFIG = {
     'BETA_STRAND_CANON': (-135,135), # (Phi,Psi); Wikipedia Beta strand # FIXME
     'FASPR_PATH': 'faspr', # defaults to faspr alias
     'PULCHRA_PATH': 'pulchra', # defaults to pulchra alias
-    'PEPSI_SAXS_PATH': 'pepsi-saxs', # defaults to pepsi-saxs alias
+    'PEPSI_SAXS_PATH': 'pepsi_saxs', # defaults to pepsi_saxs alias
     'BIFT_PATH': 'bift', # defaults to bift alias
     'PLOTLY_DISPLAY_CONFIG': {'displaylogo': False,
                               'toImageButtonOptions': {'format': 'svg', # defaults to svg download

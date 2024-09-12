@@ -1,0 +1,42 @@
+Third-Party Software Notice
+
+The ./mdreader-master directory contains all files from the mdreader software distribution.
+Source: https://github.com/mnmelo/MDreader
+
+License:
+---------
+This software is distributed under the GNU Public License, detailed in the 
+./mdreader-master/LICENSE file.
+
+Modifications:
+--------------
+The mdreader_CHANGED.py file is a modified version of the original source code file mdreader.py:
+
+    - In lines 694+695:
+        if self.opts.verbose and self.p_id == 0:
+            sys.stderr.write("Loading...\n")
+      was changed to:
+        # if self.opts.verbose and self.p_id == 0:
+        #     sys.stderr.write("Loading...\n")
+
+    - In lines 718+719:
+            if not self.opts.asframenum and not self.p_id:
+                sys.stderr.write("Trajectory has no time information. Will interpret limits as frame numbers.\n")
+      was changed to:
+            # if not self.opts.asframenum and not self.p_id:
+            #     sys.stderr.write("Trajectory has no time information. Will interpret limits as frame numbers.\n")
+
+    - In line 793:
+        sys.stderr.write("Iterating through trajectory...\n")
+      was changed to:
+        #sys.stderr.write("Iterating through trajectory...\n")
+
+    - In line 1176:
+                frames_per_worker = np.ones(self.p_num,dtype=np.int)*((self.totalframes-self.p_overlap)//self.p_num)
+      was changed to:
+                frames_per_worker = np.ones(self.p_num,dtype=int)*((self.totalframes-self.p_overlap)//self.p_num)
+
+These were all minimal changes to make the code compatible with Ensemblify's use case, and other than printing less
+messages to the console they do not alter the functionality of mdreader in any way.
+
+All other files taken from the original distribution were not modified in any way.

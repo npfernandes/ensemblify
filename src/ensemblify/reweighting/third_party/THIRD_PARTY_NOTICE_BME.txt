@@ -1,0 +1,21 @@
+Third-Party Software Notice
+
+The ./BME_main directory contains all files from the BME software distribution.
+Source: https://github.com/KULL-Centre/BME
+
+License:
+---------
+This software is distributed under the GNU Public License, detailed in the 
+./BME_main/LICENSE.md file.
+
+Modifications:
+--------------
+In the BME.py file line number 13 was altered from:
+    import BME_tools as bt
+to:
+    import ensemblify_TEST.reweighting.third_party.BME_main.BME_tools as bt
+
+This was done simply to make the absolute import of BME_tools auxiliary functions
+possible and does not alter the functionality of BME in any way.
+
+All other files taken from the original distribution were not modified in any way.

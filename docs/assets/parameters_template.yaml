@@ -1,0 +1,66 @@
+job_name: # Name to give the files/folders resulting from this script
+  example_job_name
+sequence: # Path to the input sequence, in .pdb or .txt format
+  inputs/example_input.pdb
+size: # Size of ensemble to generate (1-10000)
+  1
+databases: # Path to database(s) to use during sampling
+  all: /home/tiagogomes/Desktop/projects/nuno_fernandes/tripeptide_db_moma_cortes/tripeptide_angles_data/data_all/data_all_highest_protocol/all.pkl
+  coil: /home/tiagogomes/Desktop/projects/nuno_fernandes/tripeptide_db_moma_cortes/tripeptide_angles_data/data_coil/data_coil_w_frags/coil.pkl
+  # add more databases here
+targets: # Dictionary of chain:List of lists, indicating sampling targets
+  A : [ [ MC, [1,49], all , TRIPEPTIDE] ]
+  B : [ [ MC, [51,100], coil, SINGLERESIDUE ] ]
+alphafold: # Inside target range, target only residues below pddt threshold?
+  False
+pae: # Apply constraints solely based on given pae matrix
+  None
+restraints: # Force secondary structure or conserve contacts present in starting structure
+  ss_bias :
+    - 
+      - [ A, [25,49], alpha_helix ] # chain, region, sstruc
+      - [ B, [51,75], beta_strand ] # chain, region, sstruc
+      # add more ssbias here
+    - 100 # ssbias percentage
+  contacts : # Defines what contacts between regions we want to keep conserved
+    - [ [A, [50,100]] , [B,  [1,49]] ]
+    # add more contacts here
+output_path: # Path to output directory
+  src/ensemblify_DASK/output
+faspr_path: # Path to FASPR (e.g /home/username/software/FASPR-master/FASPR)
+  /home/tiagogomes/software/FASPR-master/FASPR
+pulchra_path: # Path to (changed!) Pulchra (e.g. /home/username/software/pulchra-master/pulchra_CHANGED)
+  /home/tiagogomes/software/pulchra-master/pulchra_CHANGED
+######################################################################## Advanced Parameters ########################################################################
+core_amount: # Number of processor cores to use for parallel sampling
+  32
+scorefxn: # PyRosetta Score Function .wts weights file, default or custom, must be defined in /.../pyrosetta/database/scoring/weights/ .
+  id: score0 # Default ScoreFunction used is score0, with only a VdW score term.
+  weight: 1.0 # VdW score term weight. Will only have an effect if the ScoreFunction has a Van der Waals term.
+minimizer: # PyRosetta Minimizer (for MinMover)
+  id: dfpmin_armijo_nonmonotone # PyRosetta minimization algorithm.
+  tolerance: 0.001
+  max_iters: 5000
+  finalcycles: 5 # Number of final rounds of minimization to perform on each sampled structure.
+sampler_params:
+  MC: # Dictionary of parameters for each sampler used in targets
+    temperature: 200
+    max_loops: 200 
+constraints:
+  weight: 1.0 # Weight of the AtomPairConstraint score term in the ScoreFunction.
+  stdev: 10.0
+  tolerance: 0.001
+constraints_violation:
+  threshold: 0.015
+  maxres: 20 # Number of residues whose AtomPairConstraint's values are allowed to be above a certain threshold.
+plddt_params:
+  threshold: 70 # Sample residues with pLDDT below this number.
+  contiguous_res: 4 # If residue's pLDDT is below threshold, sample them only if they make up a contigous region of at least this size.
+pae_params:
+  cutoff: 10.0 # Only consider PAE values below this number.
+  flatten_cutoff: 10.0 # Any PAE values below this value will be changed to match flatten value.
+  flatten_value: 10.0 # Any PAE values below flatten cutoff will be changed to match this value.
+  weight: 1.0 # The stdev of AtomPairConstraints created from the PAE matrix is given by error x weight.
+  tolerance: 0.001 # The tol of AtomPairConstraints created from the PAE matrix is given by this value.
+  adjacency_threshold: 8 # How far away two residues need to be to consider their PAE value.
+  plddt_scaling_factor: 1.0 # Constraints between high pLDDT and low pLDDT residues will be made weaker through this scaling factor (high scaling factor -> weaker constraints)

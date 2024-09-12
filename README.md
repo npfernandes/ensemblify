@@ -32,11 +32,11 @@ If you prefer to create your own parameters file from scratch, a template file (
 </summary>    
 
 ## Ensemblify Python Package
-It is heavily recommended to install Ensemblify in a dedicated virtual environment. You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`.
+<!-- It is heavily recommended to install Ensemblify in a dedicated virtual environment. You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`.
 
 You can create a new environment named `ensemblify-env` directly by running:
 
-    conda env create ensemblify-env
+    conda env create ensemblify-env -->
 
 <!-- [TESTING SECTION]
 
@@ -50,7 +50,7 @@ Then, you can download the ensemblify source code from this repository and insta
 
 If you want to create a new `ensemblify-env` environment with Ensemblify and all its necessary python dependencies already installed you can use the provided conda environment file by running:
 
-    wget https://github.com/npfernandes/ensemblify/blob/main/environment.yml
+    wget https://raw.githubusercontent.com/npfernandes/ensemblify/main/environment.yml
     conda env create -f environment.yml
 
 <!-- The `ensemblify-env` environment should be activated before installing Ensemblify in the usual manner:

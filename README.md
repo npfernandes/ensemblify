@@ -170,7 +170,7 @@ For UNIX or Linux users run:
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/GROMACS/ -->
     wget -O gromacs-2024.2.tar.gz https://zenodo.org/records/11148655/files/gromacs-2024.2.tar.gz?download=1
 
-After downloading the GROMACS source-code, you can build it following the [GROMACS installation instructions](https://manual.gromacs.org/documentation/current/install-guide/index.html).
+After downloading the GROMACS source-code, you can build it (~45mins) following the [GROMACS installation instructions](https://manual.gromacs.org/documentation/current/install-guide/index.html).
 
 For UNIX or Linux users run:
 

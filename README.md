@@ -76,16 +76,16 @@ Alternatively, Ensemblify is available via the Python Package Index:
     conda activate ensemblify_env   
     pip install ensemblify --upgrade -->
 
-## Third-Party Software
-Each of Ensemblify's modules has different dependencies to third-party software, so if you only plan on only using a certain module you do not have to install software required for others. The dependencies are:
+## third_party Software
+Each of Ensemblify's modules has different dependencies to third_party software, so if you only plan on only using a certain module you do not have to install software required for others. The dependencies are:
 
 - `generation` module: [PyRosetta](#pyrosetta), [FASPR](#faspr) and [PULCHRA](#pulchra).
 
 - `conversion` module: [GROMACS](#gromacs), [Pepsi-SAXS](#pepsi-saxs) and optionally [BIFT](#bift).
 
-- `analysis` module: no third-party software required.
+- `analysis` module: no third_party software required.
 
-- `reweighting` module: no third-party software required.
+- `reweighting` module: no third_party software required.
 
 ### PyRosetta
 PyRosetta is a Python-based interface to the powerful Rosetta molecular modeling suite [[1]](#ref1). Its functionalities are used and extended through Ensemblify in order to generate conformational ensembles.
@@ -119,22 +119,22 @@ You will need to compile the provided FASPR source-code.
 For UNIX or Linux users run:
 
     conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third-party/FASPR-master/
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/FASPR-master/ -->
+    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/ -->
     g++ -O3 --fast-math -o FASPR src/*.cpp
 
 For Mac users run:
     
     conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third-party/FASPR-master/
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/FASPR-master/ -->
+    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/ -->
     g++ -03 -fast-math -o FASPR src/*.cpp
 
 or
 
     conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third-party/FASPR-master/
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/FASPR-master/ -->
+    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/ -->
     g++ -03 -o FASPR src/*.cpp
 
 To register `faspr` as an alias for your FASPR executable in your bash shell run:
@@ -148,8 +148,8 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
 You will need to compile the provided PULCHRA modified source-code, by running:
 
     conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third-party/pulchra-master/
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/pulchra-master/ -->
+    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/pulchra-master/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/pulchra-master/ -->
     cc -O3 -o pulchra pulchra_CHANGED.c pulchra_data.c -lm
 
 To register `pulchra` as an alias for your PULCHRA executable in your bash shell run:
@@ -166,8 +166,8 @@ You will need to download and compile the GROMACS source code from their [websit
 For UNIX or Linux users run:
 
     conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third-party/GROMACS/
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/GROMACS/ -->
+    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/GROMACS/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/GROMACS/ -->
     wget -O gromacs-2024.2.tar.gz https://zenodo.org/records/11148655/files/gromacs-2024.2.tar.gz?download=1
 
 After downloading the GROMACS source-code, you can build it following the [GROMACS installation instructions](https://manual.gromacs.org/documentation/current/install-guide/index.html).
@@ -194,16 +194,16 @@ You will need to download and unzip the Pepsi-SAXS executable from their [websit
 For UNIX or Linux users run:
 
     conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third-party/Pepsi-SAXS/Linux_3.0/
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/Pepsi-SAXS/Linux_3.0/ -->
+    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/ -->
     wget -O Pepsi-SAXS-Linux.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/Linux/3.0/Pepsi-SAXS-Linux.zip
     unzip Pepsi-SAXS-Linux.zip
 
 For MacOS users run:
 
     conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third-party/Pepsi-SAXS/MacOS_2.6/
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/Pepsi-SAXS/MacOS_2.6/ -->
+    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/ -->
     curl -O Pepsi-SAXS-MacOS.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/MacOS/2.6/Pepsi-SAXS.zip
     unzip Pepsi-SAXS-MacOS.zip
 
@@ -218,8 +218,8 @@ Bayesian indirect Fourier transformation (BIFT) of small-angle experimental data
 You will need to compile the provided BIFT source-code by running:
     
     conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third-party/BIFT/
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/BIFT/ -->
+    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/BIFT/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/BIFT/ -->
     gfortran -march=native -O3 bift.f -o bift
 
 - the `-march=native` flag may be replaced with `-m64` or `-m32`, and it may be necessary to include the `-static` flag depending on which system you are on.

@@ -38,17 +38,18 @@ It is heavily recommended to install Ensemblify in a dedicated virtual environme
 First create a folder to store downloaded files throughout the installation:
 
     mkdir -p ~/ensemblify_installation
+
+In the newly created folder, download the ensemblify source code from this repository along with the provided conda environment file and create your `ensemblify_env` conda environment with all of Ensemblify's python dependencies installed by running:
+
     cd ~/ensemblify_installation
-
-Then download the ensemblify source code from this repository along with the provided conda environment file and create your `ensemblify_env` conda environment with all of Ensemblify's python dependencies installed by running:
-
-    wget https://github.com/npfernandes/ensemblify/archive/refs/heads/main.zip
-    unzip main.zip
-    cd ensemblify-main
+    wget -O ~/ensemblify_installation https://github.com/npfernandes/ensemblify/archive/refs/heads/main.zip
+    unzip ~/ensemblify_installation/main.zip
+    cd ~/ensemblify_installation/ensemblify-main
     conda env create -f environment.yml
 
 Finally install the ensemblify python package it into your newly created `ensemblify_env` conda environment.
 
+    cd ~/ensemblify_installation/ensemblify-main
     conda activate ensemblify_env
     pip install -e .
 

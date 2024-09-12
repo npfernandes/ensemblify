@@ -76,7 +76,7 @@ Alternatively, Ensemblify is available via the Python Package Index:
     conda activate ensemblify_env   
     pip install ensemblify --upgrade -->
 
-## third_party Software
+## Third Party Software
 Each of Ensemblify's modules has different dependencies to third_party software, so if you only plan on only using a certain module you do not have to install software required for others. The dependencies are:
 
 - `generation` module: [PyRosetta](#pyrosetta), [FASPR](#faspr) and [PULCHRA](#pulchra).

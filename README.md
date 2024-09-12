@@ -16,14 +16,15 @@ In a terminal window:
     ensemblify -p PARAMETERS_FILEPATH
 
 ## Setting up your parameters file
-An [.html form](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_form.html) (./docs/assets/parameters_form.html) is provided to aid you in building your parameters file.
+An [.html form](docs/assets/parameters_form.html) is provided to aid you in building your parameters file.
 <details open>  
   <summary><b>Parameters Form Preview</b></summary>
 
-  ![alt text](docs/assets/parameters_form_svg.svg)
+  ![alt text](docs/assets/parameters_form_preview_.svg)
 </details>
 <br>
-If you prefer to create your own parameters file from scratch, a template file (./docs/assets/parameters_template.yaml) is also provided.
+
+If you prefer to create your own parameters file from scratch, a [template file](docs/assets/parameters_template.yaml) is also provided.
 
 <details><summary>
 
@@ -34,7 +35,25 @@ If you prefer to create your own parameters file from scratch, a template file (
 ## Ensemblify Python Package
 It is heavily recommended to install Ensemblify in a dedicated virtual environment. You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).
 
-You can create a new environment named `ensemblify_env`, download the ensemblify source code from this repository and install it in your `ensemblify_env` environment by running:
+First create a folder to store downloaded files throughout the installation:
+
+    mkdir -p ~/ensemblify_installation
+    cd ~/ensemblify_installation
+
+Then create your `ensemblify_env` conda environment with all of Ensemblify's python dependencies installed by running:
+
+    wget https://raw.githubusercontent.com/npfernandes/ensemblify/main/environment.yml
+    conda env create -f environment.yml
+
+Finally download the ensemblify source code from this repository and install it into your newly created `ensemblify_env` conda environment.
+
+    wget https://github.com/npfernandes/ensemblify/archive/refs/heads/main.zip
+    unzip main.zip
+    mv ensemblify-main ensemblify
+    conda activate ensemblify_env
+    pip install -e .
+
+<!-- You can create a new environment named `ensemblify_env`, download the ensemblify source code from this repository and install it in your `ensemblify_env` environment (along with all its python dependencies) by running:
 
     conda env create ensemblify_env
     conda activate ensemblify_env
@@ -46,7 +65,7 @@ You can create a new environment named `ensemblify_env`, download the ensemblify
 If you want to create a new `ensemblify_env` environment with Ensemblify and all its necessary python dependencies already installed you can use the provided conda environment file by running:
 
     wget https://raw.githubusercontent.com/npfernandes/ensemblify/main/environment.yml
-    conda env create -f environment.yml
+    conda env create -f environment.yml -->
 
 <!-- The `ensemblify_env` environment should be activated before installing Ensemblify in the usual manner:
 
@@ -101,19 +120,22 @@ You will need to compile the provided FASPR source-code.
 For UNIX or Linux users run:
 
     conda activate ensemblify_env
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/FASPR-master/
+    cd ~/ensemblify_installation/ensemblify/third-party/FASPR-master/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/FASPR-master/ -->
     g++ -O3 --fast-math -o FASPR src/*.cpp
 
 For Mac users run:
     
     conda activate ensemblify_env
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/FASPR-master/
+    cd ~/ensemblify_installation/ensemblify/third-party/FASPR-master/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/FASPR-master/ -->
     g++ -03 -fast-math -o FASPR src/*.cpp
 
 or
 
     conda activate ensemblify_env
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/FASPR-master/
+    cd ~/ensemblify_installation/ensemblify/third-party/FASPR-master/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/FASPR-master/ -->
     g++ -03 -o FASPR src/*.cpp
 
 To register `faspr` as an alias for your FASPR executable in your bash shell run:
@@ -127,7 +149,8 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
 You will need to compile the provided PULCHRA modified source-code, by running:
 
     conda activate ensemblify_env
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/pulchra-master/
+    cd ~/ensemblify_installation/ensemblify/third-party/pulchra-master/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/pulchra-master/ -->
     cc -O3 -o pulchra pulchra_CHANGED.c pulchra_data.c -lm
 
 To register `pulchra` as an alias for your PULCHRA executable in your bash shell run:
@@ -144,7 +167,8 @@ You will need to download and compile the GROMACS source code from their [websit
 For UNIX or Linux users run:
 
     conda activate ensemblify_env
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/GROMACS/
+    cd ~/ensemblify_installation/ensemblify/third-party/GROMACS/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/GROMACS/ -->
     wget -O gromacs-2024.2.tar.gz https://zenodo.org/records/11148655/files/gromacs-2024.2.tar.gz?download=1
 
 After downloading the GROMACS source-code, you can build it following the [GROMACS installation instructions](https://manual.gromacs.org/documentation/current/install-guide/index.html).
@@ -171,14 +195,16 @@ You will need to download and unzip the Pepsi-SAXS executable from their [websit
 For UNIX or Linux users run:
 
     conda activate ensemblify_env
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/Pepsi-SAXS/Linux_3.0/
+    cd ~/ensemblify_installation/ensemblify/third-party/Pepsi-SAXS/Linux_3.0/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/Pepsi-SAXS/Linux_3.0/ -->
     wget -O Pepsi-SAXS-Linux.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/Linux/3.0/Pepsi-SAXS-Linux.zip
     unzip Pepsi-SAXS-Linux.zip
 
 For MacOS users run:
 
     conda activate ensemblify_env
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/Pepsi-SAXS/MacOS_2.6/
+    cd ~/ensemblify_installation/ensemblify/third-party/Pepsi-SAXS/MacOS_2.6/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/Pepsi-SAXS/MacOS_2.6/ -->
     curl -O Pepsi-SAXS-MacOS.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/MacOS/2.6/Pepsi-SAXS.zip
     unzip Pepsi-SAXS-MacOS.zip
 
@@ -193,7 +219,8 @@ Bayesian indirect Fourier transformation (BIFT) of small-angle experimental data
 You will need to compile the provided BIFT source-code by running:
     
     conda activate ensemblify_env
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/BIFT/
+    cd ~/ensemblify_installation/ensemblify/third-party/BIFT/
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third-party/BIFT/ -->
     gfortran -march=native -O3 bift.f -o bift
 
 - the `-march=native` flag may be replaced with `-m64` or `-m32`, and it may be necessary to include the `-static` flag depending on which system you are on.

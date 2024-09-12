@@ -139,8 +139,7 @@ or
 
 To register `faspr` as an alias for your FASPR executable in your bash shell run:
 
-    PATH_TO_FASPR_EXECUTABLE=$(realpath FASPR)
-    echo "alias faspr='$PATH_TO_FASPR_EXECUTABLE'" >> ~/.bashrc
+    echo "alias faspr='$(realpath FASPR)'" >> ~/.bashrc
 
 ### PULCHRA
 PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing full-atom protein models from reduced representations [[3]](#ref3).
@@ -154,8 +153,7 @@ You will need to compile the provided PULCHRA modified source-code, by running:
 
 To register `pulchra` as an alias for your PULCHRA executable in your bash shell run:
 
-    PATH_TO_PULCHRA_EXECUTABLE=$(realpath pulchra)
-    echo "alias pulchra='$PATH_TO_PULCHRA_EXECUTABLE'" >> ~/.bashrc 
+    echo "alias pulchra='$(realpath pulchra)'" >> ~/.bashrc 
 
 ### GROMACS
 GROMACS is a molecular dynamics package mainly designed for simulations of proteins, lipids, and nucleic acids [[4]](#ref4).
@@ -196,7 +194,7 @@ You will need to download and unzip the Pepsi-SAXS executable from their [websit
 For UNIX or Linux users run:
 
     conda activate ensemblify_env
-    mkdir ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/
+    mkdir -p ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/
     cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/
 <!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/ -->
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/ -->
@@ -206,7 +204,7 @@ For UNIX or Linux users run:
 For MacOS users run:
 
     conda activate ensemblify_env
-    mkdir ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/
+    mkdir -p ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/
     cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/
 <!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/ -->
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/ -->
@@ -215,8 +213,7 @@ For MacOS users run:
 
 To register `pepsi-saxs` as an alias for your Pepsi-SAXS executable in your bash shell run:
 
-    PATH_TO_Pepsi-SAXS_EXECUTABLE=$(realpath Pepsi-SAXS)
-    echo "alias pepsi-saxs='PATH_TO_Pepsi-SAXS_EXECUTABLE'" >> ~/.bashrc
+    echo "alias pepsi-saxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
 
 ### BIFT
 Bayesian indirect Fourier transformation (BIFT) of small-angle experimental data allows for an estimation of parameters that describe the data [[6]](#ref6). Larsen *et al.* show in [[7]](#ref7) that BIFT can identify whether the experimental error in small-angle scattering data is over or underestimated. Here we use their implementation of this method to make this determination and scale the error values accordingly.
@@ -232,8 +229,8 @@ You will need to compile the provided BIFT source-code by running:
 
 To register `bift` as an alias for your BIFT executable in your bash shell run:
 
-    PATH_TO_BIFT_EXECUTABLE=$(realpath bift)
-    echo "alias bift='PATH_TO_BIFT_EXECUTABLE'" >> ~/.bashrc
+    echo "alias bift='$(realpath bift)'" >> ~/.bashrc
+
 </details>
 
 <details>  

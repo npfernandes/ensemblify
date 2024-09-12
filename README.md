@@ -20,7 +20,7 @@ An [.html form](docs/assets/parameters_form.html) is provided to aid you in buil
 <details open>  
   <summary><b>Parameters Form Preview</b></summary>
 
-  ![alt text](docs/assets/parameters_form_preview_.svg)
+  ![alt text](docs/assets/parameters_form_preview.svg)
 </details>
 <br>
 
@@ -166,7 +166,9 @@ You will need to download and compile the GROMACS source code from their [websit
 For UNIX or Linux users run:
 
     conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/GROMACS/
+    mkdir ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/GROMACS
+    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/GROMACS
+<!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/GROMACS/ -->
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/GROMACS/ -->
     wget -O gromacs-2024.2.tar.gz https://zenodo.org/records/11148655/files/gromacs-2024.2.tar.gz?download=1
 
@@ -194,7 +196,9 @@ You will need to download and unzip the Pepsi-SAXS executable from their [websit
 For UNIX or Linux users run:
 
     conda activate ensemblify_env
+    mkdir ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/
     cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/
+<!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/ -->
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/ -->
     wget -O Pepsi-SAXS-Linux.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/Linux/3.0/Pepsi-SAXS-Linux.zip
     unzip Pepsi-SAXS-Linux.zip
@@ -202,7 +206,9 @@ For UNIX or Linux users run:
 For MacOS users run:
 
     conda activate ensemblify_env
+    mkdir ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/
     cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/
+<!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/ -->
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/ -->
     curl -O Pepsi-SAXS-MacOS.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/MacOS/2.6/Pepsi-SAXS.zip
     unzip Pepsi-SAXS-MacOS.zip

@@ -33,16 +33,20 @@ If you prefer to create your own parameters file from scratch, a [template file]
 </summary>    
 
 ## Ensemblify Python Package
-It is heavily recommended to install Ensemblify in a dedicated virtual environment. You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html). We recommend installing [miniconda](https://docs.anaconda.com/miniconda/#quick-command-line-install), a free minimal installer for conda. To install the `ensemblify` package, you can follow these commands:
+It is heavily recommended to install Ensemblify in a dedicated virtual environment.
 
-0. Choose your current working directory. The `ensemblify` package and any third-party software will be installed there. You can choose your desired location or simply create a new directory dedicated to the ensemblify installation in your home directory by running:
+You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html). We recommend [miniconda](https://docs.anaconda.com/miniconda/#quick-command-line-install), a free minimal installer for conda.
+
+To install the `ensemblify` package, you can follow these commands:
+
+1. Choose your current working directory. The `ensemblify` package and any third-party software will be installed there. You can choose your desired location or simply create a new directory dedicated to the ensemblify installation in your home directory by running:
 
     ```bash
     mkdir -p ~/ensemblify_installation
     cd ~/ensemblify_installation
     ```
 
-1. Download and extract the ensemblify source code from this repository:
+2. Download and extract the ensemblify source code from this repository:
 
     ```bash
     cd ~/ensemblify_installation
@@ -56,13 +60,13 @@ It is heavily recommended to install Ensemblify in a dedicated virtual environme
     cd ensemblify-main
     ```
 
-2. Create your `ensemblify_env` conda environment with all of Ensemblify's python dependencies installed by using the provided conda environment file:
+3. Create your `ensemblify_env` conda environment with all of Ensemblify's python dependencies installed by using the provided conda environment file:
 
     ```bash
     conda env create -f environment.yml
     ```
 
-3. Install the `ensemblify` python package it into your newly created `ensemblify_env` conda environment.
+4. Install the `ensemblify` python package it into your newly created `ensemblify_env` conda environment.
 
     ```bash
     conda activate ensemblify_env
@@ -137,34 +141,55 @@ Remember to re-activate the `ensemblify_env` conda environment each time you wis
 
 ### FASPR
 
-FASPR is an ultra-fast and accurate program for deterministic protein sidechain packing [[2]](#ref2).
+FASPR is an ultra-fast and accurate program for deterministic protein sidechain packing [[2]](#ref2). To compile the provided FASPR source-code, you can follow these commands:
 
-You will need to compile the provided FASPR source-code.
+For UNIX or Linux users:
 
-1a. For UNIX or Linux users run:
+1. Navigate to where the FASPR source code is located:
 
-    conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
+    ```bash
+    cd ./ensemblify-main/src/ensemblify/third_party/FASPR-master/
+    ```
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/ -->
+
+2. Compile the FASPR source code:
+
+    ```bash
     g++ -O3 --fast-math -o FASPR src/*.cpp
+    ```
 
-1b. For Mac users run:
-    
-    conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/ -->
-    g++ -03 -fast-math -o FASPR src/*.cpp
+3. If you are using a bash shell, you can register `faspr` as an alias for your FASPR executable by running:
 
-    or
-
-    conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/ -->
-    g++ -03 -o FASPR src/*.cpp
-
-2. To register `faspr` as an alias for your FASPR executable in your bash shell run:
-
+    ```bash
     echo "alias faspr='$(realpath FASPR)'" >> ~/.bashrc
+    ```
+
+For MacOS users:
+
+1. Navigate to where the FASPR source code is located:
+
+    ```bash
+    cd ./ensemblify-main/src/ensemblify/third_party/FASPR-master/
+    ```
+<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/ -->
+
+2. Compile the FASPR source code:
+
+    ```bash
+    g++ -03 -fast-math -o FASPR src/*.cpp
+    ```
+
+    or, if you get an error
+
+    ```bash
+    g++ -03 -o FASPR src/*.cpp
+    ```
+
+3. If you are using a bash shell, you can register `faspr` as an alias for your FASPR executable by running:
+
+    ```bash
+    echo "alias faspr='$(realpath FASPR)'" >> ~/.bashrc
+    ```
 
 ### PULCHRA
 PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing full-atom protein models from reduced representations [[3]](#ref3).

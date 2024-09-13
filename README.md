@@ -217,21 +217,26 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
 GROMACS is a molecular dynamics package mainly designed for simulations of proteins, lipids, and nucleic acids [[4]](#ref4).
 It comes with a large selection of flexible tools for trajectory analysis and the output formats are also supported by all major analysis and visualisation packages.
 
-You will need to download and compile the GROMACS source code from their [website](https://ftp.gromacs.org/gromacs/gromacs-2024.2.tar.gz).
+To download and compile the GROMACS source code from their [website](https://ftp.gromacs.org/gromacs/gromacs-2024.2.tar.gz) you can follow these commands:
 
-For UNIX or Linux users run:
+1. Create and navigate into the GROMACS installation directory:
 
-    conda activate ensemblify_env
-    mkdir ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/GROMACS
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/GROMACS
+    ```bash
+    mkdir ./ensemblify-main/src/ensemblify/third_party/GROMACS
+    cd ./ensemblify-main/src/ensemblify/third_party/GROMACS
+    ```
 <!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/GROMACS/ -->
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/GROMACS/ -->
+
+2. Download the GROMACS source code from their website:
+
+    ```bash
     wget -O gromacs-2024.2.tar.gz https://zenodo.org/records/11148655/files/gromacs-2024.2.tar.gz?download=1
+    ```
 
-After downloading the GROMACS source-code, you can build it (~45mins) following the [GROMACS installation instructions](https://manual.gromacs.org/documentation/current/install-guide/index.html).
+3. Follow the [GROMACS installation instructions](https://manual.gromacs.org/documentation/current/install-guide/index.html) to compile the GROMACS source code (this could take a while):
 
-For UNIX or Linux users run:
-
+    ```bash
     tar xfz gromacs-2024.2.tar.gz
     cd gromacs-2024.2
     mkdir build
@@ -241,53 +246,87 @@ For UNIX or Linux users run:
     make check
     sudo make install
     source /usr/local/gromacs/bin/GMXRC
+    ```
 
 The `gmx` command should already be registered as an alias for your GROMACS installation.
 
 ### PEPSI-SAXS
 Pepsi-SAXS (Polynomial Expansions of Protein Structures and Interactions - SAXS) is an adaptive method for rapid and accurate computation of small-angle X-ray scattering (SAXS) profiles from atomistic protein models [[5]](#ref5).
 
-You will need to download and unzip the Pepsi-SAXS executable from their [website](https://team.inria.fr/nano-d/software/pepsi-saxs/).
+To download the Pepsi-SAXS executable from their [website](https://team.inria.fr/nano-d/software/pepsi-saxs/) you can follow these commands:
 
-For UNIX or Linux users run:
+For UNIX or Linux users:
 
-    conda activate ensemblify_env
-    mkdir -p ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/
+1. Create and navigate into the Pepsi-SAXS installation directory:
+
+    ```bash
+    mkdir -p ./ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/
+    cd ./ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/
+    ```
 <!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/ -->
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/ -->
+
+2. Download and extract the Pepsi-SAXS Linux executable:
+
+    ```bash
     wget -O Pepsi-SAXS-Linux.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/Linux/3.0/Pepsi-SAXS-Linux.zip
     unzip Pepsi-SAXS-Linux.zip
+    ```
+
+3. If you are using a bash shell, you can register `pepsi_saxs` as an alias for your Pepsi-SAXS executable by running:
+
+    ```bash
+    echo "alias pepsi_saxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
+    ```
 
 For MacOS users run:
 
-    conda activate ensemblify_env
-    mkdir -p ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/
+1. Create and navigate into the Pepsi-SAXS installation directory:
+
+    ```bash
+    mkdir -p ./ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/
+    cd ./ensemblify-main/src/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/
+    ```
 <!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/ -->
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/ -->
+
+2. Download and extract the Pepsi-SAXS MacOS executable:
+
+    ```bash
     curl -O Pepsi-SAXS-MacOS.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/MacOS/2.6/Pepsi-SAXS.zip
     unzip Pepsi-SAXS-MacOS.zip
+    ```
 
-To register `pepsi_saxs` as an alias for your Pepsi-SAXS executable in your bash shell run:
+3. If you are using a bash shell, you can register `pepsi_saxs` as an alias for your Pepsi-SAXS executable by running:
 
+    ```bash
     echo "alias pepsi_saxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
+    ```
 
 ### BIFT
 Bayesian indirect Fourier transformation (BIFT) of small-angle experimental data allows for an estimation of parameters that describe the data [[6]](#ref6). Larsen *et al.* show in [[7]](#ref7) that BIFT can identify whether the experimental error in small-angle scattering data is over or underestimated. Here we use their implementation of this method to make this determination and scale the error values accordingly.
 
-You will need to compile the provided BIFT source-code by running:
+To compile the provided BIFT source code, you can follow these commands:
+
+1. Navigate to where the BIFT source code is located:
     
-    conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/BIFT/
+    ```bash
+    cd ./ensemblify-main/src/ensemblify/third_party/BIFT/
+    ```
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/BIFT/ -->
+
+2. Compile the BIFT source code:
+
+    ```bash
     gfortran -march=native -O3 bift.f -o bift
+    ```
+    the `-march=native` flag may be replaced with `-m64` or `-m32`, and it may be necessary to include the `-static` flag depending on which system you are on.
 
-- the `-march=native` flag may be replaced with `-m64` or `-m32`, and it may be necessary to include the `-static` flag depending on which system you are on.
+3. If you are using a bash shell, you can register `bift` as an alias for your bift executable by running:
 
-To register `bift` as an alias for your BIFT executable in your bash shell run:
-
+    ```bash
     echo "alias bift='$(realpath bift)'" >> ~/.bashrc
+    ```
 
 </details>
 

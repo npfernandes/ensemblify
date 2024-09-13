@@ -1,7 +1,30 @@
 # Ensemblify: A Python package for generating ensembles of intrinsically disordered regions of AlphaFold or user defined models
 
-# Overview
-Ensemblify is a python package that generates diverse protein conformations by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of an input protein of interest (e.g intrinsically disordered regions (IDRs)). It supports both user-defined models and AlphaFold predictions, using PAE and pLDDT confidence metrics to guide the conformational sampling process. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
+## What is Ensemblify?
+
+Ensemblify is a python package that generates diverse protein conformations by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of an input protein of interest (e.g intrinsically disordered regions (IDRs)).
+
+It supports both user-defined models and AlphaFold predictions, using PAE and pLDDT confidence metrics to guide the conformational sampling process. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
+
+## How do I install Ensemblify?
+Step-by-step instructions for installing Ensemblify are available in the [Installation](#installation) section.
+
+## How can I use Ensemblify?
+Ensemblify can be used either as a Command Line Interface (CLI) like so:
+
+    ensemblify [options]
+
+or as a library inside a Python script or notebook:
+
+    import ensemblify as ey
+    ey.do_cool_stuff()
+
+Check the [Usage](#usage) section for more details and links to example Jupyter notebooks.
+
+## How does Ensemblify work?
+A general overview of Ensemblify, descriptions of employed methods and applications can be found in the Ensemblify paper:
+
+    PAPER
 
 <details><summary>
 
@@ -349,6 +372,17 @@ An [.html form](docs/assets/parameters_form.html) is provided to aid you in buil
 <br>
 
 If you prefer to create your own parameters file from scratch, a [template file](docs/assets/parameters_template.yaml) is also provided.
+</details>
+
+<details>
+  <summary>
+    
+  # API Documentation
+    
+  </summary>
+
+Ensemblify's API documentation is available at https://ensemblify.readthedocs.io/en/latest/index.html.
+
 </details>
 
 <details>  

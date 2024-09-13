@@ -1,30 +1,7 @@
 # Ensemblify: A Python package for generating ensembles of intrinsically disordered regions of AlphaFold or user defined models
 
 # Overview
-Ensemblify works by sampling dihedral angle values from a three-residue fragment database and repeatedly inserting them into flexible regions of a protein of interest, generating conformational ensembles.
-
-# Usage
-To use the package you simply need to import it and call the desired function. If you want to generate an ensemble, provide the path to the parameters file that you created using the provided [parameters form](#setting-up-your-parameters-file).
-
-Inside a Python script or Jupyter Notebook:
-
-    import ensemblify as ey
-    ey.generate_ensemble(PARAMETERS_FILEPATH)
-
-In a terminal window:
-
-    ensemblify -p PARAMETERS_FILEPATH
-
-## Setting up your parameters file
-An [.html form](docs/assets/parameters_form.html) is provided to aid you in building your parameters file.
-<details open>  
-  <summary><b>Parameters Form Preview</b></summary>
-
-  ![alt text](docs/assets/parameters_form_preview.svg)
-</details>
-<br>
-
-If you prefer to create your own parameters file from scratch, a [template file](docs/assets/parameters_template.yaml) is also provided.
+Ensemblify is a python package that generates diverse protein conformations by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of an input protein of interest (e.g intrinsically disordered regions (IDRs)). It supports both user-defined models and AlphaFold predictions, using PAE and pLDDT confidence metrics to guide the conformational sampling process. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
 
 <details><summary>
 
@@ -33,20 +10,20 @@ If you prefer to create your own parameters file from scratch, a [template file]
 </summary>    
 
 ## Ensemblify Python Package
-It is heavily recommended to install Ensemblify in a dedicated virtual environment.
+It is heavily recommended to install the `ensemblify` Python package in a dedicated virtual environment.
 
 You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html). We recommend [miniconda](https://docs.anaconda.com/miniconda/#quick-command-line-install), a free minimal installer for conda.
 
 To install the `ensemblify` package, you can follow these commands:
 
-1. Choose your current working directory. The `ensemblify` package and any third-party software will be installed there. You can choose your desired location or simply create a new directory dedicated to the ensemblify installation in your home directory by running:
+1. Choose your current working directory, where the `ensemblify` package and any third-party software will be installed. You can create a new directory dedicated to the ensemblify installation in your home directory and navigate into it by running:
 
     ```bash
     mkdir -p ~/ensemblify_installation
     cd ~/ensemblify_installation
     ```
 
-2. Download and extract the ensemblify source code from this repository:
+2. Download and extract the `ensemblify` source code from this repository:
 
     ```bash
     cd ~/ensemblify_installation
@@ -60,13 +37,22 @@ To install the `ensemblify` package, you can follow these commands:
     cd ensemblify-main
     ```
 
-3. Create your `ensemblify_env` conda environment with all of Ensemblify's python dependencies installed by using the provided conda environment file:
+3. Create your `ensemblify_env` [Conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) with all of Ensemblify's python dependencies installed by using the provided environment file (recommended):
 
     ```bash
     conda env create -f environment.yml
     ```
 
-4. Install the `ensemblify` python package it into your newly created `ensemblify_env` conda environment.
+    or by creating the environment and installing the necessary python packages directly (not recommended):
+
+    ```bash
+    conda env create --name ensemblify_env
+    conda activate ensemblify_env
+    conda install --channel=conda-forge biopython contact_map MDAnalysis mdtraj numpy pandas plotly pyyaml scikit-sklearn scipy tqdm
+    pip install ray["default"]
+    ```
+
+4. Install the `ensemblify` python package it into your newly created environment.
 
     ```bash
     conda activate ensemblify_env
@@ -98,7 +84,7 @@ Alternatively, Ensemblify is available via the Python Package Index:
     pip install ensemblify --upgrade -->
 
 ## Third Party Software
-Each of Ensemblify's modules has different dependencies to third_party software, so if you only plan on only using a certain module you do not have to install software required for others. The requirements are:
+Each of Ensemblify's modules has different dependencies to third party software, so if you only plan on only using a certain module you do not have to install software required for others. The requirements are:
 
 - `generation` module: [PyRosetta](#pyrosetta), [FASPR](#faspr) and [PULCHRA](#pulchra).
 
@@ -162,6 +148,7 @@ For UNIX or Linux users:
 
     ```bash
     echo "alias faspr='$(realpath FASPR)'" >> ~/.bashrc
+    source ~/.bashrc
     ```
 
 For MacOS users:
@@ -189,6 +176,7 @@ For MacOS users:
 
     ```bash
     echo "alias faspr='$(realpath FASPR)'" >> ~/.bashrc
+    source ~/.bashrc
     ```
 
 ### PULCHRA
@@ -210,7 +198,8 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
 3. If you are using a bash shell, you can register `pulchra` as an alias for your PULCHRA executable by running:
 
     ```bash
-    echo "alias pulchra='$(realpath pulchra)'" >> ~/.bashrc 
+    echo "alias pulchra='$(realpath pulchra)'" >> ~/.bashrc
+    source ~/.bashrc
     ```
 
 ### GROMACS
@@ -277,6 +266,7 @@ For UNIX or Linux users:
 
     ```bash
     echo "alias pepsi_saxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
+    source ~/.bashrc
     ```
 
 For MacOS users run:
@@ -301,6 +291,7 @@ For MacOS users run:
 
     ```bash
     echo "alias pepsi_saxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
+    source ~/.bashrc
     ```
 
 ### BIFT
@@ -326,8 +317,38 @@ To compile the provided BIFT source code, you can follow these commands:
 
     ```bash
     echo "alias bift='$(realpath bift)'" >> ~/.bashrc
+    source ~/.bashrc
     ```
 
+</details>
+
+<details>  
+  <summary>
+  
+  # Usage
+  
+  </summary>   
+To use the package you simply need to import it and call the desired function. If you want to generate an ensemble, provide the path to the parameters file that you created using the provided [parameters form](#setting-up-your-parameters-file).
+
+Inside a Python script or Jupyter Notebook:
+
+    import ensemblify as ey
+    ey.generate_ensemble(PARAMETERS_FILEPATH)
+
+In a terminal window:
+
+    ensemblify -p PARAMETERS_FILEPATH
+
+## Setting up your parameters file
+An [.html form](docs/assets/parameters_form.html) is provided to aid you in building your parameters file.
+<details open>  
+  <summary><b>Parameters Form Preview</b></summary>
+
+  ![alt text](docs/assets/parameters_form_preview.svg)
+</details>
+<br>
+
+If you prefer to create your own parameters file from scratch, a [template file](docs/assets/parameters_template.yaml) is also provided.
 </details>
 
 <details>  
@@ -337,7 +358,7 @@ To compile the provided BIFT source code, you can follow these commands:
   
   </summary>   
 
-Ensemblify provides a three-residue fragment (tripeptide) database from which to sample dihedral angles. As described by González-Delgado *et al.* in [[8]](#ref8), this database was built by extracting dihedral angles from structures taken from the SCOPe [[9]](#ref9) [[10]](#ref10) 2.07 release, a curated database of high-resolution experimentally determined protein structures.
+Ensemblify provides a three-residue fragment (tripeptide) database from which to sample dihedral angles. This database was created and made available by González-Delgado *et al.* and, as described in [[8]](#ref8), it was built by extracting dihedral angles from structures taken from the SCOPe [[9]](#ref9) [[10]](#ref10) 2.07 release, a curated database of high-resolution experimentally determined protein structures.
 In total, 6,740,433 tripeptide dihedral angle values were extracted, making up the *all* dataset. A structurally filtered dataset, *coil*, was generated by removing tripeptides contained in α-helices or β-strands, reducing the number of tripeptide dihedral angle values to 3,141,877.
 
 ## Using your own database
@@ -375,6 +396,18 @@ Your database must contain at least 4 columns: 3 containing the Phi, Psi and Ome
 If you use Ensemblify, please cite its original publication:
 
     PUB
+
+</details>
+
+<details>  
+  <summary>
+  
+  # Acknowledgements
+  
+  </summary> 
+
+We would like to thank the DeepMind team for developing AlphaFold.
+We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS institute for creating the tripeptide database used in the development of this tool. Check out their work at https://moma.laas.fr/.
 
 </details>
 

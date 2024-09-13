@@ -33,25 +33,41 @@ If you prefer to create your own parameters file from scratch, a [template file]
 </summary>    
 
 ## Ensemblify Python Package
-It is heavily recommended to install Ensemblify in a dedicated virtual environment. You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).
+It is heavily recommended to install Ensemblify in a dedicated virtual environment. You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html). We recommend installing [miniconda](https://docs.anaconda.com/miniconda/#quick-command-line-install), a free minimal installer for conda. To install the `ensemblify` package, you can follow these commands:
 
-First create a folder to store downloaded files throughout the installation:
+0. Choose your current working directory. The `ensemblify` package and any third-party software will be installed there. You can choose your desired location or simply create a new directory dedicated to the ensemblify installation in your home directory by running:
 
+    ```bash
     mkdir -p ~/ensemblify_installation
-
-In the newly created folder, download the ensemblify source code from this repository along with the provided conda environment file and create your `ensemblify_env` conda environment with all of Ensemblify's python dependencies installed by running:
-
     cd ~/ensemblify_installation
-    wget -O ~/ensemblify_installation https://github.com/npfernandes/ensemblify/archive/refs/heads/main.zip
-    unzip ~/ensemblify_installation/main.zip
-    cd ~/ensemblify_installation/ensemblify-main
+    ```
+
+1. Download and extract the ensemblify source code from this repository:
+
+    ```bash
+    cd ~/ensemblify_installation
+    wget https://github.com/npfernandes/ensemblify/archive/refs/heads/main.zip
+    unzip main.zip
+    ```
+
+    and navigate into the directory with the extracted files.
+
+    ```bash
+    cd ensemblify-main
+    ```
+
+2. Create your `ensemblify_env` conda environment with all of Ensemblify's python dependencies installed by using the provided conda environment file:
+
+    ```bash
     conda env create -f environment.yml
+    ```
 
-Finally install the ensemblify python package it into your newly created `ensemblify_env` conda environment.
+3. Install the `ensemblify` python package it into your newly created `ensemblify_env` conda environment.
 
-    cd ~/ensemblify_installation/ensemblify-main
+    ```bash
     conda activate ensemblify_env
     pip install -e .
+    ```
 
 <!-- You can create a new environment named `ensemblify_env`, download the ensemblify source code from this repository and install it in your `ensemblify_env` environment (along with all its python dependencies) by running:
 
@@ -78,7 +94,7 @@ Alternatively, Ensemblify is available via the Python Package Index:
     pip install ensemblify --upgrade -->
 
 ## Third Party Software
-Each of Ensemblify's modules has different dependencies to third_party software, so if you only plan on only using a certain module you do not have to install software required for others. The dependencies are:
+Each of Ensemblify's modules has different dependencies to third_party software, so if you only plan on only using a certain module you do not have to install software required for others. The requirements are:
 
 - `generation` module: [PyRosetta](#pyrosetta), [FASPR](#faspr) and [PULCHRA](#pulchra).
 
@@ -89,23 +105,31 @@ Each of Ensemblify's modules has different dependencies to third_party software,
 - `reweighting` module: no third_party software required.
 
 ### PyRosetta
-PyRosetta is a Python-based interface to the powerful Rosetta molecular modeling suite [[1]](#ref1). Its functionalities are used and extended through Ensemblify in order to generate conformational ensembles.
+PyRosetta is a Python-based interface to the powerful Rosetta molecular modeling suite [[1]](#ref1). Its functionalities are used and extended through Ensemblify in order to generate conformational ensembles. You can install it by following these commands:
 
-Start by activating your newly created `ensemblify_env` conda environment:
+1. Activate your `ensemblify_env` conda environment:
 
+    ```bash
     conda activate ensemblify_env
+    ```
+    If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
 
-Then, install the [`pyrosetta-installer`](https://pypi.org/project/pyrosetta-installer/) Python package, kindly provided by RosettaCommons, to aid in the `pyrosetta` installation.
-
+2. Install the [`pyrosetta-installer`](https://pypi.org/project/pyrosetta-installer/) Python package, kindly provided by RosettaCommons, to aid in the `pyrosetta` installation:
+    ```bash
     pip install pyrosetta-installer 
+    ```
 
-Use `pyrosetta-installer` to download (~ 1.6 GB) and install `pyrosetta` (note the distributed and serialization parameters):
-
+3. Use `pyrosetta-installer` to download (~ 1.6 GB) and install `pyrosetta` (note the distributed and serialization parameters):
+    
+    ```bash
     python -c 'import pyrosetta_installer; pyrosetta_installer.install_pyrosetta(distributed=True,serialization=True)'
+    ```
 
-To test your `pyrosetta` installation, you can type in a terminal:
+4. To test your `pyrosetta` installation, you can type in a terminal:
 
+    ```bash
     python -c 'import pyrosetta.distributed; pyrosetta.distributed.init()'
+    ```
 
 If this step does not produce a complaint or error, your installation has been successful.
 
@@ -117,28 +141,28 @@ FASPR is an ultra-fast and accurate program for deterministic protein sidechain 
 
 You will need to compile the provided FASPR source-code.
 
-For UNIX or Linux users run:
+1a. For UNIX or Linux users run:
 
     conda activate ensemblify_env
     cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/ -->
     g++ -O3 --fast-math -o FASPR src/*.cpp
 
-For Mac users run:
+1b. For Mac users run:
     
     conda activate ensemblify_env
     cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/ -->
     g++ -03 -fast-math -o FASPR src/*.cpp
 
-or
+    or
 
     conda activate ensemblify_env
     cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/ -->
     g++ -03 -o FASPR src/*.cpp
 
-To register `faspr` as an alias for your FASPR executable in your bash shell run:
+2. To register `faspr` as an alias for your FASPR executable in your bash shell run:
 
     echo "alias faspr='$(realpath FASPR)'" >> ~/.bashrc
 
@@ -179,7 +203,7 @@ For UNIX or Linux users run:
     cd gromacs-2024.2
     mkdir build
     cd build
-    cmake .. -DGMX_BUILD_OWN_FFTW=ON -DREGRESSIONTEST_DOWNLOAD=ON
+    cmake .. -DGMX_BUILD_OWN_FFTW=ON -DREGRESSIONTEST_DOWNLOAD=ON -j $(nproc)
     make
     make check
     sudo make install

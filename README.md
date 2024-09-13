@@ -1,8 +1,11 @@
+[ Logo goes here]
 # Ensemblify: A Python package for generating ensembles of intrinsically disordered regions of AlphaFold or user defined models
+
+[Image with ensemble -> Graphical dashboard goes here]
 
 ## What is Ensemblify?
 
-Ensemblify is a python package that generates diverse protein conformations by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of an input protein of interest (e.g intrinsically disordered regions (IDRs)).
+Ensemblify is a python package that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (e.g intrinsically disordered regions (IDRs)).
 
 It supports both user-defined models and AlphaFold predictions, using PAE and pLDDT confidence metrics to guide the conformational sampling process. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
 
@@ -350,21 +353,31 @@ To compile the provided BIFT source code, you can follow these commands:
   
   # Usage
   
-  </summary>   
-To use the package you simply need to import it and call the desired function. If you want to generate an ensemble, provide the path to the parameters file that you created using the provided [parameters form](#setting-up-your-parameters-file).
+  </summary>
+
+Ensemblify offers four different modules, all of which can be acessed either through the command line or from inside a Python script or Jupyter Notebook.
+
+## The `generation` module
+With the `generation` module, you can generate conformational ensembles for your protein of interest.
+
+Before generating an ensemble, you must create a parameters file either through the provided [parameters form](docs/assets/parameters_form.html) or directly by editing the provided [parameters file template](docs/assets/parameters_template.yaml). Check the [parameters file setup](#setting-up-your-parameters-file) section for more details.
+
+To generate an ensemble, provide Ensemblify with the path to your parameters file.
+
+Using the `ensemblify` command in a terminal:
+
+    ensemblify -g -p parameters_file.yaml
 
 Inside a Python script or Jupyter Notebook:
 
     import ensemblify as ey
-    ey.generate_ensemble(PARAMETERS_FILEPATH)
+    ey.generate_ensemble('parameters_file.yaml')
 
-In a terminal window:
+Check the [example notebooks](examples/README.md) for detailed instructions.
 
-    ensemblify -p PARAMETERS_FILEPATH
-
-## Setting up your parameters file
+### Setting up your parameters file
 An [.html form](docs/assets/parameters_form.html) is provided to aid you in building your parameters file.
-<details open>  
+<details>  
   <summary><b>Parameters Form Preview</b></summary>
 
   ![alt text](docs/assets/parameters_form_preview.svg)
@@ -372,6 +385,62 @@ An [.html form](docs/assets/parameters_form.html) is provided to aid you in buil
 <br>
 
 If you prefer to create your own parameters file from scratch, a [template file](docs/assets/parameters_template.yaml) is also provided.
+
+## The `conversion` module
+With the `conversion` module, you can convert your generated .pdb structures into a .xtc trajectory file, enabling you to easily store and manipulate your conformational ensemble.
+
+To convert your ensemble of .pdb structures to a trajectory .xtc format, provide the name for your created trajectory, the directory where the ensemble is stored and the directory where the trajectory file should be created.
+
+Using the `ensemblify` command in a terminal:
+
+    ensemblify -c trajectory_name -i ensemble_dir -o trajectory_dir
+
+Inside a Python script or Jupyter Notebook:
+
+    import ensemblify as ey
+    ey.ensemble2traj('trajectory_name','ensemble_dir','trajectory_dir')
+
+Check the [example notebooks](examples/README.md) for detailed instructions.
+
+## The `analysis` module
+With the `analysis` module, you can create an interactive graphical dashboard displaying structural information calculated from the conformational ensemble of your protein of interest.
+
+To create an interactive graphical dashboard, provide the path to your ensemble in trajectory format, the path to your trajectory's topology file, the name you want to use for your protein and what structural metrics you want to calculate (by default, all available metrics are calculated).
+
+Using the `ensemblify` command in a terminal:
+
+    ensemblify -a trajectory.xtc topology.pdb trajectory_name
+
+Inside a Python script or Jupyter Notebook:
+
+    import ensemblify as ey
+    ey.analyze_trajectory('trajectory.xtc','topology.pdb','trajectory_name')
+
+Check the [example notebooks](examples/README.md) for detailed instructions.
+
+## The `reweighting` module
+With the `reweighting` module, you can use experimental SAXS data to reweigh your ensemble following the BME method described in https://github.com/KULL-Centre/BME.
+
+@incollection{bottaro2020integrating,
+title={Integrating molecular simulation and experimental data: a Bayesian/maximum entropy reweighting approach},
+author={Bottaro, Sandro and Bengtsen, Tone and Lindorff-Larsen, Kresten},
+booktitle={Structural Bioinformatics},
+pages={219--240},
+year={2020},
+publisher={Springer}
+}
+
+Using the `ensemblify` command in a terminal:
+
+    ensemblify -r trajectory.xtc topology.pdb trajectory_name experimental_SAXS_data.dat
+
+Inside a Python script or Jupyter Notebook:
+
+    import ensemblify as ey
+    ey.reweigh_ensemble('trajectory.xtc','topology.pdb','trajectory_name','experimental_SAXS_data.dat')
+
+Check the [example notebooks](examples/README.md) for detailed instructions.
+
 </details>
 
 <details>

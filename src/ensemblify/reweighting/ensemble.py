@@ -25,7 +25,7 @@ def reweigh_ensemble(
     topology: str,
     trajectory_id: str,
     exp_saxs_data: str,
-    output_dir: str,
+    output_dir: str = os.getcwd(),
     thetas: list[int] = [1, 10, 20, 50, 75, 100, 200, 400, 750, 1000, 5000, 10000],
     calculated_metrics_data: dict[str,list[pd.DataFrame]] = None,
     compare_rg: bool = True,
@@ -52,7 +52,7 @@ def reweigh_ensemble(
             path to .dat file with experimental SAXS data.
         output_dir:
             path to directory where interactive .html plots and reweighting output files will be
-            stored.
+            stored. Defaults to current working directory.
         thetas:
             list of values to assign to the theta parameter in BME. The ensemble will be reweighted
             each time using a different theta value. The effect of different theta values can then be

@@ -192,18 +192,26 @@ For MacOS users:
     ```
 
 ### PULCHRA
-PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing full-atom protein models from reduced representations [[3]](#ref3).
+PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing full-atom protein models from reduced representations [[3]](#ref3). To compile the provided PULCHRA modified source-code, you can follow these commands:
 
-You will need to compile the provided PULCHRA modified source-code, by running:
+1. Navigate to where the PULCHRA source code is located:
 
-    conda activate ensemblify_env
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/pulchra-master/
+    ```bash
+    cd ./ensemblify-main/src/ensemblify/third_party/pulchra-master/
+    ```
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/pulchra-master/ -->
+
+2. Compile the PULCHRA source code:
+
+    ```bash
     cc -O3 -o pulchra pulchra_CHANGED.c pulchra_data.c -lm
+    ```
 
-To register `pulchra` as an alias for your PULCHRA executable in your bash shell run:
+3. If you are using a bash shell, you can register `pulchra` as an alias for your PULCHRA executable by running:
 
+    ```bash
     echo "alias pulchra='$(realpath pulchra)'" >> ~/.bashrc 
+    ```
 
 ### GROMACS
 GROMACS is a molecular dynamics package mainly designed for simulations of proteins, lipids, and nucleic acids [[4]](#ref4).

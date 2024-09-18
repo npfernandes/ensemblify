@@ -354,7 +354,7 @@ Ensemblify offers four different modules, all of which can be acessed either thr
 ## The `generation` module
 With the `generation` module, you can generate conformational ensembles for your protein of interest.
 
-Before generating an ensemble, you must create a parameters file either through the provided [parameters form](docs/assets/parameters_form.html) or directly by editing the provided [parameters file template](docs/assets/parameters_template.yaml). Check the [parameters file setup](#setting-up-your-parameters-file) section for more details.
+Before generating an ensemble, you must create a parameters file either through the provided [parameters form](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_form.html) or directly by editing the provided [parameters file template](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml). Check the [parameters file setup](#setting-up-your-parameters-file) section for more details.
 
 To generate an ensemble, provide Ensemblify with the path to your parameters file.
 
@@ -370,7 +370,7 @@ Inside a Python script or Jupyter Notebook:
 Check the [example notebooks](examples/README.md) for detailed instructions.
 
 ### Setting up your parameters file
-An [.html form](docs/assets/parameters_form.html) is provided to aid you in building your parameters file.
+An [.html form](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_form.html) is provided to aid you in building your parameters file.
 <details>  
   <summary><b>Parameters Form Preview</b></summary>
 
@@ -378,7 +378,7 @@ An [.html form](docs/assets/parameters_form.html) is provided to aid you in buil
 </details>
 <br>
 
-If you prefer to create your own parameters file from scratch, a [template file](docs/assets/parameters_template.yaml) is also provided.
+If you prefer to create your own parameters file from scratch, a [template file](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml) is also provided.
 
 ## The `conversion` module
 With the `conversion` module, you can convert your generated .pdb structures into a .xtc trajectory file, enabling you to easily store and manipulate your conformational ensemble.

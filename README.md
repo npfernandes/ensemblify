@@ -354,7 +354,7 @@ Ensemblify offers four different modules, all of which can be acessed either thr
 ## The `generation` module
 With the `generation` module, you can generate conformational ensembles for your protein of interest.
 
-Before generating an ensemble, you must create a parameters file either through the provided [parameters form](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_form.html) or directly by editing the provided [parameters file template](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml). Check the [parameters file setup](#setting-up-your-parameters-file) section for more details.
+Before generating an ensemble, you must create a parameters file either through the provided [parameters form](docs/assets/parameters_form.html) or directly by editing the provided [parameters file template](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml). Check the [parameters file setup](#setting-up-your-parameters-file) section for more details.
 
 To generate an ensemble, provide Ensemblify with the path to your parameters file.
 

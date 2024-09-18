@@ -46,6 +46,7 @@ class SetRandomDihedralsMover(Mover):
         Mover.__init__(self)
         self.databases = databases
         self.log_file = log_file
+
     def get_name(self):
         """Return the name of this mover."""
         return self.__class__.__name__
@@ -81,7 +82,11 @@ class SetRandomDihedralsMover(Mover):
             database = self.databases[database_id]
 
             # Get residue
-            residue = fragment[1]
+            if len(fragment) == 3:
+                residue = fragment[1]
+            else:
+                # single residue databases
+                residue = fragment
 
             # Get angles for this res from database
             res_dihedrals = database[residue]
@@ -89,7 +94,7 @@ class SetRandomDihedralsMover(Mover):
             # Respect sampling mode
             if sampling_mode == 'TRIPEPTIDE':
                 # Filter res db to look only at curr frag
-                all_dihedrals = res_dihedrals[res_dihedrals['FRAGMENT'].str.match(fragment)]
+                all_dihedrals = res_dihedrals[res_dihedrals['FRAG'].str.match(fragment)]
 
             elif sampling_mode == 'SINGLERESIDUE':
                 # Do not filter db by fragment
@@ -99,8 +104,8 @@ class SetRandomDihedralsMover(Mover):
             if secondary_structure is not None:
                 # Filter db to include only dihedrals for the desired secondary structure
                 phi_bounds, psi_bounds = get_ss_bounds(secondary_structure)
-                phi_mask = all_dihedrals['PHI_RES_2'].map(lambda x: math.radians(phi_bounds[0]) <= x <= math.radians(phi_bounds[1]))
-                psi_mask = all_dihedrals['PSI_RES_2'].map(lambda x: math.radians(psi_bounds[0]) <= x <= math.radians(psi_bounds[1]))
+                phi_mask = all_dihedrals['PHI2'].map(lambda x: math.radians(phi_bounds[0]) <= x <= math.radians(phi_bounds[1]))
+                psi_mask = all_dihedrals['PSI2'].map(lambda x: math.radians(psi_bounds[0]) <= x <= math.radians(psi_bounds[1]))
                 dihedrals = all_dihedrals[phi_mask & psi_mask]
             else:
                 dihedrals = all_dihedrals
@@ -110,15 +115,15 @@ class SetRandomDihedralsMover(Mover):
                 if secondary_structure == 'alpha_helix':
                     # Set canonical alpha helix values with omega 180
                     phi, psi = GLOBAL_CONFIG['ALPHA_HELIX_CANON']
-                    omega = 180
+                    omg = 180
                 elif secondary_structure == 'beta_strand':
                     # Set canonical beta strand values with omega 180
                     phi, psi = GLOBAL_CONFIG['BETA_STRAND_CANON']
-                    omega = 180
+                    omg = 180
 
                 pose.set_phi(target_resnum,phi)
                 pose.set_psi(target_resnum,psi)
-                pose.set_omega(target_resnum,omega)
+                pose.set_omega(target_resnum,omg)
 
                 no_rows_found_msg = ('No rows respecting filters found in database, canonical '
                                      f'values for {secondary_structure} set on residue '
@@ -135,19 +140,19 @@ class SetRandomDihedralsMover(Mover):
                 dihedrals_indexed = dihedrals.reset_index(drop=True)
 
                 # Get the dihedral values and convert from radians to degrees
-                phi = dihedrals_indexed['PHI_RES_2'][choice_angle]
-                psi = dihedrals_indexed['PSI_RES_2'][choice_angle]
-                omega = dihedrals_indexed['OMEGA_RES_2'][choice_angle]
+                phi = dihedrals_indexed['PHI2'][choice_angle]
+                psi = dihedrals_indexed['PSI2'][choice_angle]
+                omg = dihedrals_indexed['OMG2'][choice_angle]
 
                 phi = math.degrees(phi)
                 psi = math.degrees(psi)
-                omega = math.degrees(omega)
+                omg = math.degrees(omg)
 
                 # Perform the mover operation (change Phi/Psi/Omega angles)
                 # sample from a normal distribution to add diversity
                 pose.set_phi(target_resnum,np.random.normal(phi,abs(phi*0.10)))
                 pose.set_psi(target_resnum,np.random.normal(psi,abs(psi*0.10)))
-                pose.set_omega(target_resnum,np.random.normal(omega,abs(omega*0.10)))
+                pose.set_omega(target_resnum,np.random.normal(omg,abs(omg*0.10)))
 
 
 # FUNCTIONS

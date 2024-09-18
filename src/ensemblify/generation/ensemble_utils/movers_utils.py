@@ -10,16 +10,16 @@ import pandas as pd
 from ensemblify.config import GLOBAL_CONFIG
 
 # CONSTANTS
-DATABASE_OPTIMIZED_COL_DTYPES = { GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['OM1'] : 'float32',
-                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['OM2'] : 'float32',
-                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['OM3'] : 'float32',
-                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['PH1'] : 'float32',
-                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['PH2'] : 'float32',
-                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['PH3'] : 'float32',
-                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['PS1'] : 'float32',
-                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['PS2'] : 'float32',
-                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['PS3'] : 'float32',
-                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['FRG'] : 'category'}
+DATABASE_OPTIMIZED_COL_DTYPES = { GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['OMG1'] : 'float32',
+                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['OMG2'] : 'float32',
+                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['OMG3'] : 'float32',
+                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['PHI1'] : 'float32',
+                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['PHI2'] : 'float32',
+                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['PHI3'] : 'float32',
+                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['PSI1'] : 'float32',
+                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['PSI2'] : 'float32',
+                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['PSI3'] : 'float32',
+                                  GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['FRAG'] : 'category'}
 
 # FUNCTIONS
 def read_database(database_path: str) -> pd.DataFrame:
@@ -39,12 +39,11 @@ def read_database(database_path: str) -> pd.DataFrame:
     if database_path.endswith('.csv'): # pick columns, convert dtypes
         database = pd.read_csv(database_path,
                                usecols=list(GLOBAL_CONFIG['USED_DATABASE_COLNAMES'].values()),
-                               dtype=DATABASE_OPTIMIZED_COL_DTYPES,
-                               encoding='utf-8-sig')
+                               dtype=DATABASE_OPTIMIZED_COL_DTYPES)
 
-    elif database_path.endswith('.h5'): # pick columns
-        database = pd.read_hdf(database_path,
-                               columns=list(GLOBAL_CONFIG['USED_DATABASE_COLNAMES'].values()))
+    elif database_path.endswith('.parquet'): # pick columns
+        database = pd.read_parquet(database_path,
+                                   columns=list(GLOBAL_CONFIG['USED_DATABASE_COLNAMES'].values()))
 
     elif database_path.endswith('.pkl'): # no customization
         database = pd.read_pickle(database_path)
@@ -91,53 +90,32 @@ def optimize_database(database: pd.DataFrame) -> dict[str,pd.DataFrame]:
     # Optimize our database, chaging datatypes to ones that are appropriate but use less memory
     optimized_db = database.astype(DATABASE_OPTIMIZED_COL_DTYPES)
 
-    # Now we break apart our full database into a dataFrame for each aminoacid residue
-    A_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+A.+')]
-    R_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+R.+')]
-    N_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+N.+')]
-    D_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+D.+')]
-    C_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+C.+')]
-    Q_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+Q.+')]
-    E_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+E.+')]
-    G_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+G.+')]
-    H_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+H.+')]
-    I_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+I.+')]
-    L_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+L.+')]
-    K_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+K.+')]
-    M_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+M.+')]
-    F_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+F.+')]
-    P_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+P.+')]
-    S_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+S.+')]
-    T_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+T.+')]
-    V_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+V.+')]
-    W_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+W.+')]
-    Y_angles_optimized = optimized_db[optimized_db['FRAGMENT'].str.contains('.+Y.+')]
+    # Freeup memory
+    del database
 
-    # Make sure we free up memory
-    del optimized_db
-
-    # Create the new database dictionary
+    # Now we break apart our full database into a dataFrame for each aminoacid residue and
+    # create the new database dictionary
     res_angles = {
-        'A' : A_angles_optimized,
-        'R' : R_angles_optimized,
-        'N' : N_angles_optimized,
-        'D' : D_angles_optimized,
-        'C' : C_angles_optimized,
-        'Q' : Q_angles_optimized,
-        'E' : E_angles_optimized,
-        'G' : G_angles_optimized,
-        'H' : H_angles_optimized,
-        'I' : I_angles_optimized,
-        'L' : L_angles_optimized,
-        'K' : K_angles_optimized,
-        'M' : M_angles_optimized,
-        'F' : F_angles_optimized,
-        'P' : P_angles_optimized,
-        'S' : S_angles_optimized,
-        'T' : T_angles_optimized,
-        'V' : V_angles_optimized,
-        'W' : W_angles_optimized,
-        'Y' : Y_angles_optimized,
+        'A' : optimized_db[optimized_db['FRAG'].str.contains('.+A.+')],
+        'R' : optimized_db[optimized_db['FRAG'].str.contains('.+R.+')],
+        'N' : optimized_db[optimized_db['FRAG'].str.contains('.+N.+')],
+        'D' : optimized_db[optimized_db['FRAG'].str.contains('.+D.+')],
+        'C' : optimized_db[optimized_db['FRAG'].str.contains('.+C.+')],
+        'Q' : optimized_db[optimized_db['FRAG'].str.contains('.+Q.+')],
+        'E' : optimized_db[optimized_db['FRAG'].str.contains('.+E.+')],
+        'G' : optimized_db[optimized_db['FRAG'].str.contains('.+G.+')],
+        'H' : optimized_db[optimized_db['FRAG'].str.contains('.+H.+')],
+        'I' : optimized_db[optimized_db['FRAG'].str.contains('.+I.+')],
+        'L' : optimized_db[optimized_db['FRAG'].str.contains('.+L.+')],
+        'K' : optimized_db[optimized_db['FRAG'].str.contains('.+K.+')],
+        'M' : optimized_db[optimized_db['FRAG'].str.contains('.+M.+')],
+        'F' : optimized_db[optimized_db['FRAG'].str.contains('.+F.+')],
+        'P' : optimized_db[optimized_db['FRAG'].str.contains('.+P.+')],
+        'S' : optimized_db[optimized_db['FRAG'].str.contains('.+S.+')],
+        'T' : optimized_db[optimized_db['FRAG'].str.contains('.+T.+')],
+        'V' : optimized_db[optimized_db['FRAG'].str.contains('.+V.+')],
+        'W' : optimized_db[optimized_db['FRAG'].str.contains('.+W.+')],
+        'Y' : optimized_db[optimized_db['FRAG'].str.contains('.+Y.+')],
     }
 
     return res_angles

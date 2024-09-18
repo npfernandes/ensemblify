@@ -2,16 +2,16 @@
 
 # Global configuration dictionary
 GLOBAL_CONFIG = {
-    'USED_DATABASE_COLNAMES': {'OM1': 'OMEGA_RES_1', # values == column names required in input dbs
-                               'OM2': 'OMEGA_RES_2', # case insensitive, becomes capital letter
-                               'OM3': 'OMEGA_RES_3',
-                               'PH1': 'PHI_RES_1',
-                               'PH2': 'PHI_RES_2',
-                               'PH3': 'PHI_RES_3',
-                               'PS1': 'PSI_RES_1',
-                               'PS2': 'PSI_RES_2',
-                               'PS3': 'PSI_RES_3',
-                               'FRG': 'FRAGMENT'},
+    'USED_DATABASE_COLNAMES': {'OMG1': 'OMG1', # values == column names required in input dbs
+                               'OMG2': 'OMG2', # case insensitive, becomes capital letter
+                               'OMG3': 'OMG3',
+                               'PHI1': 'PHI1',
+                               'PHI2': 'PHI2',
+                               'PHI3': 'PHI3',
+                               'PSI1': 'PSI1',
+                               'PSI2': 'PSI2',
+                               'PSI3': 'PSI3',
+                               'FRAG': 'FRAG'},
     'ALPHA_HELIX_CANON': (-57,-47), # (Phi,Psi); Lehninger principles of biochemistry (2021)
     'BETA_STRAND_CANON': (-135,135), # (Phi,Psi); Wikipedia Beta strand # FIXME
     'FASPR_PATH': 'faspr', # defaults to faspr alias
@@ -36,16 +36,16 @@ def show_config() -> dict:
     Example:
         >>> import ensemblify as ey
         >>> ey.show_config()
-        {'USED_DATABASE_COLNAMES': {'OM1': 'OMEGA_RES_1',
-                                    'OM2': 'OMEGA_RES_2',
-                                    'OM3': 'OMEGA_RES_3',
-                                    'PH1': 'PHI_RES_1',
-                                    'PH2': 'PHI_RES_2',
-                                    'PH3': 'PHI_RES_3',
-                                    'PS1': 'PSI_RES_1',
-                                    'PS2': 'PSI_RES_2',
-                                    'PS3': 'PSI_RES_3',
-                                    'FRG': 'FRAGMENT'},
+        {'USED_DATABASE_COLNAMES': {'OM1': 'OMG1',
+                                    'OM2': 'OMG2',
+                                    'OM3': 'OMG3',
+                                    'PH1': 'PHI1',
+                                    'PH2': 'PHI2',
+                                    'PH3': 'PHI3',
+                                    'PS1': 'PSI1',
+                                    'PS2': 'PSI2',
+                                    'PS3': 'PSI3',
+                                    'FRG': 'FRAG'}
          'ALPHA_HELIX_CANON': (-57,-47),
          'BETA_STRAND_CANON': (-135,135),
          'FASPR_PATH': 'faspr',

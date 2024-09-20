@@ -410,9 +410,9 @@ An [.html form](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/
 
   ![alt text](docs/assets/parameters_form_preview.svg)
 </details>
-<br> -->
+<br> 
 
-If you prefer to create your own parameters file from scratch, a [template file](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml) is also provided.
+If you prefer to create your own parameters file from scratch, a [template file](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml) is also provided. -->
 
 ## The `conversion` module
 With the `conversion` module, you can convert your generated .pdb structures into a .xtc trajectory file, enabling you to easily store and manipulate your conformational ensemble.

@@ -6,7 +6,7 @@
 
 Ensemblify is a python package that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (e.g intrinsically disordered regions (IDRs)).
 
-It supports both user-defined models and AlphaFold predictions, using PAE and pLDDT confidence metrics to guide the conformational sampling process. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
+It supports both user-defined models and AlphaFold predictions, using pLDDT and Predicted Aligned Error (PAE) confidence metrics to guide the conformational sampling process. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
 
 ## How do I install Ensemblify?
 Step-by-step instructions for installing Ensemblify are available in the [Installation](#installation) section.

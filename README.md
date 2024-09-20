@@ -15,6 +15,7 @@ Step-by-step instructions for installing Ensemblify are available in the [Instal
 ## How can I use Ensemblify?
 Ensemblify can be used either as a Command Line Interface (CLI) like so:
 
+    conda activate ensemblify_env
     ensemblify [options]
 
 or as a library inside a Python script or Jupyter notebook:
@@ -59,7 +60,8 @@ To install the `ensemblify` package, you can follow these commands:
 3. Create your `ensemblify_env` [Conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) with all of Ensemblify's python dependencies installed by using the provided [environment file](environment.yml) (recommended):
 
     ```bash
-    conda env create -f ./ensemblify_main/environment.yml
+    cd ensemblify_main
+    conda env create -f environment.yml
     ```
 
     or by creating the environment and installing the necessary python packages directly (not recommended):
@@ -78,16 +80,7 @@ To install the `ensemblify` package, you can follow these commands:
     pip install -e .
     ```
 
-<!-- You can create a new environment named `ensemblify_env`, download the ensemblify source code from this repository and install it in your `ensemblify_env` environment (along with all its python dependencies) by running:
-
-    conda env create ensemblify_env
-    conda activate ensemblify_env
-    wget https://github.com/npfernandes/ensemblify/archive/refs/heads/main.zip
-    unzip main.zip
-    cd ensemblify-main
-    pip install -e .
-
-If you want to create a new `ensemblify_env` environment with Ensemblify and all its necessary python dependencies already installed you can use the provided conda environment file by running:
+<!-- If you want to create a new `ensemblify_env` environment with Ensemblify and all its necessary python dependencies already installed you can use the provided conda environment file by running:
 
     wget https://raw.githubusercontent.com/npfernandes/ensemblify/main/environment.yml
     conda env create -f environment.yml -->

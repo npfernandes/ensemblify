@@ -97,7 +97,7 @@ Alternatively, Ensemblify is available via the Python Package Index:
     pip install ensemblify --upgrade -->
 
 ## Third Party Software
-Each of Ensemblify's modules has different dependencies to third party software, so if you only plan on only using a certain module you do not have to install software required for others. The requirements are:
+Each of Ensemblify's modules has different dependencies to third party software, so if you only plan on using a certain module you do not have to install software required for others. The requirements are:
 
 - `generation` module: [PyRosetta](#pyrosetta), [FASPR](#faspr) and [PULCHRA](#pulchra).
 

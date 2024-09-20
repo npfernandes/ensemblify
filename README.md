@@ -348,7 +348,9 @@ Ensemblify offers four different modules, all of which can be acessed either thr
 ## The `generation` module
 With the `generation` module, you can generate conformational ensembles for your protein of interest.
 
-Before generating an ensemble, you must create a parameters file either through the provided [parameters form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html) or directly by editing the provided [parameters file template](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml). Check the [parameters file setup](#setting-up-your-parameters-file) section for more details.
+Before generating an ensemble, you must create a parameters file either through the provided [parameters form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html) or directly by editing the provided [parameters file template](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml).
+
+<!-- Check the [parameters file setup](#setting-up-your-parameters-file) section for more details. -->
 
 To generate an ensemble, provide Ensemblify with the path to your parameters file.
 
@@ -363,25 +365,25 @@ Inside a Python script or Jupyter Notebook:
 
 Check the [example notebooks](examples/README.md) for detailed instructions.
 
-### Setting up your parameters file
+<!-- ### Setting up your parameters file
 An [.html form](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_form.html) is provided to aid you in building your parameters file.
 <details>  
   <summary><b>Parameters Form Preview</b></summary>
 
   ![alt text](docs/assets/parameters_form_preview.svg)
 </details>
-<br>
+<br> -->
 
 If you prefer to create your own parameters file from scratch, a [template file](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml) is also provided.
 
 ## The `conversion` module
 With the `conversion` module, you can convert your generated .pdb structures into a .xtc trajectory file, enabling you to easily store and manipulate your conformational ensemble.
 
-To convert your ensemble of .pdb structures to a trajectory .xtc format, provide the name for your created trajectory, the directory where the ensemble is stored and the directory where the trajectory file should be created.
+To do this, provide the name for your created trajectory, the directory where the ensemble is stored and the directory where the trajectory file should be created.
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify -c trajectory_name -i ensemble_dir -o trajectory_dir
+    ensemblify -c -id trajectory_name -ed ensemble_dir -td trajectory_dir
 
 Inside a Python script or Jupyter Notebook:
 
@@ -393,11 +395,11 @@ Check the [example notebooks](examples/README.md) for detailed instructions.
 ## The `analysis` module
 With the `analysis` module, you can create an interactive graphical dashboard displaying structural information calculated from the conformational ensemble of your protein of interest.
 
-To create an interactive graphical dashboard, provide the path to your ensemble in trajectory format, the path to your trajectory's topology file, the name you want to use for your protein and what structural metrics you want to calculate (by default, all available metrics are calculated).
+To do this, provide your ensemble in trajectory format, your trajectory's topology file and the name you want to use for your protein in the graphical dashboard.
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify -a trajectory.xtc topology.pdb trajectory_name
+    ensemblify -a -traj trajectory.xtc -top topology.pdb -id trajectory_name
 
 Inside a Python script or Jupyter Notebook:
 
@@ -407,16 +409,9 @@ Inside a Python script or Jupyter Notebook:
 Check the [example notebooks](examples/README.md) for detailed instructions.
 
 ## The `reweighting` module
-With the `reweighting` module, you can use experimental SAXS data to reweigh your ensemble following the BME method described in https://github.com/KULL-Centre/BME.
+With the `reweighting` module, you can use experimental SAXS data to reweigh your conformational ensemble following the Bayesian Maximum Entropy method [[8]](#ref8).
 
-@incollection{bottaro2020integrating,
-title={Integrating molecular simulation and experimental data: a Bayesian/maximum entropy reweighting approach},
-author={Bottaro, Sandro and Bengtsen, Tone and Lindorff-Larsen, Kresten},
-booktitle={Structural Bioinformatics},
-pages={219--240},
-year={2020},
-publisher={Springer}
-}
+To do this, provide your ensemble in trajectory format, your trajectory's topology file, the name you want to use for your protein in the graphical dashboard and your experimental SAXS data.
 
 Using the `ensemblify` command in a terminal:
 
@@ -449,7 +444,7 @@ Ensemblify's API documentation is available at https://ensemblify.readthedocs.io
   
   </summary>   
 
-Ensemblify provides a three-residue fragment (tripeptide) database from which to sample dihedral angles. This database was created and made available by González-Delgado *et al.* and, as described in [[8]](#ref8), it was built by extracting dihedral angles from structures taken from the SCOPe [[9]](#ref9) [[10]](#ref10) 2.07 release, a curated database of high-resolution experimentally determined protein structures.
+Ensemblify provides a three-residue fragment (tripeptide) database from which to sample dihedral angles. This database was created and made available by González-Delgado *et al.* and, as described in [[9]](#ref9), it was built by extracting dihedral angles from structures taken from the SCOPe [[10]](#ref10) [[11]](#ref11) 2.07 release, a curated database of high-resolution experimentally determined protein structures.
 In total, 6,740,433 tripeptide dihedral angle values were extracted, making up the *all* dataset. A structurally filtered dataset, *coil*, was generated by removing tripeptides contained in α-helices or β-strands, reducing the number of tripeptide dihedral angle values to 3,141,877.
 
 ## Using your own database
@@ -523,14 +518,12 @@ We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS in
 
 <a id="ref7">[7]</a> A. H. Larsen and M. C. Pedersen, "Experimental noise in small-angle scattering can be assessed using the Bayesian indirect Fourier transformation," *Journal of Applied Crystallography*, vol. 54, no. 5, pp. 1281-1289, Oct. 2021 [[Link](https://doi.org/10.1107/S1600576721006877)]
 
-<a id="ref8">[8]</a> J. González-Delgado , P. Bernadó , P. Neuvial and J. Cortés, "Statistical proofs of the interdependence between nearest neighbor effects on polypeptide backbone conformations," *Journal of Structural Biology*, vol. 214, no. 4, p. 107907, Dec. 2022 [[Link](https://doi.org/10.1016/j.jsb.2022.107907)]
+<a id="ref8">[8]</a> S. Bottaro , T. Bengsten and K. Lindorff-Larsen, "Integrating Molecular Simulation and Experimental Data: A Bayesian/Maximum Entropy Reweighting Approach," pp. 219-240, Feb. 2020. In: Z. Gáspári, (eds) *Structural Bioinformatics*, *Methods in Molecular Biology*, vol. 2112, Humana, New York, NY. [[Link](https://doi.org/10.1007/978-1-0716-0270-6_15)]
 
-<a id="ref9">[9]</a> N. K. Fox, S. E. Brenner and J. M. Chandonia, "SCOPe: Structural Classification of Proteins—extended, integrating SCOP and ASTRAL data and classification of new structures," *Nucleic Acids Research*, vol. 42, no. D1, pp. D304-D309, Jan. 2014 [[Link](https://doi.org/10.1093/nar/gkt1240)] 
+<a id="ref9">[9]</a> J. González-Delgado , P. Bernadó , P. Neuvial and J. Cortés, "Statistical proofs of the interdependence between nearest neighbor effects on polypeptide backbone conformations," *Journal of Structural Biology*, vol. 214, no. 4, p. 107907, Dec. 2022 [[Link](https://doi.org/10.1016/j.jsb.2022.107907)]
 
-<a id="ref10">[10]</a> J. M. Chandonia, N. K. Fox and S. E. Brenner, "SCOPe: classification of large macromolecular structures in the structural classification of proteins—extended database," *Nucleic Acids Research*, vol. 47, no. D1, pp. D475–D481, Jan. 2019 [[Link](https://doi.org/10.1093/nar/gky1134)]
+<a id="ref10">[10]</a> N. K. Fox, S. E. Brenner and J. M. Chandonia, "SCOPe: Structural Classification of Proteins—extended, integrating SCOP and ASTRAL data and classification of new structures," *Nucleic Acids Research*, vol. 42, no. D1, pp. D304-D309, Jan. 2014 [[Link](https://doi.org/10.1093/nar/gkt1240)] 
 
-<!-- [9] A. Estaña, N. Sibille, E. Delaforge, M. Vaisset, J. Cortés and P. Bernadó, "Realistic Ensemble Models of Intrinsically Disordered Proteins Using a Structure-Encoding Coil Database," *Structure* vol.27, no.2, pp. 381-391.e2, Feb. 2019 [[Link](https://doi.org/10.1016/j.str.2018.10.016)] -->
-
-<!-- [10] J. M. Chandonia, L. Guan, S. Lin, C. Yu, N. K. Fox and S. E. Brenner, "SCOPe: Improvements to the Structural Classification of Proteins—extended Database to facilitate Variant Interpretation and Machine Learning," *Nucleic Acids Research*, vol. 50, no. D1, pp. D553–D559, Jan. 2022 [[Link](https://doi.org/10.1093/nar/gkab1054)] -->
+<a id="ref11">[11]</a> J. M. Chandonia, N. K. Fox and S. E. Brenner, "SCOPe: classification of large macromolecular structures in the structural classification of proteins—extended database," *Nucleic Acids Research*, vol. 47, no. D1, pp. D475–D481, Jan. 2019 [[Link](https://doi.org/10.1093/nar/gky1134)]
 
 </details>

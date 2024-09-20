@@ -44,7 +44,7 @@ You can create a new virtual environment using your favorite virtual environment
 
 To install the `ensemblify` package, you can follow these commands:
 
-1. Choose your current working directory where the `ensemblify` package will be installed. If you prefer, in your home directory you can create a new directory dedicated to the ensemblify installation and navigate into it by running:
+1. Choose your current working directory, where the `ensemblify` package will be installed. If you prefer, in your home directory you can create a new directory dedicated to the ensemblify installation and navigate into it by running:
 
     ```bash
     mkdir -p ~/ensemblify_installation
@@ -103,9 +103,9 @@ Each of Ensemblify's modules has different dependencies to third party software,
 
 - `conversion` module: [GROMACS](#gromacs), [Pepsi-SAXS](#pepsi-saxs) and optionally [BIFT](#bift).
 
-- `analysis` module: no third_party software required.
+- `analysis` module: no other software required.
 
-- `reweighting` module: no third_party software required.
+- `reweighting` module: no other software required.
 
 ### PyRosetta
 PyRosetta is a Python-based interface to the powerful Rosetta molecular modeling suite [[1]](#ref1). Its functionalities are used and extended through Ensemblify in order to generate conformational ensembles. You can install it by following these commands:
@@ -207,7 +207,7 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
     ```bash
     cc -O3 -o pulchra pulchra_CHANGED.c pulchra_data.c -lm
     ```
-    Some warnings will show up on your screen, this is normal and they can be ignored.
+    Do not be alarmed if some warnings show up on your screen; this is normal and they can be ignored.
 
 3. If you are using a bash shell, you can register `pulchra` as an alias for your PULCHRA executable by running:
 
@@ -225,8 +225,8 @@ To download and compile the GROMACS source code from their [website](https://ftp
 1. Create and navigate into your desired GROMACS installation directory, for example:
 
     ```bash
-    mkdir ~/GROMACS
-    cd ~/GROMACS
+    mkdir -p ~/software/GROMACS
+    cd ~/software/GROMACS
     ```
 <!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/GROMACS/ -->
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/GROMACS/ -->
@@ -263,8 +263,8 @@ For UNIX or Linux users:
 1. Create and navigate into your desired Pepsi-SAXS installation directory, for example:
 
     ```bash
-    mkdir ~/Pepsi-SAXS/
-    cd ~/Pepsi-SAXS/
+    mkdir -p ~/software/Pepsi-SAXS/
+    cd ~/software/Pepsi-SAXS/
     ```
 <!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/ -->
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/ -->
@@ -288,8 +288,8 @@ For MacOS users:
 1. Create and navigate into your desired Pepsi-SAXS installation directory, for example:
 
     ```bash
-    mkdir ~/Pepsi-SAXS/
-    cd ~/Pepsi-SAXS/
+    mkdir -p ~/software/Pepsi-SAXS/
+    cd ~/software/Pepsi-SAXS/
     ```
 <!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/ -->
 <!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/ -->

@@ -464,50 +464,58 @@ Check the [example notebooks](examples/README.md) for detailed instructions.
 
 </details>
 
-<details>
+<!-- <details>
   <summary>
     
   # API Documentation
     
-  </summary>
+  </summary> -->
+
+# API Documentation
 
 Ensemblify's API documentation is available at https://ensemblify.readthedocs.io/en/latest/index.html.
 
-</details>
+<!-- </details> -->
 
-<details>  
+<!-- <details>  
   <summary>
   
   # Citation and Publications
   
-  </summary>
+  </summary> -->
+
+# Citation and Publications
 
 If you use Ensemblify, please cite its original publication:
 
     PUB
 
-</details>
+<!-- </details> -->
 
-<details>  
+<!-- <details>  
   <summary>
   
   # Acknowledgements
   
-  </summary> 
+  </summary>  -->
+
+# Acknowledgements
 
 We would like to thank the DeepMind team for developing AlphaFold.
 We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS institute for creating the tripeptide database used in the development of this tool. Check out their work at https://moma.laas.fr/.
 
-</details>
+<!-- </details> -->
 
-<details>  
+<!-- <details>  
   <summary>
   
   # References
   
-  </summary>    
+  </summary>     -->
 
-<a id="ref1">[1]</a>J. Jumper, R. Evans, A. Pritzel et al., "Highly accurate protein structure prediction with AlphaFold," *Nature*, vol. 596, pp. 583–589, 2021. [[Link] https://doi.org/10.1038/s41586-021-03819-2]
+# References
+
+<a id="ref1">[1]</a> J. Jumper, R. Evans, A. Pritzel et al., "Highly accurate protein structure prediction with AlphaFold," *Nature*, vol. 596, pp. 583–589, 2021. [[Link](https://doi.org/10.1038/s41586-021-03819-2)]
 
 <a id="ref2">[2]</a> S. Chaudhury, S. Lyskov and J. J. Gray, "PyRosetta: a script-based interface for implementing molecular modeling algorithms using Rosetta," *Bioinformatics*, vol. 26, no. 5, pp. 689-691, Mar. 2010 [[Link](https://doi.org/10.1093/bioinformatics/btq007)]
 
@@ -531,4 +539,4 @@ We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS in
 
 <a id="ref12">[12]</a> S. Bottaro , T. Bengsten and K. Lindorff-Larsen, "Integrating Molecular Simulation and Experimental Data: A Bayesian/Maximum Entropy Reweighting Approach," pp. 219-240, Feb. 2020. In: Z. Gáspári, (eds) *Structural Bioinformatics*, *Methods in Molecular Biology*, vol. 2112, Humana, New York, NY. [[Link](https://doi.org/10.1007/978-1-0716-0270-6_15)]
 
-</details>
+<!-- </details> -->

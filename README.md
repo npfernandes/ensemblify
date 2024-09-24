@@ -37,7 +37,12 @@ A general overview of Ensemblify, descriptions of employed methods and applicati
 
 </summary>    
 
+<details><summary>
+
 ## Ensemblify Python Package
+
+</summary>    
+
 It is heavily recommended to install the `ensemblify` Python package in a dedicated virtual environment.
 
 You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html). We recommend [miniconda](https://docs.anaconda.com/miniconda/#quick-command-line-install), a free minimal installer for conda.
@@ -95,8 +100,14 @@ Alternatively, Ensemblify is available via the Python Package Index:
     
     conda activate ensemblify_env   
     pip install ensemblify --upgrade -->
+</details>
+
+<details><summary>
 
 ## Third Party Software
+
+</summary>  
+
 Each of Ensemblify's modules has different dependencies to third party software, so if you only plan on using a certain module you do not have to install software required for others. The requirements are:
 
 - `generation` module: [PyRosetta](#pyrosetta), [FASPR](#faspr) and [PULCHRA](#pulchra).
@@ -333,6 +344,9 @@ To compile the provided BIFT source code, you can follow these commands:
     echo "alias bift='$(realpath bift)'" >> ~/.bashrc
     source ~/.bashrc
     ```
+</details>
+
+Do not forget to visit the [Tripeptide Database](#tripeptide-database) section to learn where you can get the database files that are required for conformational ensemble generation.
 
 </details>
 
@@ -383,7 +397,13 @@ Your database must contain at least 4 columns: 3 containing the Phi, Psi and Ome
 
 Ensemblify offers four different modules, all of which can be acessed either through the command line or from inside a Python script or Jupyter Notebook.
 
+<details>  
+  <summary>
+  
 ## The `generation` module
+  
+  </summary>
+
 With the `generation` module, you can generate conformational ensembles for your protein of interest.
 
 Before generating an ensemble, you must create a parameters file either through the provided [parameters form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html) or directly by editing the provided [parameters file template](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml).
@@ -403,6 +423,8 @@ Inside a Python script or Jupyter Notebook:
 
 Check the [example notebooks](examples/README.md) for detailed instructions.
 
+</details>
+
 <!-- ### Setting up your parameters file
 An [.html form](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_form.html) is provided to aid you in building your parameters file.
 <details>  
@@ -414,7 +436,13 @@ An [.html form](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/
 
 If you prefer to create your own parameters file from scratch, a [template file](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml) is also provided. -->
 
+<details>  
+  <summary>
+  
 ## The `conversion` module
+  
+  </summary>
+
 With the `conversion` module, you can convert your generated .pdb structures into a .xtc trajectory file, enabling you to easily store and manipulate your conformational ensemble.
 
 To do this, provide the name for your created trajectory, the directory where the ensemble is stored and the directory where the trajectory file should be created.
@@ -430,7 +458,15 @@ Inside a Python script or Jupyter Notebook:
 
 Check the [example notebooks](examples/README.md) for detailed instructions.
 
+</details>
+
+<details>  
+  <summary>
+  
 ## The `analysis` module
+  
+  </summary>
+
 With the `analysis` module, you can create an interactive graphical dashboard displaying structural information calculated from the conformational ensemble of your protein of interest.
 
 To do this, provide your ensemble in trajectory format, your trajectory's topology file and the name you want to use for your protein in the graphical dashboard.
@@ -446,7 +482,15 @@ Inside a Python script or Jupyter Notebook:
 
 Check the [example notebooks](examples/README.md) for detailed instructions.
 
+</details>
+
+<details>  
+  <summary>
+  
 ## The `reweighting` module
+  
+  </summary>
+
 With the `reweighting` module, you can use experimental SAXS data to reweigh your conformational ensemble following the Bayesian Maximum Entropy method [[12]](#ref12).
 
 To do this, provide your ensemble in trajectory format, your trajectory's topology file, the name you want to use for your protein in the graphical dashboard and your experimental SAXS data.
@@ -462,6 +506,7 @@ Inside a Python script or Jupyter Notebook:
 
 Check the [example notebooks](examples/README.md) for detailed instructions.
 
+</details>
 </details>
 
 <!-- <details>

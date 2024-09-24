@@ -2,18 +2,18 @@
 
 <img src="docs/assets/ensemblify_presentation.svg" width="100%"/>
 
-## What is Ensemblify?
+## 💡 What is Ensemblify?
 
-Ensemblify is a python package that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (e.g intrinsically disordered regions (IDRs)).
+**Ensemblify** is a python package that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (e.g intrinsically disordered regions (IDRs)).
 
 It supports both user-defined models and AlphaFold [[1]](#ref1) predictions, using pLDDT and Predicted Aligned Error (PAE) confidence metrics to guide conformational sampling. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
 
-## How do I install Ensemblify?
+## 🧰 How do I install Ensemblify?
 Step-by-step instructions for installing Ensemblify are available in the [Installation](#installation) section.
 
 After installing Ensemblify, make sure to visit the [Tripeptide Database](#tripeptide-database) section to learn where you can get the required database files.
 
-## How can I use Ensemblify?
+## 💻 How can I use Ensemblify?
 Ensemblify can be used either as a Command Line Interface (CLI) like so:
 
     conda activate ensemblify_env
@@ -26,14 +26,14 @@ or as a library inside a Python script or Jupyter notebook:
 
 Check the [Usage](#usage) section for more details and links to example Jupyter notebooks.
 
-## How does Ensemblify work?
+## 🔎 How does Ensemblify work?
 A general overview of Ensemblify, descriptions of employed methods and applications can be found in the Ensemblify paper:
 
     PAPER
 
 <details><summary>
 
-# Installation
+# 🧰 Installation
 
 </summary>    
 
@@ -353,7 +353,7 @@ Do not forget to visit the [Tripeptide Database](#tripeptide-database) section t
 <details>  
   <summary>
   
-  # Tripeptide Database
+  # 🗃 Tripeptide Database
   
   </summary>   
 
@@ -391,7 +391,7 @@ Your database must contain at least 4 columns: 3 containing the Phi, Psi and Ome
 <details>  
   <summary>
   
-  # Usage
+  # 💻 Usage
   
   </summary>
 
@@ -425,7 +425,7 @@ Check the [example notebooks](examples/README.md) for detailed instructions.
 
 </details>
 
-<!-- ### Setting up your parameters file
+<!-- ###  📝 Setting up your parameters file
 An [.html form](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_form.html) is provided to aid you in building your parameters file.
 <details>  
   <summary><b>Parameters Form Preview</b></summary>
@@ -516,7 +516,7 @@ Check the [example notebooks](examples/README.md) for detailed instructions.
     
   </summary> -->
 
-# API Documentation
+# 📚 API Documentation
 
 Ensemblify's API documentation is available at https://ensemblify.readthedocs.io/en/latest/index.html.
 
@@ -529,7 +529,7 @@ Ensemblify's API documentation is available at https://ensemblify.readthedocs.io
   
   </summary> -->
 
-# Citation and Publications
+# 🗨️ Citation and Publications
 
 If you use Ensemblify, please cite its original publication:
 
@@ -544,7 +544,7 @@ If you use Ensemblify, please cite its original publication:
   
   </summary>  -->
 
-# Acknowledgements
+# 🤝 Acknowledgements
 
 We would like to thank the DeepMind team for developing AlphaFold.
 We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS institute for creating the tripeptide database used in the development of this tool. Check out their work at https://moma.laas.fr/.
@@ -558,7 +558,7 @@ We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS in
   
   </summary>     -->
 
-# References
+# 📖 References
 
 <a id="ref1">[1]</a> J. Jumper, R. Evans, A. Pritzel et al., "Highly accurate protein structure prediction with AlphaFold," *Nature*, vol. 596, pp. 583–589, 2021. [[Link](https://doi.org/10.1038/s41586-021-03819-2)]
 

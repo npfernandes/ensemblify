@@ -31,10 +31,10 @@ A general overview of Ensemblify, descriptions of employed methods and applicati
 
     PAPER
 
+# 🧰 Installation
 <details><summary>
 
-# 🧰 Installation
-
+[Click to Show/Hide **Installation**]
 </summary>    
 
 <details><summary>

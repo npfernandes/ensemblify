@@ -37,7 +37,7 @@ A general overview of Ensemblify, descriptions of employed methods and applicati
 
 </summary>    
 
-<details><summary>
+<details open><summary>
 
 ## Ensemblify Python Package
 
@@ -102,7 +102,7 @@ Alternatively, Ensemblify is available via the Python Package Index:
     pip install ensemblify --upgrade -->
 </details>
 
-<details><summary>
+<details open><summary>
 
 ## Third Party Software
 
@@ -397,7 +397,7 @@ Your database must contain at least 4 columns: 3 containing the Phi, Psi and Ome
 
 Ensemblify offers four different modules, all of which can be acessed either through the command line or from inside a Python script or Jupyter Notebook.
 
-<details>  
+<details open>  
   <summary>
   
 ## The `generation` module
@@ -436,7 +436,7 @@ An [.html form](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/
 
 If you prefer to create your own parameters file from scratch, a [template file](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml) is also provided. -->
 
-<details>  
+<details open>  
   <summary>
   
 ## The `conversion` module
@@ -460,7 +460,7 @@ Check the [example notebooks](examples/README.md) for detailed instructions.
 
 </details>
 
-<details>  
+<details open>  
   <summary>
   
 ## The `analysis` module
@@ -484,7 +484,7 @@ Check the [example notebooks](examples/README.md) for detailed instructions.
 
 </details>
 
-<details>  
+<details open>  
   <summary>
   
 ## The `reweighting` module

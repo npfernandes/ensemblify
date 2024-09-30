@@ -1,3 +1,5 @@
+"""Auxiliary functions for the reweighting module."""
+
 # IMPORTS
 ## Standard Library Imports
 import contextlib
@@ -197,7 +199,6 @@ def ibme(
                 an array containing the new weights of the ensemble, one for each frame.
 
     """
-
     # Change current working directory
     old_cd = os.getcwd()
     os.chdir(output_dir)
@@ -278,16 +279,8 @@ def bme_ensemble_reweighting(
     results = []
     with ProcessPoolExecutor() as ppe:
         futures = [ppe.submit(ibme, theta, exp_file, calc_file, output_dir) for theta in thetas]
-
         for future in tqdm(as_completed(futures),total=len(thetas),desc='Reweighting ensemble... '):
             results.append(future.result())
-
-        # futures = [ppe.submit(ibme,
-        #                       theta,
-        #                       os.path.abspath(exp_saxs_file),
-        #                       os.path.abspath(calc_saxs_file),
-        #                       output_dir) for theta in thetas]
-        # results = [future.result() for future in futures]
 
     # Extract the results
     results.sort()  # sort by theta (first element)
@@ -304,7 +297,7 @@ def create_effective_frames_fit_fig(
     thetas: np.ndarray,
     choices: list[int] | None = None,
     title_text: str | None = None,
-    colors: list[str] = ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7'],
+    colors: list[str] = None,
     ) -> go.Figure:
     """Create a Figure plotting the fraction of effective frames vs the chisquare value, resulting
     from applying BME using different theta values.
@@ -343,6 +336,11 @@ def create_effective_frames_fit_fig(
             the created plot, optionally with data points corresponding to highlighted theta
             values in different colors.
     """
+    # Setup color palette
+    if colors is None:
+        colors = ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7']
+
+    # Create Figure
     fig = go.Figure()
 
     # Add data points
@@ -372,7 +370,6 @@ def create_effective_frames_fit_fig(
                                            f'{round(y_val,2)}'
                                            '<br>\u03B8 = '
                                            f'{choice}')))
-                                     #name=f'\u03B8 = {choice}'))
 
     # Update Figure layout
     fig.update_layout(plot_bgcolor='#FFFFFF',
@@ -485,7 +482,7 @@ def create_reweighting_fits_fig(
     i_prior: np.ndarray,
     i_posts: np.ndarray,
     title_text: str | None = None,
-    colors: list[str] = ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7'],
+    colors: list[str] = None,
     ) -> go.Figure:
     """Create a multiplot Figure showcasing the differences between uniform and reweighted
     calculated SAXS data, when fit to experimental data.
@@ -517,7 +514,11 @@ def create_reweighting_fits_fig(
                 - Kraty plot for i_prior and i_post fitted to experimental data.
                 - residuals between i_prior/i_post(s) and i_exp.
     """
-
+    # Setup color palette
+    if colors is None:
+        colors = ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7']
+    
+    # Create Figure
     fig = make_subplots(rows=2,
                         cols=2,
                         horizontal_spacing=0.25/2,
@@ -814,7 +815,9 @@ def create_ss_frequency_difference_fig(
                                         line_width=2,
                                         name=structure,
                                         hoverinfo='text',
-                                        hovertext=[ f'{x_label}, {difference_frequency.loc[structure].iloc[i]}' for i,x_label in enumerate(x_labels) ]))
+                                        hovertext=[ f'{x_label}, \
+                                                   {difference_frequency.loc[structure].iloc[i]}' \
+                                                   for i,x_label in enumerate(x_labels) ]))
 
     # Setup chain dividers lines
     num_res = len(difference_frequency.columns)
@@ -926,7 +929,7 @@ def create_reweighting_metrics_fig(
     metrics: pd.DataFrame,
     rw_weights: list[np.ndarray],
     title_text: str | None = None,
-    colors: list[str] = ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7'],
+    colors: list[str] = None,
     ) -> go.Figure:
     """Create a Figure with probability distribution plots for calculated structural metrics, using
     uniform or unequal weights.
@@ -949,12 +952,17 @@ def create_reweighting_metrics_fig(
             a Figure plotting the structural metrics distributions for uniformly and unequally
             weighted conformational ensembles.
     """
+    # Setup color palette
+    if colors is None:
+        colors = ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7']
+    
+    # Setup axis titles
     axis_titles = {'rg': 'R<sub>g</sub>',
                    'dmax': 'D<sub>max</sub>',
                    'eed': 'D<sub>ee</sub>'}
 
+    # Create Figure
     nrows = math.ceil(len(metrics.columns)/2)
-
     fig = make_subplots(rows=nrows,
                         cols=2,
                         horizontal_spacing=0.35/2,

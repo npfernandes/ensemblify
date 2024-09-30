@@ -1,4 +1,5 @@
-#!/usr/bin/python3
+"""Analyze a trajectory,topology pair, outputting a graphical dashboard."""
+
 # IMPORTS
 ## Standard Library Imports
 import os
@@ -15,7 +16,7 @@ def analyze_trajectory(
     trajectories: list[str],
     topologies: list[str],
     trajectory_ids: list[str],
-    output_directory: str = os.getcwd(),
+    output_directory: str = None,
     ramachandran_data: bool = True,
     distancematrices: bool = True,
     contactmatrices: bool = True,
@@ -24,8 +25,7 @@ def analyze_trajectory(
     dmax: bool = True,
     eed: bool = True,
     cm_dist: dict | None = None,
-    color_palette: list[str] = ['#636EFA','#EF553B','#00CC96','#AB63FA','#FFA15A',
-                                '#19D3F3','#FF6692','#B6E880','#FF97FF','#FECB52'],
+    color_palette: list[str] = None,
     ):
     """Calculate structural data and create interactive figures for given trajectory and
     topology files.
@@ -45,7 +45,7 @@ def analyze_trajectory(
             file pair.
         distancematrices:
             whether to calculate an alpha carbon distance matrix for each trajectory,topology
-            file pair.
+            file pair and create the corresponding distance matrix interactive figure.
         contactmatrices:
             whether to calculate a contact frequency matrix for each trajectory,topology
             file pair and create the corresponding contact map interactive figure.
@@ -80,8 +80,15 @@ def analyze_trajectory(
             as well as saved to output directory.
     """
     # Setup output directory
-    if not os.path.isdir(output_directory):
+    if output_directory is None:
+        output_directory = os.getcwd()
+    elif not os.path.isdir(output_directory):
         os.mkdir(output_directory)
+
+    # Setup color palette
+    if color_palette is None:
+        color_palette = ['#636EFA','#EF553B','#00CC96','#AB63FA','#FFA15A',
+                         '#19D3F3','#FF6692','#B6E880','#FF97FF','#FECB52']
 
     # Calculate analysis data
     print(f'Analyzing {trajectory_ids} trajectories...')
@@ -196,20 +203,7 @@ def analyze_trajectory(
 
     print('Ensemble metrics calculation has finished. Please refer to the interactive '
           'analysis_dashboard.html figure for analysis.')
-        
+
     # For convenience, return the calculated analysis data.
     return analysis_data
-
-# TODO Add argparse layer so we can run this from command line.
-
-if __name__ == '__main__':
-    analyze_trajectory(trajectories=['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc'],
-                       topologies=['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb'],
-                       trajectory_ids=['Hst5'],
-                       output_directory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5')
-
-    # analyze_trajectory(trajectories=['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/USH3_A/USH3A_trajectory.xtc'],
-    #                    topologies=['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/USH3_A/USH3A_top.pdb'],
-    #                    trajectory_ids=['USH3A'],
-    #                    output_directory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/USH3A')
     

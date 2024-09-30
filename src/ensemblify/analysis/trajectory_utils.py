@@ -1,3 +1,5 @@
+"""Auxiliary functions for the analysis module."""
+
 # IMPORTS
 ## Standard Library Imports
 import math

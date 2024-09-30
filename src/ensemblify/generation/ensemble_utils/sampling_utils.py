@@ -1,3 +1,5 @@
+"""Auxiliary functions for the conformational sampling process."""
+
 # IMPORTS
 ## Standard Library Imports
 from copy import deepcopy

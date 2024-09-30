@@ -1,11 +1,8 @@
-"""
+"""All of Ensemblify's functionalities integrated into one function call."""
 
-"""
-#!/usr/bin/python3
 # IMPORTS
 ## Standard Library Imports
 import os
-import sys
 from timeit import default_timer as timer
 
 ## Local Imports
@@ -91,24 +88,4 @@ def ensemblify_pipeline(
                 '-----------------'))
 
     print("Ensemblify's pipeline has finished, good luck in your analysis!")
-
-def main():
-    ey.update_config({'FASPR_PATH': '/home/tiagogomes/software/FASPR-master/FASPR',
-                      'PULCHRA_PATH': '/home/tiagogomes/software/pulchra-master/pulchra_CHANGED',
-                      'PEPSI_SAXS_PATH': '/home/tiagogomes/software/Pepsi-SAXS'})
-
-    parameters = sys.argv[1]
-    analysis = sys.argv[2]
-    exp_saxs_data = sys.argv[3]
-
-    # run the pipeline
-    ensemblify_pipeline(parameters=parameters,
-                        analysis=analysis,
-                        exp_saxs_data=exp_saxs_data)
-
-if __name__ == '__main__':
-    main()
-
-# TODO Add argparse layer to main function so we can run this from command line.
-# pipeline -p params.yaml -a True -data tir.dat
 

@@ -40,6 +40,8 @@ analysis
     Calculate and plot data describing your ensemble.
 reweighting
     Reweigh a generated ensemble using experimental data.
+utils
+    Generally useful auxilliary functions for the other modules.
 
 Utilities
 ---------
@@ -56,6 +58,7 @@ from ensemblify.analysis import analyze_trajectory
 from ensemblify.conversion import ensemble2traj,traj2saxs
 from ensemblify.generation import generate_ensemble
 from ensemblify.reweighting import reweigh_ensemble
+from ensemblify.pipeline import ensemblify_pipeline
 from ensemblify.config import show_config,update_config
 from ensemblify.utils import df_from_pdb, df_to_pdb, extract_pdb_info, kde
 
@@ -64,6 +67,7 @@ __all__ = ['analyze_trajectory',
            'traj2saxs',
            'generate_ensemble',
            'reweigh_ensemble',
+           'ensemblify_pipeline',
            'show_config',
            'update_config',
            'df_from_pdb',

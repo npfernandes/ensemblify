@@ -1,3 +1,5 @@
+"""Auxiliary functions to read, manipulate and write .pdb files."""
+
 # IMPORTS
 ## Standard Library Imports
 import os

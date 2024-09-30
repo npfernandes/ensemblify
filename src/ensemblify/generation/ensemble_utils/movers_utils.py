@@ -1,6 +1,4 @@
-"""
-Auxiliary functions for custom Movers created from the PyRosetta Mover class.
-"""
+"""Auxiliary functions to read database files into memory and for custom Movers created from the PyRosetta Mover class."""
 
 # IMPORTS
 ## Third Party Imports

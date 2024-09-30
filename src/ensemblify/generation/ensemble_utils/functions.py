@@ -1,6 +1,4 @@
-"""
-Useful functions for sampling.
-"""
+"""Auxiliary functions for sampling."""
 
 # IMPORTS
 ## Standard Library Imports

@@ -1,4 +1,4 @@
-""" Fit a calculated SAXS curve to experimental SAXS data."""
+"""Auxiliary functions for the conversion module."""
 
 # IMPORTS
 ## Standard Library Imports
@@ -40,11 +40,12 @@ def move_topol_pdb(
     """
     topology_path = os.path.join(destination_path,f'{job_name}_top.pdb')
     for pdb in glob.iglob(os.path.join(origin_path,'*.pdb')):
-        with open(pdb,'r',encoding='utf-8-sig') as f, open(topology_path,'w',encoding='utf-8') as output:
-            output.write(f.read())
+        with open(pdb,'r',encoding='utf-8-sig') as f, open(topology_path,'w',encoding='utf-8') as t:
+            t.write(f.read())
             break
 
     return topology_path
+
 
 def join_pdbs(
     pdbs_dir: str,

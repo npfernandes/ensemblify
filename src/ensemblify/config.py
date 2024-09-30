@@ -1,5 +1,6 @@
-"""View and update Ensemblify's global configuration."""
+"""Auxilliary functions to view and update Ensemblify's global configuration."""
 
+# CONSTANTS
 # Global configuration dictionary
 GLOBAL_CONFIG = {
     'USED_DATABASE_COLNAMES': {'OMG1': 'OMG1', # values == column names required in input dbs
@@ -26,6 +27,7 @@ GLOBAL_CONFIG = {
     }
 
 
+# FUNCTIONS
 def show_config() -> dict:
     """
     Show the current configuration dictionary.

@@ -1,5 +1,4 @@
 """Create a trajectory (.xtc) file from an ensemble of .pdb files."""
-#!/usr/bin/python3
 
 # IMPORTS
 ## Standard Library Imports
@@ -84,5 +83,3 @@ def ensemble2traj(
         pbar.set_description(f'{job_name} trajectory creation completed! ')
 
     return trajectory_path,topology_path
-
-# TODO Add argparse layer so we can run this from command line.

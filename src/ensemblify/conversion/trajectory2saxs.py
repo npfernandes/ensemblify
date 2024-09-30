@@ -1,5 +1,4 @@
-"""Calculate a SAXS curve from a trajectory file."""
-#!/usr/bin/python3
+"""Calculate a SAXS curve (.dat) from a trajectory file (.xtc)."""
 
 # IMPORTS
 ## Standard Library Imports
@@ -80,5 +79,3 @@ def traj2saxs(
     np.savetxt(calc_saxs_file, all_calc_saxs,encoding='utf-8')
 
     return calc_saxs_file
-
-# TODO Add argparse layer so we can run this from command line.

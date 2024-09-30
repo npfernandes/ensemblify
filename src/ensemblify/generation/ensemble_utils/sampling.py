@@ -1,3 +1,5 @@
+"""Function to sampling conformational ensembles from an input structure."""
+
 # IMPORTS
 ## Standard Library Imports
 import glob
@@ -326,4 +328,3 @@ def run_sampling(
 
     logger.info(final_log_msg)
     print(final_log_msg)
-

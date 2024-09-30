@@ -1,3 +1,5 @@
+"""Auxiliary functions and classes with miscellaneous use."""
+
 # IMPORTS
 ## Third Party Imports
 import numpy as np

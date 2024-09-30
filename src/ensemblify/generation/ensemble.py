@@ -1,24 +1,12 @@
-#!/usr/bin/python3
-"""A one-line summary of the module or program, terminated by a period.
+"""Generate an ensemble of conformations from a parameters file."""
 
-Leave one blank line.  The rest of this docstring should contain an
-overall description of the module or program.  Optionally, it may also
-contain a brief description of exported classes and functions and/or usage
-examples.
-
-Typical usage example:
-
-  foo = ClassFoo()
-  bar = foo.FunctionBar()
-"""
 # IMPORTS
 ## Standard Library Imports
-import argparse
 import os
 import shutil
 
 ## Local Imports
-from ensemblify.generation.ensemble_utils import read_input_parameters,setup_ensemble_gen_params, run_sampling
+from ensemblify.generation.ensemble_utils import read_input_parameters,setup_ensemble_gen_params,run_sampling
 
 # MAIN FUNCTION
 def generate_ensemble(parameters_path: str):
@@ -112,13 +100,3 @@ def generate_ensemble(parameters_path: str):
     print('Ensemble Generation Finished!')
 
     return VALID_PDBS_DIR
-
-def main():
-    parser = argparse.ArgumentParser(description='Given an Ensemblify parameters file, generate an ensemble.',
-                                     usage='ensemblify [parameters]')
-    parser.add_argument('-p','--parameters',
-                        metavar='parameters',
-                        type=str,
-                        help='path to Ensemblify parameters .yaml file')
-    args = parser.parse_args()
-    generate_ensemble(args.parameters)

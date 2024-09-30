@@ -1,6 +1,4 @@
-"""
-Custom Movers created from the PyRosetta Mover class.
-"""
+"""Custom Mover classes created from the PyRosetta Mover class."""
 
 # IMPORTS
 ## Standard Library Imports

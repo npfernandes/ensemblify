@@ -1,4 +1,4 @@
-"""Process inputs (parameters file and sequence in .pdb format)."""
+"""Auxiliary functions to process input parameters file and the input structure."""
 
 # IMPORTS
 ## Standard Library Imports
@@ -405,4 +405,3 @@ def read_input_parameters(parameter_path: str) -> dict:
 
     validated_params = copy.deepcopy(params)
     return validated_params
-

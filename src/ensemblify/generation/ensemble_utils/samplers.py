@@ -1,4 +1,4 @@
-""" Dihedral angles sampling algorithms. """
+"""Custom Sampler classes to generate protein conformations."""
 
 # IMPORTS
 ## Standard Library Imports
@@ -62,8 +62,8 @@ class MonteCarloSampler():
         """
         self.scorefxn = scorefxn
         self.databases = databases
-        self.params = smp_params
-        self.mover = setup_mover(mover_id,databases,log_file) #smp_params is a dictionary
+        self.params = smp_params  #smp_params is a dictionary
+        self.mover = setup_mover(mover_id,databases,log_file)
         self.log_file = log_file
 
     def apply(self,
@@ -144,10 +144,7 @@ class MonteCarloSampler():
                         tryagain = False
                         current_score = new_score
                     else:
-                        #start = timer()
                         working_pose.assign(pose)
-                        # end = timer()
-                        # print('Detached_copy time:',end-start)
                 loops += 1
 
             # Log MC failure for this res

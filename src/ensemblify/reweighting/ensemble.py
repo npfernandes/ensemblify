@@ -1,6 +1,8 @@
-#!/usr/bin/python3
+"""Reweigh a conformational ensemble using experimental data."""
+
 # IMPORTS
 ## Standard Library Imports
+import glob
 import os
 import shutil
 
@@ -14,10 +16,10 @@ from plotly.offline import get_plotlyjs
 from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.analysis import calculate_metrics_data
 from ensemblify.conversion import traj2saxs
-from ensemblify.reweighting.ensemble_utils import (process_exp_data,correct_exp_error,
-                                                        bme_ensemble_reweighting,create_effective_frames_fit_fig,
-                                                        average_saxs_profiles,create_reweighting_fits_fig,
-                                                        create_ss_frequency_difference_fig, create_reweighting_metrics_fig)
+from ensemblify.reweighting.ensemble_utils import (process_exp_data,correct_exp_error,bme_ensemble_reweighting,
+                                                   create_effective_frames_fit_fig,average_saxs_profiles,
+                                                   create_reweighting_fits_fig,create_ss_frequency_difference_fig,
+                                                   create_reweighting_metrics_fig)
 
 # FUNCTIONS
 def reweigh_ensemble(
@@ -25,9 +27,9 @@ def reweigh_ensemble(
     topology: str,
     trajectory_id: str,
     exp_saxs_data: str,
-    output_dir: str = os.getcwd(),
-    thetas: list[int] = [1, 10, 20, 50, 75, 100, 200, 400, 750, 1000, 5000, 10000],
-    calculated_metrics_data: dict[str,list[pd.DataFrame]] = None,
+    output_dir: str = None,
+    thetas: list[int] = None,
+    calculated_metrics_data: pd.DataFrame | str = None,
     compare_rg: bool = True,
     compare_dmax: bool = True,
     compare_eed: bool = True,
@@ -54,12 +56,12 @@ def reweigh_ensemble(
             path to directory where interactive .html plots and reweighting output files will be
             stored. Defaults to current working directory.
         thetas:
-            list of values to assign to the theta parameter in BME. The ensemble will be reweighted
-            each time using a different theta value. The effect of different theta values can then be
+            list of values to try as the theta parameter in BME. The ensemble will be reweighted
+            each time using a different theta value. The effect of different theta values can be
             analyzed in the created effective frames figure.
         calculated_metrics_data:
             DataFrame with calculated structural metrics (columns) for each frame of the trajectory
-            (rows). Defaults to None, and this data is calculated anew.
+            (rows) or path to this DataFrame in .csv format. Defaults to None, and this data is calculated anew.
         compare_rg:
             whether to calculate/consider the radius of gyration when comparing structural metrics
             between uniform and reweighted conformational ensembles. Defaults to True.
@@ -80,8 +82,14 @@ def reweigh_ensemble(
             MDAnalysis selections.
             Defaults to None.
     """
+    # Setup theta values
+    if thetas is None:
+        thetas = [1, 10, 20, 50, 75, 100, 200, 400, 750, 1000, 5000, 10000]
+
     # Setup output directory
-    if not os.path.isdir(output_dir):
+    if output_dir is None:
+        output_dir = os.getcwd()
+    elif not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 
     # Copy experimental data file into output dir before working on it
@@ -116,25 +124,33 @@ def reweigh_ensemble(
                                exp_saxs_file=exp_saxs_file)
 
     # Calculate metrics from trajectory
-    if calculated_metrics_data:
+    if isinstance(calculated_metrics_data,str):
+        assert calculated_metrics_data.endswith('.csv'), ('Calculated metrics data must be'
+                                                          ' provided in .csv format!')
+        metrics = pd.read_csv(calculated_metrics_data,index_col=0)
+        print('Ensemble structural metrics data has been read from file.')
+    elif isinstance(calculated_metrics_data,pd.DataFrame):
+        print('Ensemble structural metrics data has been provided.')
         metrics = calculated_metrics_data
     else:
+        print('No data was provided for ensemble structural metrics.')
         print('Calculating ensemble structural metrics...')
         metrics = calculate_metrics_data(trajectory=trajectory,
                                          topology=topology,
-                                         output_path=os.path.join(output_dir,f'{trajectory_id}_structural_metrics.csv'),
+                                         output_path=os.path.join(output_dir,
+                                                                  f'{trajectory_id}_structural_metrics.csv'),
                                          rg=compare_rg,
                                          dmax=compare_dmax,
                                          eed=compare_eed,
                                          cm_dist=compare_cmdist)
 
     # Reweigh ensemble using different theta values
-    theta_values = np.array(thetas)
+    thetas_array = np.array(thetas)
 
     print('Reweighting ensemble with different values for theta parameter...')
     stats, weights = bme_ensemble_reweighting(exp_saxs_file=exp_saxs_file,
                                               calc_saxs_file=calc_saxs_file,
-                                              thetas=theta_values,
+                                              thetas=thetas_array,
                                               output_dir=reweighting_dir)
 
     print(('Please analyse the provided interactive figure (effective_frames_fit.html) and '
@@ -143,7 +159,7 @@ def reweigh_ensemble(
            flush=True)
 
     effective_frames_fit_fig = create_effective_frames_fit_fig(stats=stats,
-                                                               thetas=thetas,
+                                                               thetas=thetas_array,
                                                                choices=None,
                                                                title_text=trajectory_id)
 
@@ -156,11 +172,11 @@ def reweigh_ensemble(
     choices = [int(x) for x in input_choices]
 
     # Index(es) for chosen theta(s), used to extract correct set(s) of weights
-    choice_idxs = [np.where(theta_values == x)[0][0] for x in choices]
+    choice_idxs = [np.where(thetas_array == x)[0][0] for x in choices]
 
     # Plot L curve with chosen theta(s)
     chosen_thetas_fig = create_effective_frames_fit_fig(stats=stats,
-                                                        thetas=theta_values,
+                                                        thetas=thetas_array,
                                                         choices=choices,
                                                         title_text=f'{trajectory_id} BME Reweighting')
 
@@ -177,10 +193,8 @@ def reweigh_ensemble(
     for choice,choice_idx in zip(choices,choice_idxs):
 
         # Take reweighted SAXS data using choice theta, and corresponding weights
-        rw_calc_saxs_file = os.path.join(reweighting_dir,
-                                         list(filter(lambda x: x.startswith(f'ibme_t{choice}_') and\
-                                                               x.endswith('.calc.dat'),
-                                                     os.listdir(reweighting_dir)))[0])
+        rw_calc_saxs_file = glob.glob(os.path.join(reweighting_dir,
+                                                   f'ibme_t{choice}_*.calc.dat'))
         choice_weights = weights[choice_idx]
         rw_weights.append(choice_weights)
 
@@ -262,23 +276,3 @@ def reweigh_ensemble(
 
     print('Ensemble reweighting has finished. Please refer to the interactive '
           'reweighting_dashboard.html figure for analysis.')
-
-# TODO Add argparse layer so we can run this from command line.
-
-if __name__ == '__main__':
-    import ensemblify as ey
-    ey.update_config({'PEPSI_SAXS_PATH':'/home/tiagogomes/software/Pepsi-SAXS',
-                      'BIFT_PATH': '/home/tiagogomes/software/bift'})
-
-    # ey.reweigh_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/USH3_A/USH3A_trajectory.xtc',
-    #                     topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/USH3_A/USH3A_top.pdb',
-    #                     trajectory_id='USH3A',
-    #                     exp_saxs_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/ush3_a.dat',
-    #                     output_dir='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/REWEIGHTING/USH3A')
-
-    ey.reweigh_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
-                        topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb',
-                        trajectory_id='Hst5',
-                        exp_saxs_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/bift_Hst5.dat',
-                        output_dir='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/REWEIGHTING/Hst5',)
-                        #thetas=[200])

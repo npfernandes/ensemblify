@@ -38,4 +38,5 @@ dependencies = [
 Repository = "https://github.com/npfernandes/ensemblify"
 
 [project.scripts]
-ensemblify = "ensemblify.generation.ensemble:main"
+ensemblify = "ensemblify.cli:main"
+#ensemblify = "ensemblify.generation.ensemble:main"

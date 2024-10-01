@@ -211,7 +211,7 @@ def calculate_distance_matrix(
     trajectory: str,
     topology: str,
     weights: np.ndarray | None = None,
-    output_path: str = os.getcwd(),
+    output_path: str | None = None,
     ) -> pd.DataFrame:
     """Calculate an alpha carbon average distance matrix from a trajectory and topology files.
     
@@ -238,6 +238,10 @@ def calculate_distance_matrix(
             DataFrame with the average distance between each pair of alpha carbons in the
             trajectory.
     """
+    # Setup output directory
+    if output_path is None:
+        output_path = os.getcwd()
+
     # Register alpha carbon atom numbers
     df = df_from_pdb(topology)
     df_subset = df[['ResidueNumber','AtomNumber','AtomName','X','Y','Z']]
@@ -264,6 +268,67 @@ def calculate_distance_matrix(
 
     # Get Matrix of Distances in DataFrame format
     distance_matrix = pd.DataFrame(dist_avg)
+
+
+    # # Setup weights
+    # if weights is None:
+    #     total_frames = 0
+    #     for chunk in mdtraj.iterload(trajectory, top=topology, chunk=1000):
+    #         total_frames += chunk.n_frames
+    #     weights = np.array([1/total_frames] * total_frames)
+    # else:
+    #     total_frames = len(weights)
+
+    # # Register alpha carbon atom numbers
+    # df = df_from_pdb(topology)
+    # df_subset = df[['ResidueNumber','AtomNumber','AtomName','X','Y','Z']]
+    # df_filtered = df_subset[df_subset['AtomName'] == 'CA']
+    # ca_atom_numbers = df_filtered['AtomNumber'].values
+
+    # # Calculate Distance Matrix for each trajectory chunk
+    # chunk_size = 2000
+    # chunk_idx = 0
+    # distance_matrix = None
+    # for chunk in mdtraj.iterload(trajectory,chunk=chunk_size,top=topology):
+
+    #     # Get chunk weights
+    #     chunk_weights = weights[chunk_idx * chunk_size : (chunk_idx + 1) * chunk_size]
+
+    #     # Get alpha carbon atom numbers
+    #     chunk_ca_atom_numbers = np.array([ca_atom_numbers]*chunk_size) # for multiprocess input
+
+    #     # Calculate Contact Frequencies
+    #     with ProcessPoolExecutor() as ppe:
+    #         chunk_results = list(tqdm(
+    #             ppe.map(calculate_distance_matrix_frame,chunk,chunk_weights,chunk_ca_atom_numbers),
+    #             desc=f'Calculating distance matrix for chunk {chunk_idx+1}... ',
+    #             total=chunk_size
+    #         ))
+
+    #     # Accumulate the results from the current chunk
+    #     if distance_matrix is None:
+    #         # Ensure chunk_results is an array if it's not already
+    #         distance_matrix = np.sum(chunk_results, axis=0)
+    #         print('After first chunk',distance_matrix.shape)
+    #     else:
+    #         # Ensure all arrays are concatenated properly
+    #         print('After second chunk, preconcat',distance_matrix.shape)
+    #         combined_results = np.concatenate([distance_matrix] + chunk_results, axis=0)
+    #         print('Combined results postconcat',combined_results.shape)
+    #         distance_matrix = np.sum(combined_results, axis=0,keepdims=True)
+    #         print('Post sum', distance_matrix.shape)
+
+
+    #     # # Accumulate the results from the current chunk
+    #     # if distance_matrix is None:
+    #     #     distance_matrix = np.sum(chunk_results,axis=0)
+    #     # else:
+    #     #     distance_matrix = np.sum(np.concatenate([distance_matrix]+chunk_results,axis=0),axis=0)
+
+    #     chunk_idx += 1
+
+    # # Get Matrix of Distances in DataFrame format
+    # distance_matrix = pd.DataFrame(distance_matrix)
 
     # Save contact matrix
     if os.path.isdir(output_path):
@@ -347,7 +412,7 @@ def create_distance_matrix_fig(
         y_labels = [f'{resnum}' for chain_letter in chain_letters
                     for resnum in resranges[chain_letter]]
 
-    # Create Contact Map Figure
+    # Create Distance Matrix Figure
     dmatrix_fig = go.Figure()
 
     # Add our data
@@ -525,7 +590,6 @@ def calculate_contact_matrix_frame(
     cmatrix = cmatrix.sparse.to_dense()
     mask = cmatrix == 1.0
     cmatrix[mask] = cmatrix[mask] * frame_weight
-
     return cmatrix
 
 
@@ -533,7 +597,7 @@ def calculate_contact_matrix(
     trajectory: str,
     topology: str,
     weights: np.ndarray | None = None,
-    output_path: str = os.getcwd(),
+    output_path: str | None = None,
     ) -> pd.DataFrame:
     """Calculate a contact frequency matrix from a trajectory and topology files.
     
@@ -558,6 +622,10 @@ def calculate_contact_matrix(
         contact_matrix:
             DataFrame with the frequency of each residue contact in the trajectory.
     """
+    # Setup output directory
+    if output_path is None:
+        output_path = os.getcwd()
+
     # Setup trajectory object
     traj = mdtraj.load(trajectory,top=topology)
 
@@ -573,6 +641,44 @@ def calculate_contact_matrix(
 
     # Get Matrix of Contact Frequency
     contact_matrix = reduce(lambda x, y: x.add(y,axis=0,fill_value=0), results)
+    
+    # # Setup weights
+    # if weights is None:
+    #     total_frames = 0
+    #     for chunk in mdtraj.iterload(trajectory, top=topology, chunk=1000):
+    #         total_frames += chunk.n_frames
+    #     weights = np.array([1/total_frames] * total_frames)
+    # else:
+    #     total_frames = len(weights)
+
+    # # Calculate Contact Frequencies for each trajectory chunk
+    # chunk_size = 2000
+    # chunk_idx = 0
+    # contact_matrix = None
+    # for chunk in mdtraj.iterload(trajectory,chunk=chunk_size,top=topology):
+
+    #     # Get chunk weights
+    #     chunk_weights = weights[chunk_idx * chunk_size : (chunk_idx + 1) * chunk_size]
+
+    #     # Calculate Contact Frequencies
+    #     with ProcessPoolExecutor() as ppe:
+    #         chunk_results = list(tqdm(
+    #             ppe.map(calculate_contact_matrix_frame,chunk,chunk_weights),
+    #             desc=f'Calculating contact matrix for chunk {chunk_idx+1}... ',
+    #             total=chunk_size
+    #         ))
+
+    #     # Accumulate the results from the current chunk
+    #     if contact_matrix is None:
+    #         # contact_matrix = reduce(lambda x, y: x.add(y,axis=0,fill_value=0),
+    #         #                         chunk_results)
+    #         contact_matrix = pd.concat(chunk_results).fillna(0).sum(axis=0)
+    #     else:
+    #         # contact_matrix = reduce(lambda x, y: x.add(y,axis=0,fill_value=0),
+    #         #                         [contact_matrix] + chunk_results)
+    #         contact_matrix = pd.concat([contact_matrix] + chunk_results).fillna(0).sum(axis=0)
+
+    #     chunk_idx += 1
 
     # Save contact matrix
     if os.path.isdir(output_path):
@@ -903,7 +1009,7 @@ def calculate_ss_frequency(
     """
     if weights is None:
         # Count the frequency of each secondary structure element
-        frequency = ss_assignment.apply(pd.value_counts)
+        frequency = ss_assignment.apply(lambda x: pd.Series(x).value_counts())
         frequency = frequency.fillna(0)
         frequency = frequency / ss_assignment.shape[0]
     else:
@@ -1471,7 +1577,7 @@ def create_metrics_fig(
                                      col=colnum)
 
     # Equalize x axis range
-    for rownum in range(1,nrows):
+    for rownum in range(1,nrows+1):
         for colnum, (min_val,max_val) in min_max_values.items():
             if min_val-round(max_val*0.05) > 0:
                 x_axis_min = min_val-round(max_val*0.05)
@@ -1600,7 +1706,7 @@ def calculate_analysis_data(
     trajectories: list[str],
     topologies: list[str],
     trajectory_ids: list[str],
-    output_directory: str = os.getcwd(),
+    output_directory: str | None = None,
     ramachandran_data: bool = True,
     distancematrices: bool = True,
     contactmatrices: bool = True,
@@ -1658,7 +1764,11 @@ def calculate_analysis_data(
                     'SecondaryStructureAssignments' : [SSAssignment1,SSAssignment2,SSAssignment3],
                     'StructuralMetrics' : [StructuralMetrics1,StructuralMetrics2,StructuralMetrics3]}
     """
+    # Setup output directory
+    if output_directory is None:
+        output_directory = os.getcwd()
 
+    # Calculate analysis data
     data = {'DistanceMatrices' : [],
             'ContactMatrices' : [],
             'SecondaryStructureAssignments' : [],
@@ -1730,9 +1840,8 @@ def create_analysis_figures(
     analysis_data: dict[str,list[pd.DataFrame]] | None,
     topologies: list[str],
     trajectory_ids: list[str],
-    output_directory: str = os.getcwd(),
-    color_palette: list[str] = ('#636EFA','#EF553B','#00CC96','#AB63FA','#FFA15A',
-                                '#19D3F3','#FF6692','#B6E880','#FF97FF','#FECB52'),
+    output_directory: str | None = None,
+    color_palette: list[str] | None = None,
     ) -> dict[str,list[go.Figure]]:
     """Create interactive figures given analysis data for one or more trajectory,topology
     pair of files.
@@ -1760,6 +1869,15 @@ def create_analysis_figures(
                     'SecondaryStructureFrequencies' : [SSFrequencies1,SSFrequencies2,SSFrequencies3],
                     'StructuralMetrics' : [StructuralMetrics1,StructuralMetrics2,StructuralMetrics3] }
     """
+    # Setup output directory
+    if output_directory is None:
+        output_directory = os.getcwd()
+    
+    # Setup color palette
+    if color_palette is None:
+        color_palette = ['#636EFA','#EF553B','#00CC96','#AB63FA','#FFA15A',
+                         '#19D3F3','#FF6692','#B6E880','#FF97FF','#FECB52']
+
     # If data is not available check output directory for it
     if analysis_data is None:
         analysis_data = {'DistanceMatrices' : [],
@@ -1782,6 +1900,7 @@ def create_analysis_figures(
                 else:
                     print(f'Found calculated {trajectory_id}_{data_id}')
 
+    # Create figures
     figures = {'DistanceMatrices' : [],
                'ContactMaps' : [],
                'SecondaryStructureFrequencies' : [],

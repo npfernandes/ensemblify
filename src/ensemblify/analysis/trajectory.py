@@ -25,7 +25,7 @@ def analyze_trajectory(
     dmax: bool = True,
     eed: bool = True,
     cm_dist: dict | None = None,
-    color_palette: list[str] = None,
+    color_palette: list[str] | None = None,
     ):
     """Calculate structural data and create interactive figures for given trajectory and
     topology files.
@@ -206,4 +206,13 @@ def analyze_trajectory(
 
     # For convenience, return the calculated analysis data.
     return analysis_data
-    
+
+if __name__ == '__main__':
+    analyze_trajectory(['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc'],
+                       ['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb'],
+                       ['Hst5'],
+                       output_directory='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal',
+                       ramachandran_data=False,
+                       contactmatrices=False,
+                       distancematrices=False,
+                       ssassignments=False)

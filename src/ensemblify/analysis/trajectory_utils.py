@@ -74,7 +74,7 @@ def calc_dmax(u: mda.Universe) -> float:
             frame.
 
     """
-    ca_selection = u.select_atoms('protein')
+    ca_selection = u.select_atoms('protein and name CA')
     ca_coordinates = ca_selection.positions #expose numpy array of coords
     distance_matrix_pool = scipy.spatial.distance.cdist(ca_coordinates, ca_coordinates)
     maximum_distance_pool = distance_matrix_pool.max()
@@ -171,40 +171,46 @@ def calculate_ramachandran_data(
 
 
 def calculate_distance_matrix_frame(
-    frame: mdtraj.core.trajectory.Trajectory,
+    u: mda.Universe,
+    frame_idx: int,
     frame_weight: float,
-    ca_atom_numbers: np.ndarray,
     ) -> np.ndarray:
     """Calculates a distance matrix for the alpha carbons of a trajectory frame.
 
     Args:
-        frame:
-            `mdtraj` trajectory object containing one frame of the trajectory
-            being analyzed.
+        u:
+            `MDAnalysis.Universe` object containing the trajectory being analyzed.
+        frame_idx:
+            number of the frame to be analyzed.
         frame_weight:
             distances calculated for this frame will be multiplied by this value
             in the resulting frame matrix. In a uniformly weighted matrix, calculated
             distances will be multiplied by 1 / number of trajectory frames.
-        ca_atom_numbers:
-            array of atom numbers corresponding to the structure's alpha carbons.
 
     Returns:
             np.ndarray: distance matrix for the current frame.
     """
-    frame_ca_coords = []
-    for idx in ca_atom_numbers:
-        frame_ca_coords.append(frame.xyz[0][idx-1])
+    # Point universe to frame of interest
+    u.trajectory[frame_idx]
 
-    distance_matrix = []
-    for i,a_ca_coords in enumerate(frame_ca_coords):
-        distance_list = []
-        for j,b_ca_coords in enumerate(frame_ca_coords):
-            if abs(i-j) <= 2:
-                distance_list.append(0.0)
-            else:
-                distance_list.append(np.linalg.norm(a_ca_coords-b_ca_coords)* frame_weight)
-        distance_matrix.append(distance_list)
-    return np.array(distance_matrix)
+    # Select alpha carbons
+    ca_selection = u.select_atoms('protein and name CA')
+
+    # Expose coordinates np.array
+    ca_coordinates = ca_selection.positions
+
+    # Calculate distance matrix
+    distance_matrix = scipy.spatial.distance.cdist(ca_coordinates,ca_coordinates,'euclidean')
+
+    # Ignore neighbours
+    for ca1_idx, ca2_idx in np.argwhere(distance_matrix):
+        if abs(ca1_idx - ca2_idx) <= 2:
+            distance_matrix[ca1_idx,ca2_idx] = 0.0
+
+    # Reweigh matrix
+    distance_matrix *= frame_weight
+
+    return distance_matrix
 
 
 def calculate_distance_matrix(
@@ -242,95 +248,30 @@ def calculate_distance_matrix(
     if output_path is None:
         output_path = os.getcwd()
 
-    # Register alpha carbon atom numbers
-    df = df_from_pdb(topology)
-    df_subset = df[['ResidueNumber','AtomNumber','AtomName','X','Y','Z']]
-    df_filtered = df_subset[df_subset['AtomName'] == 'CA']
-    ca_atom_numbers = df_filtered['AtomNumber'].values
+    # Setup Universe object
+    u = mda.Universe(topology,trajectory)
+    trajectory_size = len(u.trajectory)
 
-    # Setup trajectory object
-    traj = mdtraj.load(trajectory,top=topology)
-
-    # Setup weights
+    # Setup multiprocessing variables
     if weights is None:
-        weights = np.array([1/len(traj)] * len(traj) )
+        weights = np.array([1/trajectory_size] * trajectory_size )
+    frame_idxs = np.array(range(trajectory_size))
+    universes = [u] * trajectory_size
 
-    # Calculate distance matrix
-    all_ca_atom_numbers = np.array([ca_atom_numbers]*len(traj)) # for multiprocess input
+    # Calculate average distance matrix using multiprocessing
     with ProcessPoolExecutor() as ppe:
-        results = list(tqdm(ppe.map(calculate_distance_matrix_frame,
-                                    traj,
-                                    weights,
-                                    all_ca_atom_numbers),
-                            desc='Calculating distance matrix... ',
-                            total=len(traj)))
-    dist_avg = np.sum(results,axis=0)
+        distance_matrix_array = reduce(lambda x,y: np.add(x,y),
+                                       tqdm(ppe.map(calculate_distance_matrix_frame,
+                                                    universes,
+                                                    frame_idxs,
+                                                    weights),
+                                            desc='Calculating distance matrix... ',
+                                            total=trajectory_size))
 
-    # Get Matrix of Distances in DataFrame format
-    distance_matrix = pd.DataFrame(dist_avg)
+    # Convert calculated averaged matrix to DataFrame
+    distance_matrix = pd.DataFrame(distance_matrix_array)
 
-
-    # # Setup weights
-    # if weights is None:
-    #     total_frames = 0
-    #     for chunk in mdtraj.iterload(trajectory, top=topology, chunk=1000):
-    #         total_frames += chunk.n_frames
-    #     weights = np.array([1/total_frames] * total_frames)
-    # else:
-    #     total_frames = len(weights)
-
-    # # Register alpha carbon atom numbers
-    # df = df_from_pdb(topology)
-    # df_subset = df[['ResidueNumber','AtomNumber','AtomName','X','Y','Z']]
-    # df_filtered = df_subset[df_subset['AtomName'] == 'CA']
-    # ca_atom_numbers = df_filtered['AtomNumber'].values
-
-    # # Calculate Distance Matrix for each trajectory chunk
-    # chunk_size = 2000
-    # chunk_idx = 0
-    # distance_matrix = None
-    # for chunk in mdtraj.iterload(trajectory,chunk=chunk_size,top=topology):
-
-    #     # Get chunk weights
-    #     chunk_weights = weights[chunk_idx * chunk_size : (chunk_idx + 1) * chunk_size]
-
-    #     # Get alpha carbon atom numbers
-    #     chunk_ca_atom_numbers = np.array([ca_atom_numbers]*chunk_size) # for multiprocess input
-
-    #     # Calculate Contact Frequencies
-    #     with ProcessPoolExecutor() as ppe:
-    #         chunk_results = list(tqdm(
-    #             ppe.map(calculate_distance_matrix_frame,chunk,chunk_weights,chunk_ca_atom_numbers),
-    #             desc=f'Calculating distance matrix for chunk {chunk_idx+1}... ',
-    #             total=chunk_size
-    #         ))
-
-    #     # Accumulate the results from the current chunk
-    #     if distance_matrix is None:
-    #         # Ensure chunk_results is an array if it's not already
-    #         distance_matrix = np.sum(chunk_results, axis=0)
-    #         print('After first chunk',distance_matrix.shape)
-    #     else:
-    #         # Ensure all arrays are concatenated properly
-    #         print('After second chunk, preconcat',distance_matrix.shape)
-    #         combined_results = np.concatenate([distance_matrix] + chunk_results, axis=0)
-    #         print('Combined results postconcat',combined_results.shape)
-    #         distance_matrix = np.sum(combined_results, axis=0,keepdims=True)
-    #         print('Post sum', distance_matrix.shape)
-
-
-    #     # # Accumulate the results from the current chunk
-    #     # if distance_matrix is None:
-    #     #     distance_matrix = np.sum(chunk_results,axis=0)
-    #     # else:
-    #     #     distance_matrix = np.sum(np.concatenate([distance_matrix]+chunk_results,axis=0),axis=0)
-
-    #     chunk_idx += 1
-
-    # # Get Matrix of Distances in DataFrame format
-    # distance_matrix = pd.DataFrame(distance_matrix)
-
-    # Save contact matrix
+    # Save distance matrix
     if os.path.isdir(output_path):
         with warnings.catch_warnings():
             # Suppress FutureWarnings related to SparseDtype
@@ -569,28 +510,64 @@ def create_distance_matrix_fig(
 
 
 def calculate_contact_matrix_frame(
-    frame: mdtraj.core.trajectory.Trajectory,
+    u: mda.Universe,
+    frame_idx: int,
     frame_weight: float,
-    ) -> pd.DataFrame:
+    ) -> np.ndarray:
     """Calculates a contact matrix for a frame of a trajectory.
 
     Args:
-        frame:
-            `mdtraj` trajectory object containing one frame of the trajectory
-            being analyzed.
+        u:
+            `MDAnalysis.Universe` object containing the trajectory being analyzed.
+        frame_idx:
+            number of the frame to be analyzed.
         frame_weight:
             contacts found in this frame will be assigned this value in the
             resulting matrix instead of the default value of 1. In a uniformly
             weighted matrix, this value will be of 1 / number of trajectory frames.
 
     Returns:
-            pd.DataFrame: contact matrix for the current frame.
+        np.ndarray:
+            contact matrix for the current frame.
     """
-    cmatrix = ContactFrequency(frame,cutoff=0.45,n_neighbors_ignored=2).residue_contacts.df
-    cmatrix = cmatrix.sparse.to_dense()
-    mask = cmatrix == 1.0
-    cmatrix[mask] = cmatrix[mask] * frame_weight
-    return cmatrix
+    # Point universe to frame of interest
+    u.trajectory[frame_idx]
+
+    # Create results contact matrix
+    contact_matrix = np.array([[0.0] * len(u.residues)] *len(u.residues))
+
+    # For each residue, iterate over all other residues
+    for res1 in u.residues:
+
+        # Select current residue's atoms
+        current_res_atom_selection = res1.atoms
+
+        # Expose coordinates np.array
+        current_res_atom_coordinates = current_res_atom_selection.positions
+
+        # Only calculate distances once for each pair, ignoring neighbours
+        for res2 in u.residues[res1.resindex + 3:]:
+
+            # Select current residue's atoms
+            target_res_atom_selection = res2.atoms
+
+            # Expose coordinates np.array
+            target_res_atom_coordinates = target_res_atom_selection.positions
+
+            # Calculate distance matrix
+            distance_matrix = scipy.spatial.distance.cdist(current_res_atom_coordinates,
+                                                            target_res_atom_coordinates,
+                                                            'euclidean')
+
+            if np.argwhere(distance_matrix < 4.5).shape[0] > 0:
+                # Add contacts on both halves of matrix
+                contact_matrix[res1.resindex,res2.resindex] = 1.0
+                contact_matrix[res2.resindex,res1.resindex] = 1.0
+
+    # Reweigh matrix
+    contact_matrix *= frame_weight
+
+    return contact_matrix
 
 
 def calculate_contact_matrix(
@@ -626,59 +603,28 @@ def calculate_contact_matrix(
     if output_path is None:
         output_path = os.getcwd()
 
-    # Setup trajectory object
-    traj = mdtraj.load(trajectory,top=topology)
+    # Setup Universe object
+    u = mda.Universe(topology,trajectory)
+    trajectory_size = len(u.trajectory)
 
-    # Setup weights
+    # Setup multiprocessing variables
     if weights is None:
-        weights = np.array([1/len(traj)] * len(traj) )
+        weights = np.array([1/trajectory_size] * trajectory_size )
+    frame_idxs = np.array(range(trajectory_size))
+    universes = [u] * trajectory_size
 
-    # Calculate Contact Frequencies
+    # Calculate average distance matrix using multiprocessing
     with ProcessPoolExecutor() as ppe:
-        results = list(tqdm(ppe.map(calculate_contact_matrix_frame,traj,weights),
-                            desc='Calculating contact matrix... ',
-                            total=len(traj)))
+        contact_matrix_array = reduce(lambda x,y: np.add(x,y),
+                                      tqdm(ppe.map(calculate_contact_matrix_frame,
+                                                   universes,
+                                                   frame_idxs,
+                                                   weights),
+                                           desc='Calculating contact matrix...',
+                                           total=trajectory_size))
 
-    # Get Matrix of Contact Frequency
-    contact_matrix = reduce(lambda x, y: x.add(y,axis=0,fill_value=0), results)
-    
-    # # Setup weights
-    # if weights is None:
-    #     total_frames = 0
-    #     for chunk in mdtraj.iterload(trajectory, top=topology, chunk=1000):
-    #         total_frames += chunk.n_frames
-    #     weights = np.array([1/total_frames] * total_frames)
-    # else:
-    #     total_frames = len(weights)
-
-    # # Calculate Contact Frequencies for each trajectory chunk
-    # chunk_size = 2000
-    # chunk_idx = 0
-    # contact_matrix = None
-    # for chunk in mdtraj.iterload(trajectory,chunk=chunk_size,top=topology):
-
-    #     # Get chunk weights
-    #     chunk_weights = weights[chunk_idx * chunk_size : (chunk_idx + 1) * chunk_size]
-
-    #     # Calculate Contact Frequencies
-    #     with ProcessPoolExecutor() as ppe:
-    #         chunk_results = list(tqdm(
-    #             ppe.map(calculate_contact_matrix_frame,chunk,chunk_weights),
-    #             desc=f'Calculating contact matrix for chunk {chunk_idx+1}... ',
-    #             total=chunk_size
-    #         ))
-
-    #     # Accumulate the results from the current chunk
-    #     if contact_matrix is None:
-    #         # contact_matrix = reduce(lambda x, y: x.add(y,axis=0,fill_value=0),
-    #         #                         chunk_results)
-    #         contact_matrix = pd.concat(chunk_results).fillna(0).sum(axis=0)
-    #     else:
-    #         # contact_matrix = reduce(lambda x, y: x.add(y,axis=0,fill_value=0),
-    #         #                         [contact_matrix] + chunk_results)
-    #         contact_matrix = pd.concat([contact_matrix] + chunk_results).fillna(0).sum(axis=0)
-
-    #     chunk_idx += 1
+    # Convert calculated averaged matrix to DataFrame
+    contact_matrix = pd.DataFrame(contact_matrix_array)
 
     # Save contact matrix
     if os.path.isdir(output_path):
@@ -767,6 +713,7 @@ def create_contact_map_fig(
 
     # Add our data
     if not difference:
+        contact_matrix.replace(0,np.nan,inplace=True)
         cmap_fig.add_trace(go.Heatmap(z=contact_matrix,
                                       zmin=0,
                                       zmax=1,
@@ -782,7 +729,8 @@ def create_contact_map_fig(
             hovertext.append(list())
             for xi, xx in enumerate(x_labels):
                 hovertext[-1].append(f'{xx},{yy},{contact_matrix.iat[yi,xi]}')
-
+        
+        contact_matrix.replace(0,np.nan,inplace=True)
         cmap_fig.add_trace(go.Heatmap(z=contact_matrix,
                                       zmin=-1,
                                       zmax=1,

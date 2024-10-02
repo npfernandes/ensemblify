@@ -517,7 +517,7 @@ def create_reweighting_fits_fig(
     # Setup color palette
     if colors is None:
         colors = ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7']
-    
+
     # Create Figure
     fig = make_subplots(rows=2,
                         cols=2,
@@ -774,7 +774,7 @@ def create_ss_frequency_difference_fig(
     # Iterate through chains
     for chain_number in range(len(top_info.keys()),0,-1):
         chain_letter, starting_res, chain_size = top_info[chain_number]
-        resranges[chain_letter] = [ x for x in range(starting_res, starting_res + chain_size)]  
+        resranges[chain_letter] = [ x for x in range(starting_res, starting_res + chain_size)]
         chain_letters.append(chain_letter)
 
     # Create tick labels that respect chain id
@@ -955,7 +955,7 @@ def create_reweighting_metrics_fig(
     # Setup color palette
     if colors is None:
         colors = ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7']
-    
+
     # Setup axis titles
     axis_titles = {'rg': 'R<sub>g</sub>',
                    'dmax': 'D<sub>max</sub>',

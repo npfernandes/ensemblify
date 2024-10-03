@@ -100,7 +100,7 @@ def reweigh_ensemble(
 
     # Setup directory for reweighting files
     reweighting_dir = os.path.join(output_dir,
-                                   'reweighting_results')
+                                   'bme_reweighting_results')
     if not os.path.isdir(reweighting_dir):
         os.mkdir(reweighting_dir)
 
@@ -194,7 +194,7 @@ def reweigh_ensemble(
 
         # Take reweighted SAXS data using choice theta, and corresponding weights
         rw_calc_saxs_file = glob.glob(os.path.join(reweighting_dir,
-                                                   f'ibme_t{choice}_*.calc.dat'))
+                                                   f'ibme_t{choice}_*.calc.dat'))[0]
         choice_weights = weights[choice_idx]
         rw_weights.append(choice_weights)
 
@@ -279,11 +279,14 @@ def reweigh_ensemble(
           'reweighting_dashboard.html figure for analysis.')
 
 if __name__ == '__main__':
+    from ensemblify import update_config
+    update_config({'PEPSI_SAXS_PATH': '/home/tiagogomes/software/Pepsi-SAXS',
+                   'BIFT_PATH': '/home/tiagogomes/software/bift'})
     reweigh_ensemble('/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
                      '/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb',
                      'Hst5',
                      '/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/bift_Hst5.dat',
-                     '/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/',
+                     '/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting',
                      calculated_metrics_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/Hst5_structural_metrics.csv',
                     #ramachandran_data=False,
                     #contactmatrices=False,

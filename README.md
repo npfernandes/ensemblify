@@ -287,10 +287,10 @@ For UNIX or Linux users:
     unzip Pepsi-SAXS-Linux.zip
     ```
 
-3. If you are using a bash shell, you can register `pepsi_saxs` as an alias for your Pepsi-SAXS executable by running:
+3. If you are using a bash shell, you can register `pepsisaxs` as an alias for your Pepsi-SAXS executable by running:
 
     ```bash
-    echo "alias pepsi_saxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
+    echo "alias pepsisaxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
     source ~/.bashrc
     ```
 
@@ -312,10 +312,10 @@ For MacOS users:
     unzip Pepsi-SAXS-MacOS.zip
     ```
 
-3. If you are using a bash shell, you can register `pepsi_saxs` as an alias for your Pepsi-SAXS executable by running:
+3. If you are using a bash shell, you can register `pepsisaxs` as an alias for your Pepsi-SAXS executable by running:
 
     ```bash
-    echo "alias pepsi_saxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
+    echo "alias pepsisaxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
     source ~/.bashrc
     ```
 

@@ -277,3 +277,19 @@ def reweigh_ensemble(
 
     print('Ensemble reweighting has finished. Please refer to the interactive '
           'reweighting_dashboard.html figure for analysis.')
+
+if __name__ == '__main__':
+    reweigh_ensemble('/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
+                     '/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb',
+                     'Hst5',
+                     '/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/bift_Hst5.dat',
+                     '/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/',
+                     calculated_metrics_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/Hst5_structural_metrics.csv',
+                    #ramachandran_data=False,
+                    #contactmatrices=False,
+                    #distancematrices=False,
+                    #ssassignments=False,
+                    #rg=False,
+                    #dmax=False,
+                    #eed=False
+                    )

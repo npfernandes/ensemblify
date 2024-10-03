@@ -973,7 +973,7 @@ def create_reweighting_metrics_fig(
     col_num = 1
     for metric in metrics.columns:
         # Calculate KDE for each metric and add it to Figure, along with average
-        x, p_x, av = kde(data=metrics[metric])
+        x, p_x, av, av_stderr = kde(data=metrics[metric])
         uniform_trace = go.Scatter(x=x,
                                    y=p_x,
                                    line=dict(width=3,
@@ -1004,10 +1004,10 @@ def create_reweighting_metrics_fig(
                                                          0.001)],
                                  mode='markers',
                                  marker_color='black',
-                                 hovertext=f'Avg: {round(av,2)}',
+                                 hovertext=f'Avg: {round(av,2)} &plusmn; {round(av_stderr,2)}',
                                  hoverinfo='text',
                                  fill='toself',
-                                 name=f'Avg: {round(av,2)}',
+                                 name=f'Avg: {round(av,2)} &plusmn; {round(av_stderr,2)}',
                                  opacity=0),
                       row=row_num,
                       col=col_num)
@@ -1018,8 +1018,8 @@ def create_reweighting_metrics_fig(
 
         for weights,color in zip(rw_weights,colors):
             # Recalculate KDE for each metric and add it to Figure, along with average
-            x_rew, p_x_rew, av_rew = kde(data=metrics[metric],
-                                         weights=weights)
+            x_rew, p_x_rew, av_rew, av_rew_stderr = kde(data=metrics[metric],
+                                                        weights=weights)
             x_rews.append(x_rew)
             p_x_rews.append(p_x_rew)
             reweighted_trace = go.Scatter(x=x_rew,
@@ -1052,10 +1052,10 @@ def create_reweighting_metrics_fig(
                                                              0.001)],
                                      mode='markers',
                                      marker_color=reweighted_trace.line.color,
-                                     hovertext=f'Avg: {round(av_rew,2)}',
+                                     hovertext=f'Avg: {round(av_rew,2)} &plusmn; {round(av_rew_stderr,2)}',
                                      hoverinfo='text',
                                      fill='toself',
-                                     name=f'Avg: {round(av_rew,2)}',
+                                     name=f'Avg: {round(av_rew,2)} &plusmn; {round(av_rew_stderr,2)}',
                                      opacity=0),
                           row=row_num,
                           col=col_num)

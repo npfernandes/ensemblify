@@ -169,6 +169,7 @@ def analyze_trajectory(
 
     # Build html
     dashboard_html = f'''
+    <!DOCTYPE html>
     <html>
         <head>
             <script type="text/javascript">{get_plotlyjs()}</script>

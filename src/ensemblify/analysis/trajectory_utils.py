@@ -1317,6 +1317,7 @@ def create_metrics_traces(
     hist_traces = []
     scatter_traces = []
     avg_values = []
+    avg_stderr_values = []
 
     for col_name in metrics.columns:
         hist_trace = go.Histogram(x=metrics[col_name],
@@ -1332,7 +1333,7 @@ def create_metrics_traces(
 
         hist_traces.append(hist_trace)
 
-        kde_x, kde_y, avg = kde(data=np.array(metrics[col_name]))
+        kde_x, kde_y, avg, avg_stderr = kde(data=np.array(metrics[col_name]))
 
         scatter_trace = go.Scatter(x=kde_x,
                                    y=kde_y,
@@ -1345,8 +1346,9 @@ def create_metrics_traces(
 
         scatter_traces.append(scatter_trace)
         avg_values.append(avg)
+        avg_stderr_values.append(avg_stderr)
 
-    return box_traces,hist_traces,scatter_traces,avg_values
+    return box_traces,hist_traces,scatter_traces,avg_values,avg_stderr_values
 
 
 def create_metrics_fig(
@@ -1355,6 +1357,7 @@ def create_metrics_fig(
     total_hist_traces: dict[str,list[go.Histogram]],
     total_scatter_traces: dict[str,list[go.Scatter]],
     total_avg_values: dict[str,list[float]],
+    total_avg_stderr_values: dict[str,list[float]],
     output_path: str | None = None,
     ) -> go.Figure:
     """Create a Structural Metrics Figure from previously created Box, Histogram and Scatter traces.
@@ -1453,6 +1456,8 @@ def create_metrics_fig(
 
             # Add mean dashed lines
             mean_value = total_avg_values[trajectory_id][colnum-1]
+            mean_value_stderr = total_avg_stderr_values[trajectory_id][colnum-1]
+
             metrics_fig.add_shape(dict(name=scatter_trace.name,
                                        type='line',
                                        xref='x',
@@ -1467,7 +1472,7 @@ def create_metrics_fig(
                                                  width=3)),
                                        legend='legend',
                                        row=nrows,
-                                        col=colnum)
+                                       col=colnum)
 
             # Allows for hovering the dashed line to get mean value
             metrics_fig.add_trace(go.Scatter(x=[mean_value],
@@ -1478,11 +1483,11 @@ def create_metrics_fig(
                                                                                0.001)],
                                              mode='markers',
                                              marker_color=hist_trace.marker.color,
-                                             hovertext=f'Avg: {round(mean_value,2)}',
+                                             hovertext=f'Avg: {round(mean_value,2)} &plusmn; {round(mean_value_stderr,2)}',
                                              hoverinfo='text',
                                              hoverlabel_bgcolor=hist_trace.marker.color,
                                              fill='toself',
-                                             name=f'Avg: {round(mean_value,2)}',
+                                             name=f'Avg: {round(mean_value,2)} &plusmn; {round(mean_value_stderr,2)}',
                                              opacity=0,
                                              showlegend=False),
                                   row=nrows,
@@ -1905,6 +1910,7 @@ def create_analysis_figures(
     total_hist_traces = {}
     total_scatter_traces = {}
     total_avg_values = {}
+    total_avg_stderr_values = {}
 
     for i,(trajectory_id,topology,color) in enumerate(zip(trajectory_ids,topologies,color_palette)):
         try:
@@ -1915,14 +1921,16 @@ def create_analysis_figures(
             box_traces,\
             hist_traces,\
             scatter_traces,\
-            avg_values = create_metrics_traces(metrics=metrics,
-                                               trajectory_id=trajectory_id,
-                                               color=color)
+            avg_values,\
+            avg_stderr_values = create_metrics_traces(metrics=metrics,
+                                                      trajectory_id=trajectory_id,
+                                                      color=color)
 
             total_box_traces[trajectory_id] = box_traces
             total_hist_traces[trajectory_id] = hist_traces
             total_scatter_traces[trajectory_id] = scatter_traces
             total_avg_values[trajectory_id] = avg_values
+            total_avg_stderr_values[trajectory_id] = avg_stderr_values
 
     if total_box_traces:
         metrics_fig_output_path = os.path.join(output_directory,
@@ -1933,6 +1941,7 @@ def create_analysis_figures(
                                          total_hist_traces=total_hist_traces,
                                          total_scatter_traces=total_scatter_traces,
                                          total_avg_values=total_avg_values,
+                                         total_avg_stderr_values=total_avg_stderr_values,
                                          output_path=metrics_fig_output_path)
 
         figures['StructuralMetrics'] = metrics_fig

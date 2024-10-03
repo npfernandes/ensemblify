@@ -47,6 +47,8 @@ def kde(
                 normalized kde distribution.
             avg:
                 average of the given dataset.
+            avg_stderr:
+                the standard error of the calculated average.
 
     """
     # By default weights are uniform
@@ -76,4 +78,7 @@ def kde(
     avg = np.average(data,
                      weights=weights)
 
-    return x_coords,norm_kde,avg
+    # Get the standard error of the calculated mean
+    avg_stderr = np.std(data, ddof=1) / np.sqrt(np.sum(np.square(weights))) # weighted SEM
+
+    return x_coords,norm_kde,avg,avg_stderr

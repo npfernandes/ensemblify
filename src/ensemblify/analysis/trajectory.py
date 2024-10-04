@@ -13,9 +13,9 @@ from ensemblify.analysis.trajectory_utils import calculate_analysis_data,create_
 
 # FUNCTIONS
 def analyze_trajectory(
-    trajectories: list[str],
-    topologies: list[str],
-    trajectory_ids: list[str],
+    trajectories: list[str] | str,
+    topologies: list[str] | str,
+    trajectory_ids: list[str] | str,
     output_directory: str = None,
     ramachandran_data: bool = True,
     distancematrices: bool = True,
@@ -32,11 +32,14 @@ def analyze_trajectory(
 
     Args:
         trajectories:
-            list of paths to .xtc trajectory files.
+            list of paths to .xtc trajectory files or string with the path to a single .xtc
+            trajectory file.
         topologies:
-            list of paths to .pdb topology files.
+            list of paths to .pdb topology files or string with the path to a single .pdb
+            topology file.
         trajectory_ids:
-            prefix trajectory identifiers to distinguish between calculated data files.
+            list of prefix trajectory identifiers to distinguish between calculated data
+            files or string with a single prefix trajectory identifier.
         output_directory:
             path to directory where calculated data and created figures will be stored.
             If it does not exist, it is created. Defaults to current working directory.
@@ -79,6 +82,14 @@ def analyze_trajectory(
             each frame of each given trajectory. For convenience, this is returned as a variable
             as well as saved to output directory.
     """
+    # Setup trajectory,topology,trajectory_id
+    if isinstance(trajectories,str):
+        trajectories = list(trajectories)
+    if isinstance(topologies,str):
+        topologies = list(topologies)
+    if isinstance(trajectory_ids,str):
+        trajectory_ids = list(trajectory_ids)
+
     # Setup output directory
     if output_directory is None:
         output_directory = os.getcwd()
@@ -91,7 +102,6 @@ def analyze_trajectory(
                          '#19D3F3','#FF6692','#B6E880','#FF97FF','#FECB52']
 
     # Calculate analysis data
-    print(f'Analyzing {trajectory_ids} trajectories...')
     analysis_data = calculate_analysis_data(trajectories=trajectories,
                                             topologies=topologies,
                                             trajectory_ids=trajectory_ids,
@@ -106,7 +116,6 @@ def analyze_trajectory(
                                             cm_dist=cm_dist)
 
     # Create Figures
-    print(f'Creating {trajectory_ids} analysis figures...')
     figures = create_analysis_figures(analysis_data=analysis_data,
                                       topologies=topologies,
                                       trajectory_ids=trajectory_ids,
@@ -202,8 +211,8 @@ def analyze_trajectory(
     with open(os.path.join(output_directory,'analysis_dashboard.html'),'w',encoding='utf-8') as f:
         f.write(dashboard_html)
 
-    print('Ensemble metrics calculation has finished. Please refer to the interactive '
-          'analysis_dashboard.html figure for analysis.')
+    print('Ensemble analysis calculation has finished. Please consult the interactive '
+          'analysis_dashboard.html figure.')
 
     # For convenience, return the calculated analysis data.
     return analysis_data

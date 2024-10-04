@@ -1728,6 +1728,8 @@ def calculate_analysis_data(
             'StructuralMetrics' : [] }
 
     for trajectory_id,trajectory,topology in zip(trajectory_ids,trajectories,topologies):
+        print(f'Analyzing {trajectory_id} trajectory...')
+
         # Analysis not meant for interactive figures
         if ramachandran_data:
             print(f'Calculating ramachandran data for {trajectory_id}...')
@@ -1860,6 +1862,7 @@ def create_analysis_figures(
                'StructuralMetrics' : None }
 
     for i,(trajectory_id,topology,color) in enumerate(zip(trajectory_ids,topologies,color_palette)):
+        print(f'Creating {trajectory_id} analysis figures...')
 
         try:
             distance_matrix = analysis_data['DistanceMatrices'][i]

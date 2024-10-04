@@ -22,7 +22,7 @@ from ensemblify.reweighting.ensemble_utils import (process_exp_data,correct_exp_
                                                    create_reweighting_metrics_fig)
 
 # FUNCTIONS
-def reweigh_ensemble(
+def reweight_ensemble(
     trajectory: str,
     topology: str,
     trajectory_id: str,
@@ -104,10 +104,13 @@ def reweigh_ensemble(
     if not os.path.isdir(reweighting_dir):
         os.mkdir(reweighting_dir)
 
-    # Process input experimental data (check units)
+    # Process input experimental data
+    print(f'Processing {trajectory_id} experimental data file...')
+
+    ## Check units
     processed_exp_data = process_exp_data(experimental_data_path=exp_saxs_data_copy)
 
-    # Process input experimental data (correct error)
+    ## Correct error
     try:
         exp_saxs_file = correct_exp_error(experimental_data_path=processed_exp_data)
     except subprocess.CalledProcessError: # if BIFT is not available
@@ -125,16 +128,17 @@ def reweigh_ensemble(
 
     # Calculate metrics from trajectory
     if isinstance(calculated_metrics_data,str):
+        print(f'Attempting to read {trajectory_id} ensemble structural metrics data from file...')
         assert calculated_metrics_data.endswith('.csv'), ('Calculated metrics data must be'
                                                           ' provided in .csv format!')
         metrics = pd.read_csv(calculated_metrics_data,index_col=0)
-        print('Ensemble structural metrics data has been read from file.')
+        print(f'{trajectory_id} ensemble structural metrics data has been read from file.')
     elif isinstance(calculated_metrics_data,pd.DataFrame):
-        print('Ensemble structural metrics data has been provided.')
+        print(f'{trajectory_id} ensemble structural metrics data has been provided.')
         metrics = calculated_metrics_data
     else:
-        print('No data was provided for ensemble structural metrics.')
-        print('Calculating ensemble structural metrics...')
+        print(f'No data was provided for {trajectory_id} ensemble structural metrics.')
+        print(f'Calculating {trajectory_id} ensemble structural metrics...')
         metrics = calculate_metrics_data(trajectory=trajectory,
                                          topology=topology,
                                          output_path=os.path.join(output_dir,
@@ -147,7 +151,7 @@ def reweigh_ensemble(
     # Reweigh ensemble using different theta values
     thetas_array = np.array(thetas)
 
-    print('Reweighting ensemble with different values for theta parameter...')
+    print(f'Applying BME reweighting to {trajectory_id} ensemble with different values for theta parameter...')
     stats, weights = bme_ensemble_reweighting(exp_saxs_file=exp_saxs_file,
                                               calc_saxs_file=calc_saxs_file,
                                               thetas=thetas_array,
@@ -167,7 +171,7 @@ def reweigh_ensemble(
                                         config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
 
     # Capture chosen theta values
-    input_choices = input('Chosen theta(s):').split(',')
+    input_choices = input('Choose theta(s):').split(',')
     print(f'Chosen theta value(s): {",".join(input_choices)}.')
     choices = [int(x) for x in input_choices]
 
@@ -209,6 +213,7 @@ def reweigh_ensemble(
     # All the priors are the same
     common_i_prior = i_priors[0]
 
+    print(f'Creating {trajectory_id} reweighted interactive figures...')
     # Plot uniform/reweighted fits
     rw_fits_fig = create_reweighting_fits_fig(q=q,
                                               i_exp=i_exp,
@@ -225,6 +230,7 @@ def reweigh_ensemble(
                                                     rw_weights=rw_weights,
                                                     title_text=f'{trajectory_id} Reweighted Structural Metrics')
 
+    print(f'Building {trajectory_id} reweighting dashboard...')
     # Offline Interactive Html
     chosen_theta_div = chosen_thetas_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
                                                  full_html=False,
@@ -282,7 +288,7 @@ if __name__ == '__main__':
     from ensemblify import update_config
     update_config({'PEPSI_SAXS_PATH': '/home/tiagogomes/software/Pepsi-SAXS',
                    'BIFT_PATH': '/home/tiagogomes/software/bift'})
-    reweigh_ensemble('/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
+    reweight_ensemble('/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
                      '/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb',
                      'Hst5',
                      '/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/bift_Hst5.dat',

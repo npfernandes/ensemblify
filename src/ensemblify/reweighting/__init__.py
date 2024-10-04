@@ -11,6 +11,6 @@ Typical usage example:
   bar = foo.FunctionBar()
 """
 
-from ensemblify.reweighting.ensemble import reweigh_ensemble
+from ensemblify.reweighting.ensemble import reweight_ensemble
 
-__all__ = ['reweigh_ensemble']
+__all__ = ['reweight_ensemble']

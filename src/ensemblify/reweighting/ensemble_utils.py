@@ -525,7 +525,7 @@ def create_reweighting_fits_fig(
                         vertical_spacing=0.35/2)
 
     # Add exp and prior traces
-    ## Exp SAXS vs SAXS reweighted (i_post) and unreweighted (i_prior). No log scale
+    ## Exp SAXS vs SAXS reweighted (i_post) and uniform (i_prior). No log scale
     fig.add_traces([go.Scatter(x=q,
                                y=i_exp,
                                error_y=go.scatter.ErrorY(array=err,
@@ -545,7 +545,7 @@ def create_reweighting_fits_fig(
                     rows=1,
                     cols=1)
 
-    ## Exp SAXS vs SAXS reweighted and unreweighted. yy axis log scale
+    ## Exp SAXS vs SAXS reweighted and uniform. yy axis log scale
     fig.add_traces([go.Scatter(x=q,
                                y=i_exp,
                                error_y=go.scatter.ErrorY(array=err,
@@ -599,7 +599,7 @@ def create_reweighting_fits_fig(
     # Add post traces
     for i_post,color in zip(i_posts,colors):
 
-        # Exp SAXS vs SAXS reweighted (i_post) and unreweighted (i_prior). No log scale
+        # Exp SAXS vs SAXS reweighted (i_post) and uniform (i_prior). No log scale
         fig.add_trace(go.Scatter(x=q,
                                  y=i_post,
                                  line=dict(width=3,
@@ -610,7 +610,7 @@ def create_reweighting_fits_fig(
                       row=1,
                       col=1)
 
-        # Exp SAXS vs SAXS reweighted and unreweighted. yy axis log scale
+        # Exp SAXS vs SAXS reweighted and uniform. yy axis log scale
         fig.add_trace(go.Scatter(x=q,
                                  y=i_post,
                                  line=dict(width=3,
@@ -644,13 +644,13 @@ def create_reweighting_fits_fig(
                        col=2)
 
     # Update axes and layout
-    ## Exp SAXS vs SAXS reweighted (I_post) and unreweighted (I_prior). No log scale
+    ## Exp SAXS vs SAXS reweighted (I_post) and uniform (I_prior). No log scale
     fig.update_yaxes(row=1,
                      col=1,
                      title_text='Intensity',
                      ticks='')
 
-    ## Exp SAXS vs SAXS reweighted and unreweighted. yy axis log scale
+    ## Exp SAXS vs SAXS reweighted and uniform. yy axis log scale
     fig.update_yaxes(row=1,
                      col=2,
                      title_text='log (Intensity)',

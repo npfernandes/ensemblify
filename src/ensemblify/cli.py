@@ -5,12 +5,12 @@
 import argparse
 import sys
 
-## Third Party Imports
-from ensemblify import generate_ensemble,ensemble2traj,analyze_trajectory,reweigh_ensemble
-
 # CLASSES
 class CustomHelpFormatter(argparse.HelpFormatter):
-    """Helper class derived from argparse.HelpFormatter to make our help menus cleaner."""
+    """Helper class derived from argparse.HelpFormatter to make our help menus cleaner.
+    Looks hackish, namely the almost full cloning of the _format_action method but it is
+    unavoidable given the way argparse is built.
+    """
     def __init__(self, prog, max_help_position=4,width=80):
         super().__init__(prog, max_help_position,width)
 
@@ -89,17 +89,37 @@ def read_dict():
 def read_list():
     pass
 
-
 def main():
-    # Create top-level argument parser
+    # Create the initial argument parser to capture the module
+    initial_parser = argparse.ArgumentParser(description='Command-line tool to access various modules of the Ensemblify Python library.',
+                                             usage='ensemblify {generation,conversion,analysis,reweighting} [module options]',
+                                             add_help=False)  # Disable help for this phase
+
+    initial_parser.add_argument('module', choices=['generation', 'g', 'gen', 'conversion', 'c', 'con',
+                                                   'analysis', 'a', 'ana', 'reweighting', 'r', 'rew',
+                                                   'h','help'])
+    
+    # Print error message if no arguments are provided
+    if len(sys.argv) == 1:
+        print('Error: Missing required arguments.\n')
+        print('Usage:')
+        print('  ensemblify {generation, conversion, analysis, reweighting} [module options]\n')
+        print('Run \'ensemblify help\'  for more information.\n')
+        sys.exit(1)
+
+    # Parse only the module first
+    args, remaining_args = initial_parser.parse_known_args()
+
+    # Now create the full parser with subparsers for each module
     parser = argparse.ArgumentParser(description='Command-line tool to access the various modules of the Ensemblify Python library.',
                                      usage='ensemblify {generation,conversion,analysis,reweighting} [module options]',
                                      formatter_class=CustomHelpFormatter)
-    
+
     # Create subparsers for the modules
-    subparsers = parser.add_subparsers(dest='module',
-                                       required=True,
-                                       metavar='')
+    subparsers = parser.add_subparsers(dest='module',required=True,  metavar='')
+
+    # Expose the help option since initial parser has no help menu
+    subparsers.add_parser(name='help',aliases=['h'])
 
     # Subparser for the 'generation' module with aliases
     parser_generation = subparsers.add_parser(name='generation',
@@ -109,7 +129,7 @@ def main():
                                               description='The generation module of the Ensemblify Python library.',
                                               formatter_class=CustomHelpFormatter)
     
-    parser_generation.add_argument('-p','--parameters', type=str, required=True, help='Path to parameters file in .yaml format.', metavar='PARAMS')
+    parser_generation.add_argument('-p','--parameters', type=str, required=True, help='Path to parameters file in .yaml format.', metavar='')
 
     # Subparser for the 'conversion' module with aliases
     parser_conversion = subparsers.add_parser(name='conversion',
@@ -122,7 +142,8 @@ def main():
     parser_conversion.add_argument('-n','--jobname', required=True, type=str, help='Name for created trajectory file (.xtc).', metavar='')
     parser_conversion.add_argument('-i','--ensembledir', required=True, type=str, help='Path to directory where ensemble files (.pdb) are located.', metavar='')
     parser_conversion.add_argument('-o','--trajectorydir', required=True, type=str, help='Path to directory where trajectory file (.xtc) will be created.', metavar='')
-    parser_conversion.add_argument('-s','--size', type=int, help='(Optional) Number of frames of created trajectory file (.xtc).', metavar='')
+
+    parser_conversion.add_argument('-s','--size', default=10000, type=int, help='(Optional) Number of frames of created trajectory file (.xtc).', metavar='')
 
     # Subparser for the 'analysis' module with aliases
     parser_analysis = subparsers.add_parser(name='analysis',
@@ -167,49 +188,90 @@ def main():
     parser_reweighting.add_argument('--eed', action ='store_true', help='(Optional) Calculate and compare uniform/reweighted end-to-end distance distributions.')
     parser_reweighting.add_argument('--cmdist', type=dict[str,(str,str)], help='(Optional) Calculate and compare uniform/reweighted center of mass distance distributions for each pair of given MDAnalysis selection strings.', metavar='')
 
-    # Print error message if no arguments are provided
-    if len(sys.argv) == 1:
-        print('Error: Missing required arguments.\n')
-        print('Usage:')
-        print('  ensemblify {generation, conversion, analysis, reweighting} [module options]\n')
-        print('Run \'ensemblify --help\'  for more information.\n')
-        sys.exit(1)
+    # Now parse the remaining arguments with the full parser
+    full_args = parser.parse_args([args.module] + remaining_args)
 
-    # Parse the command-line arguments
-    args = parser.parse_args()
+    # Handle the different modules based on the parsed arguments
+    help_msg = '''
+usage: ensemblify {generation,conversion,analysis,reweighting} [module options]
 
-    # Handle the different modules
-    if args.module in ['generation', 'g', 'gen']:
-        generate_ensemble(parameters_path=args.PARAMS)
+Command-line tool to access the modules of the Ensemblify Python library.
 
-    elif args.module in ['conversion', 'c', 'con']:
-        ensemble2traj(job_name=args.jobname,
-                      ensemble_dir=args.ensembledir,
-                      trajectory_dir=args.trajectorydir)
+positional arguments:
 
-    elif args.module in ['analysis', 'a', 'ana']:
-        analyze_trajectory(trajectories=args.trajectory,
-                           topologies=args.topology,
-                           trajectory_ids=args.trajectoryid,
-                           output_directory=args.outputdir,
-                           ramachandran_data=args.ramadata,
-                           distancematrices=args.distancematrix,
-                           contactmatrices=args.contactmap,
-                           ssassignments=args.ssassign,
-                           rg=args.rg,
-                           dmax=args.dmax,
-                           eed=args.eed,
-                           cm_dist=args.cmdist,
-                           color_palette=args.colors)
+    generation (g, gen)        Access the generation module.
+    conversion (c, con)        Access the conversion module.
+    analysis (a, ana)          Access the analysis module.
+    reweighting (r, rew)       Access the reweighting module.
 
-    elif args.module in ['reweighting', 'r', 'rew']:
-        reweigh_ensemble(trajectory=args.trajectory,
-                         topology=args.topology,
-                         trajectory_id=args.trajectoryid,
-                         exp_saxs_data=args.expdata,
-                         output_dir=args.outputdir,
-                         thetas=args.thetas,
-                         compare_rg=args.rg,
-                         compare_dmax=args.dmax,
-                         compare_eed=args.eed,
-                         compare_cmdist=args.cmdist)
+'''
+    if full_args.module in ['help','h']:
+        print(help_msg)
+
+    if full_args.module in ['generation', 'g', 'gen']:
+        from ensemblify import generate_ensemble
+        print(full_args.parameters)
+        #generate_ensemble(parameters_path=full_args.parameters)
+
+    elif full_args.module in ['conversion', 'c', 'con']:
+        from ensemblify import ensemble2traj
+        print(full_args.jobname)
+        print(full_args.ensembledir)
+        print(full_args.trajectorydir)
+        print(full_args.size)
+        # ensemble2traj(job_name=full_args.jobname,
+        #               ensemble_dir=full_args.ensembledir,
+        #               trajectory_dir=full_args.trajectorydir,
+        #               size=full_args.size)
+
+    elif full_args.module in ['analysis', 'a', 'ana']:
+        from ensemblify import analyze_trajectory
+        print(full_args.trajectory)
+        print(full_args.topology)
+        print(full_args.trajectoryid)
+        print(full_args.outputdir)
+        print(full_args.ramadata)
+        print(full_args.distancematrix)
+        print(full_args.contactmap)
+        print(full_args.ssassign)
+        print(full_args.rg)
+        print(full_args.dmax)
+        print(full_args.eed)
+        print(full_args.cmdist)
+        print(full_args.colors)
+        # analyze_trajectory(trajectories=full_args.trajectory,
+        #                    topologies=full_args.topology,
+        #                    trajectory_ids=full_args.trajectoryid,
+        #                    output_directory=full_args.outputdir,
+        #                    ramachandran_data=full_args.ramadata,
+        #                    distancematrices=full_args.distancematrix,
+        #                    contactmatrices=full_args.contactmap,
+        #                    ssassignments=full_args.ssassign,
+        #                    rg=full_args.rg,
+        #                    dmax=full_args.dmax,
+        #                    eed=full_args.eed,
+        #                    cm_dist=full_args.cmdist,
+        #                    color_palette=full_args.colors)
+
+    elif full_args.module in ['reweighting', 'r', 'rew']:
+        from ensemblify import reweight_ensemble
+        print(full_args.trajectory)
+        print(full_args.topology)
+        print(full_args.trajectoryid)
+        print(full_args.expdata)
+        print(full_args.outputdir)
+        print(full_args.thetas)
+        print(full_args.rg)
+        print(full_args.dmax)
+        print(full_args.eed)
+        print(full_args.cmdist)
+        # reweight_ensemble(trajectory=full_args.trajectory,
+        #                   topology=full_args.topology,
+        #                   trajectory_id=full_args.trajectoryid,
+        #                   exp_saxs_data=full_args.expdata,
+        #                   output_dir=full_args.outputdir,
+        #                   thetas=full_args.thetas,
+        #                   compare_rg=full_args.rg,
+        #                   compare_dmax=full_args.dmax,
+        #                   compare_eed=full_args.eed,
+        #                   compare_cmdist=full_args.cmdist)

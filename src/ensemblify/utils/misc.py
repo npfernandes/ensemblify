@@ -79,6 +79,6 @@ def kde(
                      weights=weights)
 
     # Get the standard error of the calculated mean
-    avg_stderr = np.std(data, ddof=1) / np.sqrt(np.sum(np.square(weights))) # weighted SEM
+    avg_stderr = np.std(data, ddof=1) / np.sqrt(np.size(data)) # SEM
 
     return x_coords,norm_kde,avg,avg_stderr

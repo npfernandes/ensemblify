@@ -18,12 +18,11 @@ import plotly.graph_objects as go
 import scipy
 from MDAnalysis.analysis import dihedrals
 from plotly.subplots import make_subplots
-from contact_map import ContactFrequency
 from tqdm import tqdm
 
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.utils import df_from_pdb, extract_pdb_info, kde
+from ensemblify.utils import extract_pdb_info, kde
 from ensemblify.analysis.third_party.mdreader_CHANGED import MDreader
 
 # FUNCTIONS
@@ -170,345 +169,6 @@ def calculate_ramachandran_data(
     return rama_data
 
 
-def calculate_distance_matrix_frame(
-    u: mda.Universe,
-    frame_idx: int,
-    frame_weight: float,
-    ) -> np.ndarray:
-    """Calculates a distance matrix for the alpha carbons of a trajectory frame.
-
-    Args:
-        u:
-            `MDAnalysis.Universe` object containing the trajectory being analyzed.
-        frame_idx:
-            number of the frame to be analyzed.
-        frame_weight:
-            distances calculated for this frame will be multiplied by this value
-            in the resulting frame matrix. In a uniformly weighted matrix, calculated
-            distances will be multiplied by 1 / number of trajectory frames.
-
-    Returns:
-            np.ndarray: distance matrix for the current frame.
-    """
-    # Point universe to frame of interest
-    u.trajectory[frame_idx]
-
-    # Select alpha carbons
-    ca_selection = u.select_atoms('protein and name CA')
-
-    # Expose coordinates np.array
-    ca_coordinates = ca_selection.positions
-
-    # Calculate distance matrix
-    distance_matrix = scipy.spatial.distance.cdist(ca_coordinates,ca_coordinates,'euclidean')
-
-    # Ignore neighbours
-    for ca1_idx, ca2_idx in np.argwhere(distance_matrix):
-        if abs(ca1_idx - ca2_idx) <= 2:
-            distance_matrix[ca1_idx,ca2_idx] = 0.0
-
-    # Reweigh matrix
-    distance_matrix *= frame_weight
-
-    return distance_matrix
-
-
-def calculate_distance_matrix(
-    trajectory: str,
-    topology: str,
-    weights: np.ndarray | None = None,
-    output_path: str | None = None,
-    ) -> pd.DataFrame:
-    """Calculate an alpha carbon average distance matrix from a trajectory and topology files.
-    
-    The distances between different pairs of alpha carbons pair is calculated for each trajectory
-    frame and the values are then averaged to create the final distance matrix. 
-    
-    Optionally save the matrix to output directory in .csv format.
-    Uses multiprocessing whenever possible.
-
-    Args:
-        trajectory:
-            path to .xtc trajectory file.
-        topology:
-            path to .pdb topology file.
-        weights:
-            array of weights to be used when calculating the distance matrix. If None, uniform
-            weights are used.
-        output_path:
-            path to output .csv file or output directory. If directory, written file is named
-            'distance_matrix.csv'. Defaults to current working directory.
-
-    Returns:
-        distance_matrix:
-            DataFrame with the average distance between each pair of alpha carbons in the
-            trajectory.
-    """
-    # Setup output directory
-    if output_path is None:
-        output_path = os.getcwd()
-
-    # Setup Universe object
-    u = mda.Universe(topology,trajectory)
-    trajectory_size = len(u.trajectory)
-
-    # Setup multiprocessing variables
-    if weights is None:
-        weights = np.array([1/trajectory_size] * trajectory_size )
-    frame_idxs = np.array(range(trajectory_size))
-    universes = [u] * trajectory_size
-
-    # Calculate average distance matrix using multiprocessing
-    with ProcessPoolExecutor() as ppe:
-        distance_matrix_array = reduce(lambda x,y: np.add(x,y),
-                                       tqdm(ppe.map(calculate_distance_matrix_frame,
-                                                    universes,
-                                                    frame_idxs,
-                                                    weights),
-                                            desc='Calculating distance matrix... ',
-                                            total=trajectory_size))
-
-    # Convert calculated averaged matrix to DataFrame
-    distance_matrix = pd.DataFrame(distance_matrix_array)
-
-    # Save distance matrix
-    if os.path.isdir(output_path):
-        with warnings.catch_warnings():
-            # Suppress FutureWarnings related to SparseDtype
-            warnings.filterwarnings('ignore',category=FutureWarning)
-            distance_matrix.to_csv(os.path.join(output_path,'distance_matrix.csv'))
-
-    elif output_path.endswith('.csv'):
-        with warnings.catch_warnings():
-            # Suppress FutureWarnings related to SparseDtype
-            warnings.filterwarnings('ignore',category=FutureWarning)
-            distance_matrix.to_csv(output_path)
-    else:
-        print(('Distance matrix was not saved to disk, '
-               'output path must be a directory or .csv filepath!'))
-
-    return distance_matrix
-
-
-def create_distance_matrix_fig(
-    distance_matrix: pd.DataFrame | str,
-    topology: str,
-    trajectory_id: str | None = None,
-    output_path: str | None = None,
-    difference: bool = False,
-    ) -> go.Figure:
-    """Create a distance matrix Figure from a calculated distance matrix.
-
-    The topology provides information about number of chains, their chain letters and
-    residue numbers.
-
-    Args:
-        distance_matrix:
-            calculated distance matrix DataFrame or path to calculated matrix in .csv format.
-            If difference is True, this should be the difference distance matrix between the
-            uniformly weighted and the reweighted distance matrix.
-        topology:
-            path to topology .pdb file.
-        trajectory_id:
-            used on Figure title and prefix for saved distance matrix filename. Defaults to None.
-        output_path:
-            path to output .html file or output directory where created Figure will be stored.
-            If directory, written file is named 'distance_matrix.html', optionally with
-            trajectory_id prefix. Defaults to None.
-        difference:
-            boolean stating whether we are creating a difference distance matrix figure or a default
-            one. Defaults to False.
-
-    Returns:
-        dmatrix_fig:
-            Ploty Figure object displaying a distance matrix.
-    """
-    if isinstance(distance_matrix,str):
-        assert distance_matrix.endswith('.csv'), 'Distance matrix file must be in .csv format!'
-        distance_matrix = pd.read_csv(distance_matrix,index_col=0)
-
-    # Extract info regarding chains and resnums
-    top_info = extract_pdb_info(topology)
-    resranges = {}
-    chain_letters = []
-
-    # Start from the last chain as the .pdb was also parsed from the last res
-    for chain_number in range(len(top_info.keys()),0,-1):
-        chain_info = top_info[chain_number] # (chain_letter, starting_res, chain_size)
-        resrange = [ x for x in range(chain_info[1],chain_info[1] + chain_info[2])]
-        resranges[chain_info[0]] = resrange
-        chain_letters.append(chain_info[0])
-
-    # Create tick labels that respect chain id
-    if len(chain_letters) > 1:
-        x_labels = [f'{chain_letter}{resnum}' for chain_letter in chain_letters
-                    for resnum in resranges[chain_letter]]
-
-        y_labels = [f'{chain_letter}{resnum}' for chain_letter in chain_letters
-                    for resnum in resranges[chain_letter]]
-    else:
-        x_labels = [f'{resnum}' for chain_letter in chain_letters
-                    for resnum in resranges[chain_letter]]
-
-        y_labels = [f'{resnum}' for chain_letter in chain_letters
-                    for resnum in resranges[chain_letter]]
-
-    # Create Distance Matrix Figure
-    dmatrix_fig = go.Figure()
-
-    # Add our data
-    if not difference:
-        distance_matrix.replace(0,np.nan,inplace=True)
-        dmatrix_fig.add_trace(go.Heatmap(z=distance_matrix,
-                                         x=x_labels,
-                                         y=y_labels,
-                                         zmin=0,
-                                         colorbar_title='&#197;',
-                                         transpose=True,
-                                         hoverongaps=False,
-                                         colorscale=px.colors.sequential.Reds))
-    else:
-        # Create hovertext
-        hovertext = list()
-        for yi, yy in enumerate(x_labels):
-            hovertext.append(list())
-            for xi, xx in enumerate(x_labels):
-                hovertext[-1].append(f'{xx},{yy},{distance_matrix.iat[yi,xi]}')
-
-        distance_matrix.replace(0,np.nan,inplace=True)
-        dmatrix_fig.add_trace(go.Heatmap(z=distance_matrix, # dm_reweighted / dm_uniform
-                                         hoverongaps=False,
-                                         hoverinfo='text',
-                                         hovertext=hovertext,
-                                         colorscale=px.colors.diverging.RdBu,
-                                         zmid=1,
-                                         reversescale=True))
-
-    # Setup chain dividers lines
-    num_res = len(distance_matrix.columns)
-    chain_ends = [] # to be used in tickvals
-    chain_begins = [] # to be used in tickvals
-    shapes = []
-    cum_res = 0
-    for chain_letter in chain_letters[:-1]:
-        chain_size = len(resranges[chain_letter])
-        chain_begins.append(cum_res)
-        chain_end = cum_res + chain_size
-        chain_ends.append(chain_end)
-        shapes.append(dict(type='line',
-                           xref='x',
-                           x0=chain_end-0.5,
-                           x1=chain_end-0.5,
-                           y0=0-0.5,
-                           y1=num_res+0.5,
-                           line=dict(color='black',
-                                     width=2)))
-        shapes.append(dict(type='line',
-                           yref='y',
-                           y0=chain_end-0.5,
-                           y1=chain_end-0.5,
-                           x0=0-0.5,
-                           x1=num_res+0.5,
-                           line=dict(color='black',
-                                     width=2)))
-        cum_res += chain_size
-    chain_begins.append(num_res-len(resranges[chain_letters[-1]]))
-
-    # Setup tick values
-    tickvals = chain_begins
-    curr_chain = 0
-    curr_val = 0
-    tick_step = num_res // len(chain_letters) // 4 # always 5 ticks per axis
-    while curr_val <= num_res:
-        try:
-            chain_end = chain_ends[curr_chain]
-        except IndexError:
-            tickvals.append(curr_val)
-        else:
-            if chain_end - curr_val <= tick_step:
-                curr_chain += 1
-            else:
-                tickvals.append(curr_val)
-        curr_val += tick_step
-
-    # Update Figure Layout
-    if difference:
-        if trajectory_id is not None:
-            dmatrix_title = f'{trajectory_id} Distance Difference Matrix'
-        else:
-            dmatrix_title = 'Distance Difference Matrix'
-    else:
-        if trajectory_id is not None:
-            dmatrix_title = f'{trajectory_id} Distance Matrix'
-        else:
-            dmatrix_title = 'Distance Matrix'
-
-    # Add subtitle
-    dmatrix_fig.add_annotation(text='Average distance between alpha carbons of a residue pair',
-                               font=dict(family='Helvetica',
-                                         color='#707070',
-                                         size=24),
-                               xref='paper',
-                               yref='paper',
-                               x=0.5,
-                               y=1.05,
-                               showarrow=False)
-
-    dmatrix_fig.update_layout(width=900,
-                              height=900,
-                              plot_bgcolor='#FFFFFF',
-                              font=dict(family='Helvetica',
-                                        color='black',
-                                        size=30),
-                              modebar_remove=['zoom','pan','select','lasso2d','zoomIn','zoomOut'],
-                              title=dict(text=dmatrix_title,
-                                         x=0.5),
-                              xaxis=dict(title='Residue',
-                                         tickvals=tickvals,
-                                         ticks='outside',
-                                         ticklen=10,
-                                         tickwidth=3,
-                                         showgrid=False,),
-                              yaxis=dict(title='Residue',
-                                         tickvals=tickvals,
-                                         ticks='outside',
-                                         ticklen=10,
-                                         tickwidth=3,
-                                         showgrid=False,
-                                         title_standoff=5,
-                                         scaleanchor='x'),
-                              shapes=shapes)
-
-    dmatrix_fig.update_xaxes(showline=True,
-                             linewidth=3,
-                             linecolor='black',
-                             mirror=True)
-    dmatrix_fig.update_yaxes(showline=True,
-                             linewidth=3,
-                             linecolor='black',
-                             mirror=True)
-
-    if output_path is not None:
-        # Save distance matrix
-        if os.path.isdir(output_path):
-            if trajectory_id is not None:
-                output_filename = f'{trajectory_id}_distance_matrix.html'
-            else:
-                output_filename = 'distance_matrix.html'
-            dmatrix_fig.write_html(os.path.join(output_path,output_filename),
-                                config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
-
-        elif output_path.endswith('.html'):
-            dmatrix_fig.write_html(output_path,
-                                config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
-
-        else:
-            print(('Distance Matrix was not saved to disk, '
-                   'output path must be a directory or .html filepath!'))
-
-    return dmatrix_fig
-
-
 def calculate_contact_matrix_frame(
     u: mda.Universe,
     frame_idx: int,
@@ -608,36 +268,47 @@ def calculate_contact_matrix(
     trajectory_size = len(u.trajectory)
 
     # Setup multiprocessing variables
-    if weights is None:
-        weights = np.array([1/trajectory_size] * trajectory_size )
     frame_idxs = np.array(range(trajectory_size))
     universes = [u] * trajectory_size
 
-    # Calculate average distance matrix using multiprocessing
-    with ProcessPoolExecutor() as ppe:
-        contact_matrix_array = reduce(lambda x,y: np.add(x,y),
-                                      tqdm(ppe.map(calculate_contact_matrix_frame,
-                                                   universes,
-                                                   frame_idxs,
-                                                   weights),
-                                           desc='Calculating contact matrix...',
-                                           total=trajectory_size))
+    if weights is None:
+        # Setup multiprocessing variables
+        weights = np.array([1/trajectory_size] * trajectory_size )
+
+        # Calculate average distance matrix using multiprocessing
+        with ProcessPoolExecutor() as ppe:
+            contact_matrix_array = reduce(lambda x,y: np.add(x,y),
+                                          tqdm(ppe.map(calculate_contact_matrix_frame,
+                                                       universes,
+                                                       frame_idxs,
+                                                       weights),
+                                               desc='Calculating contact matrix...',
+                                               total=trajectory_size))
+    else:
+        # Calculate average distance matrix using multiprocessing
+        with ProcessPoolExecutor() as ppe:
+            contact_matrix_array = reduce(lambda x,y: np.add(x,y),
+                                          tqdm(ppe.map(calculate_contact_matrix_frame,
+                                                       universes,
+                                                       frame_idxs,
+                                                       weights),
+                                               desc='Calculating reweighted contact matrix...',
+                                               total=trajectory_size))
 
     # Convert calculated averaged matrix to DataFrame
-    contact_matrix = pd.DataFrame(contact_matrix_array)
+    contact_matrix = pd.DataFrame(data=contact_matrix_array,
+                                  index=list(range(1,contact_matrix_array.shape[0]+1)),
+                                  columns=list(range(1,contact_matrix_array.shape[0]+1)))
 
     # Save contact matrix
     if os.path.isdir(output_path):
-        with warnings.catch_warnings():
-            # Suppress FutureWarnings related to SparseDtype
-            warnings.filterwarnings('ignore',category=FutureWarning)
-            contact_matrix.to_csv(os.path.join(output_path,'contact_matrix.csv'))
-
+        if weights is None:
+            contact_matrix_output_filename = 'contact_matrix_csv'
+        else:
+            contact_matrix_output_filename = 'contact_matrix_reweighted.csv'
+        contact_matrix.to_csv(os.path.join(output_path,contact_matrix_output_filename))
     elif output_path.endswith('.csv'):
-        with warnings.catch_warnings():
-            # Suppress FutureWarnings related to SparseDtype
-            warnings.filterwarnings('ignore',category=FutureWarning)
-            contact_matrix.to_csv(output_path)
+        contact_matrix.to_csv(output_path)
     else:
         print(('Contact matrix was not saved to disk, '
                'output path must be a directory or .csv filepath!'))
@@ -650,6 +321,7 @@ def create_contact_map_fig(
     topology: str,
     trajectory_id: str | None = None,
     output_path: str | None = None,
+    reweighted: bool = False,
     difference: bool = False,
     ) -> go.Figure:
     """Create a contact map Figure from a calculated contact matrix.
@@ -670,6 +342,9 @@ def create_contact_map_fig(
             path to output .html file or output directory where created Figure will be stored.
             If directory, written file is named 'contact_map.html', optionally with
             trajectory_id prefix. Defaults to None.
+        reweighted:
+            boolean stating whether we are creating a reweighted contact map figure or a default
+            one. Defaults to False.
         difference:
             boolean stating whether we are creating a difference contact map figure or a default
             one. Defaults to False.
@@ -724,28 +399,24 @@ def create_contact_map_fig(
                                       colorscale=px.colors.sequential.Reds))
     else:
         # Create hovertext
-        hovertext = list()
+        hovertext = []
         for yi, yy in enumerate(x_labels):
-            hovertext.append(list())
+            hovertext.append([])
             for xi, xx in enumerate(x_labels):
-                hovertext[-1].append(f'{xx},{yy},{contact_matrix.iat[yi,xi]}')
-        
+                text = f'x: {xx}<br />y: {yy}<br />z: {round(contact_matrix.iat[yi,xi],3)}'
+                hovertext[-1].append(text)
+
         contact_matrix.replace(0,np.nan,inplace=True)
         cmap_fig.add_trace(go.Heatmap(z=contact_matrix,
                                       zmin=-1,
                                       zmax=1,
+                                      x=x_labels,
+                                      y=y_labels,
                                       hoverongaps=False,
                                       hoverinfo='text',
                                       hovertext=hovertext,
-                                      colorscale=[[0.0, 'rgb(0, 128, 0)'], # Green
-                                                  [0.17, 'rgb(102, 187, 85)'], # Softer Yellow-Green
-                                                  [0.34, 'rgb(187, 232, 109)'],# Soft Light Yellow-Green
-                                                  [0.51, 'rgb(255, 255, 180)'],# Very Soft Yellow
-                                                  [0.68, 'rgb(255, 213, 128)'],# Soft Yellow-Orange
-                                                  [0.85, 'rgb(255, 178, 102)'],# Soft Orange-Yellow
-                                                  [1.0, 'rgb(255, 153, 77)']   # Soft Orange
-                                                  ],
-                                      zmid=0.0,
+                                      colorscale=px.colors.diverging.RdBu,
+                                      zmid=0,
                                       reversescale=True))
 
     # Setup chain dividers lines
@@ -801,6 +472,11 @@ def create_contact_map_fig(
             cmap_title = f'{trajectory_id} Difference Contact Map'
         else:
             cmap_title = 'Difference Contact Map'
+    elif reweighted:
+        if trajectory_id is not None:
+            cmap_title = f'{trajectory_id} Reweighted Contact Map'
+        else:
+            cmap_title = 'Reweighted Contact Map'
     else:
         if trajectory_id is not None:
             cmap_title = f'{trajectory_id} Contact Map'
@@ -831,32 +507,44 @@ def create_contact_map_fig(
                                       tickvals=tickvals,
                                       ticks='outside',
                                       ticklen=10,
-                                      tickwidth=3,
+                                      tickwidth=4,
                                       showgrid=False,),
                            yaxis=dict(title='Residue',
                                       tickvals=tickvals,
                                       ticks='outside',
                                       ticklen=10,
-                                      tickwidth=3,
+                                      tickwidth=4,
                                       showgrid=False,
                                       title_standoff=5,
                                       scaleanchor='x'),
                            shapes=shapes)
 
     cmap_fig.update_xaxes(showline=True,
-                          linewidth=3,
+                          linewidth=4,
                           linecolor='black',
+                          color='black',
                           mirror=True)
+
     cmap_fig.update_yaxes(showline=True,
-                          linewidth=3,
+                          linewidth=4,
                           linecolor='black',
+                          color='black',
                           mirror=True)
 
     if output_path is not None:
         # Save contact map
         if os.path.isdir(output_path):
             if trajectory_id is not None:
-                output_filename = f'{trajectory_id}_contact_map.html'
+                if reweighted:
+                    output_filename = f'{trajectory_id}_contact_map_reweighted.html'
+                elif difference:
+                    output_filename = f'{trajectory_id}_contact_map_difference.html'
+                else:
+                    output_filename = f'{trajectory_id}_contact_map.html'
+            elif reweighted:
+                output_filename = 'contact_map_reweighted.html'
+            elif difference:
+                output_filename = 'contact_map_difference.html'
             else:
                 output_filename = 'contact_map.html'
             cmap_fig.write_html(os.path.join(output_path,output_filename),
@@ -873,10 +561,389 @@ def create_contact_map_fig(
     return cmap_fig
 
 
+def calculate_distance_matrix_frame(
+    u: mda.Universe,
+    frame_idx: int,
+    frame_weight: float,
+    ) -> np.ndarray:
+    """Calculates a distance matrix for the alpha carbons of a trajectory frame.
+
+    Args:
+        u:
+            `MDAnalysis.Universe` object containing the trajectory being analyzed.
+        frame_idx:
+            number of the frame to be analyzed.
+        frame_weight:
+            distances calculated for this frame will be multiplied by this value
+            in the resulting frame matrix. In a uniformly weighted matrix, calculated
+            distances will be multiplied by 1 / number of trajectory frames.
+
+    Returns:
+            np.ndarray: distance matrix for the current frame.
+    """
+    # Point universe to frame of interest
+    u.trajectory[frame_idx]
+
+    # Select alpha carbons
+    ca_selection = u.select_atoms('protein and name CA')
+
+    # Expose coordinates np.array
+    ca_coordinates = ca_selection.positions
+
+    # Calculate distance matrix
+    distance_matrix = scipy.spatial.distance.cdist(ca_coordinates,ca_coordinates,'euclidean')
+
+    # Ignore neighbours
+    for ca1_idx, ca2_idx in np.argwhere(distance_matrix):
+        if abs(ca1_idx - ca2_idx) <= 2:
+            distance_matrix[ca1_idx,ca2_idx] = 0.0
+
+    # Reweigh matrix
+    distance_matrix *= frame_weight
+
+    return distance_matrix
+
+
+def calculate_distance_matrix(
+    trajectory: str,
+    topology: str,
+    weights: np.ndarray | None = None,
+    output_path: str | None = None,
+    ) -> pd.DataFrame:
+    """Calculate an alpha carbon average distance matrix from a trajectory and topology files.
+    
+    The distances between different pairs of alpha carbons pair is calculated for each trajectory
+    frame and the values are then averaged to create the final distance matrix. 
+    
+    Optionally save the matrix to output directory in .csv format.
+    Uses multiprocessing whenever possible.
+
+    Args:
+        trajectory:
+            path to .xtc trajectory file.
+        topology:
+            path to .pdb topology file.
+        weights:
+            array of weights to be used when calculating the distance matrix. If None, uniform
+            weights are used.
+        output_path:
+            path to output .csv file or output directory. If directory, written file is named
+            'distance_matrix.csv'. Defaults to current working directory.
+
+    Returns:
+        distance_matrix:
+            DataFrame with the average distance between each pair of alpha carbons in the
+            trajectory.
+    """
+    # Setup output directory
+    if output_path is None:
+        output_path = os.getcwd()
+
+    # Setup Universe object
+    u = mda.Universe(topology,trajectory)
+    trajectory_size = len(u.trajectory)
+
+    # Setup multiprocessing variables
+    frame_idxs = np.array(range(trajectory_size))
+    universes = [u] * trajectory_size
+
+    if weights is None:
+        weights = np.array([1/trajectory_size] * trajectory_size )
+
+        # Calculate average distance matrix using multiprocessing
+        with ProcessPoolExecutor() as ppe:
+            distance_matrix_array = reduce(lambda x,y: np.add(x,y),
+                                           tqdm(ppe.map(calculate_distance_matrix_frame,
+                                                        universes,
+                                                        frame_idxs,
+                                                        weights),
+                                                desc='Calculating distance matrix... ',
+                                                total=trajectory_size))
+    else:
+        # Calculate average distance matrix using multiprocessing
+        with ProcessPoolExecutor() as ppe:
+            distance_matrix_array = reduce(lambda x,y: np.add(x,y),
+                                           tqdm(ppe.map(calculate_distance_matrix_frame,
+                                                        universes,
+                                                        frame_idxs,
+                                                        weights),
+                                                desc='Calculating reweighted distance matrix... ',
+                                                total=trajectory_size))
+
+    # Convert calculated averaged matrix to DataFrame
+    distance_matrix = pd.DataFrame(data=distance_matrix_array,
+                                   index=list(range(1,distance_matrix_array.shape[0]+1)),
+                                   columns=list(range(1,distance_matrix_array.shape[0]+1)))
+
+    # Save distance matrix
+    if os.path.isdir(output_path):
+        if weights is None:
+            distance_matrix_output_filename = 'distance_matrix.csv'
+        else:
+            distance_matrix_output_filename = 'distance_matrix_reweighted.csv'
+        distance_matrix.to_csv(os.path.join(output_path,distance_matrix_output_filename))
+    elif output_path.endswith('.csv'):
+        distance_matrix.to_csv(output_path)
+    else:
+        print(('Distance matrix was not saved to disk, '
+               'output path must be a directory or .csv filepath!'))
+
+    return distance_matrix
+
+
+def create_distance_matrix_fig(
+    distance_matrix: pd.DataFrame | str,
+    topology: str,
+    trajectory_id: str | None = None,
+    output_path: str | None = None,
+    max_colorbar: int | None = None,
+    reweighted: bool = False,
+    difference: bool = False,
+    ) -> go.Figure:
+    """Create a distance matrix Figure from a calculated distance matrix.
+
+    The topology provides information about number of chains, their chain letters and
+    residue numbers.
+
+    Args:
+        distance_matrix:
+            calculated distance matrix DataFrame or path to calculated matrix in .csv format.
+            If difference is True, this should be the difference distance matrix between the
+            uniformly weighted and the reweighted distance matrix.
+        topology:
+            path to topology .pdb file.
+        trajectory_id:
+            used on Figure title and prefix for saved distance matrix filename. Defaults to None.
+        output_path:
+            path to output .html file or output directory where created Figure will be stored.
+            If directory, written file is named 'distance_matrix.html', optionally with
+            trajectory_id prefix. Defaults to None.
+        max_colorbar:
+            maximum limit for the angstrom distance colorbar. Defaults to None, in which case it is
+            derived from the data.
+        reweighted:
+            boolean stating whether we are creating a reweighted distance matrix figure or a default
+            one. Defaults to False.
+        difference:
+            boolean stating whether we are creating a difference distance matrix figure or a default
+            one. Defaults to False.
+
+    Returns:
+        dmatrix_fig:
+            Ploty Figure object displaying a distance matrix.
+    """
+    if isinstance(distance_matrix,str):
+        assert distance_matrix.endswith('.csv'), 'Distance matrix file must be in .csv format!'
+        distance_matrix = pd.read_csv(distance_matrix,index_col=0)
+
+    # Extract info regarding chains and resnums
+    top_info = extract_pdb_info(topology)
+    resranges = {}
+    chain_letters = []
+
+    # Start from the last chain as the .pdb was also parsed from the last res
+    for chain_number in range(len(top_info.keys()),0,-1):
+        chain_info = top_info[chain_number] # (chain_letter, starting_res, chain_size)
+        resrange = [ x for x in range(chain_info[1],chain_info[1] + chain_info[2])]
+        resranges[chain_info[0]] = resrange
+        chain_letters.append(chain_info[0])
+
+    # Create tick labels that respect chain id
+    if len(chain_letters) > 1:
+        x_labels = [f'{chain_letter}{resnum}' for chain_letter in chain_letters
+                    for resnum in resranges[chain_letter]]
+
+        y_labels = [f'{chain_letter}{resnum}' for chain_letter in chain_letters
+                    for resnum in resranges[chain_letter]]
+    else:
+        x_labels = [f'{resnum}' for chain_letter in chain_letters
+                    for resnum in resranges[chain_letter]]
+
+        y_labels = [f'{resnum}' for chain_letter in chain_letters
+                    for resnum in resranges[chain_letter]]
+
+    # Create Distance Matrix Figure
+    dmatrix_fig = go.Figure()
+
+    # Add our data
+    if not difference:
+        distance_matrix.replace(0,np.nan,inplace=True)
+        dmatrix_fig.add_trace(go.Heatmap(z=distance_matrix,
+                                         x=x_labels,
+                                         y=y_labels,
+                                         zmin=0,
+                                         zmax=max_colorbar,
+                                         colorbar_title='&#197;',
+                                         transpose=True,
+                                         hoverongaps=False,
+                                         colorscale=px.colors.sequential.Reds))
+    else:
+        # Create hovertext
+        hovertext = []
+        for yi, yy in enumerate(x_labels):
+            hovertext.append([])
+            for xi, xx in enumerate(x_labels):
+                text = f'x: {xx}<br />y: {yy}<br />z: {round(distance_matrix.iat[yi,xi],3)}'
+                hovertext[-1].append(text)
+
+        distance_matrix.replace(0,np.nan,inplace=True)
+        dmatrix_fig.add_trace(go.Heatmap(z=distance_matrix,
+                                         x=x_labels,
+                                         y=y_labels,
+                                         hoverongaps=False,
+                                         colorbar_title='&#197;',
+                                         hoverinfo='text',
+                                         hovertext=hovertext,
+                                         colorscale=px.colors.diverging.RdBu,
+                                         zmid=0,
+                                         reversescale=True))
+
+    # Setup chain dividers lines
+    num_res = len(distance_matrix.columns)
+    chain_ends = [] # to be used in tickvals
+    chain_begins = [] # to be used in tickvals
+    shapes = []
+    cum_res = 0
+    for chain_letter in chain_letters[:-1]:
+        chain_size = len(resranges[chain_letter])
+        chain_begins.append(cum_res)
+        chain_end = cum_res + chain_size
+        chain_ends.append(chain_end)
+        shapes.append(dict(type='line',
+                           xref='x',
+                           x0=chain_end-0.5,
+                           x1=chain_end-0.5,
+                           y0=0-0.5,
+                           y1=num_res+0.5,
+                           line=dict(color='black',
+                                     width=2)))
+        shapes.append(dict(type='line',
+                           yref='y',
+                           y0=chain_end-0.5,
+                           y1=chain_end-0.5,
+                           x0=0-0.5,
+                           x1=num_res+0.5,
+                           line=dict(color='black',
+                                     width=2)))
+        cum_res += chain_size
+    chain_begins.append(num_res-len(resranges[chain_letters[-1]]))
+
+    # Setup tick values
+    tickvals = chain_begins
+    curr_chain = 0
+    curr_val = 0
+    tick_step = num_res // len(chain_letters) // 4 # always 5 ticks per axis
+    while curr_val <= num_res:
+        try:
+            chain_end = chain_ends[curr_chain]
+        except IndexError:
+            tickvals.append(curr_val)
+        else:
+            if chain_end - curr_val <= tick_step:
+                curr_chain += 1
+            else:
+                tickvals.append(curr_val)
+        curr_val += tick_step
+
+    # Update Figure Layout
+    if difference:
+        if trajectory_id is not None:
+            dmatrix_title = f'{trajectory_id} Difference Distance Matrix'
+        else:
+            dmatrix_title = 'Difference Distance Matrix'
+    elif reweighted:
+        if trajectory_id is not None:
+            dmatrix_title = f'{trajectory_id} Reweighted Distance Matrix'
+        else:
+            dmatrix_title = 'Reweighted Distance Matrix'
+    else:
+        if trajectory_id is not None:
+            dmatrix_title = f'{trajectory_id} Distance Matrix'
+        else:
+            dmatrix_title = 'Distance Matrix'
+
+    # Add subtitle
+    dmatrix_fig.add_annotation(text='Average distance between alpha carbons of a residue pair',
+                               font=dict(family='Helvetica',
+                                         color='#707070',
+                                         size=24),
+                               xref='paper',
+                               yref='paper',
+                               x=0.5,
+                               y=1.05,
+                               showarrow=False)
+
+    dmatrix_fig.update_layout(width=900,
+                              height=900,
+                              plot_bgcolor='#FFFFFF',
+                              font=dict(family='Helvetica',
+                                        color='black',
+                                        size=30),
+                              modebar_remove=['zoom','pan','select','lasso2d','zoomIn','zoomOut'],
+                              title=dict(text=dmatrix_title,
+                                         x=0.5),
+                              xaxis=dict(title='Residue',
+                                         tickvals=tickvals,
+                                         ticks='outside',
+                                         ticklen=10,
+                                         tickwidth=4,
+                                         showgrid=False,),
+                              yaxis=dict(title='Residue',
+                                         tickvals=tickvals,
+                                         ticks='outside',
+                                         ticklen=10,
+                                         tickwidth=4,
+                                         showgrid=False,
+                                         title_standoff=5,
+                                         scaleanchor='x'),
+                              shapes=shapes)
+
+    dmatrix_fig.update_xaxes(showline=True,
+                             linewidth=4,
+                             linecolor='black',
+                             color='black',
+                             mirror=True)
+
+    dmatrix_fig.update_yaxes(showline=True,
+                             linewidth=4,
+                             linecolor='black',
+                             color='black',
+                             mirror=True)
+
+    if output_path is not None:
+        # Save distance matrix
+        if os.path.isdir(output_path):
+            if trajectory_id is not None:
+                if reweighted:
+                    output_filename = f'{trajectory_id}_distance_matrix_reweighted.html'
+                elif difference:
+                    output_filename = f'{trajectory_id}_distance_matrix_difference.html'
+                else:
+                    output_filename = f'{trajectory_id}_distance_matrix.html'
+            elif reweighted:
+                output_filename = 'distance_matrix_reweighted.html'
+            elif difference:
+                output_filename = 'distance_matrix_difference.html'
+            else:
+                output_filename = 'distance_matrix.html'
+            dmatrix_fig.write_html(os.path.join(output_path,output_filename),
+                                   config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
+
+        elif output_path.endswith('.html'):
+            dmatrix_fig.write_html(output_path,
+                                config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
+
+        else:
+            print(('Distance Matrix was not saved to disk, '
+                   'output path must be a directory or .html filepath!'))
+
+    return dmatrix_fig
+
+
 def calculate_ss_assignment(
     trajectory: str,
     topology: str,
-    output_path: str = os.getcwd(),
+    output_path: str = None,
     ) -> pd.DataFrame:
     """Calculate a secondary structure assignment matrix from a trajectory and topology files.
     
@@ -894,7 +961,7 @@ def calculate_ss_assignment(
             path to .pdb topology file.
         output_path:
             path to output .csv file or output directory. If directory, written file is named
-            'ss_assignment.csv'. Defaults to current working directory.
+            'ss_assignment.csv'. Defaults to None, and no file is written.
 
     Returns:
         ss_assign:
@@ -926,67 +993,100 @@ def calculate_ss_assignment(
     ss_assign.columns = full_column_names
 
     # Save ss assignment
-    if os.path.isdir(output_path):
-        ss_assign.to_csv(os.path.join(output_path,'ss_assignment.csv'))
-    elif output_path.endswith('.csv'):
-        ss_assign.to_csv(output_path)
-    else:
-        print(('Secondary structure assignment matrix was not saved to disk, '
-               'output path must be a directory or .csv filepath!'))
+    if output_path is not None:
+        if os.path.isdir(output_path):
+            ss_assign.to_csv(os.path.join(output_path,'ss_assignment.csv'))
+        elif output_path.endswith('.csv'):
+            ss_assign.to_csv(output_path)
+        else:
+            print(('Secondary structure assignment matrix was not saved to disk, '
+                'output path must be a directory or .csv filepath!'))
 
     return ss_assign
 
 
 def calculate_ss_frequency(
-    ss_assignment: pd.DataFrame,
-    weights: np.ndarray | None,
+    trajectory: str,
+    topology: str,
+    weights: np.ndarray | None = None,
+    output_path: str = os.getcwd(),
     ) -> pd.DataFrame:
-    """Calculate the secondary structure frequencies given a secondary structure
-    assignment matrix.
+    """Calculate secondary structure assignment frequencies from a trajectory and topology files.
 
     Args:
-        ss_assignment:
-            secondary structure assignment matrix.
+        trajectory:
+            path to .xtc trajectory file.
+        topology:
+            path to .pdb topology file.
         weights:
             optional array of weight values to be used in secondary structure
             assignment reweighting. If None, uniform weights are used.
+        output_path:
+            path to output .csv file or output directory. If directory, written file is named
+            'ss_assignment.csv'. Defaults to current working directory.
 
     Returns:
         frequency:
             secondary structure frequencies matrix for trajectory being analyzed.
     """
+    # Calculate ss assignment
+    ss_assignment = calculate_ss_assignment(trajectory=trajectory,
+                                            topology=topology)
+
     if weights is None:
         # Count the frequency of each secondary structure element
         frequency = ss_assignment.apply(lambda x: pd.Series(x).value_counts())
         frequency = frequency.fillna(0)
         frequency = frequency / ss_assignment.shape[0]
+        frequency.columns = [int(x) for x in frequency.columns]
     else:
         # Count the frequency of each secondary structure element and reweigh it
-        frequency = pd.DataFrame([[0]*ss_assignment.shape[1]]*3,
-                                    index=['C','E','H'],
-                                    columns=[int(x) for x in ss_assignment.columns])
-
-        for row_idx,row_series in ss_assignment.iterrows():
+        frequency = pd.DataFrame([[0.0]*ss_assignment.shape[1]]*3,
+                                 index=['C','E','H'],
+                                 columns=[int(x) for x in ss_assignment.columns])
+        for row_idx in tqdm(range(ss_assignment.shape[0]),
+                            desc='Calculating reweighted secondary structure frequencies... ',
+                            total=ss_assignment.shape[0]):
+            row_series = ss_assignment.iloc[row_idx,:]
             weight = weights[row_idx]
-            for col_idx in range(frequency.shape[1]):
-                ssa_value = row_series[col_idx]
-                frequency[col_idx+1][ssa_value] += weight
+            for col_idx in range(1,frequency.shape[1]+1):
+                ssa_label = row_series.iloc[col_idx-1]
+                frequency.loc[ssa_label,col_idx] += weight
+
+    # Save ss assignment frequency
+    if os.path.isdir(output_path):
+        if weights is None:
+            ss_frequency_output_filename = 'ss_frequency.csv'
+        else:
+            ss_frequency_output_filename = 'ss_frequency_reweighted.csv'
+        frequency.to_csv(os.path.join(output_path,ss_frequency_output_filename))
+    elif output_path.endswith('.csv'):
+        frequency.to_csv(output_path)
+    else:
+        print(('Secondary structure assignment frequency matrix was not saved to disk, '
+               'output path must be a directory or .csv filepath!'))
+
     return frequency
 
 
 def create_ss_frequency_figure(
-    ss_assignment: pd.DataFrame | str,
+    ss_frequency: pd.DataFrame | str,
     topology: str,
-    weights: np.ndarray | None = None,
     trajectory_id: str | None = None,
     output_path: str | None = None,
+    reweighted: bool = False,
+    difference: bool = False,
     ) -> go.Figure:
-    """Create a secondary structure frequency Figure from a secondary structure assignment matrix.
+    """Create a secondary structure frequency Figure from a secondary structure assignment
+    frequency matrix.
+
+    The topology provides information about number of chains, their chain letters and
+    residue numbers.
 
     Args:
-        ss_assignment:
-            calculated secondary structure assignment matrix DataFrame or path to calculated matrix
-            in .csv format.
+        ss_frequency:
+            calculated secondary structure assignment frequency matrix DataFrame or path to
+            calculated matrix in .csv format.
         topology:
             path to topology .pdb file.
         trajectory_id:
@@ -995,16 +1095,22 @@ def create_ss_frequency_figure(
             path to output .html file or output directory where created Figure will be stored.
             If directory, written file is named 'ss_frequency.html', optionally with
             trajectory_id prefix. Defaults to None.
+        reweighted:
+            boolean stating whether we are creating a reweighted secondary structure frequency
+            figure or a default one. Defaults to False.
+        difference:
+            boolean stating whether we are creating a difference secondary structure frequency
+            figure or a default one. Defaults to False.
 
     Returns:
         ss_freq_fig:
-            a stacked line plot with the secondary structure frequencies of each secondary structure
-            type for each residue in the structure.
+            a stacked line plot with the secondary structure frequencies of each secondary
+            structure type for each residue in the structure.
     """
-    if isinstance(ss_assignment,str):
-        assert ss_assignment.endswith('.csv'), ('Secondary structure assignment '
+    if isinstance(ss_frequency,str):
+        assert ss_frequency.endswith('.csv'), ('Secondary structure assignment frequency '
                                                 'matrix must be in .csv format!')
-        ss_assignment = pd.read_csv(ss_assignment,index_col=0)
+        ss_frequency = pd.read_csv(ss_frequency,index_col=0)
 
     # Extract info regarding chains and resnums
     top_info = extract_pdb_info(topology)
@@ -1025,10 +1131,6 @@ def create_ss_frequency_figure(
         x_labels = [f'{resnum}' for chain_letter in chain_letters
                     for resnum in resranges[chain_letter]]
 
-    # Count the frequency of each secondary structure element, reweighting if desired
-    frequency = calculate_ss_frequency(ss_assignment=ss_assignment,
-                                       weights=weights)
-
     # Create Figure
     ss_freq_fig = go.Figure()
 
@@ -1038,17 +1140,32 @@ def create_ss_frequency_figure(
               '#d62728'  # Red
               ]
 
-    for structure,color in zip(frequency.index,colors):
-        ss_freq_fig.add_trace(go.Scatter(x=frequency.columns,
-                                         y=frequency.loc[structure],
-                                         mode='lines',
-                                         stackgroup='one', # remove for non stacked plot
-                                         marker_color=color,
-                                         line_width=0,
-                                         name=structure))
+    if difference:
+        for structure,color in zip(ss_frequency.index,colors):
+            # Create hovertext
+            hovertext = [f'x: {x_label}<br />y: {round(ss_frequency.loc[structure].iloc[i],5)}'
+                          for i,x_label in enumerate(x_labels)]
+            ss_freq_fig.add_trace(go.Scatter(x=list(range(ss_frequency.columns[0],
+                                                          ss_frequency.columns[-1]+1)),
+                                             y=ss_frequency.loc[structure],
+                                             mode='lines',
+                                             marker_color=color,
+                                             line_width=4,
+                                             name=structure,
+                                             hoverinfo='text',
+                                             hovertext=hovertext))
+    else:
+        for structure,color in zip(ss_frequency.index,colors):
+            ss_freq_fig.add_trace(go.Scatter(x=ss_frequency.columns,
+                                             y=ss_frequency.loc[structure],
+                                             mode='lines',
+                                             stackgroup='one', # remove for non stacked plot
+                                             marker_color=color,
+                                             line_width=0,
+                                             name=structure))
 
     # Setup chain dividers lines
-    num_res = len(frequency.columns)
+    num_res = len(ss_frequency.columns)
     chain_ends = [] # to be used in tickvals
     chain_begins = [] # to be used in tickvals
     shapes = []
@@ -1107,13 +1224,25 @@ def create_ss_frequency_figure(
         x_text.append(x_t)
 
     # Update Figure Layout
-    if trajectory_id is not None:
-        ss_freq_title = f'{trajectory_id} Secondary Structure Frequencies'
+    if difference:
+        if trajectory_id is not None:
+            ss_freq_title = f'{trajectory_id} Difference Secondary Structure Frequencies'
+        else:
+            ss_freq_title = 'Difference Secondary Structure Frequencies'
+    elif reweighted:
+        if trajectory_id is not None:
+            ss_freq_title = f'{trajectory_id} Reweighted Secondary Structure Frequencies'
+        else:
+            ss_freq_title = 'Reweighted Secondary Structure Frequencies'
     else:
-        ss_freq_title = 'Secondary Structure Frequencies'
+        if trajectory_id is not None:
+            ss_freq_title = f'{trajectory_id} Secondary Structure Frequencies'
+        else:
+            ss_freq_title = 'Secondary Structure Frequencies'
 
     # Add subtitle
-    ss_freq_fig.add_annotation(text='Frequency of each secondary structure assignment code for each residue',
+    ss_freq_fig.add_annotation(text='Frequency of each secondary structure assignment code '
+                                    'for each residue',
                                font=dict(family='Helvetica',
                                          color='#707070',
                                          size=24),
@@ -1122,6 +1251,11 @@ def create_ss_frequency_figure(
                                x=0.5,
                                y=1.07,
                                showarrow=False)
+
+    if difference:
+        range_y = [-1,1]
+    else:
+        range_y = [0,1]
 
     ss_freq_fig.update_layout(width=1000,
                               height=750,
@@ -1138,31 +1272,42 @@ def create_ss_frequency_figure(
                                          tickvals=tickvals,
                                          ticktext=x_text,
                                          ticklen=10,
-                                         tickwidth=3,
-                                         showgrid=True),
+                                         tickwidth=4,
+                                         showgrid=False),
                               yaxis=dict(title='Frequency',
                                          ticks='outside',
                                          ticklen=10,
-                                         tickwidth=3,
-                                         range=[0,1],
-                                         showgrid=False,
-                                         title_standoff=5),
+                                         tickwidth=4,
+                                         range=range_y,
+                                         showgrid=False),
                               shapes=shapes)
 
     ss_freq_fig.update_xaxes(showline=True,
-                             linewidth=3,
+                             linewidth=4,
                              linecolor='black',
+                             color='black',
                              mirror=True)
+
     ss_freq_fig.update_yaxes(showline=True,
-                             linewidth=3,
+                             linewidth=4,
                              linecolor='black',
+                             color='black',
                              mirror=True)
 
     if output_path is not None:
         # Save Secondary Structure frequency
         if os.path.isdir(output_path):
             if trajectory_id is not None:
-                output_filename = f'{trajectory_id}_ss_frequency.html'
+                if reweighted:
+                    output_filename = f'{trajectory_id}_ss_frequency_reweighted.html'
+                elif difference:
+                    output_filename = f'{trajectory_id}_ss_frequency_difference.html'
+                else:
+                    output_filename = f'{trajectory_id}_ss_frequency.html'
+            elif reweighted:
+                output_filename = 'ss_frequency_reweighted.html'
+            elif difference:
+                output_filename = 'ss_frequency_difference.html'
             else:
                 output_filename = 'ss_frequency.html'
             ss_freq_fig.write_html(os.path.join(output_path,output_filename),
@@ -1340,7 +1485,7 @@ def create_metrics_traces(
                                    mode='lines',
                                    name=f'{trajectory_id}_{col_name}',
                                    marker_color=color,
-                                   line=dict(width=3),
+                                   line=dict(width=4),
                                    legend='legend',
                                    visible=True)
 
@@ -1469,7 +1614,7 @@ def create_metrics_fig(
                                                     scatter_trace.y),
                                        line=dict(dash='dot',
                                                  color=hist_trace.marker.color,
-                                                 width=3)),
+                                                 width=4)),
                                        legend='legend',
                                        row=nrows,
                                        col=colnum)
@@ -1622,17 +1767,19 @@ def create_metrics_fig(
 
     metrics_fig.update_xaxes(showline=True,
                              ticklen=10,
-                             tickwidth=3,
-                             linewidth=3,
+                             tickwidth=4,
+                             linewidth=4,
                              linecolor='black',
+                             color='black',
                              mirror=True,
                              title_standoff=30)
 
     metrics_fig.update_yaxes(showline=True,
                              ticklen=10,
-                             tickwidth=3,
-                             linewidth=3,
+                             tickwidth=4,
+                             linewidth=4,
                              linecolor='black',
+                             color='black',
                              mirror=True,
                              title_standoff=0)
 
@@ -1663,7 +1810,7 @@ def calculate_analysis_data(
     ramachandran_data: bool = True,
     distancematrices: bool = True,
     contactmatrices: bool = True,
-    ssassignments: bool = True,
+    ssfrequencies: bool = True,
     rg: bool = True,
     dmax: bool = True,
     eed: bool = True,
@@ -1690,9 +1837,9 @@ def calculate_analysis_data(
         contactmatrices:
             whether to calculate a contact frequency matrix for each trajectory,topology
             file pair.
-        ssassignments:
-            whether to calculate a secondary structure assignment matrix for each trajectory,
-            topology file pair.
+        ssfrequencies:
+            whether to calculate a secondary structure assignment frequency matrix for each
+            trajectory, topology file pair.
         rg:
             whether to calculate the radius of gyration for each trajectory,topology file pair.
         dmax:
@@ -1714,7 +1861,7 @@ def calculate_analysis_data(
             one element for each given trajectory,topology,trajectory_id trio. For example:
             data = {'DistanceMatrices' : [DistanceMatrix1,DistanceMatrix2,DistanceMatrix3],
                     'ContactMatrices' : [ContactMatrix1,ContactMatrix2,ContactMatrix3],
-                    'SecondaryStructureAssignments' : [SSAssignment1,SSAssignment2,SSAssignment3],
+                    'SecondaryStructureFrequencies' : [SSFrequency1,SSFrequency2,SSFrequency3],
                     'StructuralMetrics' : [StructuralMetrics1,StructuralMetrics2,StructuralMetrics3]}
     """
     # Setup output directory
@@ -1724,7 +1871,7 @@ def calculate_analysis_data(
     # Calculate analysis data
     data = {'DistanceMatrices' : [],
             'ContactMatrices' : [],
-            'SecondaryStructureAssignments' : [],
+            'SecondaryStructureFrequencies' : [],
             'StructuralMetrics' : [] }
 
     for trajectory_id,trajectory,topology in zip(trajectory_ids,trajectories,topologies):
@@ -1763,16 +1910,17 @@ def calculate_analysis_data(
 
             data['ContactMatrices'].append(contact_matrix)
 
-        if ssassignments:
-            print(f'Calculating secondary structure assignment matrix for {trajectory_id}...')
-            ss_assignment_output_path = os.path.join(output_directory,
-                                                     f'{trajectory_id}_ss_assignment.csv')
+        if ssfrequencies:
+            print('Calculating secondary structure assignment frequency matrix for '
+                  f'{trajectory_id}...')
+            ss_frequency_output_path = os.path.join(output_directory,
+                                                     f'{trajectory_id}_ss_frequency.csv')
 
-            ss_assignment = calculate_ss_assignment(trajectory=trajectory,
-                                                    topology=topology,
-                                                    output_path=ss_assignment_output_path)
+            ss_frequency = calculate_ss_frequency(trajectory=trajectory,
+                                                  topology=topology,
+                                                  output_path=ss_frequency_output_path)
 
-            data['SecondaryStructureAssignments'].append(ss_assignment)
+            data['SecondaryStructureFrequencies'].append(ss_frequency)
 
         if rg or dmax or eed or cm_dist:
             structural_metrics_output_path = os.path.join(output_directory,
@@ -1821,7 +1969,7 @@ def create_analysis_figures(
             outlined in the given analysis data. For example:
             data = {'DistanceMatrices' : [DistanceMatrix1,DistanceMatrix2,DistanceMatrix3],
                     'ContactMaps' : [ContactMap1,ContactMap2,ContactMap3],
-                    'SecondaryStructureFrequencies' : [SSFrequencies1,SSFrequencies2,SSFrequencies3],
+                    'SecondaryStructureFrequencies' : [SSFrequency1,SSFrequency2,SSFrequency3],
                     'StructuralMetrics' : [StructuralMetrics1,StructuralMetrics2,StructuralMetrics3] }
     """
     # Setup output directory
@@ -1837,12 +1985,12 @@ def create_analysis_figures(
     if analysis_data is None:
         analysis_data = {'DistanceMatrices' : [],
                          'ContactMatrices' : [],
-                         'SecondaryStructureAssignments' : [],
+                         'SecondaryStructureFrequencies' : [],
                          'StructuralMetrics' : [] }
-        data_ids = ['distance_matrix.csv','contact_matrix.csv','ss_assignment.csv','structural_metrics.csv']
+        data_ids = ['distance_matrix.csv','contact_matrix.csv','ss_frequency.csv','structural_metrics.csv']
         data_ids_2_data = {'distance_matrix.csv': 'DistanceMatrices',
                            'contact_matrix.csv': 'ContactMatrices',
-                           'ss_assignment.csv': 'SecondaryStructureAssignments',
+                           'ss_frequency.csv': 'SecondaryStructureFrequencies',
                            'structural_metrics.csv': 'StructuralMetrics'}
         for data_id in data_ids:
             for trajectory_id in trajectory_ids:
@@ -1895,17 +2043,17 @@ def create_analysis_figures(
             figures['ContactMaps'].append(contact_map_fig)
 
         try:
-            ss_assignment = analysis_data['SecondaryStructureAssignments'][i]
+            ss_frequency = analysis_data['SecondaryStructureFrequencies'][i]
         except (KeyError,IndexError):
             pass
         else:
             ss_frequency_fig_output_path = os.path.join(output_directory,
                                                         f'{trajectory_id}_ss_frequency.html')
 
-            ss_frequency_fig = create_ss_frequency_figure(ss_assignment=ss_assignment,
-                                                       trajectory_id=trajectory_id,
-                                                       topology=topology,
-                                                       output_path=ss_frequency_fig_output_path)
+            ss_frequency_fig = create_ss_frequency_figure(ss_frequency=ss_frequency,
+                                                          topology=topology,
+                                                          trajectory_id=trajectory_id,
+                                                          output_path=ss_frequency_fig_output_path)
 
             figures['SecondaryStructureFrequencies'].append(ss_frequency_fig)
 

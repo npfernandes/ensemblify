@@ -3,8 +3,10 @@
 # IMPORTS
 ## Standard Library Imports
 import contextlib
+import glob
 import math
 import os
+from collections.abc import Callable
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 ## Third Party Imports
@@ -18,9 +20,8 @@ from tqdm import tqdm
 
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.utils import extract_pdb_info,kde
+from ensemblify.utils import kde
 from ensemblify.reweighting.third_party.BME_main import BME
-from ensemblify.analysis.trajectory_utils import calculate_ss_frequency
 
 # FUNCTIONS
 def process_exp_data(experimental_data_path: str) -> str:
@@ -71,8 +72,8 @@ def process_exp_data(experimental_data_path: str) -> str:
 
     # Save processed data
     processed_exp_saxs = os.path.join(os.path.split(experimental_data_path)[0],
-                                         f'{trajectory_id}_exp_saxs_input_processed.dat')
-    np.savetxt(processed_exp_saxs, exp_saxs_input)
+                                      f'{trajectory_id}_exp_saxs_input_processed.dat')
+    np.savetxt(processed_exp_saxs,exp_saxs_input)
 
     return processed_exp_saxs
 
@@ -139,7 +140,7 @@ def correct_exp_error(experimental_data_path: str) -> str:
     # Save used parameters in log file
     with (open(os.path.join(working_dir,'parameters.dat'),'r',encoding='utf-8-sig') as f,
           open(os.path.join(working_dir,'bift.log'),'a',encoding='utf-8') as t):
-        t.write('-------- Input Parameters --------\n')
+        t.write('------------------------ Input Parameters ------------------------\n')
         t.write(f.read())
 
     # Remove unnecessary bift output files
@@ -164,7 +165,7 @@ def ibme(
 
     The used algorithm is explained in:
         https://github.com/KULL-Centre/BME/blob/main/notebook/example_04.ipynb
-    
+
     Reference:
         Bottaro S, Bengtsen T, Lindorff-Larsen K. Integrating Molecular Simulation and Experimental
         Data: A Bayesian/Maximum Entropy Reweighting Approach. Methods Mol Biol. 2020;2112:219-240.
@@ -237,7 +238,7 @@ def bme_ensemble_reweighting(
     Applies the iterative BME algorithm, explained in:
         https://github.com/KULL-Centre/BME/blob/main/notebook/example_04.ipynb
     The algorithm is applied using different theta values and the results for each value are stored.
-    
+
     Reference:
         Bottaro S, Bengtsen T, Lindorff-Larsen K. Integrating Molecular Simulation and Experimental
         Data: A Bayesian/Maximum Entropy Reweighting Approach. Methods Mol Biol. 2020;2112:219-240.
@@ -295,13 +296,13 @@ def bme_ensemble_reweighting(
 def create_effective_frames_fit_fig(
     stats: np.ndarray,
     thetas: np.ndarray,
-    choices: list[int] | None = None,
+    choices: int | list[int] | None = None,
     title_text: str | None = None,
     colors: list[str] = None,
     ) -> go.Figure:
     """Create a Figure plotting the fraction of effective frames vs the chisquare value, resulting
     from applying BME using different theta values.
-    
+
     The fraction of effective frames of an ensemble after reweighting is plotted agaisnt the
     chisquare value of the fitting of the data calculated from the reweighted ensemble to the
     experimental data.
@@ -336,6 +337,10 @@ def create_effective_frames_fit_fig(
             the created plot, optionally with data points corresponding to highlighted theta
             values in different colors.
     """
+    # Setup choices
+    if isinstance(choices,int):
+        choices = [choices]
+
     # Setup color palette
     if colors is None:
         colors = ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7']
@@ -386,26 +391,26 @@ def create_effective_frames_fit_fig(
                                  color='black',
                                  mirror=True,
                                  ticks='outside',
-                                 ticklen=20,
-                                 tickwidth=5,
+                                 ticklen=10,
+                                 tickwidth=4,
                                  range=[0,1.02]),
                       yaxis=dict(title=dict(text='Reduced <i>&#967;<sup>2</sup><sub></sub></i>',
-                                            standoff=30),
+                                            standoff=45),
                                  showgrid=False,
                                  showline=True,
-                                 linewidth=5,
+                                 linewidth=4,
                                  linecolor='black',
                                  color='black',
                                  mirror=True,
                                  ticks='outside',
-                                 ticklen=20,
-                                 tickwidth=5),
+                                 ticklen=10,
+                                 tickwidth=4),
                       width=1200,
                       height=800,
                       margin=dict(t=75,l=80,r=0,b=0),
                       legend=dict(x=0.02,
                                   y=0.98,
-                                  borderwidth=5,
+                                  borderwidth=3,
                                   bordercolor='black',
                                   itemsizing='constant'),)
 
@@ -480,7 +485,7 @@ def create_reweighting_fits_fig(
     i_exp: np.ndarray,
     err: np.ndarray,
     i_prior: np.ndarray,
-    i_posts: np.ndarray,
+    i_posts: np.ndarray | list[np.ndarray],
     title_text: str | None = None,
     colors: list[str] = None,
     ) -> go.Figure:
@@ -498,8 +503,8 @@ def create_reweighting_fits_fig(
             an array of SAXS intensities averaged over all the frames of a SAXS data file
             calculated from a conformational ensemble with uniform weights.
         i_posts:
-            a list of arrays of SAXS intensities averaged over all the frames of a SAXS data file
-            calculated from a conformational ensemble with the provided set of weights.
+            an array or list of arrays of SAXS intensities averaged over all the frames of a SAXS
+            data file calculated from a conformational ensemble with the provided set of weights.
         title_text:
             a title for the created multiplot Figure. Defaults to None.
         colors:
@@ -514,6 +519,10 @@ def create_reweighting_fits_fig(
                 - Kraty plot for i_prior and i_post fitted to experimental data.
                 - residuals between i_prior/i_post(s) and i_exp.
     """
+    # Setup i_posts
+    if isinstance(i_posts,np.ndarray):
+        i_posts = [i_posts]
+
     # Setup color palette
     if colors is None:
         colors = ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7']
@@ -664,7 +673,7 @@ def create_reweighting_fits_fig(
                      range=[0,
                             np.max((q**2)*i_prior) + 0.1*np.max((q**2)*i_prior)],
                      ticks='outside',
-                     ticklen=20,
+                     ticklen=10,
                      tickwidth=4,)
 
     ## Residuals
@@ -672,7 +681,7 @@ def create_reweighting_fits_fig(
                      col=2,
                      title_text='(I<sup>EXP</sup>-I<sup>CALC</sup>)/&#963;',
                      ticks='outside',
-                     ticklen=20,
+                     ticklen=10,
                      tickwidth=4,)
 
     fig.add_shape(row=2,
@@ -698,7 +707,7 @@ def create_reweighting_fits_fig(
 
     fig.update_xaxes(title_text='q (nm<sup>-1</sup>)',
                      ticks='outside',
-                     ticklen=20,
+                     ticklen=10,
                      tickwidth=4,
                      showline=True,
                      linewidth=4,
@@ -734,200 +743,229 @@ def create_reweighting_fits_fig(
     return fig
 
 
-def create_ss_frequency_difference_fig(
-    ss_assignment: pd.DataFrame | str,
-    topology: str,
-    weights: np.ndarray | None = None,
-    trajectory_id: str | None = None,
-    output_path: str | None = None,
-    ) -> go.Figure:
-    """Create a secondary structure frequency Figure from a secondary structure assignment matrix.
+# def create_ss_frequency_difference_fig(
+#     ss_assignment: pd.DataFrame | str,
+#     topology: str,
+#     weights: np.ndarray | None = None,
+#     trajectory_id: str | None = None,
+#     output_path: str | None = None,
+#     ) -> go.Figure:
+#     """Create a secondary structure frequency difference Figure from a secondary structure assignment
+#     matrix and a set of weights.
 
-    Args:
-        ss_assignment:
-            calculated secondary structure assignment matrix DataFrame or path to calculated matrix
-            in .csv format.
-        topology:
-            path to topology .pdb file.
-        trajectory_id:
-            used on Figure title and prefix for saved ss_frequency filename. Defaults to None.
-        output_path:
-            path to output .html file or output directory where created Figure will be stored.
-            If directory, written file is named 'ss_frequency.html', optionally with
-            trajectory_id prefix. Defaults to None.
+#     Args:
+#         ss_assignment:
+#             calculated secondary structure assignment matrix DataFrame or path to calculated matrix
+#             in .csv format.
+#         topology:
+#             path to topology .pdb file.
+#         weights:
+#             array of weights to use when reweighting the calculated secondary structure frequency matrix.
+#         trajectory_id:
+#             used on Figure title and prefix for saved ss_frequency filename. Defaults to None.
+#         output_path:
+#             path to output .html file or output directory where created Figure will be stored.
+#             If directory, written file is named 'ss_frequency.html', optionally with
+#             trajectory_id prefix. Defaults to None.
 
-    Returns:
-        ss_freq_fig:
-            a stacked line plot with the secondary structure frequencies of each secondary structure
-            type for each residue in the structure.
-    """
-    if isinstance(ss_assignment,str):
-        assert ss_assignment.endswith('.csv'), ('Secondary structure assignment '
-                                                'matrix must be in .csv format!')
-        ss_assignment = pd.read_csv(ss_assignment,index_col=0)
+#     Returns:
+#         ss_freq_fig:
+#             a plot with the difference in secondary structure frequencies of each secondary structure
+#             type for each residue in the structure, between the uniform and reweighted secondary structure
+#             assignment matrix.
+#     """
+#     if isinstance(ss_assignment,str):
+#         assert ss_assignment.endswith('.csv'), ('Secondary structure assignment '
+#                                                 'matrix must be in .csv format!')
+#         ss_assignment = pd.read_csv(ss_assignment,index_col=0)
 
-    # Extract info regarding chains and resnums
-    top_info = extract_pdb_info(topology)
-    resranges = {}
-    chain_letters = []
+#     # Extract info regarding chains and resnums
+#     top_info = extract_pdb_info(topology)
+#     resranges = {}
+#     chain_letters = []
 
-    # Iterate through chains
-    for chain_number in range(len(top_info.keys()),0,-1):
-        chain_letter, starting_res, chain_size = top_info[chain_number]
-        resranges[chain_letter] = [ x for x in range(starting_res, starting_res + chain_size)]
-        chain_letters.append(chain_letter)
+#     # Iterate through chains
+#     for chain_number in range(len(top_info.keys()),0,-1):
+#         chain_letter, starting_res, chain_size = top_info[chain_number]
+#         resranges[chain_letter] = [ x for x in range(starting_res, starting_res + chain_size)]  
+#         chain_letters.append(chain_letter)
 
-    # Create tick labels that respect chain id
-    if len(chain_letters) > 1:
-        x_labels = [f'{chain_letter}{resnum}' for chain_letter in chain_letters
-                    for resnum in resranges[chain_letter]]
-    else:
-        x_labels = [f'{resnum}' for chain_letter in chain_letters
-                    for resnum in resranges[chain_letter]]
+#     # Create tick labels that respect chain id
+#     if len(chain_letters) > 1:
+#         x_labels = [f'{chain_letter}{resnum}' for chain_letter in chain_letters
+#                     for resnum in resranges[chain_letter]]
+#     else:
+#         x_labels = [f'{resnum}' for chain_letter in chain_letters
+#                     for resnum in resranges[chain_letter]]
 
-    # Count the frequency of each secondary structure element
-    uniform_frequency = calculate_ss_frequency(ss_assignment=ss_assignment,
-                                               weights=None)
+#     # Count the frequency of each secondary structure element
+#     uniform_frequency = calculate_ss_frequency(ss_assignment=ss_assignment,
+#                                                weights=None)
 
-    # Count the frequency of each secondary structure element with reweighting
-    reweighted_frequency = calculate_ss_frequency(ss_assignment=ss_assignment,
-                                                  weights=weights)
+#     # Count the frequency of each secondary structure element with reweighting
+#     reweighted_frequency = calculate_ss_frequency(ss_assignment=ss_assignment,
+#                                                   weights=weights)
 
-    # Calculate the frequency difference
-    difference_frequency = uniform_frequency - reweighted_frequency
+#     # Calculate the frequency difference
+#     difference_frequency = uniform_frequency - reweighted_frequency
 
-    # Create Figure
-    ss_freq_fig = go.Figure()
+#     # Create Figure
+#     ss_freq_fig = go.Figure()
 
-    # Adding traces for each secondary structure type
-    colors = ['#1f77b4',  # Blue
-              '#2ca02c',  # Green
-              '#d62728'  # Red
-              ]
+#     # Adding traces for each secondary structure type
+#     colors = ['#1f77b4',  # Blue
+#               '#2ca02c',  # Green
+#               '#d62728'  # Red
+#               ]
 
-    for structure,color in zip(difference_frequency.index,colors):
-        ss_freq_fig.add_trace(go.Scatter(x=list(range(difference_frequency.columns[0],
-                                                      difference_frequency.columns[-1]+1)),
-                                        y=difference_frequency.loc[structure],
-                                        mode='lines',
-                                        marker_color=color,
-                                        marker_size=50,
-                                        line_width=2,
-                                        name=structure,
-                                        hoverinfo='text',
-                                        hovertext=[ f'{x_label}, \
-                                                   {difference_frequency.loc[structure].iloc[i]}' \
-                                                   for i,x_label in enumerate(x_labels) ]))
+#     for structure,color in zip(difference_frequency.index,colors):
+#         ss_freq_fig.add_trace(go.Scatter(x=list(range(int(difference_frequency.columns[0]),
+#                                                       int(difference_frequency.columns[-1])+1)),
+#                                         y=difference_frequency.loc[structure],
+#                                         mode='lines',
+#                                         marker_color=color,
+#                                         marker_size=50,
+#                                         line_width=2,
+#                                         name=structure,
+#                                         hoverinfo='text',
+#                                         hovertext=[ f'{x_label}, \
+#                                                    {difference_frequency.loc[structure].iloc[i]}' \
+#                                                    for i,x_label in enumerate(x_labels) ]))
 
-    # Setup chain dividers lines
-    num_res = len(difference_frequency.columns)
-    chain_ends = [] # to be used in tickvals
-    chain_begins = [] # to be used in tickvals
-    shapes = []
-    cumulative_residues = 0
+#     # Setup chain dividers lines
+#     num_res = len(difference_frequency.columns)
+#     chain_ends = [] # to be used in tickvals
+#     chain_begins = [] # to be used in tickvals
+#     shapes = []
+#     cumulative_residues = 0
 
-    for chain_letter in chain_letters[:-1]:
-        chain_begins.append(cumulative_residues+1)
-        chain_size = len(resranges[chain_letter])
-        chain_end = cumulative_residues + chain_size
-        chain_ends.append(chain_end)
+#     for chain_letter in chain_letters[:-1]:
+#         chain_begins.append(cumulative_residues+1)
+#         chain_size = len(resranges[chain_letter])
+#         chain_end = cumulative_residues + chain_size
+#         chain_ends.append(chain_end)
 
-        shapes.append(dict(type='line',
-                            xref='x',
-                            x0=cumulative_residues+len(resranges[chain_letter])-1,
-                            x1=cumulative_residues+len(resranges[chain_letter])-1,
-                            y0=0,
-                            y1=1,
-                            line=dict(color='black',
-                                      width=0.5)))
+#         shapes.append(dict(type='line',
+#                             xref='x',
+#                             x0=cumulative_residues+len(resranges[chain_letter])-1,
+#                             x1=cumulative_residues+len(resranges[chain_letter])-1,
+#                             y0=0,
+#                             y1=1,
+#                             line=dict(color='black',
+#                                       width=2)))
 
-        cumulative_residues += chain_size
-    chain_begins.append(num_res - len(resranges[chain_letters[-1]]) + 1)
-    chain_ends.append(num_res)
+#         cumulative_residues += chain_size
+#     chain_begins.append(num_res - len(resranges[chain_letters[-1]]) + 1)
+#     chain_ends.append(num_res)
 
-    # Setup axis tick values
-    tickvals = []
-    chain_counter = 0
-    curr_val = chain_begins[chain_counter]
-    tick_step = num_res // len(chain_letters) // 4 # always 5 ticks per axis
+#     # Setup axis tick values
+#     tickvals = []
+#     chain_counter = 0
+#     curr_val = chain_begins[chain_counter]
+#     tick_step = num_res // len(chain_letters) // 4 # always 5 ticks per axis
 
-    while curr_val <= num_res:
-        try:
-            chain_end = chain_ends[chain_counter]
-        except IndexError:
-            tickvals.append(curr_val)
-        else:
-            if chain_end - curr_val <= tick_step:
-                chain_counter += 1
-                try:
-                    curr_val = chain_begins[chain_counter]
-                    tickvals.append(curr_val)
-                except IndexError:
-                    if chain_ends[-1] - curr_val <= 3:
-                        tickvals.append(chain_ends[-1])
-                    else:
-                        tickvals.append(curr_val)
-                        tickvals.append(chain_ends[-1])
-            else:
-                tickvals.append(curr_val)
-        curr_val += tick_step
+#     while curr_val <= num_res:
+#         try:
+#             chain_end = chain_ends[chain_counter]
+#         except IndexError:
+#             tickvals.append(curr_val)
+#         else:
+#             if chain_end - curr_val <= tick_step:
+#                 chain_counter += 1
+#                 try:
+#                     curr_val = chain_begins[chain_counter]
+#                     tickvals.append(curr_val)
+#                 except IndexError:
+#                     if chain_ends[-1] - curr_val <= 3:
+#                         tickvals.append(chain_ends[-1])
+#                     else:
+#                         tickvals.append(curr_val)
+#                         tickvals.append(chain_ends[-1])
+#             else:
+#                 tickvals.append(curr_val)
+#         curr_val += tick_step
 
-    # Setup tick text
-    x_text = []
-    for x_val in tickvals:
-        x_t = x_labels[x_val-1]
-        x_text.append(x_t)
+#     # Setup tick text
+#     x_text = []
+#     for x_val in tickvals:
+#         x_t = x_labels[x_val-1]
+#         x_text.append(x_t)
 
-    # Update Figure Layout
-    if trajectory_id is not None:
-        ss_freq_title = f'{trajectory_id} Secondary Structure Frequencies'
-    else:
-        ss_freq_title = 'Secondary Structure Frequencies'
-    ss_freq_fig.update_layout(width=1000,
-                              height=750,
-                              font=dict(family='Arial',
-                                        color='black',
-                                        size=18),
-                              plot_bgcolor = '#FFFFFF',
-                              paper_bgcolor = '#FFFFFF',
-                              modebar_remove=['zoom','pan','select','lasso2d','zoomIn','zoomOut'],
-                              title=dict(text=ss_freq_title,
-                                         x=0.5),
-                              xaxis=dict(title='Residue',
-                                         ticks='outside',
-                                         tickvals=tickvals,
-                                         ticktext=x_text,
-                                         showgrid=True),
-                              yaxis=dict(title='Frequency',
-                                         ticks='outside',
-                                         range=[0,1],
-                                         showgrid=False,
-                                         title_standoff=5),
-                              shapes=shapes)
+#     # Update Figure Layout
+#     if trajectory_id is not None:
+#         ss_freq_title = f'{trajectory_id} Secondary Structure Frequency Differences'
+#     else:
+#         ss_freq_title = 'Secondary Structure Frequency Differences'
 
-    if output_path is not None:
-        # Save Secondary Structure frequency
-        if os.path.isdir(output_path):
-            if trajectory_id is not None:
-                output_filename = f'{trajectory_id}_ss_frequency.html'
-            else:
-                output_filename = 'ss_frequency.html'
-            ss_freq_fig.write_html(os.path.join(output_path,output_filename),
-                                   config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
+#     # Add subtitle
+#     ss_freq_fig.add_annotation(text='Difference in frequency of each sec. struc. assignment code for each residue',
+#                                font=dict(family='Helvetica',
+#                                          color='#707070',
+#                                          size=24),
+#                                xref='paper',
+#                                yref='paper',
+#                                x=0.5,
+#                                y=1.07,
+#                                showarrow=False)
 
-        elif output_path.endswith('.html'):
-            ss_freq_fig.write_html(output_path,
-                                   config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
-        else:
-            print(('Secondary structure frequency graph was not saved to disk, '
-                   'output path must be a directory or .html filepath!'))
+#     ss_freq_fig.update_layout(width=1000,
+#                               height=750,
+#                               font=dict(family='Helvetica',
+#                                         color='black',
+#                                         size=30),
+#                               plot_bgcolor = '#FFFFFF',
+#                               paper_bgcolor = '#FFFFFF',
+#                               modebar_remove=['zoom','pan','select','lasso2d','zoomIn','zoomOut'],
+#                               title=dict(text=ss_freq_title,
+#                                          x=0.5),
+#                               xaxis=dict(title='Residue',
+#                                          ticks='outside',
+#                                          tickvals=tickvals,
+#                                          ticktext=x_text,
+#                                          ticklen=10,
+#                                          tickwidth=3,
+#                                          showgrid=True),
+#                               yaxis=dict(title='Frequency',
+#                                          ticks='outside',
+#                                          ticklen=10,
+#                                          tickwidth=3,
+#                                          range=[0,1],
+#                                          showgrid=False,
+#                                          title_standoff=5),
+#                               shapes=shapes)
 
-    return ss_freq_fig
+#     ss_freq_fig.update_xaxes(showline=True,
+#                              linewidth=3,
+#                              linecolor='black',
+#                              mirror=True)
+#     ss_freq_fig.update_yaxes(showline=True,
+#                              linewidth=3,
+#                              linecolor='black',
+#                              mirror=True)
+
+#     if output_path is not None:
+#         # Save Secondary Structure frequency
+#         if os.path.isdir(output_path):
+#             if trajectory_id is not None:
+#                 output_filename = f'{trajectory_id}_difference_ss_frequency.html'
+#             else:
+#                 output_filename = 'difference_ss_frequency.html'
+#             ss_freq_fig.write_html(os.path.join(output_path,output_filename),
+#                                    config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
+
+#         elif output_path.endswith('.html'):
+#             ss_freq_fig.write_html(output_path,
+#                                    config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
+#         else:
+#             print(('Secondary structure frequency difference graph was not saved to disk, '
+#                    'output path must be a directory or .html filepath!'))
+
+#     return ss_freq_fig
 
 
 def create_reweighting_metrics_fig(
     metrics: pd.DataFrame,
-    rw_weights: list[np.ndarray],
+    weight_sets: np.ndarray | list[np.ndarray],
     title_text: str | None = None,
     colors: list[str] = None,
     ) -> go.Figure:
@@ -938,9 +976,9 @@ def create_reweighting_metrics_fig(
         metrics:
             a DataFrame with the calculated structural metrics, one row per frame in the
             conformational ensemble.
-        rw_weights:
-            a list of arrays containing the weights for calculating the probability distributions of
-            each structural metric, for each set of weights.
+        weight_sets:
+            an array or list of arrays containing the weights for calculating the probability
+            distributions of each structural metric, for each set of weights.
         title_text:
             title for the created Figure. Defaults to None.
         colors:
@@ -952,6 +990,10 @@ def create_reweighting_metrics_fig(
             a Figure plotting the structural metrics distributions for uniformly and unequally
             weighted conformational ensembles.
     """
+    # Setup weights
+    if isinstance(weight_sets,np.ndarray):
+        weight_sets = [weight_sets]
+
     # Setup color palette
     if colors is None:
         colors = ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7']
@@ -976,7 +1018,7 @@ def create_reweighting_metrics_fig(
         x, p_x, av, av_stderr = kde(data=metrics[metric])
         uniform_trace = go.Scatter(x=x,
                                    y=p_x,
-                                   line=dict(width=3,
+                                   line=dict(width=4,
                                              color='black'),
                                    name=f'{metric}_uniform')
         fig.add_trace(uniform_trace,
@@ -992,7 +1034,7 @@ def create_reweighting_metrics_fig(
                            y1=np.interp(av,x,p_x),
                            line=dict(dash='dash',
                                      color=uniform_trace.line.color,
-                                     width=3)),
+                                     width=4)),
                            legend='legend',
                            row=row_num,
                            col=col_num)
@@ -1016,7 +1058,7 @@ def create_reweighting_metrics_fig(
         x_rews = []
         p_x_rews = []
 
-        for weights,color in zip(rw_weights,colors):
+        for weights,color in zip(weight_sets,colors):
             # Recalculate KDE for each metric and add it to Figure, along with average
             x_rew, p_x_rew, av_rew, av_rew_stderr = kde(data=metrics[metric],
                                                         weights=weights)
@@ -1024,7 +1066,7 @@ def create_reweighting_metrics_fig(
             p_x_rews.append(p_x_rew)
             reweighted_trace = go.Scatter(x=x_rew,
                                           y=p_x_rew,
-                                          line=dict(width=3,
+                                          line=dict(width=4,
                                                     color=color),
                                           name=f'{metric}_reweighted')
             fig.add_trace(reweighted_trace,
@@ -1040,7 +1082,7 @@ def create_reweighting_metrics_fig(
                                y1=np.interp(av_rew,x_rew,p_x_rew),
                                line=dict(dash='dash',
                                          color=reweighted_trace.line.color,
-                                         width=3)),
+                                         width=4)),
                                legend='legend',
                                row=row_num,
                                col=col_num)
@@ -1098,7 +1140,7 @@ def create_reweighting_metrics_fig(
 
     # Update Figure layout
     fig.update_yaxes(ticks='outside',
-                     ticklen=20,
+                     ticklen=10,
                      tickwidth=4,
                      showline=True,
                      linewidth=4,
@@ -1108,14 +1150,14 @@ def create_reweighting_metrics_fig(
                      title_standoff=0)
 
     fig.update_xaxes(ticks='outside',
-                     ticklen=20,
+                     ticklen=10,
                      tickwidth=4,
                      showline=True,
                      linewidth=4,
                      linecolor='black',
                      color='black',
                      mirror=True,
-                     title_standoff=20)
+                     title_standoff=30)
 
     fig.update_layout(plot_bgcolor='#FFFFFF',
                       font=dict(family='Arial',
@@ -1140,3 +1182,156 @@ def create_reweighting_metrics_fig(
         fig.update_layout(margin_t=40)
 
     return fig
+
+
+def attempt_read_data(
+    data: pd.DataFrame | str | None,
+    data_msg_tag: str,
+    calc_fn: Callable,
+    *args,
+    **kwargs,
+    ) -> pd.DataFrame:
+    """Attempt to read data from file, else calculate it using provided function.
+
+    If data is given directly as a DataFrame, it is simply returned. Otherwise, it
+    is either read from file or calculated using the provided function and arguments.
+
+    Args:
+        data:
+            a DataFrame with the desired data, the path to the data in .csv format or None.
+        data_msg_tag:
+            string identifier for which data we are working with so prints to console are
+            correct.
+        calc_fn:
+            an object with a __call__ method, e.g. a function to be used in calculating the
+            data if it is not provided.
+
+    Returns:
+        pd.DataFrame:
+            desired data in DataFrame format.
+    """
+    # Setup messages to console
+    if data_msg_tag == 'cmatrix':
+        ATTEMPTING_READ_MSG = 'Attempting to read contact matrix from file...'
+        SUCCESSFUL_READ_MSG = 'Contact matrix has been read from file.'
+        PROVIDED_MSG = 'Contact matrix data has been provided.'
+        NOT_PROVIDED_MSG = 'No contact matrix data was provided.'
+    elif data_msg_tag == 'dmatrix':
+        ATTEMPTING_READ_MSG = 'Attempting to read distance matrix from file...'
+        SUCCESSFUL_READ_MSG = 'Distance matrix has been read from file.'
+        PROVIDED_MSG = 'Distance matrix data has been provided.'
+        NOT_PROVIDED_MSG = 'No distance matrix data was provided.'
+    elif data_msg_tag == 'ss_freq':
+        ATTEMPTING_READ_MSG = ('Attempting to read secondary structure assignment frequency '
+                               'matrix from file...')
+        SUCCESSFUL_READ_MSG = ('Secondary structure assignment frequency matrix has been read '
+                               'from file.')
+        PROVIDED_MSG = 'Secondary structure assignment frequency matrix data has been provided.'
+        NOT_PROVIDED_MSG = 'No secondary structure assignment frequency matrix data was provided.'
+    elif data_msg_tag == 'structural_metrics':
+        ATTEMPTING_READ_MSG = 'Attempting to read structural metrics distributions from file...'
+        SUCCESSFUL_READ_MSG = 'Structural metrics distributions have been read from file.'
+        PROVIDED_MSG = 'Structural metrics distributions data has been provided.'
+        NOT_PROVIDED_MSG = 'No structural metrics distributions data was provided.'
+
+    # Attempt read of data
+    if isinstance(data,str):
+        print(ATTEMPTING_READ_MSG)
+        assert data.endswith('.csv'), ('Calculated data must be'
+                                       ' provided in .csv format!')
+        data_df = pd.read_csv(data,index_col=0)
+        print(SUCCESSFUL_READ_MSG)
+    elif isinstance(data,pd.DataFrame):
+        print(PROVIDED_MSG)
+        data_df = data
+    else:
+        print(NOT_PROVIDED_MSG)
+        data_df = calc_fn(*args,**kwargs)
+    return data_df
+
+
+def attempt_read_reweigthing_data(
+    reweighting_output_directory: str,
+    trajectory_id: str,
+    ) -> tuple[str|None, str|None, np.ndarray|None,
+               np.ndarray|None, np.ndarray|None]:
+    """Attempt to read reweighting data from output directory, returning None if not found.
+
+    Args:
+        reweighting_output_directory:
+            directory where data should be searched.
+        trajectory_id:
+            prefix for filenames to look for in directory.
+    Returns:
+        A tuple exp_saxs_file, calc_saxs_file, thetas_array, stats, weights where each variable
+        is either the corresponding data (if found) or None (if not found).
+    """
+    # Check for experimental SAXS data file
+    exp_saxs_file = os.path.join(reweighting_output_directory,f'{trajectory_id}_exp_saxs.dat')
+    if not os.path.isfile(exp_saxs_file):
+        exp_saxs_file = None
+        return None, None, None, None, None
+
+    # Check for calculated SAXS data file
+    calc_saxs_file = os.path.join(reweighting_output_directory,f'{trajectory_id}_calc_saxs.dat')
+    if not os.path.isfile(calc_saxs_file):
+        calc_saxs_file = None
+        return exp_saxs_file, None, None, None, None
+
+    # Check for BME reweighting results
+    bme_results_dir = os.path.join(reweighting_output_directory,'bme_reweighting_results')
+    if not os.path.isdir(bme_results_dir):
+        return exp_saxs_file, calc_saxs_file, None, None, None
+
+    ## Check which theta values are present (if any)
+    theta_values = set()
+    for theta_log in glob.glob(os.path.join(bme_results_dir,'ibme_t*.log')):
+        theta_log_prefix = os.path.split(theta_log)[1].split('_')[1]
+        if '.log' not in theta_log_prefix:
+            theta_value = int(theta_log_prefix[1:])
+            theta_values.add(theta_value)
+    if not theta_values:
+        return exp_saxs_file, calc_saxs_file, None, None, None
+    else:
+        thetas_array = np.array(sorted(list(theta_values)))
+
+    ## Check which weights/stats are present (if any)
+    ## weights = 'ibme_t{THETA_VALUE}.weights.dat'
+    ## stats = 'ibme_t{THETA_VALUE}_ibme_{ITERATION_NUMBER}.log' with the highest ITERATION_NUMBER
+
+    all_weights = []
+    all_stats = []
+
+    for theta in sorted(list(theta_values)):
+        # Get weights
+        weights_files = glob.glob(os.path.join(bme_results_dir,f'ibme_t{theta}_*.weights.dat'))
+
+        try:
+            weights = np.loadtxt(weights_files[0],
+                                 usecols=1)
+            all_weights.append(weights)
+        except (IndexError, FileNotFoundError):
+            return exp_saxs_file, calc_saxs_file, None, None, None
+
+        # Get stats
+        stats_files_sorted = sorted(glob.glob(os.path.join(bme_results_dir,
+                                                           f'ibme_t{theta}_ibme_*.log')),
+                                    key=lambda x : int(os.path.split(x)[1].split('_')[-1][:-4]))
+        try:
+            with open(stats_files_sorted[-1],'r',encoding='utf-8-sig') as stats_file:
+                lines = stats_file.readlines()
+            chi2_before = float(lines[2].strip().split(' ')[-1])
+            chi2_after = float(lines[5].strip().split(' ')[-1])
+            phi = float(lines[-1].strip().split(' ')[-1])
+            stats = (chi2_before,chi2_after,phi)
+            all_stats.append(stats)
+        except (IndexError, FileNotFoundError):
+            return exp_saxs_file, calc_saxs_file, None, None, None
+
+    if len(all_weights) != len(theta_values) or len(all_stats) != len(theta_values):
+        return exp_saxs_file, calc_saxs_file, None, None, None
+
+    weights = np.array(all_weights)
+    stats = np.array(all_stats)
+
+    return exp_saxs_file, calc_saxs_file, thetas_array, stats, weights

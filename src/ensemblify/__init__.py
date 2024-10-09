@@ -58,6 +58,7 @@ from ensemblify.analysis import analyze_trajectory
 from ensemblify.conversion import ensemble2traj,traj2saxs
 from ensemblify.generation import generate_ensemble
 from ensemblify.reweighting import reweight_ensemble
+from ensemblify.utils.clash_checking import check_steric_clashes
 from ensemblify.pipeline import ensemblify_pipeline
 from ensemblify.config import show_config,update_config
 from ensemblify.utils import df_from_pdb, df_to_pdb, extract_pdb_info, kde
@@ -67,6 +68,7 @@ __all__ = ['analyze_trajectory',
            'traj2saxs',
            'generate_ensemble',
            'reweight_ensemble',
+           'check_steric_clashes',
            'ensemblify_pipeline',
            'show_config',
            'update_config',

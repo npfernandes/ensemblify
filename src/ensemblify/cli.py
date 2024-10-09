@@ -83,27 +83,27 @@ class CustomHelpFormatter(argparse.HelpFormatter):
         return self._join_parts(parts)
 
 # FUNCTIONS
-def read_dict():
-    pass
+# def read_dict():
+#     pass
 
-def read_list():
-    pass
+# def read_list():
+#     pass
 
 def main():
     # Create the initial argument parser to capture the module
     initial_parser = argparse.ArgumentParser(description='Command-line tool to access various modules of the Ensemblify Python library.',
                                              usage='ensemblify {generation,conversion,analysis,reweighting} [module options]',
-                                             add_help=False)  # Disable help for this phase
+                                             add_help=False) # required
 
     initial_parser.add_argument('module', choices=['generation', 'g', 'gen', 'conversion', 'c', 'con',
                                                    'analysis', 'a', 'ana', 'reweighting', 'r', 'rew',
-                                                   'h','help'])
+                                                   'clash_checking','cch','h','help'])
     
     # Print error message if no arguments are provided
     if len(sys.argv) == 1:
         print('Error: Missing required arguments.\n')
         print('Usage:')
-        print('  ensemblify {generation, conversion, analysis, reweighting} [module options]\n')
+        print('  ensemblify {generation, conversion, analysis, reweighting, clash_checking} [module options]\n')
         print('Run \'ensemblify help\'  for more information.\n')
         sys.exit(1)
 
@@ -112,7 +112,7 @@ def main():
 
     # Now create the full parser with subparsers for each module
     parser = argparse.ArgumentParser(description='Command-line tool to access the various modules of the Ensemblify Python library.',
-                                     usage='ensemblify {generation,conversion,analysis,reweighting} [module options]',
+                                     usage='ensemblify {generation,conversion,analysis,reweighting,clash_checking} [module options]',
                                      formatter_class=CustomHelpFormatter)
 
     # Create subparsers for the modules
@@ -121,6 +121,18 @@ def main():
     # Expose the help option since initial parser has no help menu
     subparsers.add_parser(name='help',aliases=['h'])
 
+    # Subparser for the 'clash_checking' module with aliases
+    parser_clash_check = subparsers.add_parser(name='clash_checking',
+                                               help='Access the clash checking module',
+                                               aliases=['cch'],
+                                               usage='ensemblify {clash_checking,cch} [options]',
+                                               description='The clash checking module of the Ensemblify Python library.',
+                                               formatter_class=CustomHelpFormatter)
+
+    parser_clash_check.add_argument('-e','--ensemble_dir', type=str, required=True, help='Path to directory where ensemble .pdb structures are stored.',metavar='')
+    parser_clash_check.add_argument('-s','--sampling_targets', default=None, type=str, help='(Optional) Path to file (.yaml) with mapping of chains to sampled regions.',metavar='')
+    parser_clash_check.add_argument('-i','--input_structure', default=None, type=str, help='(Optional) Path to input structure (.pdb) used to generate the ensemble.',metavar='')
+
     # Subparser for the 'generation' module with aliases
     parser_generation = subparsers.add_parser(name='generation',
                                               help='Access the generation module',
@@ -128,8 +140,8 @@ def main():
                                               usage='ensemblify {generation,gen,g} [options]',
                                               description='The generation module of the Ensemblify Python library.',
                                               formatter_class=CustomHelpFormatter)
-    
-    parser_generation.add_argument('-p','--parameters', type=str, required=True, help='Path to parameters file in .yaml format.', metavar='')
+
+    parser_generation.add_argument('-p','--parameters', type=str, required=True, help='Path to parameters file (.yaml).', metavar='')
 
     # Subparser for the 'conversion' module with aliases
     parser_conversion = subparsers.add_parser(name='conversion',
@@ -152,21 +164,21 @@ def main():
                                             usage='ensemblify {analysis,ana,a} [options]',
                                             description='The analysis module of the Ensemblify Python library.',
                                             formatter_class=CustomHelpFormatter)
-    
-    parser_analysis.add_argument('-tj','--trajectory', required=True, type=list[str], help='Path(s) to trajectory file(s) (.xtc).', metavar='')
-    parser_analysis.add_argument('-tp','--topology', required=True, type=list[str], help='Path(s) to topology file(s) (.pdb).', metavar='')
-    parser_analysis.add_argument('-ti','--trajectoryid', required=True, type=list[str], help='Prefix identifier(s) for trajectory file(s).', metavar='')
+
+    parser_analysis.add_argument('--trajectory', required=True, type=list[str], help='Path(s) to trajectory file(s) (.xtc).', metavar='')
+    parser_analysis.add_argument('--topology', required=True, type=list[str], help='Path(s) to topology file(s) (.pdb).', metavar='')
+    parser_analysis.add_argument('--trajectoryid', required=True, type=list[str], help='Prefix identifier(s) for trajectory file(s).', metavar='')
 
     parser_analysis.add_argument('--outputdir', type=str, help='(Optional) Path to output directory.', metavar='')
-    parser_analysis.add_argument('--ramadata', action ='store_true', help='(Optional) Calculate a dihedral angles matrix.')
-    parser_analysis.add_argument('--distancematrix', action ='store_true', help='(Optional) Calculate a distance matrix.')
-    parser_analysis.add_argument('--contactmap', action ='store_true', help='(Optional) Calculate a contact map.')
-    parser_analysis.add_argument('--ssassign', action ='store_true', help='(Optional) Calculate a secondary structure assignment matrix.')
-    parser_analysis.add_argument('--rg', action ='store_true', help='(Optional) Calculate a radius of gyration distribution.')
-    parser_analysis.add_argument('--dmax', action ='store_true', help='(Optional) Calculate a maximum distance distribution.')
-    parser_analysis.add_argument('--eed', action ='store_true', help='(Optional) Calculate an end-to-end distance distribution.')
-    parser_analysis.add_argument('--cmdist', type=dict[str,(str,str)], help='(Optional) Calculate a center of mass distance distribution for each pair of given MDAnalysis selection strings.', metavar='')
-    parser_analysis.add_argument('--colors', type=list[str], help='(Optional) List of color hexcodes to use, one for each analyzed trajectory.', metavar='')
+    # parser_analysis.add_argument('--ramadata', action ='store_true', help='(Optional) Calculate a dihedral angles matrix.')
+    # parser_analysis.add_argument('--distancematrix', action ='store_true', help='(Optional) Calculate a distance matrix.')
+    # parser_analysis.add_argument('--contactmap', action ='store_true', help='(Optional) Calculate a contact map.')
+    # parser_analysis.add_argument('--ssassign', action ='store_true', help='(Optional) Calculate a secondary structure assignment matrix.')
+    # parser_analysis.add_argument('--rg', action ='store_true', help='(Optional) Calculate a radius of gyration distribution.')
+    # parser_analysis.add_argument('--dmax', action ='store_true', help='(Optional) Calculate a maximum distance distribution.')
+    # parser_analysis.add_argument('--eed', action ='store_true', help='(Optional) Calculate an end-to-end distance distribution.')
+    # parser_analysis.add_argument('--cmdist', type=dict[str,(str,str)], help='(Optional) Calculate a center of mass distance distribution for each pair of given MDAnalysis selection strings.', metavar='')
+    # parser_analysis.add_argument('--colors', type=list[str], help='(Optional) List of color hexcodes to use, one for each analyzed trajectory.', metavar='')
 
     # Subparser for the 'reweighting' module with aliases
     parser_reweighting = subparsers.add_parser(name='reweighting',
@@ -183,10 +195,10 @@ def main():
 
     parser_reweighting.add_argument('--outputdir', type=str, help='(Optional) Path to output directory.', metavar='')
     parser_reweighting.add_argument('--thetas', type=list[int], help='(Optional) List of values to try as the theta parameter in BME.', metavar='')
-    parser_reweighting.add_argument('--rg', action ='store_true', help='(Optional) Calculate and compare uniform/reweighted radius of gyration distributions.')
-    parser_reweighting.add_argument('--dmax', action ='store_true', help='(Optional) Calculate and compare uniform/reweighted maximum distance distributions.')
-    parser_reweighting.add_argument('--eed', action ='store_true', help='(Optional) Calculate and compare uniform/reweighted end-to-end distance distributions.')
-    parser_reweighting.add_argument('--cmdist', type=dict[str,(str,str)], help='(Optional) Calculate and compare uniform/reweighted center of mass distance distributions for each pair of given MDAnalysis selection strings.', metavar='')
+    # parser_reweighting.add_argument('--rg', action ='store_true', help='(Optional) Calculate and compare uniform/reweighted radius of gyration distributions.')
+    # parser_reweighting.add_argument('--dmax', action ='store_true', help='(Optional) Calculate and compare uniform/reweighted maximum distance distributions.')
+    # parser_reweighting.add_argument('--eed', action ='store_true', help='(Optional) Calculate and compare uniform/reweighted end-to-end distance distributions.')
+    # parser_reweighting.add_argument('--cmdist', type=dict[str,(str,str)], help='(Optional) Calculate and compare uniform/reweighted center of mass distance distributions for each pair of given MDAnalysis selection strings.', metavar='')
 
     # Now parse the remaining arguments with the full parser
     full_args = parser.parse_args([args.module] + remaining_args)
@@ -203,42 +215,40 @@ positional arguments:
     conversion (c, con)        Access the conversion module.
     analysis (a, ana)          Access the analysis module.
     reweighting (r, rew)       Access the reweighting module.
+    clash_checking (cch)       Access the clash checking module.
 
 '''
     if full_args.module in ['help','h']:
         print(help_msg)
 
-    if full_args.module in ['generation', 'g', 'gen']:
-        from ensemblify import generate_ensemble
+    elif full_args.module in ['clash_checking', 'cch']:
+        # from ensemblify.utils.clash_checking import check_steric_clashes
+        # check_steric_clashes(ensemble_dir=full_args.ensembledir,
+        #                      sampling_targets=full_args.samplingtargets,
+        #                      input_structure=full_args.inputstructure)
+        print(full_args.ensembledir)
+        print(full_args.samplingtargets)
+        print(full_args.inputstructure)
+    elif full_args.module in ['generation', 'g', 'gen']:
+        # from ensemblify import generate_ensemble
+        # generate_ensemble(parameters_path=full_args.parameters)
+
         print(full_args.parameters)
-        #generate_ensemble(parameters_path=full_args.parameters)
 
     elif full_args.module in ['conversion', 'c', 'con']:
-        from ensemblify import ensemble2traj
-        print(full_args.jobname)
-        print(full_args.ensembledir)
-        print(full_args.trajectorydir)
-        print(full_args.size)
+        # from ensemblify import ensemble2traj
         # ensemble2traj(job_name=full_args.jobname,
         #               ensemble_dir=full_args.ensembledir,
         #               trajectory_dir=full_args.trajectorydir,
         #               size=full_args.size)
 
+        print(full_args.jobname)
+        print(full_args.ensembledir)
+        print(full_args.trajectorydir)
+        print(full_args.size)
+
     elif full_args.module in ['analysis', 'a', 'ana']:
-        from ensemblify import analyze_trajectory
-        print(full_args.trajectory)
-        print(full_args.topology)
-        print(full_args.trajectoryid)
-        print(full_args.outputdir)
-        print(full_args.ramadata)
-        print(full_args.distancematrix)
-        print(full_args.contactmap)
-        print(full_args.ssassign)
-        print(full_args.rg)
-        print(full_args.dmax)
-        print(full_args.eed)
-        print(full_args.cmdist)
-        print(full_args.colors)
+        # from ensemblify import analyze_trajectory
         # analyze_trajectory(trajectories=full_args.trajectory,
         #                    topologies=full_args.topology,
         #                    trajectory_ids=full_args.trajectoryid,
@@ -253,18 +263,22 @@ positional arguments:
         #                    cm_dist=full_args.cmdist,
         #                    color_palette=full_args.colors)
 
-    elif full_args.module in ['reweighting', 'r', 'rew']:
-        from ensemblify import reweight_ensemble
         print(full_args.trajectory)
         print(full_args.topology)
         print(full_args.trajectoryid)
-        print(full_args.expdata)
         print(full_args.outputdir)
-        print(full_args.thetas)
+        print(full_args.ramadata)
+        print(full_args.distancematrix)
+        print(full_args.contactmap)
+        print(full_args.ssassign)
         print(full_args.rg)
         print(full_args.dmax)
         print(full_args.eed)
         print(full_args.cmdist)
+        print(full_args.colors)
+
+    elif full_args.module in ['reweighting', 'r', 'rew']:
+        # from ensemblify import reweight_ensemble
         # reweight_ensemble(trajectory=full_args.trajectory,
         #                   topology=full_args.topology,
         #                   trajectory_id=full_args.trajectoryid,
@@ -275,3 +289,14 @@ positional arguments:
         #                   compare_dmax=full_args.dmax,
         #                   compare_eed=full_args.eed,
         #                   compare_cmdist=full_args.cmdist)
+
+        print(full_args.trajectory)
+        print(full_args.topology)
+        print(full_args.trajectoryid)
+        print(full_args.expdata)
+        print(full_args.outputdir)
+        print(full_args.thetas)
+        print(full_args.rg)
+        print(full_args.dmax)
+        print(full_args.eed)
+        print(full_args.cmdist)

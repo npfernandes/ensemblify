@@ -18,7 +18,7 @@ from ensemblify.utils import df_from_pdb,df_to_pdb,extract_pdb_info,cleanup_pdbs
 def check_clashes(
     sampled_pdb: str,
     pulchra_output_buffer: str,
-    sampling_targets: dict,
+    sampling_targets: dict[str,tuple[tuple[str,tuple[int,...],str,str]]],
     input_clashes: list[tuple[str,str]] | None,
     ) -> bool:
     """Check if there are recorded steric clashes in given PULCHRA output.

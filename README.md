@@ -11,7 +11,7 @@ It supports both user-defined models and AlphaFold [[1]](#ref1) predictions, usi
 ## 🧰 How do I install Ensemblify?
 Step-by-step instructions for installing Ensemblify are available in the [Installation](#installation) section.
 
-After installing Ensemblify, make sure to visit the [Tripeptide Database](#tripeptide-database) section to learn where you can get the required database files.
+After installing Ensemblify, make sure to visit the [Tripeptide Database](#tripeptide-database) section to learn where you can get the database files required for ensemble generation.
 
 ## 💻 How can I use Ensemblify?
 Ensemblify can be used either as a Command Line Interface (CLI) like so:

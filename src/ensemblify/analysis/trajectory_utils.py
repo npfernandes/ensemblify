@@ -23,7 +23,7 @@ from tqdm import tqdm
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.utils import extract_pdb_info, kde
-from ensemblify.analysis.third_party.mdreader_CHANGED import MDreader
+from ensemblify.analysis.third_party.mdreader_CHANGED import SimpleMDreader
 
 # FUNCTIONS
 def calc_rg(u: mda.Universe) -> float:
@@ -1362,7 +1362,8 @@ def calculate_metrics_data(
             of the trajectory.
     """
     # Initialize MDReader
-    u = MDreader(f'-f {trajectory} -s {topology}'.split())
+    u = SimpleMDreader(trajectory=trajectory,
+                       topology=topology)
 
     # Calculate trajectory metrics
     results = []

@@ -509,25 +509,9 @@ Check the [example notebooks](examples/README.md) for detailed instructions.
 </details>
 </details>
 
-<!-- <details>
-  <summary>
-    
-  # API Documentation
-    
-  </summary> -->
+# 📚 Documentation
 
-# 📚 API Documentation
-
-Ensemblify's API documentation is available at https://ensemblify.readthedocs.io/en/latest/index.html.
-
-<!-- </details> -->
-
-<!-- <details>  
-  <summary>
-  
-  # Citation and Publications
-  
-  </summary> -->
+Ensemblify's documentation is available at https://ensemblify.readthedocs.io/en/latest/index.html and as docstrings inside the source-code.
 
 # 🗨️ Citation and Publications
 
@@ -535,28 +519,10 @@ If you use Ensemblify, please cite its original publication:
 
     PUB
 
-<!-- </details> -->
-
-<!-- <details>  
-  <summary>
-  
-  # Acknowledgements
-  
-  </summary>  -->
-
 # 🤝 Acknowledgements
 
 We would like to thank the DeepMind team for developing AlphaFold.
 We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS institute for creating the tripeptide database used in the development of this tool. Check out their work at https://moma.laas.fr/.
-
-<!-- </details> -->
-
-<!-- <details>  
-  <summary>
-  
-  # References
-  
-  </summary>     -->
 
 # 📖 References
 

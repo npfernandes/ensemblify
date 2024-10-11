@@ -1,4 +1,4 @@
-"""Function to sampling conformational ensembles from an input structure."""
+"""Generate conformational ensembles by sampling regions in an input structure."""
 
 # IMPORTS
 ## Standard Library Imports
@@ -12,13 +12,13 @@ from tqdm import tqdm
 
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.generation.ensemble_utils.inputs_processing import register_input_clashes
 from ensemblify.utils import HashableDict
+from ensemblify.generation.ensemble_utils.inputs_processing import register_input_clashes
 from ensemblify.generation.ensemble_utils.sampling_utils import (setup_sampling_logging,
-                                                                   setup_ray_worker_logging,
-                                                                   setup_sampling_parameters,
-                                                                   setup_sampling_initial_pose,
-                                                                   sample_pdb)
+                                                                 setup_ray_worker_logging,
+                                                                 setup_sampling_parameters,
+                                                                 setup_sampling_initial_pose,
+                                                                 sample_pdb)
 from ensemblify.generation.ensemble_utils.movers_utils import setup_databases
 from ensemblify.generation.ensemble_utils.pdb_processing import process_pdb
 
@@ -144,7 +144,7 @@ def run_sampling(
 
     # Setup sampling aux variables
     unfinished_obj_refs_batch = []
-    MAX_PENDING_TASKS = PARAMETERS['core_amount'] # Max number of tasks to allow in the system at once
+    MAX_PENDING_TASKS = PARAMETERS['core_amount'] # Max nr of tasks to allow in the system at once
     decoy_num = 0
 
     # Sample with secondary structure bias (if applicable)

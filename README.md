@@ -348,7 +348,7 @@ To compile the provided BIFT source code, you can follow these commands:
     ```
 </details>
 
-Do not forget to visit the [Tripeptide Database](#tripeptide-database) section to learn where you can get the database files that are required for conformational ensemble generation.
+Do not forget to visit the [Tripeptide Database](#-tripeptide-database) section to learn where you can get the database files that are required for conformational ensemble generation.
 
 <!-- </details> -->
 

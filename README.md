@@ -31,17 +31,11 @@ A general overview of Ensemblify, descriptions of employed methods and applicati
 
     PAPER
 
-<!-- <details><summary>
-
-# 🧰 Installation
-
-</summary>     -->
-
 # 🧰 Installation
 
 <details><summary>
 
-## Ensemblify Python Package
+## 1. Ensemblify Python Package
 
 </summary>    
 
@@ -106,7 +100,7 @@ Alternatively, Ensemblify is available via the Python Package Index:
 
 <details><summary>
 
-## Third Party Software
+## 2. Third Party Software
 
 </summary>  
 
@@ -350,15 +344,6 @@ To compile the provided BIFT source code, you can follow these commands:
 
 Do not forget to visit the [Tripeptide Database](#-tripeptide-database) section to learn where you can get the database files that are required for conformational ensemble generation.
 
-<!-- </details> -->
-
-<!-- <details>  
-  <summary>
-  
-  # 🗃 Tripeptide Database
-  
-  </summary>    -->
-
 # 🗃 Tripeptide Database
 
 Ensemblify provides a three-residue fragment (tripeptide) database from which to sample dihedral angles, found here [link].
@@ -389,8 +374,6 @@ Your database must contain at least 4 columns: 3 containing the Phi, Psi and Ome
 | ... | ... | ... | ... |
 | Y | -3.119968 | 1.407456 | 1.979130 |
 
-<!-- </details> -->
-
 # 💻 Usage
 
 Ensemblify offers four different modules, all of which can be acessed either through the command line or from inside a Python script or Jupyter Notebook.
@@ -412,7 +395,7 @@ To generate an ensemble, provide Ensemblify with the path to your parameters fil
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify -g -p parameters_file.yaml
+    ensemblify gen -p parameters_file.yaml
 
 Inside a Python script or Jupyter Notebook:
 
@@ -442,13 +425,13 @@ If you prefer to create your own parameters file from scratch, a [template file]
   
   </summary>
 
-With the `conversion` module, you can convert your generated .pdb structures into a .xtc trajectory file, enabling you to easily store and manipulate your conformational ensemble.
+With the `conversion` module, you can convert your generated .pdb structures into a .xtc trajectory file, enabling you to easily store and analyze your conformational ensemble.
 
 To do this, provide the name for your created trajectory, the directory where the ensemble is stored and the directory where the trajectory file should be created.
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify -c -id trajectory_name -ed ensemble_dir -td trajectory_dir
+    ensemblify con -id trajectory_name -ed ensemble_dir -td trajectory_dir
 
 Inside a Python script or Jupyter Notebook:
 
@@ -473,7 +456,7 @@ To do this, provide your ensemble in trajectory format, your trajectory's topolo
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify -a -traj trajectory.xtc -top topology.pdb -id trajectory_name
+    ensemblify ana -traj trajectory.xtc -top topology.pdb -id trajectory_name
 
 Inside a Python script or Jupyter Notebook:
 
@@ -498,7 +481,7 @@ To do this, provide your ensemble in trajectory format, your trajectory's topolo
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify -r trajectory.xtc topology.pdb trajectory_name experimental_SAXS_data.dat
+    ensemblify rew trajectory.xtc topology.pdb trajectory_name experimental_SAXS_data.dat
 
 Inside a Python script or Jupyter Notebook:
 
@@ -550,5 +533,3 @@ We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS in
 <a id="ref11">[11]</a> J. M. Chandonia, N. K. Fox and S. E. Brenner, "SCOPe: classification of large macromolecular structures in the structural classification of proteins—extended database," *Nucleic Acids Research*, vol. 47, no. D1, pp. D475–D481, Jan. 2019 [[Link](https://doi.org/10.1093/nar/gky1134)]
 
 <a id="ref12">[12]</a> S. Bottaro , T. Bengsten and K. Lindorff-Larsen, "Integrating Molecular Simulation and Experimental Data: A Bayesian/Maximum Entropy Reweighting Approach," pp. 219-240, Feb. 2020. In: Z. Gáspári, (eds) *Structural Bioinformatics*, *Methods in Molecular Biology*, vol. 2112, Humana, New York, NY. [[Link](https://doi.org/10.1007/978-1-0716-0270-6_15)]
-
-<!-- </details> -->

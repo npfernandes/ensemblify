@@ -9,9 +9,9 @@
 It supports both user-defined models and AlphaFold [[1]](#ref1) predictions, using predicted Local Distance Difference Test (pLDDT) and Predicted Aligned Error (PAE) confidence metrics to guide conformational sampling. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
 
 ## 🧰 How do I install Ensemblify?
-Step-by-step instructions for installing Ensemblify are available in the [Installation](#installation) section.
+Step-by-step instructions for installing Ensemblify are available in the [Installation](#-installation) section.
 
-After installing Ensemblify, make sure to visit the [Tripeptide Database](#tripeptide-database) section to learn where you can get the database files required for ensemble generation.
+After installing Ensemblify, make sure to visit the [Tripeptide Database](#-tripeptide-database) section to learn where you can get the database files required for ensemble generation.
 
 ## 💻 How can I use Ensemblify?
 Ensemblify can be used either as a Command Line Interface (CLI) like so:
@@ -24,20 +24,22 @@ or as a library inside a Python script or Jupyter notebook:
     import ensemblify as ey
     ey.do_cool_stuff()
 
-Check the [Usage](#usage) section for more details and links to example Jupyter notebooks.
+Check the [Usage](#-usage) section for more details.
 
 ## 🔎 How does Ensemblify work?
 A general overview of Ensemblify, descriptions of employed methods and applications can be found in the Ensemblify paper:
 
     PAPER
 
-<details><summary>
+<!-- <details><summary>
 
 # 🧰 Installation
 
-</summary>    
+</summary>     -->
 
-<details open><summary>
+# 🧰 Installation
+
+<details><summary>
 
 ## Ensemblify Python Package
 
@@ -102,7 +104,7 @@ Alternatively, Ensemblify is available via the Python Package Index:
     pip install ensemblify --upgrade -->
 </details>
 
-<details open><summary>
+<details><summary>
 
 ## Third Party Software
 
@@ -348,14 +350,16 @@ To compile the provided BIFT source code, you can follow these commands:
 
 Do not forget to visit the [Tripeptide Database](#tripeptide-database) section to learn where you can get the database files that are required for conformational ensemble generation.
 
-</details>
+<!-- </details> -->
 
-<details>  
+<!-- <details>  
   <summary>
   
   # 🗃 Tripeptide Database
   
-  </summary>   
+  </summary>    -->
+
+# 🗃 Tripeptide Database
 
 Ensemblify provides a three-residue fragment (tripeptide) database from which to sample dihedral angles, found here [link].
 
@@ -385,19 +389,13 @@ Your database must contain at least 4 columns: 3 containing the Phi, Psi and Ome
 | ... | ... | ... | ... |
 | Y | -3.119968 | 1.407456 | 1.979130 |
 
-</details>
+<!-- </details> -->
 
-
-<details>  
-  <summary>
-  
-  # 💻 Usage
-  
-  </summary>
+# 💻 Usage
 
 Ensemblify offers four different modules, all of which can be acessed either through the command line or from inside a Python script or Jupyter Notebook.
 
-<details open>  
+<details>  
   <summary>
   
 ## The `generation` module
@@ -421,7 +419,8 @@ Inside a Python script or Jupyter Notebook:
     import ensemblify as ey
     ey.generate_ensemble('parameters_file.yaml')
 
-Check the [example notebooks](examples/README.md) for detailed instructions.
+Check the example notebook for detailed instructions: 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/examples/02_generation_module.ipynb)
 
 </details>
 
@@ -436,9 +435,9 @@ An [.html form](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/
 
 If you prefer to create your own parameters file from scratch, a [template file](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml) is also provided. -->
 
-<details open>  
+<details>  
   <summary>
-  
+
 ## The `conversion` module
   
   </summary>
@@ -456,11 +455,12 @@ Inside a Python script or Jupyter Notebook:
     import ensemblify as ey
     ey.ensemble2traj('trajectory_name','ensemble_dir','trajectory_dir')
 
-Check the [example notebooks](examples/README.md) for detailed instructions.
+Check the example notebook for detailed instructions: 
+ [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/examples/03_conversion_module.ipynb)
 
 </details>
 
-<details open>  
+<details>  
   <summary>
   
 ## The `analysis` module
@@ -480,11 +480,12 @@ Inside a Python script or Jupyter Notebook:
     import ensemblify as ey
     ey.analyze_trajectory('trajectory.xtc','topology.pdb','trajectory_name')
 
-Check the [example notebooks](examples/README.md) for detailed instructions.
+Check the example notebook for detailed instructions: 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/examples/04_analysis_module.ipynb)
 
 </details>
 
-<details open>  
+<details>  
   <summary>
   
 ## The `reweighting` module
@@ -504,9 +505,9 @@ Inside a Python script or Jupyter Notebook:
     import ensemblify as ey
     ey.reweigh_ensemble('trajectory.xtc','topology.pdb','trajectory_name','experimental_SAXS_data.dat')
 
-Check the [example notebooks](examples/README.md) for detailed instructions.
+Check the example notebook for detailed instructions: 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/examples/05_reweighting_module.ipynb)
 
-</details>
 </details>
 
 # 📚 Documentation

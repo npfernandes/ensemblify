@@ -411,7 +411,7 @@ Inside a Python script or Jupyter Notebook:
     ey.generate_ensemble('parameters_file.yaml')
 
 Check the interactive notebook for detailed usage examples: 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/examples/02_generation_module.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/02_generation_module.ipynb)
 
 </details>
 
@@ -447,7 +447,7 @@ Inside a Python script or Jupyter Notebook:
     ey.ensemble2traj('trajectory_name','ensemble_dir','trajectory_dir')
 
 Check the interactive notebook for detailed usage examples: 
- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/examples/03_conversion_module.ipynb)
+ [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/03_conversion_module.ipynb)
 
 </details>
 
@@ -472,7 +472,7 @@ Inside a Python script or Jupyter Notebook:
     ey.analyze_trajectory('trajectory.xtc','topology.pdb','trajectory_name')
 
 Check the interactive notebook for detailed usage examples: 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/examples/04_analysis_module.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/04_analysis_module.ipynb)
 
 </details>
 
@@ -497,7 +497,7 @@ Inside a Python script or Jupyter Notebook:
     ey.reweigh_ensemble('trajectory.xtc','topology.pdb','trajectory_name','experimental_SAXS_data.dat')
 
 Check the interactive notebook for detailed usage examples: 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/examples/05_reweighting_module.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/05_reweighting_module.ipynb)
 
 </details>
 

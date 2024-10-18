@@ -410,7 +410,7 @@ Inside a Python script or Jupyter Notebook:
     import ensemblify as ey
     ey.generate_ensemble('parameters_file.yaml')
 
-Check the example notebook for detailed instructions: 
+Check the interactive notebook for detailed usage examples: 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/examples/02_generation_module.ipynb)
 
 </details>
@@ -446,7 +446,7 @@ Inside a Python script or Jupyter Notebook:
     import ensemblify as ey
     ey.ensemble2traj('trajectory_name','ensemble_dir','trajectory_dir')
 
-Check the example notebook for detailed instructions: 
+Check the interactive notebook for detailed usage examples: 
  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/examples/03_conversion_module.ipynb)
 
 </details>
@@ -471,7 +471,7 @@ Inside a Python script or Jupyter Notebook:
     import ensemblify as ey
     ey.analyze_trajectory('trajectory.xtc','topology.pdb','trajectory_name')
 
-Check the example notebook for detailed instructions: 
+Check the interactive notebook for detailed usage examples: 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/examples/04_analysis_module.ipynb)
 
 </details>
@@ -496,7 +496,7 @@ Inside a Python script or Jupyter Notebook:
     import ensemblify as ey
     ey.reweigh_ensemble('trajectory.xtc','topology.pdb','trajectory_name','experimental_SAXS_data.dat')
 
-Check the example notebook for detailed instructions: 
+Check the interactive notebook for detailed usage examples: 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/examples/05_reweighting_module.ipynb)
 
 </details>

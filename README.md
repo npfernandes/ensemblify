@@ -516,6 +516,14 @@ If you use Ensemblify, please cite its original publication:
 We would like to thank the DeepMind team for developing AlphaFold.
 We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS institute for creating the tripeptide database used in the development of this tool. Check out their work at https://moma.laas.fr/.
 
+# ✍️ Authors
+
+**Nuno P. Fernandes** (Main Developer) [[GitHub]](https://github.com/npfernandes)
+
+**Tiago Lopes Gomes** (Initial prototyping, supervisor) [[GitHub]](https://github.com/TiagoLopesGomes)
+
+**Tiago Cordeiro** (Supervisor) [[GitHub]](https://github.com/CordeiroLab)
+
 # 📖 References
 
 <a id="ref1">[1]</a> J. Jumper, R. Evans, A. Pritzel et al., "Highly accurate protein structure prediction with AlphaFold," *Nature*, vol. 596, pp. 583–589, 2021. [[Link](https://doi.org/10.1038/s41586-021-03819-2)]

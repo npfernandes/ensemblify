@@ -518,11 +518,11 @@ We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS in
 
 # ✍️ Authors
 
-**Nuno P. Fernandes** (Main Developer) [[GitHub]](https://github.com/npfernandes)
+**Nuno P. Fernandes** (Main Developer) [[GitHub]](https://github.com/npfernandes?tab=repositories)
 
-**Tiago Lopes Gomes** (Initial prototyping, supervisor) [[GitHub]](https://github.com/TiagoLopesGomes)
+**Tiago Lopes Gomes** (Initial prototyping, Supervisor) [[GitHub]](https://github.com/TiagoLopesGomes?tab=repositories)
 
-**Tiago Cordeiro** (Supervisor) [[GitHub]](https://github.com/CordeiroLab)
+**Tiago Cordeiro** (Supervisor) [[GitHub]](https://github.com/CordeiroLab?tab=repositories)
 
 # 📖 References
 

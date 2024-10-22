@@ -114,7 +114,13 @@ Each of Ensemblify's modules has different dependencies to third party software,
 
 - `reweighting` module: no other software required.
 
+<details>  
+  <summary>
+  
 ### PyRosetta
+  
+  </summary>
+
 PyRosetta is a Python-based interface to the powerful Rosetta molecular modeling suite [[2]](#ref2). Its functionalities are used and extended through Ensemblify in order to generate conformational ensembles. You can install it by following these commands:
 
 1. Activate your `ensemblify_env` conda environment:
@@ -144,8 +150,14 @@ PyRosetta is a Python-based interface to the powerful Rosetta molecular modeling
 If this step does not produce a complaint or error, your installation has been successful.
 
 Remember to re-activate the `ensemblify_env` conda environment each time you wish to run code that uses `pyrosetta`.
+</details>
 
+<details>  
+  <summary>
+  
 ### FASPR
+  
+  </summary>
 
 FASPR is an ultra-fast and accurate program for deterministic protein sidechain packing [[3]](#ref3). To compile the provided FASPR source-code, you can follow these commands:
 
@@ -198,8 +210,15 @@ For MacOS users:
     echo "alias faspr='$(realpath FASPR)'" >> ~/.bashrc
     source ~/.bashrc
     ```
+</details>
 
+<details>  
+  <summary>
+  
 ### PULCHRA
+  
+  </summary>
+
 PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing full-atom protein models from reduced representations [[4]](#ref4). To compile the provided PULCHRA modified source-code, you can follow these commands:
 
 1. Navigate to where the PULCHRA source code is located:
@@ -222,8 +241,15 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
     echo "alias pulchra='$(realpath pulchra)'" >> ~/.bashrc
     source ~/.bashrc
     ```
+</details>
 
+<details>  
+  <summary>
+  
 ### GROMACS
+  
+  </summary>
+
 GROMACS is a molecular dynamics package mainly designed for simulations of proteins, lipids, and nucleic acids [[5]](#ref5).
 It comes with a large selection of flexible tools for trajectory analysis and the output formats are also supported by all major analysis and visualisation packages.
 
@@ -259,8 +285,15 @@ To download and compile the GROMACS source code from their [website](https://ftp
     ```
 
 The `gmx` command should already be registered as an alias for your GROMACS installation.
+</details>
 
+<details>  
+  <summary>
+  
 ### PEPSI-SAXS
+  
+  </summary>
+
 Pepsi-SAXS (Polynomial Expansions of Protein Structures and Interactions - SAXS) is an adaptive method for rapid and accurate computation of small-angle X-ray scattering (SAXS) profiles from atomistic protein models [[6]](#ref6).
 
 To download the Pepsi-SAXS executable from their [website](https://team.inria.fr/nano-d/software/pepsi-saxs/) you can follow these commands:
@@ -314,8 +347,15 @@ For MacOS users:
     echo "alias pepsisaxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
     source ~/.bashrc
     ```
+</details>
 
+<details>  
+  <summary>
+  
 ### BIFT
+  
+  </summary>
+
 Bayesian indirect Fourier transformation (BIFT) of small-angle experimental data allows for an estimation of parameters that describe the data [[7]](#ref7). Larsen *et al.* show in [[8]](#ref8) that BIFT can identify whether the experimental error in small-angle scattering data is over or underestimated. Here we use their implementation of this method to make this determination and scale the error values accordingly.
 
 To compile the provided BIFT source code, you can follow these commands:
@@ -340,6 +380,7 @@ To compile the provided BIFT source code, you can follow these commands:
     echo "alias bift='$(realpath bift)'" >> ~/.bashrc
     source ~/.bashrc
     ```
+</details>
 </details>
 
 Do not forget to visit the [Tripeptide Database](#-tripeptide-database) section to learn where you can get the database files that are required for conformational ensemble generation.

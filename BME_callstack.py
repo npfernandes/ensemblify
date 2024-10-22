@@ -1,8 +1,6 @@
 # IMPORTS
 ## Standard Library Imports
-import contextlib
 import sys
-import os
 import time
 
 ## Third Party Imports
@@ -15,187 +13,35 @@ from sklearn.linear_model import LinearRegression
 ## Local Imports
 import BME_tools_callstack as bt
 
-# FUNCTIONS
-def progress(
-    count,
-    total,
-    suffix=''):
-
-    total -= 1
-    bar_len = 60
-    filled_len = int(round(bar_len * count / float(total)))
-
-    percents = round(100.0 * count / float(total), 1)
-    bar = '=' * filled_len + '-' * (bar_len - filled_len)
-
-    sys.stdout.write(f'[{bar}] {percents}% ...{suffix}\r')
-    sys.stdout.flush()
-
-
+# CLASS
 class Reweight:
     """Reweight class.
 
     Returns:
         :
     """
-    def __init__(
-        self,
-        name,
-        w0=[]):
-        """Initialize.
+    def __init__(self, name: str, w0: list | None = None):
+        """Initialize Reweight instance.
 
         Args:
             name:
-
+                name of current instance, will appear in created files.
             w0:
-                . Defaults to [].
+                initial weights. Defaults to None which will lead to uniform weight initialization.
         """
 
         self.name = name
+        self.w0 = w0
 
-        if len(w0) != 0:
-            self.w0 = w0/np.sum(w0)
-        else:
-            self.w0= []
-
-        self.w_opt = []
-        self.lambdas = []
+        self.w_opt = None
+        self.lambdas = None
 
         self.logfile = f'{name}.log'
 
-        self.labels = []
-        self.experiment =  []
-        self.calculated =  []
+        self.labels = None
+        self.experiment =  None
+        self.calculated =  None
         self.standardized = False
-
-    def _write_log(
-        self,
-        msg):
-
-        with open(self.logfile,'w',encoding='utf-8') as log_fh:
-            log_fh.write(msg)
-
-    def read_file(
-        self,
-        exp_file,
-        calc_file,
-        averaging='auto',
-        fit='no',
-        use_samples=[],
-        use_data=[]):
-
-        # read file
-        log = ''
-        label,exp,calc,log,averaging = bt.parse(exp_file,
-                                                calc_file,
-                                                averaging=averaging)
-        self._write_log(log)
-
-        # remove datapoints if use_samples or use_data is not empty
-        label,exp, calc, log = bt.subsample(label,
-                                            exp,
-                                            calc,
-                                            use_samples,
-                                            use_data)
-        self._write_log(log)
-
-        if len(self.w0) == 0:
-            self.w0 = np.ones(calc.shape[0]) / calc.shape[0]
-            self._write_log(f'Initialized uniform weights {calc.shape[0]}\n')
-
-        # fit/scale
-        _, log = bt.fit_and_scale(exp,
-                                  calc,
-                                  self.w0,
-                                  fit=fit)
-        self._write_log(log)
-
-        # do sanity checks
-        log  = bt.check_data(label,
-                             exp,
-                             calc,
-                             self.w0)
-        self._write_log(log)
-
-        return label,exp,calc
-
-    def load(
-        self,
-        exp_file,
-        calc_file,
-        averaging='auto',
-        fit='no',
-        use_samples=[],
-        use_data=[],
-        weight=1):
-
-        label, exp, calc = self.read_file(exp_file,
-                                          calc_file,
-                                          averaging=averaging,
-                                          fit=fit,
-                                          use_samples=use_samples,
-                                          use_data=use_data)
-
-        if len(self.experiment) == 0:
-            self.experiment = exp
-            self.calculated = calc
-            self.labels = label
-            self.weights = np.ones(exp.shape[0]) * weight
-        else:
-            self.experiment = np.vstack([self.experiment,exp])
-            self.calculated = np.hstack([self.calculated,calc])
-            self.labels = np.hstack([self.labels,label])
-            self.weights = np.hstack([self.weights,np.ones(exp.shape[0]) * weight])
-        # note to self: implement weight
-
-    def load_array(
-        self,
-        label,
-        exp,
-        calc,
-        weight=1):
-        """Add data from external array.
-
-        Args:
-            label:
-
-            exp:
-
-            calc:
-
-            weight:
-                . Defaults to 1.
-        """
-        if len(self.experiment) == 0:
-            self.experiment = exp
-            self.calculated = calc
-            self.labels = label
-            if len(self.w0) == 0:
-                self.w0 = np.ones(calc.shape[0]) / calc.shape[0]
-            self.weights = np.ones(exp.shape[0]) * weight
-        else:
-            self.experiment = np.vstack([self.experiment,exp])
-            self.calculated = np.hstack([self.calculated,calc])
-            self.labels = np.hstack([self.labels,label])
-            self.weights = np.hstack([self.weights,np.ones(exp.shape[0]) * weight])
-
-    def predict_array(
-        self,
-        label,
-        exp,
-        calc,
-        outfile=None,
-        averaging='linear',
-        fit='no'):
-        stats, _ = bt.calc_stats(label,
-                                 exp,
-                                 calc,
-                                 self.w0,
-                                 self.w_opt,
-                                 averaging=averaging,
-                                 outfile=outfile,
-                                 fit=fit)
-        return stats
 
     def get_lambdas(self):
         return self.lambdas
@@ -227,37 +73,167 @@ class Reweight:
     def get_w0(self):
         return np.copy(self.w0)
 
-    def set_lambdas(self,lambda0):
-        if len(self.lambdas) == 0:
+    def set_lambdas(self, lambda0: np.ndarray):
+        if self.lambdas is None:
             self.lambdas = lambda0
         else:
             print('# Overriding lambdas is not possible')
             sys.exit(1)
 
-    def fit(
+    def _write_log(self, msg: str):
+        """Write message to log file."""
+        with open(self.logfile,'w',encoding='utf-8') as log_fh:
+            log_fh.write(msg)
+
+    def read_file(
         self,
-        theta,
-        lambdas_init=True):
+        exp_file: str,
+        calc_file: str,
+        use_samples: list | None = None,
+        use_data: list | None = None,
+        ) -> tuple[np.ndarray,np.ndarray,np.ndarray]:
+        """Read experimental and calculated data files.
+
+        Args:
+            exp_file:
+                path to file with experimental data.
+            calc_file:
+                path to file with calculated calculated data.
+            use_samples:
+                Use only this subset of calculated data indices. Defaults to None, and all
+                samples are used.
+            use_data:
+                Use only this subset of experimental data indices. Defaults to None, and all
+                samples are used.
+
+        Returns:
+            label,exp,calc:
+                data labels, experimental data, calculated data.
+        """
+
+        # read file
+        log = ''
+        labels, exp, calc, log = bt.parse(exp_file,
+                                         calc_file)
+        self._write_log(log)
+
+        # remove datapoints if use_samples or use_data is not empty
+        labels, exp, calc, log = bt.subsample(labels,
+                                              exp,
+                                              calc,
+                                              use_samples,
+                                              use_data)
+        self._write_log(log)
+
+        # Initialize uniform weights
+        if self.w0 is None:
+            self.w0 = np.ones(calc.shape[0]) / calc.shape[0]
+            self._write_log(f'Initialized uniform weights {calc.shape[0]}\n')
+        else:
+            self._write_log('Warm start\n')
+
+        # do sanity checks
+        log  = bt.check_data(labels,
+                             exp,
+                             calc,
+                             self.w0)
+        self._write_log(log)
+
+        return labels,exp,calc
+
+    def load(
+        self,
+        exp_file: str,
+        calc_file: str,
+        use_samples: list | None = None,
+        use_data: list | None = None,
+        weight: int = 1,
+        ) -> None:
+        """Load data from files into class attributes.
+
+        Args:
+            exp_file:
+                path to file with experimental data.
+            calc_file:
+                path to file with calculated data.
+            use_samples:
+                Use only this subset of calculated data indices. Defaults to None, and all
+                samples are used.
+            use_data:
+                Use only this subset of experimental data indices. Defaults to None, and all
+                samples are used.
+            weight:
+                value to multiply all weights by. Defaults to 1.
+        """
+
+        labels, exp, calc = self.read_file(exp_file,
+                                          calc_file,
+                                          use_samples=use_samples,
+                                          use_data=use_data)
+
+        if self.experiment is None:
+            self.experiment = exp
+            self.calculated = calc
+            self.labels = labels
+            self.weights = np.ones(exp.shape[0]) * weight
+        else:
+            self.experiment = np.vstack([self.experiment,exp])
+            self.calculated = np.hstack([self.calculated,calc])
+            self.labels = np.hstack([self.labels,labels])
+            self.weights = np.hstack([self.weights,np.ones(exp.shape[0]) * weight])
+        # note to self: implement weight
+
+    def load_array(
+        self,
+        labels: np.ndarray,
+        exp: np.ndarray,
+        calc: np.ndarray,
+        weight: int = 1,
+        ) -> None:
+        """Load data from external array into class attributes.
+
+        Args:
+            labels:
+                array of data labels.
+            exp:
+                array of experimental data values.
+            calc:
+                array of calculated data values.
+            weight:
+                value to multiply all weights by. Defaults to 1.
+        """
+        if self.experiment is None:
+            self.experiment = exp
+            self.calculated = calc
+            self.labels = labels
+            if self.w0 is None:
+                self.w0 = np.ones(calc.shape[0]) / calc.shape[0]
+            self.weights = np.ones(exp.shape[0]) * weight
+        else:
+            self.experiment = np.vstack([self.experiment,exp])
+            self.calculated = np.hstack([self.calculated,calc])
+            self.labels = np.hstack([self.labels,labels])
+            self.weights = np.hstack([self.weights,np.ones(exp.shape[0]) * weight])
+
+    def fit(self, theta: int) -> tuple[float, float, float]:
         """Optimize.
 
         Args:
             theta:
-
-            lambdas_init:
-                . Defaults to True.
+                theta value to use in reweighting.
 
         Returns:
-            : 
+            chi2_before,chi2_after,phi:
+                chisquare value before and after fitting and fraction of effective frames.
         """
 
         if not self.standardized:
             bt.standardize(self.experiment,
                            self.calculated,
-                           self.w0,
-                           normalize='zscore')
+                           self.w0)
             self.standardized = True
 
-        def maxent(lambdas):
+        def maxent(lambdas: np.ndarray) -> tuple[float,float]:
             # weights
             arg = -np.sum(lambdas[np.newaxis,:] * self.calculated,axis=1) - tmax + np.log(self.w0)
 
@@ -280,15 +256,9 @@ class Reweight:
             # divide by theta to avoid numerical problems
             return  fun/theta, jac/theta
 
-        if lambdas_init:
-            lambdas = np.zeros(self.experiment.shape[0],
-                               dtype=np.longdouble)
-
-            self._write_log('Lagrange multipliers initialized from zero\n')
-        else:
-            assert len(self.lambdas) == self.experiment.shape[0]
-            lambdas = np.copy(self.lambdas)
-            self._write_log('Warm start\n')
+        lambdas = np.zeros(self.experiment.shape[0],
+                           dtype=np.longdouble)
+        self._write_log('Lagrange multipliers initialized from zero\n')
 
         bounds = []
         for j in range(self.experiment.shape[0]):
@@ -354,11 +324,29 @@ class Reweight:
 
     def ibme(
         self,
-        theta,
-        ftol=0.01,
-        iterations=50,
-        lr_weights=True,
-        offset=True):
+        theta: int,
+        ftol: float = 0.01,
+        iterations: int = 50,
+        offset: bool = True,
+        ) -> tuple[float | float | float | np.ndarray | np.ndarray]:
+        """_summary_
+
+        Args:
+            theta:
+                theta value to use in iBME iterations.
+            ftol:
+                tolerance for minimization procedure. Defaults to 0.01.
+            iterations:
+                number of iBME iterations to perform. Defaults to 50.
+            offset:
+                whether to offset calculated data at each step when fitting it to experimental
+                data. Defaults to True.
+
+        Returns:
+            chi2_0,rr[1],phi,calc_0,calc:
+                Initial chisquare value, final chisquare value, fraction of effective frames,
+                initial calculated data, final calculated data.
+        """
 
         current_weights = self.get_w0()
         w0 = self.get_w0()
@@ -370,10 +358,8 @@ class Reweight:
         self.ibme_weights = []
         self.ibme_stats = []
 
-        if lr_weights:
-            inv_var = 1. / exp[:,1]**2
-        else:
-            inv_var = np.ones(len(exp))
+        # Setup inverse variance (weights)
+        inv_var = 1. / exp[:,1]**2
 
         log = []
         rr_old = np.NaN
@@ -384,15 +370,15 @@ class Reweight:
                               axis=0)
 
             model = LinearRegression(fit_intercept=offset)
-            model.fit(calc_avg.reshape(-1,1),
-                      exp[:,0],
-                      inv_var)
+            model.fit(X=calc_avg.reshape(-1,1),
+                      y=exp[:,0],
+                      sample_weight=inv_var)
 
             alpha = model.coef_[0] # scale factor
             beta = model.intercept_
             calc = alpha * calc + beta
 
-            r1 = Reweight(f'{name}_ibme_{it}',
+            r1 = Reweight(name=f'{name}_ibme_{it}',
                           w0=np.copy(w0))
             r1.load_array(labels,
                           np.copy(exp),
@@ -458,82 +444,3 @@ class Reweight:
         except AttributeError:
             print('# iBME stats not available. Call iBME first')
             sys.exit(1)
-
-
-def myibme(
-    theta: int,
-    exp_file: str,
-    calc_file: str,
-    output_dir: str,
-    ) -> tuple[int,tuple[float,float,float],np.ndarray]:
-    """Perform the Iterative Bayesian Maximum Entropy (BME) algorithm on calculated SAXS data,
-    given a value for the theta parameter.
-
-    The used algorithm is explained in:
-        https://github.com/KULL-Centre/BME/blob/main/notebook/example_04.ipynb
-
-    Reference:
-        Bottaro S, Bengtsen T, Lindorff-Larsen K. Integrating Molecular Simulation and Experimental
-        Data: A Bayesian/Maximum Entropy Reweighting Approach. Methods Mol Biol. 2020;2112:219-240.
-        doi: 10.1007/978-1-0716-0270-6_15. PMID: 32006288.
-
-    Args:
-        theta:
-            value for the theta parameter to be used in BME algorithm.
-        exp_file:
-            path to .dat file with experimental SAXS curve.
-        calc_file:
-            path to .dat file with SAXS curve calculated from an ensemble.
-        output_dir:
-            path to directory where all the files resulting from the reweighting procedure will be
-            stored.
-
-    Returns:
-        A tuple (theta, stats, weights) where:
-            theta:
-                value for the theta parameter used in BME algorithm (same as input).
-            stats:
-                a tuple (chi2_before,chi2_after,phi) where:
-                    chi2_before:
-                        the value for the chisquare of fitting the ensemble with uniform
-                        weights to the experimental data.
-                    chi2_after:
-                        the value for the chisquare of fitting the reweighted ensemble to
-                        the experimental data.
-                    phi:
-                        the fraction of effective frames being used in the reweighted ensemble.
-            weights:
-                an array containing the new weights of the ensemble, one for each frame.
-
-    """
-    # Change current working directory
-    old_cd = os.getcwd()
-    os.chdir(output_dir)
-
-    # Create reweight object
-    rew = Reweight(f'ibme_t{theta}')
-
-    # Load files
-    rew.load(exp_file=exp_file,
-             calc_file=calc_file)
-
-    # Do reweighting
-    with contextlib.redirect_stdout(open(os.devnull, 'w',encoding='utf-8')):
-        rew.ibme(theta=theta,
-                 iterations=25,
-                 ftol=0.001)
-
-    # Restore working directory
-    os.chdir(old_cd)
-
-    weights = rew.get_ibme_weights()[-1] # get the final weights
-    stats = rew.get_ibme_stats()[-1] # get the final stats
-
-    return theta,stats,weights
-
-if __name__ == '__main__':
-    THETA = 100
-    EXP_FILE = '/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/REWEIGHTING/Hst5/Hst5_exp_saxs.dat'
-    CALC_FILE = '/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/REWEIGHTING/Hst5/Hst5_calc_saxs.dat'
-    OUTPUT_DIR = '/home/tiagogomes/reweighting_callstack'
-    myibme(theta=THETA,exp_file=EXP_FILE,calc_file=CALC_FILE,output_dir=OUTPUT_DIR)

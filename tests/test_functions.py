@@ -45,3 +45,46 @@ def test_derive_constraint_targets():
                                                       ('MC',(10,24),'all','TRIPEPTIDE'))})
     assert result_9 == ((1,5),(9,9)), result_9
 
+# Clash checking
+
+# if __name__ == '__main__':
+#     from ensemblify import update_config
+#     update_config({'FASPR_PATH':'/home/tiagogomes/software/FASPR-master/FASPR',
+#                    'PULCHRA_PATH':'/home/tiagogomes/software/pulchra-master/pulchra_CHANGED'})
+    
+    
+#     SAMPLING_TARGETS = {'A' : [ [ 'MC', [1,24], 'coil', 'TRIPEPTIDE' ]]}
+#     INPUT_STRUCTURE = '/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/starting_structures_atomistic/IDPs/Hst5.pdb'
+#     ENSEMBLE_DIR = '/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/ENSEMBLES/Hst5/ENSEMBLE_Rechecked'
+
+#     check_steric_clashes(ensemble_dir='/home/tiagogomes/Downloads/protein_pool',
+#                          sampling_targets=None,
+#                          input_structure=None)
+
+# Analyze trajectory
+
+# if __name__ == '__main__':
+#     analyze_trajectory(['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc'],
+#                        ['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb'],
+#                        ['Hst5'],
+#                        output_directory='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal',
+#                        ramachandran_data=False,
+#                        contactmatrices=False,
+#                        distancematrices=False,
+#                        ssfrequencies=False,
+#                     #    rg=False,
+#                     #    dmax=False,
+#                     #    eed=False
+#                     )
+
+#     # analyze_trajectory(['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORIES/LysP7951/LysP7951_trajectory.xtc'],
+#     #                    ['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORIES/LysP7951/LysP7951_top.pdb'],
+#     #                    ['LysP7951'],
+#     #                    output_directory='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_lysp7951_anal',
+#     #                    ramachandran_data=False,
+#     #                     contactmatrices=False,
+#     #                    #distancematrices=False,
+#     #                    ssassignments=False,
+#     #                    rg=False,
+#     #                    dmax=False,
+#     #                    eed=False)

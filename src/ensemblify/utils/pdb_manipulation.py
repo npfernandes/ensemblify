@@ -115,8 +115,8 @@ def df_to_pdb(df: pd.DataFrame,output_pdb_filename: str):
 
 
 def extract_pdb_info(pdb: str) -> dict[int,tuple[str,int,int]]:
-    """ Extract from a .pdb file info about number of chains, chain letters,
-    starting residue numbers and chain size.
+    """Extract from a .pdb file info about number of chains, chain letters, starting residue
+    numbers and chain size.
 
     Args:
         topology:

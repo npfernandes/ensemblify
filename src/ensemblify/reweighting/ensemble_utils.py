@@ -40,6 +40,9 @@ def process_exp_data(experimental_data_path: str) -> str:
     Returns:
         processed_exp_saxs:
             path to experimental SAXS data file with any applied changes.
+    
+    Adapted from:
+        https://github.com/FrPsc/EnsembleLab/blob/main/EnsembleLab.ipynb
     """
     # Read experimental data into array
     exp_saxs_input = np.loadtxt(experimental_data_path)
@@ -96,6 +99,9 @@ def correct_exp_error(experimental_data_path: str) -> str:
     Returns:
         corrected_exp_saxs:
             path to experimental SAXS data file with corrected errors.
+
+    Adapted from:
+        https://github.com/FrPsc/EnsembleLab/blob/main/EnsembleLab.ipynb
     """
     # Deduce working directory
     working_dir, experimental_data_file = os.path.split(experimental_data_path)
@@ -199,6 +205,8 @@ def ibme(
             weights:
                 an array containing the new weights of the ensemble, one for each frame.
 
+    Adapted from:
+        https://github.com/FrPsc/EnsembleLab/blob/main/EnsembleLab.ipynb
     """
     # Change current working directory
     old_cd = os.getcwd()
@@ -743,226 +751,6 @@ def create_reweighting_fits_fig(
     return fig
 
 
-# def create_ss_frequency_difference_fig(
-#     ss_assignment: pd.DataFrame | str,
-#     topology: str,
-#     weights: np.ndarray | None = None,
-#     trajectory_id: str | None = None,
-#     output_path: str | None = None,
-#     ) -> go.Figure:
-#     """Create a secondary structure frequency difference Figure from a secondary structure assignment
-#     matrix and a set of weights.
-
-#     Args:
-#         ss_assignment:
-#             calculated secondary structure assignment matrix DataFrame or path to calculated matrix
-#             in .csv format.
-#         topology:
-#             path to topology .pdb file.
-#         weights:
-#             array of weights to use when reweighting the calculated secondary structure frequency matrix.
-#         trajectory_id:
-#             used on Figure title and prefix for saved ss_frequency filename. Defaults to None.
-#         output_path:
-#             path to output .html file or output directory where created Figure will be stored.
-#             If directory, written file is named 'ss_frequency.html', optionally with
-#             trajectory_id prefix. Defaults to None.
-
-#     Returns:
-#         ss_freq_fig:
-#             a plot with the difference in secondary structure frequencies of each secondary structure
-#             type for each residue in the structure, between the uniform and reweighted secondary structure
-#             assignment matrix.
-#     """
-#     if isinstance(ss_assignment,str):
-#         assert ss_assignment.endswith('.csv'), ('Secondary structure assignment '
-#                                                 'matrix must be in .csv format!')
-#         ss_assignment = pd.read_csv(ss_assignment,index_col=0)
-
-#     # Extract info regarding chains and resnums
-#     top_info = extract_pdb_info(topology)
-#     resranges = {}
-#     chain_letters = []
-
-#     # Iterate through chains
-#     for chain_number in range(len(top_info.keys()),0,-1):
-#         chain_letter, starting_res, chain_size = top_info[chain_number]
-#         resranges[chain_letter] = [ x for x in range(starting_res, starting_res + chain_size)]  
-#         chain_letters.append(chain_letter)
-
-#     # Create tick labels that respect chain id
-#     if len(chain_letters) > 1:
-#         x_labels = [f'{chain_letter}{resnum}' for chain_letter in chain_letters
-#                     for resnum in resranges[chain_letter]]
-#     else:
-#         x_labels = [f'{resnum}' for chain_letter in chain_letters
-#                     for resnum in resranges[chain_letter]]
-
-#     # Count the frequency of each secondary structure element
-#     uniform_frequency = calculate_ss_frequency(ss_assignment=ss_assignment,
-#                                                weights=None)
-
-#     # Count the frequency of each secondary structure element with reweighting
-#     reweighted_frequency = calculate_ss_frequency(ss_assignment=ss_assignment,
-#                                                   weights=weights)
-
-#     # Calculate the frequency difference
-#     difference_frequency = uniform_frequency - reweighted_frequency
-
-#     # Create Figure
-#     ss_freq_fig = go.Figure()
-
-#     # Adding traces for each secondary structure type
-#     colors = ['#1f77b4',  # Blue
-#               '#2ca02c',  # Green
-#               '#d62728'  # Red
-#               ]
-
-#     for structure,color in zip(difference_frequency.index,colors):
-#         ss_freq_fig.add_trace(go.Scatter(x=list(range(int(difference_frequency.columns[0]),
-#                                                       int(difference_frequency.columns[-1])+1)),
-#                                         y=difference_frequency.loc[structure],
-#                                         mode='lines',
-#                                         marker_color=color,
-#                                         marker_size=50,
-#                                         line_width=2,
-#                                         name=structure,
-#                                         hoverinfo='text',
-#                                         hovertext=[ f'{x_label}, \
-#                                                    {difference_frequency.loc[structure].iloc[i]}' \
-#                                                    for i,x_label in enumerate(x_labels) ]))
-
-#     # Setup chain dividers lines
-#     num_res = len(difference_frequency.columns)
-#     chain_ends = [] # to be used in tickvals
-#     chain_begins = [] # to be used in tickvals
-#     shapes = []
-#     cumulative_residues = 0
-
-#     for chain_letter in chain_letters[:-1]:
-#         chain_begins.append(cumulative_residues+1)
-#         chain_size = len(resranges[chain_letter])
-#         chain_end = cumulative_residues + chain_size
-#         chain_ends.append(chain_end)
-
-#         shapes.append(dict(type='line',
-#                             xref='x',
-#                             x0=cumulative_residues+len(resranges[chain_letter])-1,
-#                             x1=cumulative_residues+len(resranges[chain_letter])-1,
-#                             y0=0,
-#                             y1=1,
-#                             line=dict(color='black',
-#                                       width=2)))
-
-#         cumulative_residues += chain_size
-#     chain_begins.append(num_res - len(resranges[chain_letters[-1]]) + 1)
-#     chain_ends.append(num_res)
-
-#     # Setup axis tick values
-#     tickvals = []
-#     chain_counter = 0
-#     curr_val = chain_begins[chain_counter]
-#     tick_step = num_res // len(chain_letters) // 4 # always 5 ticks per axis
-
-#     while curr_val <= num_res:
-#         try:
-#             chain_end = chain_ends[chain_counter]
-#         except IndexError:
-#             tickvals.append(curr_val)
-#         else:
-#             if chain_end - curr_val <= tick_step:
-#                 chain_counter += 1
-#                 try:
-#                     curr_val = chain_begins[chain_counter]
-#                     tickvals.append(curr_val)
-#                 except IndexError:
-#                     if chain_ends[-1] - curr_val <= 3:
-#                         tickvals.append(chain_ends[-1])
-#                     else:
-#                         tickvals.append(curr_val)
-#                         tickvals.append(chain_ends[-1])
-#             else:
-#                 tickvals.append(curr_val)
-#         curr_val += tick_step
-
-#     # Setup tick text
-#     x_text = []
-#     for x_val in tickvals:
-#         x_t = x_labels[x_val-1]
-#         x_text.append(x_t)
-
-#     # Update Figure Layout
-#     if trajectory_id is not None:
-#         ss_freq_title = f'{trajectory_id} Secondary Structure Frequency Differences'
-#     else:
-#         ss_freq_title = 'Secondary Structure Frequency Differences'
-
-#     # Add subtitle
-#     ss_freq_fig.add_annotation(text='Difference in frequency of each sec. struc. assignment code for each residue',
-#                                font=dict(family='Helvetica',
-#                                          color='#707070',
-#                                          size=24),
-#                                xref='paper',
-#                                yref='paper',
-#                                x=0.5,
-#                                y=1.07,
-#                                showarrow=False)
-
-#     ss_freq_fig.update_layout(width=1000,
-#                               height=750,
-#                               font=dict(family='Helvetica',
-#                                         color='black',
-#                                         size=30),
-#                               plot_bgcolor = '#FFFFFF',
-#                               paper_bgcolor = '#FFFFFF',
-#                               modebar_remove=['zoom','pan','select','lasso2d','zoomIn','zoomOut'],
-#                               title=dict(text=ss_freq_title,
-#                                          x=0.5),
-#                               xaxis=dict(title='Residue',
-#                                          ticks='outside',
-#                                          tickvals=tickvals,
-#                                          ticktext=x_text,
-#                                          ticklen=10,
-#                                          tickwidth=3,
-#                                          showgrid=True),
-#                               yaxis=dict(title='Frequency',
-#                                          ticks='outside',
-#                                          ticklen=10,
-#                                          tickwidth=3,
-#                                          range=[0,1],
-#                                          showgrid=False,
-#                                          title_standoff=5),
-#                               shapes=shapes)
-
-#     ss_freq_fig.update_xaxes(showline=True,
-#                              linewidth=3,
-#                              linecolor='black',
-#                              mirror=True)
-#     ss_freq_fig.update_yaxes(showline=True,
-#                              linewidth=3,
-#                              linecolor='black',
-#                              mirror=True)
-
-#     if output_path is not None:
-#         # Save Secondary Structure frequency
-#         if os.path.isdir(output_path):
-#             if trajectory_id is not None:
-#                 output_filename = f'{trajectory_id}_difference_ss_frequency.html'
-#             else:
-#                 output_filename = 'difference_ss_frequency.html'
-#             ss_freq_fig.write_html(os.path.join(output_path,output_filename),
-#                                    config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
-
-#         elif output_path.endswith('.html'):
-#             ss_freq_fig.write_html(output_path,
-#                                    config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
-#         else:
-#             print(('Secondary structure frequency difference graph was not saved to disk, '
-#                    'output path must be a directory or .html filepath!'))
-
-#     return ss_freq_fig
-
-
 def create_reweighting_metrics_fig(
     metrics: pd.DataFrame,
     weight_sets: np.ndarray | list[np.ndarray],
@@ -1094,10 +882,12 @@ def create_reweighting_metrics_fig(
                                                              0.001)],
                                      mode='markers',
                                      marker_color=reweighted_trace.line.color,
-                                     hovertext=f'Avg: {round(av_rew,2)} &plusmn; {round(av_rew_stderr,2)}',
+                                     hovertext=(f'Avg: {round(av_rew,2)} &plusmn; '
+                                                f'{round(av_rew_stderr,2)}'),
                                      hoverinfo='text',
                                      fill='toself',
-                                     name=f'Avg: {round(av_rew,2)} &plusmn; {round(av_rew_stderr,2)}',
+                                     name=(f'Avg: {round(av_rew,2)} &plusmn; '
+                                           f'{round(av_rew_stderr,2)}'),
                                      opacity=0),
                           row=row_num,
                           col=col_num)
@@ -1210,6 +1000,10 @@ def attempt_read_data(
         pd.DataFrame:
             desired data in DataFrame format.
     """
+    allowed_data_msg_tags = ['cmatrix','dmatrix', 'ss_freq','structural_metrics']
+    assert data_msg_tag in allowed_data_msg_tags, ('Data message tag must be in '
+                                                   f'{allowed_data_msg_tags} !')
+
     # Setup messages to console
     if data_msg_tag == 'cmatrix':
         ATTEMPTING_READ_MSG = 'Attempting to read contact matrix from file...'

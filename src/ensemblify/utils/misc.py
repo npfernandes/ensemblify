@@ -5,30 +5,12 @@
 import numpy as np
 import scipy
 
-# CLASSES
-class HashableDict(dict):
-    """Take a Python dictionary and make it hashable.
-    
-    Appropriate for when we will NOT ever modify the dictionary after hashing.
-    
-    Reference:
-        https://stackoverflow.com/a/1151686
-    """
-    def __key(self):
-        return tuple((k,self[k]) for k in sorted(self))
-    def __hash__(self):
-        return hash(self.__key())
-    def __eq__(self, other):
-        return self.__key() == other.__key()
-
-
 # FUNCTIONS
 def kde(
     data: np.ndarray,
     weights: list | None = None,
     ) -> tuple[np.ndarray,np.ndarray,float]:
-    """Create an array with the Kernel Density Estimate (KDE) distribution for a
-    given dataset.
+    """Calculate a Kernel Density Estimate (KDE) distribution for a given dataset.
 
     Weights for the given dataset can be provided to alter the contribution of each
     data point to the KDE distribution.
@@ -50,6 +32,8 @@ def kde(
             avg_stderr:
                 the standard error of the calculated average.
 
+    Adapted from:
+        https://github.com/FrPsc/EnsembleLab/blob/main/EnsembleLab.ipynb
     """
     # By default weights are uniform
     if weights is None:

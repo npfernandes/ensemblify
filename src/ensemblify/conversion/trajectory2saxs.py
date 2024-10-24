@@ -42,6 +42,9 @@ def traj2saxs(
         calc_saxs_file:
             path to the calculated SAXS curve file, with the data calculated for
             every frame of the trajectory.
+
+    Adapted from:
+        https://github.com/FrPsc/EnsembleLab/blob/main/EnsembleLab.ipynb
     """
     # Setup the Universe
     u = mda.Universe(topology, # topology

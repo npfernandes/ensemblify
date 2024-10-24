@@ -5,6 +5,23 @@
 import argparse
 import sys
 
+# CONSTANTS
+ENSEMBLIFY_HELP_MSG = '''
+usage: ensemblify {generation,conversion,analysis,reweighting,clash_checking,help} [module options]
+
+Command-line tool to access the modules of the Ensemblify Python library.
+
+positional arguments:
+
+    help (h)                   Show this message and exit.
+    generation (g, gen)        Access the generation module.
+    conversion (c, con)        Access the conversion module.
+    analysis (a, ana)          Access the analysis module.
+    reweighting (r, rew)       Access the reweighting module.
+    clash_checking (cch)       Access the clash checking module.
+
+'''
+
 # CLASSES
 class CustomHelpFormatter(argparse.HelpFormatter):
     """Helper class derived from argparse.HelpFormatter to make our help menus cleaner.
@@ -83,16 +100,10 @@ class CustomHelpFormatter(argparse.HelpFormatter):
         return self._join_parts(parts)
 
 # FUNCTIONS
-# def read_dict():
-#     pass
-
-# def read_list():
-#     pass
-
 def main():
     # Create the initial argument parser to capture the module
     initial_parser = argparse.ArgumentParser(description='Command-line tool to access various modules of the Ensemblify Python library.',
-                                             usage='ensemblify {generation,conversion,analysis,reweighting} [module options]',
+                                             usage='ensemblify {generation,conversion,analysis,reweighting,clash_checking} [module options]',
                                              add_help=False) # required
 
     initial_parser.add_argument('module', choices=['generation', 'g', 'gen', 'conversion', 'c', 'con',
@@ -103,7 +114,7 @@ def main():
     if len(sys.argv) == 1:
         print('Error: Missing required arguments.\n')
         print('Usage:')
-        print('  ensemblify {generation, conversion, analysis, reweighting, clash_checking} [module options]\n')
+        print('  ensemblify {generation,conversion,analysis,reweighting,clash_checking} [module options]\n')
         print('Run \'ensemblify help\'  for more information.\n')
         sys.exit(1)
 
@@ -112,7 +123,7 @@ def main():
 
     # Now create the full parser with subparsers for each module
     parser = argparse.ArgumentParser(description='Command-line tool to access the various modules of the Ensemblify Python library.',
-                                     usage='ensemblify {generation,conversion,analysis,reweighting,clash_checking} [module options]',
+                                     usage='ensemblify',# {generation,conversion,analysis,reweighting,clash_checking} [module options]',
                                      formatter_class=CustomHelpFormatter)
 
     # Create subparsers for the modules
@@ -129,9 +140,9 @@ def main():
                                                description='The clash checking module of the Ensemblify Python library.',
                                                formatter_class=CustomHelpFormatter)
 
-    parser_clash_check.add_argument('-e','--ensemble_dir', type=str, required=True, help='Path to directory where ensemble .pdb structures are stored.',metavar='')
-    parser_clash_check.add_argument('-s','--sampling_targets', default=None, type=str, help='(Optional) Path to file (.yaml) with mapping of chains to sampled regions.',metavar='')
-    parser_clash_check.add_argument('-i','--input_structure', default=None, type=str, help='(Optional) Path to input structure (.pdb) used to generate the ensemble.',metavar='')
+    parser_clash_check.add_argument('-e','--ensembledir', type=str, required=True, help='Path to directory where ensemble .pdb structures are stored.',metavar='')
+    parser_clash_check.add_argument('-s','--samplingtargets', default=None, type=str, help='(Optional) Path to file (.yaml) with mapping of chains to sampled regions.',metavar='')
+    parser_clash_check.add_argument('-i','--inputstructure', default=None, type=str, help='(Optional) Path to input structure (.pdb) used to generate the ensemble.',metavar='')
 
     # Subparser for the 'generation' module with aliases
     parser_generation = subparsers.add_parser(name='generation',
@@ -151,9 +162,9 @@ def main():
                                               description='The conversion module of the Ensemblify Python library.',
                                               formatter_class=CustomHelpFormatter)
 
-    parser_conversion.add_argument('-n','--jobname', required=True, type=str, help='Name for created trajectory file (.xtc).', metavar='')
-    parser_conversion.add_argument('-i','--ensembledir', required=True, type=str, help='Path to directory where ensemble files (.pdb) are located.', metavar='')
-    parser_conversion.add_argument('-o','--trajectorydir', required=True, type=str, help='Path to directory where trajectory file (.xtc) will be created.', metavar='')
+    parser_conversion.add_argument('-j','--jobname', required=True, type=str, help='Name for created trajectory file (.xtc).', metavar='')
+    parser_conversion.add_argument('-e','--ensembledir', required=True, type=str, help='Path to directory where ensemble files (.pdb) are located.', metavar='')
+    parser_conversion.add_argument('-t','--trajectorydir', required=True, type=str, help='Path to directory where trajectory file (.xtc) will be created.', metavar='')
 
     parser_conversion.add_argument('-s','--size', default=10000, type=int, help='(Optional) Number of frames of created trajectory file (.xtc).', metavar='')
 
@@ -165,9 +176,9 @@ def main():
                                             description='The analysis module of the Ensemblify Python library.',
                                             formatter_class=CustomHelpFormatter)
 
-    parser_analysis.add_argument('--trajectory', required=True, type=list[str], help='Path(s) to trajectory file(s) (.xtc).', metavar='')
-    parser_analysis.add_argument('--topology', required=True, type=list[str], help='Path(s) to topology file(s) (.pdb).', metavar='')
-    parser_analysis.add_argument('--trajectoryid', required=True, type=list[str], help='Prefix identifier(s) for trajectory file(s).', metavar='')
+    parser_analysis.add_argument('-traj','--trajectory', nargs='+', required=True, type=str, help='Path(s) to trajectory file(s) (.xtc).', metavar='')
+    parser_analysis.add_argument('-top','--topology',  nargs='+', required=True, type=str, help='Path(s) to topology file(s) (.pdb).', metavar='')
+    parser_analysis.add_argument('-id','--trajectoryid',  nargs='+', required=True, type=str, help='Prefix identifier(s) for trajectory file(s).', metavar='')
 
     parser_analysis.add_argument('--outputdir', type=str, help='(Optional) Path to output directory.', metavar='')
     # parser_analysis.add_argument('--ramadata', action ='store_true', help='(Optional) Calculate a dihedral angles matrix.')
@@ -204,22 +215,8 @@ def main():
     full_args = parser.parse_args([args.module] + remaining_args)
 
     # Handle the different modules based on the parsed arguments
-    help_msg = '''
-usage: ensemblify {generation,conversion,analysis,reweighting} [module options]
-
-Command-line tool to access the modules of the Ensemblify Python library.
-
-positional arguments:
-
-    generation (g, gen)        Access the generation module.
-    conversion (c, con)        Access the conversion module.
-    analysis (a, ana)          Access the analysis module.
-    reweighting (r, rew)       Access the reweighting module.
-    clash_checking (cch)       Access the clash checking module.
-
-'''
     if full_args.module in ['help','h']:
-        print(help_msg)
+        print(ENSEMBLIFY_HELP_MSG)
 
     elif full_args.module in ['clash_checking', 'cch']:
         # from ensemblify.utils.clash_checking import check_steric_clashes

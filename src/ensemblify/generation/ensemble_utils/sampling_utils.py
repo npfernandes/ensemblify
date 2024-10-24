@@ -1,4 +1,4 @@
-"""Auxiliary functions for the conformational sampling process."""
+"""Auxiliary functions for setting up the conformational sampling process."""
 
 # IMPORTS
 ## Standard Library Imports
@@ -18,16 +18,14 @@ import pyrosetta.distributed
 import ray
 
 ## Local Imports
-from ensemblify.generation.ensemble_utils.functions import (
-    setup_pose,
-    setup_minmover,
-    derive_constraint_targets,
-    apply_constraints,
-    apply_pae_constraints,
-    setup_fold_tree,
-    get_targets_from_plddt,
-    prep_target
-    )
+from ensemblify.generation.ensemble_utils.functions import (setup_pose,
+                                                            setup_minmover,
+                                                            derive_constraint_targets,
+                                                            apply_constraints,
+                                                            apply_pae_constraints,
+                                                            setup_fold_tree,
+                                                            get_targets_from_plddt,
+                                                            prep_target)
 from ensemblify.generation.ensemble_utils.samplers import setup_samplers
 
 # FUNCTIONS
@@ -278,7 +276,9 @@ def setup_sampling_initial_pose(
 
         # Adjust fold_tree to improve sampling yield
         logger.info('Setting up FoldTree...')
-        setup_fold_tree(initial_pose, c_targets)
+        setup_fold_tree(pose=initial_pose,
+                        constraint_targets=c_targets,
+                        contacts=params['restraints']['contacts'])
 
     # Save applied constraints to file
     cs = initial_pose.constraint_set()

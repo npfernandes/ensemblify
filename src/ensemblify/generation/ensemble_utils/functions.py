@@ -630,7 +630,8 @@ def apply_constraints(
 
 def setup_fold_tree(
     pose: pyrosetta.rosetta.core.pose.Pose,
-    constraint_targets: tuple[tuple[int,int],...]):
+    constraint_targets: tuple[tuple[int,int],...],
+    contacts: tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...] | None ):
     """Change a Pose's FoldTree in order to minimize "lever arm" effects during sampling.
         
     Perform slight alterations to the given Pose's FoldTree to minimize "lever arm" effects
@@ -647,11 +648,18 @@ def setup_fold_tree(
         
         Jump between the two "central" residues.
 
+    If there are inter-chain contacts, after deriving the optimal "central" residues they are
+    updated so that every central residue is part of a region that is in contact with another
+    chain. This avoids cases where, in multi-chain, proteins, certain folded domains would not
+    move relative to other chains which would inadvertedly bias conformational sampling.
+
     Args:
         pose (pyrosetta.rosetta.core.pose.Pose):
             Pose object whose FoldTree will be updated.
         constraint_targets:
             residues between which AtomPairConstraints will be applied.
+        contacts:
+            residue ranges where two chains are interacting.
     """
     # Prepare working pose
     ft_pose = Pose()
@@ -660,17 +668,16 @@ def setup_fold_tree(
     #central_residues = [227,483,739] # N246TRIMER (sets the fold tree manually)
     #central_residues = [227,483] # N246DIMER (sets the fold tree manually)
     #central_residues = [227] # N246MONOMER
-
     #central_residues = [52,133,214] # NLINKERTRIMER
-
     #central_residues = [227,656,1085,1514] # NFullLengthTetramer (sets the fold tree manually)
-
     # Uncomment what is below (so that the FoldTree is set automatically)
+
+    # Calculate the optimal central residues
     central_residues = []
     for i in range(1,ft_pose.num_chains()+1):
         chain_start = ft_pose.chain_begin(i)
         chain_end = ft_pose.chain_end(i)
-        ideal_central_res = chain_start + chain_end // 2
+        ideal_central_res = (chain_start + chain_end) // 2
 
         # Start from any value in constrained res range
         central_res = constraint_targets[0][0]
@@ -687,6 +694,81 @@ def setup_fold_tree(
                         central_res = res
         central_residues.append(central_res)
 
+    # If there are contacts, use them to update central residues if needed
+    # This is important in multi-chain proteins, to avoid cases where the central residue of a
+    # chain is not in a contacted region, which would make it so that folded domain that central
+    # residue belongs to would not move relative to other chains during sampling
+    if contacts is not None:
+        chains_contact_regions = {}
+        for contact in contacts:
+            # contact: ( ('X', (x1,x2) ) , ( 'Y', (y1,y2) ) )
+
+            # Chain X
+            chain_x = contact[0][0]
+
+            # Contact residue range for X
+            x_start = contact[0][1][0]
+            x_end = contact[0][1][1]
+            inter_range_x = set([pdb_to_pose(ft_pose, res_id, chain_x)
+                                for res_id in range(x_start, x_end+1) ])
+            try:
+                if inter_range_x not in chains_contact_regions[chain_x]:
+                    chains_contact_regions[chain_x].append(inter_range_x)
+            except KeyError:
+                chains_contact_regions[chain_x] = [inter_range_x]
+
+            # Chain Y
+            chain_y = contact[1][0]
+
+            # Contact residue range for Y
+            y_start = contact[1][1][0]
+            y_end = contact[1][1][1]
+            inter_range_y = [pdb_to_pose(ft_pose, res_id, chain_y)
+                                for res_id in range(y_start,y_end+1) ]
+            try:
+                if inter_range_y not in chains_contact_regions[chain_y]:
+                    chains_contact_regions[chain_y].append(inter_range_y)
+            except KeyError:
+                chains_contact_regions[chain_y] = [inter_range_y]
+
+        for chain,regions in chains_contact_regions.items():
+            regions_lists = []
+            for region in regions:
+                regions_lists.append(sorted([x for x in region]))
+            chains_contact_regions[chain] = regions_lists
+
+        updated_central_residues = []
+        for cen_res in central_residues:
+            # Get chain of current central res
+            res_chain = ft_pose.pdb_info().chain(cen_res)
+
+            # Get regions of that chain that are in contact
+            chain_contact_regions = chains_contact_regions[res_chain]
+
+            # See if the central residue is already inside a region that is in contact
+            in_contact_region = False
+            for contact_region in chain_contact_regions:
+                if cen_res in contact_region:
+                    in_contact_region = True
+                    break
+
+            # If not, replace it with the nearest residue that is inside a region in contact
+            if not in_contact_region:
+                distances = {}
+                for region in chain_contact_regions:
+                    distances[region[0]] = abs(cen_res - region[0])
+                    distances[region[1]] = abs(cen_res - region[1])
+                min_distance = min(distances.values())
+                for resnum, distance in distances.items():
+                    if distance == min_distance:
+                        updated_central_residues.append(resnum)
+            else:
+                updated_central_residues.append(cen_res)
+
+        # Update central residues with new residue numbers
+        central_residues = updated_central_residues
+
+    # Update FoldTree using new 'central residues'
     ft = ft_pose.fold_tree()
 
     # Split tree

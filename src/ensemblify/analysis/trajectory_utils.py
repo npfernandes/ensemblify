@@ -23,7 +23,7 @@ from tqdm import tqdm
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.utils import extract_pdb_info, kde
-from ensemblify.analysis.third_party.mdreader_CHANGED import SimpleMDreader
+from ensemblify.analysis.third_party.simple_mdreader import SimpleMDreader
 
 # FUNCTIONS
 def calc_rg(u: mda.Universe) -> float:

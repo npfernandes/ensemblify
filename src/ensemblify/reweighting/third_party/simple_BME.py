@@ -11,17 +11,13 @@ from scipy.special import logsumexp
 from sklearn.linear_model import LinearRegression
 
 ## Local Imports
-import BME_tools_callstack as bt
+import ensemblify.reweighting.third_party.simple_BME_tools as bt
 
 # CLASS
-class Reweight:
-    """Reweight class.
-
-    Returns:
-        :
-    """
+class SimpleReweight:
+    """SimpleReweight class."""
     def __init__(self, name: str, w0: list | None = None):
-        """Initialize Reweight instance.
+        """Initialize SimpleReweight instance.
 
         Args:
             name:
@@ -378,8 +374,8 @@ class Reweight:
             beta = model.intercept_
             calc = alpha * calc + beta
 
-            r1 = Reweight(name=f'{name}_ibme_{it}',
-                          w0=np.copy(w0))
+            r1 = SimpleReweight(name=f'{name}_ibme_{it}',
+                                w0=np.copy(w0))
             r1.load_array(labels,
                           np.copy(exp),
                           np.copy(calc))

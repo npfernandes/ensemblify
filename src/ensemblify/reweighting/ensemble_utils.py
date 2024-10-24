@@ -21,7 +21,7 @@ from tqdm import tqdm
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.utils import kde
-from ensemblify.reweighting.third_party.BME_main import BME
+from ensemblify.reweighting.third_party import simple_BME
 
 # FUNCTIONS
 def process_exp_data(experimental_data_path: str) -> str:
@@ -213,7 +213,7 @@ def ibme(
     os.chdir(output_dir)
 
     # Create reweight object
-    rew = BME.Reweight(f'ibme_t{theta}')
+    rew = simple_BME.SimpleReweight(f'ibme_t{theta}')
 
     # Load files
     rew.load(exp_file=exp_file,

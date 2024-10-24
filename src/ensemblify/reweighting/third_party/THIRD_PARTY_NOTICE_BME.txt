@@ -10,12 +10,10 @@ This software is distributed under the GNU Public License, detailed in the
 
 Modifications:
 --------------
-In the BME.py file line number 13 was altered from:
-    import BME_tools as bt
-to:
-    import ensemblify_TEST.reweighting.third_party.BME_main.BME_tools as bt
-
-This was done simply to make the absolute import of BME_tools auxiliary functions
-possible and does not alter the functionality of BME in any way.
-
-All other files taken from the original distribution were not modified in any way.
+The simple_BME.py and simple_BME_tools.py files are a modified version of the original source code
+files ./BME_main/BME.py and ./BME_main/BME_tools.py, and contain a modified version of the original
+Reweight class, SimpleReweight and its auxiliary functions. The main changes made consisted in
+removing functionalities that were not used through Ensemblify and documenting and styling the code
+to be consistent with the rest of Ensemblify's source code. The functionality of the code remained
+essentially the same, so any novel or interesting code implementations spotted can be fully
+attributed to BME's original authors.

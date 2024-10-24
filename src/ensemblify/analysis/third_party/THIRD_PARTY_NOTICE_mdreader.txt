@@ -10,7 +10,7 @@ This software is distributed under the GNU Public License, detailed in the
 
 Modifications:
 --------------
-The mdreader_CHANGED.py file is a modified version of the original source code file
+The simple_mdreader.py file is a modified version of the original source code file
 ./mdreader-master/mdreader.py, and contains a modified version of the original MDReader class,
 SimpleMDReader. The main changes made consisted in removing functionalities that were not used
 through Ensemblify, updating compatibility with recent versions of numpy, removing support for

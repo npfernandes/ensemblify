@@ -1,67 +1,77 @@
 """
 Ensemblify - a Python library for generating and analyzing ensembles of protein structures.
-=====
+===========================================================================================
+:Author(s): Nuno P. Fernandes
+:Year: 2024
+:Copyright: GNU Public License v3
 
 Main Features
 -------------
-    - Generate conformational ensembles of flexible regions of protein structures.
-    - Convert the generated ensembles to trajectory file format.
-    - Calculate theoretical SAXS curves from generated ensembles.
-    - Analyze generated ensemble's structural properties through interactive plots.
-    - Reweigh generated ensembles using experimental data.
-    - Re-analyze structural properties of generated ensembles using weights calculated
-    from experimental data, compare to non-reweighted structural properties.
+- Generate protein conformational ensembles by changing flexible regions.
+- Convert generated ensembles to trajectory file format.
+- Calculate theoretical SAXS curves from generated ensembles.
+- Analyze generated ensemble's structural properties through interactive plots.
+- Reweight generated ensembles using experimental data.
+- Re-analyze structural properties of generated ensembles using weights calculated from
+experimental data, compare to non-reweighted structural properties.
 
-How to use the documentation
+How to access documentation
 ----------------------------
 Documentation is available in two forms: docstrings provided with the code, and an online
-ReadtheDocs, available from `<https://ensemblifyreadthedocs.org>`.
+ReadtheDocs, available from https://ensemblify.readthedocs.io/en/latest/index.html.
 
-The docstring examples assume that `ensemblify` has been imported as ``ey``::
+Use the built-in `help` function to view a function or module's docstring:
 
-  >>> import ensemblify as ey
-
-Code snippets are indicated by three greater-than signs::
-
-  >>> x = 42
-  >>> x = x + 1
-
-Use the built-in ``help`` function to view a function's docstring::
-
-  >>> help(ey.generate_ensemble)
+```
+>>> import ensemblify as ey
+>>> help(ey)
+>>> help(ey.generation)
+>>> help(ey.generate_ensemble)
+```
 
 Available subpackages
 ---------------------
-generation
+`generation`
     Generate an ensemble of structures.
-conversion
+`conversion`
     Convert ensembles to trajectory files and from these calculate SAXS curves.
-analysis
+`analysis`
     Calculate and plot data describing your ensemble.
-reweighting
-    Reweigh a generated ensemble using experimental data.
-utils
-    Generally useful auxilliary functions for the other modules.
+`reweighting`
+    Reweight a generated ensemble using experimental data.
+`utils`
+    Auxilliary functions used by other modules.
 
 Utilities
 ---------
-test
-    Run ensemblify unittests.
-show_config
+`test()`
+    Run Ensemblify unit tests.
+`show_config()`
     View Ensemblify's current general configuration.
-update_config
+`update_config()`
     Update Ensemblify's current general configuration.
-pipeline
+`check_steric_clashes()`
+    Check an already generated ensemble for steric clashes, reporting any found.
+`pipeline()`
     Function to use all of Ensemblify's functionalities sequentially.
+
+Citation
+--------
+
+When using Ensemblify in published work, please cite
+
+    PUB
+
 """
+
 from ensemblify.analysis import analyze_trajectory
 from ensemblify.conversion import ensemble2traj,traj2saxs
 from ensemblify.generation import generate_ensemble
 from ensemblify.reweighting import reweight_ensemble
-from ensemblify.utils.clash_checking import check_steric_clashes
-from ensemblify.pipeline import ensemblify_pipeline
+from ensemblify.utils import df_from_pdb, df_to_pdb, extract_pdb_info
+from ensemblify.clash_checking import check_steric_clashes
 from ensemblify.config import show_config,update_config
-from ensemblify.utils import df_from_pdb, df_to_pdb, extract_pdb_info, kde
+from ensemblify.pipeline import ensemblify_pipeline
 
 __all__ = ['analyze_trajectory',
            'ensemble2traj',
@@ -69,10 +79,9 @@ __all__ = ['analyze_trajectory',
            'generate_ensemble',
            'reweight_ensemble',
            'check_steric_clashes',
-           'ensemblify_pipeline',
-           'show_config',
-           'update_config',
            'df_from_pdb',
            'df_to_pdb',
            'extract_pdb_info',
-           'kde']
+           'ensemblify_pipeline',
+           'show_config',
+           'update_config']

@@ -1,21 +1,40 @@
-"""A one-line summary of the module or program, terminated by a period.
+"""
+Generation - `ensemblify.generation`
+====================================
 
-Leave one blank line.  The rest of this docstring should contain an
-overall description of the module or program.  Optionally, it may also
-contain a brief description of exported classes and functions and/or usage
-examples.
+:Author(s): Nuno P. Fernandes
+:Year: 2024
+:Copyright: GNU Public License v3
 
-Typical usage example:
+.. versionadded:: 1.0.0
 
-  foo = ClassFoo()
-  bar = foo.FunctionBar()
+This module contains functions for generating an ensemble of protein conformations from an input
+structure using an input parameters file.
+
+Example applications
+--------------------
+
+- Generate an ensemble
+  --------------------
+  The `ensemblify.generation.generate_ensemble` function can be used to generate a conformational
+  ensemble from a .yaml parameters file. For example, we can generate an ensemble for Histatin5,
+  an intrinsically disordered protein (IDP) with 24 aminoacid residues. The required input
+  parameters file is included within the example data files:
+
+```
+>>> import ensemblify as ey
+>>> from ensemblify.datafiles import HST5_PARAMS
+>>> ey.generate_ensemble(HST5_PARAMS)
+```
+
+Available Functions
+----------------
+- `generate_ensemble`
+
+      Generate an ensemble of conformations given a parameters file.
+
 """
 
 from ensemblify.generation.ensemble import generate_ensemble
-from ensemblify.generation.ensemble_utils.inputs_processing import read_input_parameters,setup_ensemble_gen_params
-from ensemblify.generation.ensemble_utils.sampling import run_sampling
 
-__all__ = ['generate_ensemble',
-           'read_input_parameters',
-           'setup_ensemble_gen_params',
-           'run_sampling'] 
+__all__ = ['generate_ensemble']

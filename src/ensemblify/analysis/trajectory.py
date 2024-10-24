@@ -5,6 +5,7 @@
 import os
 
 ## Third Party Imports
+import pandas as pd
 from plotly.offline import get_plotlyjs
 
 ## Local Imports
@@ -20,13 +21,13 @@ def analyze_trajectory(
     ramachandran_data: bool = True,
     distancematrices: bool = True,
     contactmatrices: bool = True,
-    ssassignments: bool = True,
+    ssfrequencies: bool = True,
     rg: bool = True,
     dmax: bool = True,
     eed: bool = True,
     cm_dist: dict | None = None,
     color_palette: list[str] | None = None,
-    ):
+    ) -> dict[str,pd.DataFrame]:
     """Calculate structural data and create interactive figures for given trajectory and
     topology files.
 
@@ -52,10 +53,10 @@ def analyze_trajectory(
         contactmatrices:
             whether to calculate a contact frequency matrix for each trajectory,topology
             file pair and create the corresponding contact map interactive figure.
-        ssassignments:
-            whether to calculate a secondary structure assignment matrix for each trajectory,
-            topology file pair and create the corresponding secondary structure frequency
-            interactive figure.
+        ssfrequencies:
+            whether to calculate a secondary structure assignment frequency matrix for each
+            trajectory, topology file pair and create the corresponding secondary structure
+            frequency interactive figure.
         rg:
             whether to calculate and plot the radius of gyration for each trajectory,topology
             file pair.
@@ -109,7 +110,7 @@ def analyze_trajectory(
                                             ramachandran_data=ramachandran_data,
                                             distancematrices=distancematrices,
                                             contactmatrices=contactmatrices,
-                                            ssassignments=ssassignments,
+                                            ssfrequencies=ssfrequencies,
                                             rg=rg,
                                             dmax=dmax,
                                             eed=eed,
@@ -216,29 +217,3 @@ def analyze_trajectory(
 
     # For convenience, return the calculated analysis data.
     return analysis_data
-
-if __name__ == '__main__':
-    analyze_trajectory(['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc'],
-                       ['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb'],
-                       ['Hst5'],
-                       output_directory='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal',
-                       ramachandran_data=False,
-                       contactmatrices=False,
-                       distancematrices=False,
-                       ssassignments=False,
-                    #    rg=False,
-                    #    dmax=False,
-                    #    eed=False
-                    )
-
-    # analyze_trajectory(['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORIES/LysP7951/LysP7951_trajectory.xtc'],
-    #                    ['/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORIES/LysP7951/LysP7951_top.pdb'],
-    #                    ['LysP7951'],
-    #                    output_directory='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_lysp7951_anal',
-    #                    ramachandran_data=False,
-    #                     contactmatrices=False,
-    #                    #distancematrices=False,
-    #                    ssassignments=False,
-    #                    rg=False,
-    #                    dmax=False,
-    #                    eed=False)

@@ -113,14 +113,13 @@ def calc_cm_dist(
 def calculate_ramachandran_data(
     trajectory: str,
     topology: str,
-    output_path: str = os.getcwd(),
+    output_path: str | None = None,
     ) -> pd.DataFrame:
     """Calculate a dihedral angles matrix from trajectory and topology files.
 
-    Trajectory and topology files are used to create a MDAnalysis Universe object, from
-    which values for the Phi and Psi dihedral angles for each residue in each frame are
-    calculated.
-    Calculated matrix is saved to output_path, which defaults to the current working directory.
+    Phi and Psi dihedral angle values are calculated for each residue in each trajectory frame.
+    Optionally saves the matrix to output directory in .csv format, defaulting to current working
+    directory.
 
     Args:
         trajectory:
@@ -132,9 +131,13 @@ def calculate_ramachandran_data(
             'ramachandran_data.csv'. Defaults to current working directory.
 
     Returns:
-        rama_data:
+        dihedrals_matrix:
             DataFrame with Phi and Psi values of each residue for each frame of the trajectory.
     """
+    # Setup output directory
+    if output_path is None:
+        output_path = os.getcwd()
+
     # Create Universe
     u = mda.Universe(topology, trajectory)
     protein = u.select_atoms('protein')
@@ -149,24 +152,186 @@ def calculate_ramachandran_data(
     # Get our phi psi angle values
     rama_xs = []
     rama_ys = []
-    for row in rama_angles:
-        for x,y in row:
-            rama_xs.append(x)
-            rama_ys.append(y)
+    for frame_dihedrals_matrix in rama_angles:
+        for phi,psi in frame_dihedrals_matrix:
+            rama_xs.append(phi)
+            rama_ys.append(psi)
 
     # Create DataFrame with data
-    rama_data = pd.DataFrame({'Phi':rama_xs,'Psi':rama_ys})
+    dihedrals_matrix = pd.DataFrame({'Phi':rama_xs,
+                                     'Psi':rama_ys})
 
-    # Save dihedrals data
+    # Save dihedrals matrix
     if os.path.isdir(output_path):
-        rama_data.to_csv(os.path.join(output_path,'ramachandran_data.csv'))
+        dihedrals_matrix_output_filename = 'ramachandran_data.csv'
+        dihedrals_matrix.to_csv(os.path.join(output_path,dihedrals_matrix_output_filename))
     elif output_path.endswith('.csv'):
-        rama_data.to_csv(output_path)
+        dihedrals_matrix.to_csv(output_path)
     else:
         print(('Ramachandran data was not saved to disk, '
                'output path must be a directory or .csv filepath!'))
 
-    return rama_data
+    return dihedrals_matrix
+
+
+def create_ramachandran_figure(
+    dihedrals_matrix: pd.DataFrame | str,
+    trajectory_id: str | None = None,
+    output_path: str | None = None,
+    ) -> go.Figure:
+    """Create a ramachandran plot Figure from a calculated dihedral angles matrix.
+
+    Args:
+        dihedrals_matrix:
+            calculated dihedral angles matrix DataFrame or path to calculated matrix in .csv format.
+            If difference is True, this should be the difference dihedral angles matrix between the
+            uniformly weighted and the reweighted dihedral angles matrix.
+        trajectory_id:
+            used on Figure title and prefix for saved ramachandran plot filename. Defaults to None.
+        output_path:
+            path to output .html file or output directory where created Figure will be stored.
+            If directory, written file is named 'ramachandran_plot.html', optionally with
+            trajectory_id prefix. Defaults to None.
+
+    Returns:
+        rama_fig:
+            Ploty Figure object displaying a ramachandran plot.
+    """
+    if isinstance(dihedrals_matrix,str):
+        assert dihedrals_matrix.endswith('.csv'), ('Dihedral angles matrix file must '
+                                                   'be in .csv format!')
+        dihedrals_matrix = pd.read_csv(dihedrals_matrix,index_col=0)
+
+    # Create Ramachandran Plot figure
+    rama_fig = go.Figure()
+
+    # Add Ramachandran Reference Contours
+    rama_ref_data = np.load(os.path.join(os.path.dirname(os.path.realpath(__file__)),'rama_ref_data.npy')).flatten()
+    # Ramachandran Regions Reference:
+    # https://github.com/MDAnalysis/mdanalysis/blob/develop/package/MDAnalysis/analysis/data/rama_ref_data.npy
+
+    X, Y = np.meshgrid(np.arange(-180, 180, 4),
+                       np.arange(-180, 180, 4))
+
+    rama_fig.add_trace(go.Contour(x=X.flatten(),
+                                  y=Y.flatten(),
+                                  z=rama_ref_data,
+                                  name='Show/Hide Allowed+MarginallyAllowed regions countours',
+                                  line_width=3,
+                                  contours=dict(start=1,
+                                                end=17,
+                                                size=16,
+                                                showlabels=False,
+                                                coloring='lines'),
+                                  colorscale=['#FF7124',
+                                              '#FF000D'],
+                                  hoverinfo='none',
+                                  showscale=False,
+                                  showlegend=True))
+
+    rama_fig.add_trace(go.Scattergl(x=dihedrals_matrix['Phi'],
+                                    y=dihedrals_matrix['Psi'],
+                                    mode='markers',
+                                    marker=dict(color='black',
+                                                size=0.6),
+                                    name='dihedrals',
+                                    showlegend=False))
+
+    # Create quadrant dividers
+    shapes = []
+    shapes.append(dict(type='line',
+                       xref='x',
+                       x0=0,
+                       x1=0,
+                       y0=-180,
+                       y1=180,
+                       line=dict(color='black',
+                                 width=2)))
+    shapes.append(dict(type='line',
+                       yref='y',
+                       y0=0,
+                       y1=0,
+                       x0=-180,
+                       x1=180,
+                       line=dict(color='black',
+                                 width=2)))
+
+    # Update Figure Layout
+    if trajectory_id is not None:
+        rama_title = f'{trajectory_id} Ramachandran Plot'
+    else:
+        rama_title = 'Ramachandran Plot'
+
+    rama_title = 'Ramachandran Plot'
+
+    rama_fig.update_layout(width=900,
+                           height=900,
+                           plot_bgcolor='#FFFFFF',
+                           font=dict(family='Helvetica',
+                                     color='black',
+                                     size=30),
+                           modebar_remove=['zoom','pan','select','lasso2d','zoomIn','zoomOut'],
+                           title=dict(text=rama_title,
+                                      xref='paper',
+                                      x=0.5),
+                           xaxis=dict(title='\u03A6', # Phi
+                                      range=[-180,180],
+                                      tick0=-180,
+                                      dtick=60,
+                                      ticks='outside',
+                                      ticksuffix='\u00B0',
+                                      ticklen=10,
+                                      tickwidth=4,
+                                      showgrid=False), # Phi
+                           yaxis=dict(title='\u03A8', # Psi
+                                      range=[-180,180],
+                                      tick0=-180,
+                                      dtick=60,
+                                      ticks='outside',
+                                      ticksuffix='\u00B0',
+                                      ticklen=10,
+                                      tickwidth=4,
+                                      showgrid=False,
+                                      title_standoff=5),
+                            legend=dict(orientation='h',
+                                        xref='paper',
+                                        xanchor='center',
+                                        x=0.5,
+                                        y=1.065,
+                                        font_size=18),
+                           shapes=shapes)
+
+    rama_fig.update_xaxes(showline=True,
+                          linewidth=4,
+                          linecolor='black',
+                          color='black',
+                          mirror=True)
+
+    rama_fig.update_yaxes(showline=True,
+                          linewidth=4,
+                          linecolor='black',
+                          color='black',
+                          mirror=True)
+
+    if output_path is not None:
+        # Save ramachandran plot
+        if os.path.isdir(output_path):
+            if trajectory_id is not None:
+                output_filename = f'{trajectory_id}_ramachandran_plot.html'
+            else:
+                output_filename = 'ramachandran_plot.html'
+            rama_fig.write_html(os.path.join(output_path,output_filename),
+                                config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
+
+        elif output_path.endswith('.html'):
+            rama_fig.write_html(output_path,
+                                config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
+
+        else:
+            print(('Ramachandran plot was not saved to disk, '
+                    'output path must be a directory or .html filepath!'))
+
+    return rama_fig
 
 
 def calculate_contact_matrix_frame(
@@ -980,7 +1145,7 @@ def calculate_ss_assignment(
     chain_letters = []
     for chain_number in range(len(top_info.keys()),0,-1):
         chain_letter, starting_res, chain_size = top_info[chain_number]
-        resranges[chain_letter] = [ x for x in range(starting_res, starting_res + chain_size)]  
+        resranges[chain_letter] = [ x for x in range(starting_res, starting_res + chain_size)]
         chain_letters.append(chain_letter)
 
     if len(chain_letters) > 1:
@@ -1120,7 +1285,7 @@ def create_ss_frequency_figure(
     # Iterate through chains
     for chain_number in range(len(top_info.keys()),0,-1):
         chain_letter, starting_res, chain_size = top_info[chain_number]
-        resranges[chain_letter] = [ x for x in range(starting_res, starting_res + chain_size)]  
+        resranges[chain_letter] = [ x for x in range(starting_res, starting_res + chain_size)]
         chain_letters.append(chain_letter)
 
     # Create tick labels that respect chain id
@@ -1262,8 +1427,8 @@ def create_ss_frequency_figure(
                               font=dict(family='Helvetica',
                                         color='black',
                                         size=30),
-                              plot_bgcolor = '#FFFFFF',
-                              paper_bgcolor = '#FFFFFF',
+                              plot_bgcolor='#FFFFFF',
+                              paper_bgcolor='#FFFFFF',
                               modebar_remove=['zoom','pan','select','lasso2d','zoomIn','zoomOut'],
                               title=dict(text=ss_freq_title,
                                          x=0.5),
@@ -1863,7 +2028,8 @@ def calculate_analysis_data(
             data = {'DistanceMatrices' : [DistanceMatrix1,DistanceMatrix2,DistanceMatrix3],
                     'ContactMatrices' : [ContactMatrix1,ContactMatrix2,ContactMatrix3],
                     'SecondaryStructureFrequencies' : [SSFrequency1,SSFrequency2,SSFrequency3],
-                    'StructuralMetrics' : [StructuralMetrics1,StructuralMetrics2,StructuralMetrics3]}
+                    'StructuralMetrics' : [StructuralMetrics1,StructuralMetrics2,
+                                           StructuralMetrics3]}
     """
     # Setup output directory
     if output_directory is None:
@@ -1947,8 +2113,8 @@ def create_analysis_figures(
     output_directory: str | None = None,
     color_palette: list[str] | None = None,
     ) -> dict[str,list[go.Figure]]:
-    """Create interactive figures given analysis data for one or more trajectory,topology
-    pair of files.
+    """Create interactive figures given analysis data for one or more pairs of trajectory,topology
+      files.
 
     Args:
         analysis_data:

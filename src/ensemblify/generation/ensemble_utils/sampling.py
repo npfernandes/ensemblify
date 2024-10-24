@@ -12,7 +12,6 @@ from tqdm import tqdm
 
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.utils import HashableDict
 from ensemblify.generation.ensemble_utils.inputs_processing import register_input_clashes
 from ensemblify.generation.ensemble_utils.sampling_utils import (setup_sampling_logging,
                                                                  setup_ray_worker_logging,
@@ -21,6 +20,22 @@ from ensemblify.generation.ensemble_utils.sampling_utils import (setup_sampling_
                                                                  sample_pdb)
 from ensemblify.generation.ensemble_utils.movers_utils import setup_databases
 from ensemblify.generation.ensemble_utils.pdb_processing import process_pdb
+
+# CLASSES
+class HashableDict(dict):
+    """Take a Python dictionary and make it hashable.
+    
+    Appropriate for when we will NOT ever modify the dictionary after hashing.
+    
+    Reference:
+        https://stackoverflow.com/a/1151686
+    """
+    def __key(self):
+        return tuple((k,self[k]) for k in sorted(self))
+    def __hash__(self):
+        return hash(self.__key())
+    def __eq__(self, other):
+        return self.__key() == other.__key()
 
 # FUNCTIONS
 def run_sampling(

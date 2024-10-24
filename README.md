@@ -284,7 +284,6 @@ To download and compile the GROMACS source code from their [website](https://ftp
     source /usr/local/gromacs/bin/GMXRC
     ```
 
-The `gmx` command should already be registered as an alias for your GROMACS installation.
 </details>
 
 <details>  
@@ -436,9 +435,7 @@ Ensemblify offers four different modules, all of which can be acessed either thr
 
 With the `generation` module, you can generate conformational ensembles for your protein of interest.
 
-Before generating an ensemble, you must create a parameters file either through the provided [parameters form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html) or directly by editing the provided [parameters file template](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml).
-
-<!-- Check the [parameters file setup](#setting-up-your-parameters-file) section for more details. -->
+Before generating an ensemble, you must create a parameters file either through the provided [parameters form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html) or directly by editing the provided [parameters file template](docs/assets/parameters_template.yaml). Check the [parameters file setup](#-setting-up-your-parameters-file) section for more details.
 
 To generate an ensemble, provide Ensemblify with the path to your parameters file.
 
@@ -456,16 +453,24 @@ Check the interactive notebook for detailed usage examples:
 
 </details>
 
-<!-- ###  📝 Setting up your parameters file
-An [.html form](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_form.html) is provided to aid you in building your parameters file.
+<details>  
+  <summary>
+  
+###  📝 Setting up your parameters file
+  
+  </summary>
+
+An [.html form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html) is provided to aid you in building your parameters file.
+
 <details>  
   <summary><b>Parameters Form Preview</b></summary>
 
   ![alt text](docs/assets/parameters_form_preview.svg)
 </details>
-<br> 
 
-If you prefer to create your own parameters file from scratch, a [template file](https://github.com/npfernandes/ensemblify/blob/main/docs/assets/parameters_template.yaml) is also provided. -->
+If you prefer to create your own parameters file from scratch, a [template file](docs/assets/parameters_template.yaml) is also provided.
+
+</details>
 
 <details>  
   <summary>

@@ -451,8 +451,6 @@ Inside a Python script or Jupyter Notebook:
 Check the interactive notebook for detailed usage examples: 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/02_generation_module.ipynb)
 
-</details>
-
 <details>  
   <summary>
   
@@ -470,6 +468,7 @@ An [.html form](https://github.com/npfernandes/ensemblify/releases/download/v0.0
 
 If you prefer to create your own parameters file from scratch, a [template file](docs/assets/parameters_template.yaml) is also provided.
 
+</details>
 </details>
 
 <details>  

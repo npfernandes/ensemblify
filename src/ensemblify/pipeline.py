@@ -74,18 +74,17 @@ def ensemblify_pipeline(
         print((f' ----------------- Trajectory Analysis took: {round(end-start,3)} s '
                 '-----------------'))
 
-    # Reweigh ensemble with exp data
-    if exp_saxs_data is not None:
-        start = timer()
-        ey.reweigh_ensemble(trajectory_id=JOB_NAME,
-                            trajectory=trajectory_path,
-                            topology=topology_path,
-                            exp_saxs_data=exp_saxs_data,
-                            output_dir=REWEIGHTING_DIR,
-                            calculated_metrics_data=structural_metrics_data)
-        end = timer()
-        print((f' ----------------- Ensemble Reweighting took: {round(end-start,3)} s '
-                '-----------------'))
+        # Reweigh ensemble with exp data
+        if exp_saxs_data is not None:
+            start = timer()
+            ey.reweigh_ensemble(trajectory_id=JOB_NAME,
+                                trajectory=trajectory_path,
+                                topology=topology_path,
+                                exp_saxs_data=exp_saxs_data,
+                                output_dir=REWEIGHTING_DIR,
+                                calculated_metrics_data=structural_metrics_data)
+            end = timer()
+            print((f' ----------------- Ensemble Reweighting took: {round(end-start,3)} s '
+                    '-----------------'))
 
     print("Ensemblify's pipeline has finished, good luck in your analysis!")
-

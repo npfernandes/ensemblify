@@ -24,7 +24,7 @@ def process_pulchra_output(
     pulchra_output_buffer: str,
     sampling_targets: dict[str,tuple[tuple[str,tuple[int,...],str,str]]] | None = None,
     input_clashes: list[tuple[str,str]] | None = None,
-    ) -> bool:
+    ) -> list[str]:
     """Check if there are recorded steric clashes in given PULCHRA output.
 
     Clashes present in input structure (if provided) are not ignored.
@@ -112,7 +112,7 @@ def check_report_pdb_clashes(
     pdb2check: str,
     sampling_targets: dict[str,tuple[tuple[str,tuple[int,...],str,str]]] | None = None,
     input_clashes: list[tuple[str,str]] | None = None,
-    ) -> tuple[bool,str | None]:
+    ) -> tuple[str,list[str] | None]:
     """Check for steric clashes in a .pdb file, optionally considering sampling targets and clashes
     in the input structure.
 

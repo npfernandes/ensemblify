@@ -9,7 +9,7 @@ import subprocess
 from tqdm import tqdm
 
 ## Local Imports
-from ensemblify.conversion.conversion_utils import move_topol_pdb,join_pdbs
+from ensemblify.conversion.conversion_utils import join_pdbs, move_topol_pdb
 
 # FUNCTIONS
 def ensemble2traj(

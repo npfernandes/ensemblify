@@ -2,9 +2,9 @@
 
 # IMPORTS
 ## Standard Library Imports
-from copy import deepcopy
-from typing import Optional,Union
 import json
+from copy import deepcopy
+from typing import Optional, Union
 
 ## Third Party Imports
 import numpy as np
@@ -12,15 +12,14 @@ import pyrosetta
 import pyrosetta.distributed.io as io
 from pyrosetta.rosetta.core.id import AtomID
 from pyrosetta.rosetta.core.kinematics import MoveMap
-from pyrosetta.rosetta.core.pose import Pose, pdb_to_pose, get_chain_from_chain_id
-from pyrosetta.rosetta.core.scoring import constraints,func
+from pyrosetta.rosetta.core.pose import Pose, get_chain_from_chain_id, pdb_to_pose
+from pyrosetta.rosetta.core.scoring import constraints, func
 from pyrosetta.rosetta.protocols.constraint_movers import ConstraintSetMover
 from pyrosetta.rosetta.protocols.minimization_packing import MinMover
 from pyrosetta.rosetta.protocols.simple_moves import SwitchResidueTypeSetMover
 
 ## Local Imports
 from ensemblify.utils import df_from_pdb
-
 
 # FUNCTIONS
 def add_intrachain_constraints(

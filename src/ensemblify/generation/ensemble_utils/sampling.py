@@ -13,13 +13,15 @@ from tqdm import tqdm
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.generation.ensemble_utils.inputs_processing import register_input_clashes
-from ensemblify.generation.ensemble_utils.sampling_utils import (setup_sampling_logging,
-                                                                 setup_ray_worker_logging,
-                                                                 setup_sampling_parameters,
-                                                                 setup_sampling_initial_pose,
-                                                                 sample_pdb)
 from ensemblify.generation.ensemble_utils.movers_utils import setup_databases
 from ensemblify.generation.ensemble_utils.pdb_processing import process_pdb
+from ensemblify.generation.ensemble_utils.sampling_utils import (
+    sample_pdb,
+    setup_ray_worker_logging,
+    setup_sampling_initial_pose,
+    setup_sampling_logging,
+    setup_sampling_parameters,
+)
 
 # CLASSES
 class HashableDict(dict):

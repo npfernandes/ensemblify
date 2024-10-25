@@ -12,7 +12,7 @@ import subprocess
 import ray
 
 ## Local Imports
-from ensemblify.utils import df_from_pdb,df_to_pdb,extract_pdb_info,cleanup_pdbs
+from ensemblify.utils import cleanup_pdbs, df_from_pdb, df_to_pdb, extract_pdb_info
 
 # FUNCTIONS
 def check_clashes(

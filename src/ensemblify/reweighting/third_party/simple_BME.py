@@ -8,6 +8,7 @@ Reference:
     2020. In: Z. Gáspári, (eds) *Structural Bioinformatics*, *Methods in Molecular Biology*,
     vol. 2112, Humana, New York, NY. (https://doi.org/10.1007/978-1-0716-0270-6_15)
 """
+
 # IMPORTS
 ## Standard Library Imports
 import sys
@@ -16,7 +17,7 @@ import time
 ## Third Party Imports
 import numpy as np
 import pandas as pd
-from scipy.optimize import minimize #version >0.13.0 for dogleg optimizer
+from scipy.optimize import minimize
 from scipy.special import logsumexp
 from sklearn.linear_model import LinearRegression
 

@@ -9,8 +9,8 @@ import pandas as pd
 from plotly.offline import get_plotlyjs
 
 ## Local Imports
+from ensemblify.analysis.trajectory_utils import calculate_analysis_data, create_analysis_figures
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.analysis.trajectory_utils import calculate_analysis_data,create_analysis_figures
 
 # FUNCTIONS
 def analyze_trajectory(

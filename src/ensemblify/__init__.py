@@ -65,13 +65,15 @@ When using Ensemblify in published work, please cite
 """
 
 from ensemblify.analysis import analyze_trajectory
-from ensemblify.conversion import ensemble2traj,traj2saxs
+from ensemblify.clash_checking import check_steric_clashes
+from ensemblify.config import show_config, update_config
+from ensemblify.conversion import ensemble2traj, traj2saxs
 from ensemblify.generation import generate_ensemble
+from ensemblify.pipeline import ensemblify_pipeline
 from ensemblify.reweighting import reweight_ensemble
 from ensemblify.utils import df_from_pdb, df_to_pdb, extract_pdb_info
-from ensemblify.clash_checking import check_steric_clashes
-from ensemblify.config import show_config,update_config
-from ensemblify.pipeline import ensemblify_pipeline
+
+__version__ = '1.0.0'
 
 __all__ = ['analyze_trajectory',
            'ensemble2traj',

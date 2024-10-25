@@ -1,6 +1,9 @@
-"""Auxiliary functions for Custom Movers created from the PyRosetta Mover class and to read database files into memory."""
+"""Auxiliary functions for Custom PyRosetta Movers and to read database files into memory."""
 
 # IMPORTS
+## Standard Library Imports
+import os
+
 ## Third Party Imports
 import pandas as pd
 
@@ -8,6 +11,8 @@ import pandas as pd
 from ensemblify.config import GLOBAL_CONFIG
 
 # CONSTANTS
+ALLOWED_DATABASE_FORMATS = ['.csv','.parquet','.pkl']
+ALLOWED_SECONDARY_STRUCTURE = ['alpha_helix','beta_strand']
 DATABASE_OPTIMIZED_COL_DTYPES = { GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['OMG1'] : 'float32',
                                   GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['OMG2'] : 'float32',
                                   GLOBAL_CONFIG['USED_DATABASE_COLNAMES']['OMG3'] : 'float32',
@@ -25,7 +30,6 @@ def read_database(database_path: str) -> pd.DataFrame:
     
     If possible, read only the desired set of columns into a pandas.DataFrame
     (depends on database file format).
-    Currently supported database file extensions: .csv, .h5, .pkl.
 
     Args:
         database_path:
@@ -34,6 +38,9 @@ def read_database(database_path: str) -> pd.DataFrame:
     Returns:
         database: database as a pandas.DataFrame.
     """
+    assert os.path.splitext(database_path)[1] \
+          in ALLOWED_DATABASE_FORMATS, f'Database format must be in {ALLOWED_DATABASE_FORMATS}'
+
     if database_path.endswith('.csv'): # pick columns, convert dtypes
         database = pd.read_csv(database_path,
                                usecols=list(GLOBAL_CONFIG['USED_DATABASE_COLNAMES'].values()),
@@ -118,6 +125,7 @@ def optimize_database(database: pd.DataFrame) -> dict[str,pd.DataFrame]:
 
     return res_angles
 
+
 def setup_databases(databases_paths: dict[str,str]) -> dict[str,dict[str,pd.DataFrame]]:
     """Setup the databases the movers can access during sampling of dihedral angles.
 
@@ -169,6 +177,10 @@ def get_ss_bounds(secondary_structure: str) -> tuple[tuple[int,int],tuple[int,in
             psi_bounds: tuple with the lower and upper bounds for psi dihedral angle values
             for the secondary structure in question.
     """
+    assert secondary_structure in ALLOWED_SECONDARY_STRUCTURE, ('Desired secondary structure '
+                                                                'must be in '
+                                                                f'{ALLOWED_SECONDARY_STRUCTURE}')
+
     if secondary_structure == 'alpha_helix':
         canonical_helix = GLOBAL_CONFIG['ALPHA_HELIX_CANON']
         phi_bounds = (canonical_helix[0] - 7, canonical_helix[0] + 7) #  ~ canonical_value ± 7°
@@ -178,4 +190,3 @@ def get_ss_bounds(secondary_structure: str) -> tuple[tuple[int,int],tuple[int,in
         phi_bounds = (canonical_strand[0] - 7, canonical_strand[0] + 7) # ~ canonical value ± 7°
         psi_bounds = (canonical_strand[1] - 7, canonical_strand[1] + 7) # ~ canonical value ± 7°
     return phi_bounds, psi_bounds
-

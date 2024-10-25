@@ -11,8 +11,8 @@ import pyrosetta
 from pyrosetta.rosetta.protocols.moves import Mover
 
 ## Local Imports
-from ensemblify.generation.ensemble_utils.movers_utils import get_ss_bounds
 from ensemblify.config import GLOBAL_CONFIG
+from ensemblify.generation.ensemble_utils.movers_utils import get_ss_bounds
 
 # CLASSES
 class SetRandomDihedralsMover(Mover):

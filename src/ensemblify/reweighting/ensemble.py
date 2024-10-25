@@ -6,32 +6,36 @@ import glob
 import math
 import os
 import shutil
+import subprocess
 
 ## Third Party Imports
-import subprocess
 import numpy as np
 import pandas as pd
 from plotly.offline import get_plotlyjs
 
 ## Local Imports
+from ensemblify.analysis import (
+    calculate_contact_matrix,
+    calculate_distance_matrix,
+    calculate_metrics_data,
+    calculate_ss_frequency,
+    create_contact_map_fig,
+    create_distance_matrix_fig,
+    create_ss_frequency_figure,
+)
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.analysis import (calculate_contact_matrix,
-                                 calculate_distance_matrix,
-                                 calculate_ss_frequency,
-                                 calculate_metrics_data,
-                                 create_contact_map_fig,
-                                 create_distance_matrix_fig,
-                                 create_ss_frequency_figure)
 from ensemblify.conversion import traj2saxs
-from ensemblify.reweighting.ensemble_utils import (attempt_read_reweigthing_data,
-                                                   process_exp_data,
-                                                   correct_exp_error,
-                                                   bme_ensemble_reweighting,
-                                                   create_effective_frames_fit_fig,
-                                                   average_saxs_profiles,
-                                                   attempt_read_data,
-                                                   create_reweighting_fits_fig,
-                                                   create_reweighting_metrics_fig)
+from ensemblify.reweighting.ensemble_utils import (
+    attempt_read_data,
+    attempt_read_reweigthing_data,
+    average_saxs_profiles,
+    bme_ensemble_reweighting,
+    create_effective_frames_fit_fig,
+    create_reweighting_fits_fig,
+    create_reweighting_metrics_fig,
+    correct_exp_error,
+    process_exp_data,
+)
 
 # FUNCTIONS
 def reweight_ensemble(

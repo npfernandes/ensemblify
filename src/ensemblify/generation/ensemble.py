@@ -6,7 +6,7 @@ import os
 import shutil
 
 ## Local Imports
-from ensemblify.generation.ensemble_utils import read_input_parameters,setup_ensemble_gen_params,run_sampling
+from ensemblify.generation.ensemble_utils import read_input_parameters, run_sampling, setup_ensemble_gen_params
 
 # MAIN FUNCTION
 def generate_ensemble(parameters_path: str):

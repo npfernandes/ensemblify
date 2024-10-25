@@ -7,25 +7,27 @@ from timeit import default_timer as timer
 import logging
 import logging.config
 import os
-import yaml
 
 ## Third Party Imports
-from pyrosetta.rosetta.core.scoring.constraints import ConstraintIO
-from tqdm import tqdm
 import pandas as pd
 import pyrosetta
 import pyrosetta.distributed
 import ray
+import yaml
+from pyrosetta.rosetta.core.scoring.constraints import ConstraintIO
+from tqdm import tqdm
 
 ## Local Imports
-from ensemblify.generation.ensemble_utils.functions import (setup_pose,
-                                                            setup_minmover,
-                                                            derive_constraint_targets,
-                                                            apply_constraints,
-                                                            apply_pae_constraints,
-                                                            setup_fold_tree,
-                                                            get_targets_from_plddt,
-                                                            prep_target)
+from ensemblify.generation.ensemble_utils.functions import (
+    apply_constraints,
+    apply_pae_constraints,
+    derive_constraint_targets,
+    get_targets_from_plddt,
+    prep_target,
+    setup_fold_tree,
+    setup_minmover,
+    setup_pose,
+)
 from ensemblify.generation.ensemble_utils.samplers import setup_samplers
 
 # FUNCTIONS

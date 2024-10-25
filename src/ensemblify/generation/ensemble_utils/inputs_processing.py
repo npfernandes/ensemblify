@@ -3,17 +3,19 @@
 # IMPORTS
 ## Standard Library Imports
 import copy
+import os
 import re
 import shutil
-import os
+
+## Third Party Imports
 import yaml
 
 ## Local Imports
+from ensemblify.generation.ensemble_utils.pdb_processing import (
+    apply_faspr_single, apply_pulchra_single, apply_rewrite_single,
+    apply_restore_single
+)
 from ensemblify.utils import df_from_pdb, df_to_pdb
-from ensemblify.generation.ensemble_utils.pdb_processing import (apply_faspr_single,
-                                                                      apply_rewrite_single,
-                                                                      apply_pulchra_single,
-                                                                      apply_restore_single)
 
 # CUSTOM EXCEPTIONS
 class InvalidParameterType(Exception):

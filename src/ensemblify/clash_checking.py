@@ -2,9 +2,9 @@
 
 # IMPORTS
 ## Standard Library Imports
-import os
 import glob
 import io
+import os
 import re
 from concurrent.futures import ProcessPoolExecutor
 from subprocess import CalledProcessError
@@ -14,9 +14,9 @@ from tqdm import tqdm
 
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
+from ensemblify.generation.ensemble_utils.inputs_processing import process_input_pdb, register_input_clashes
+from ensemblify.generation.ensemble_utils.pdb_processing import apply_pulchra_single, apply_rewrite_single, cleanup_pdbs
 from ensemblify.utils import extract_pdb_info
-from ensemblify.generation.ensemble_utils.inputs_processing import register_input_clashes, process_input_pdb
-from ensemblify.generation.ensemble_utils.pdb_processing import apply_rewrite_single, apply_pulchra_single, cleanup_pdbs
 
 # FUNCTIONS
 def process_pulchra_output(

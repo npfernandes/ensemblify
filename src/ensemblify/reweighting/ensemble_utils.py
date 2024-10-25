@@ -6,6 +6,7 @@ import contextlib
 import glob
 import math
 import os
+import subprocess
 from collections.abc import Callable
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
@@ -14,14 +15,13 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import sklearn
-import subprocess
 from plotly.subplots import make_subplots
 from tqdm import tqdm
 
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.utils import kde
 from ensemblify.reweighting.third_party import simple_BME
+from ensemblify.utils import kde
 
 # FUNCTIONS
 def process_exp_data(experimental_data_path: str) -> str:

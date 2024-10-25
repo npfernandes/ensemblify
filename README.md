@@ -39,13 +39,34 @@ A general overview of Ensemblify, descriptions of employed methods and applicati
 
 </summary>    
 
-It is heavily recommended to install the `ensemblify` Python package in a dedicated virtual environment.
+It is **heavily** recommended to install the `ensemblify` Python package in a dedicated virtual environment.
 
 You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html). We recommend [miniconda](https://docs.anaconda.com/miniconda/#quick-command-line-install), a free minimal installer for conda.
 
-To install the `ensemblify` package, you can follow these commands:
+To install the `ensemblify` Python package, you can follow these commands:
 
-1. Choose your current working directory, where the `ensemblify` package will be installed. If you prefer, in your home directory you can create a new directory dedicated to the ensemblify installation and navigate into it by running:
+1. Get the `ensemblify` source code. To do this you can either clone this repository using git:
+
+    - Install Git if you haven't already:
+      - On LINUX: `sudo apt-get install git`
+      - On macOS: Install Xcode Command Line Tools or use Homebrew: `brew install git`
+
+    - Clone this repository:
+
+      ```bash
+      git clone https://github.com/npfernandes/ensemblify.git
+      cd ensemblify_main
+      ```
+
+    or download this repository and extract the `ensemblify` source-code:
+
+      ```bash
+      wget https://github.com/npfernandes/ensemblify/archive/refs/heads/main.zip
+      unzip main.zip
+      cd ensemblify_main
+      ```
+
+<!-- 1. Choose your current working directory, where the `ensemblify` package will be installed. If you prefer, in your home directory you can create a new directory dedicated to the ensemblify installation and navigate into it by running:
 
     ```bash
     mkdir -p ~/ensemblify_installation
@@ -57,25 +78,26 @@ To install the `ensemblify` package, you can follow these commands:
     ```bash
     wget https://github.com/npfernandes/ensemblify/archive/refs/heads/main.zip
     unzip main.zip
-    ```
+    cd ensemblify_main
+    ``` -->
 
-3. Create your `ensemblify_env` [Conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) with all of Ensemblify's python dependencies installed by using the provided [environment file](environment.yml) (recommended):
+2. Create your `ensemblify_env` [Conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) with all of Ensemblify's python dependencies installed by using the provided [environment file](environment.yml) (recommended):
 
     ```bash
     cd ensemblify_main
     conda env create -f environment.yml
     ```
 
-    or by creating the environment and installing the necessary python packages directly (not recommended):
+    or by creating the environment and installing the necessary python packages manually (not recommended):
 
     ```bash
-    conda env create --name ensemblify_env
+    conda env create --name ensemblify_env python=3.10
     conda activate ensemblify_env
-    conda install --channel=conda-forge biopython contact_map MDAnalysis mdtraj numpy pandas plotly pyyaml scikit-sklearn scipy tqdm
-    pip install ray["default"]
+    conda install --channel=conda-forge biopython=1.81 MDAnalysis=2.6.1 mdtraj=1.9.9 numpy=1.26.4 pandas=2.2.2 plotly=5.19.0 pyyaml=6.0.1 scikit-sklearn=1.4.2 scipy=1.12.0 tqdm=4.66.2
+    pip install ray["default"]=2.33.0
     ```
 
-4. Install the `ensemblify` python package into your newly created environment.
+3. Install the `ensemblify` python package into your newly created environment.
 
     ```bash
     conda activate ensemblify_env
@@ -166,9 +188,10 @@ For UNIX or Linux users:
 1. Navigate to where the FASPR source code is located:
 
     ```bash
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
+    conda activate ensemblify_env
+    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/
+     # cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
     ```
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/ -->
 
 2. Compile the FASPR source code:
 
@@ -176,21 +199,26 @@ For UNIX or Linux users:
     g++ -O3 --fast-math -o FASPR src/*.cpp
     ```
 
-3. If you are using a bash shell, you can register `faspr` as an alias for your FASPR executable by running:
+3. You can add an environment variable with the path to your FASPR executable to your shell configuration file by running:
 
     ```bash
-    echo "alias faspr='$(realpath FASPR)'" >> ~/.bashrc
-    source ~/.bashrc
+    echo "export FASPR_PATH='$(realpath FASPR)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
+    source ~/.bashrc # Or ~/.zshrc, depending on the shell
+    echo $FASPR_PATH # to check if the variable has been set correctly
     ```
+
+    this will allow Ensemblify to know where your FASPR executable is located.
 
 For MacOS users:
 
 1. Navigate to where the FASPR source code is located:
 
     ```bash
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
+    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/
+     # cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
     ```
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/ -->
+
+    ```
 
 2. Compile the FASPR source code:
 
@@ -204,12 +232,16 @@ For MacOS users:
     g++ -03 -o FASPR src/*.cpp
     ```
 
-3. If you are using a bash shell, you can register `faspr` as an alias for your FASPR executable by running:
+3. Add an environment variable with the path to your FASPR executable to your shell configuration file by running:
 
     ```bash
-    echo "alias faspr='$(realpath FASPR)'" >> ~/.bashrc
-    source ~/.bashrc
+    echo "export FASPR_PATH='$(realpath FASPR)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
+    source ~/.bashrc # Or ~/.zshrc, depending on the shell
+    echo $FASPR_PATH # to check if the variable has been set correctly
     ```
+
+    this will allow Ensemblify to know where your FASPR executable is located.
+
 </details>
 
 <details>  
@@ -224,9 +256,9 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
 1. Navigate to where the PULCHRA source code is located:
 
     ```bash
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/pulchra-master/
+    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/pulchra-master/
+     # cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/pulchra-master/
     ```
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/pulchra-master/ -->
 
 2. Compile the PULCHRA source code:
 
@@ -235,12 +267,16 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
     ```
     Do not be alarmed if some warnings show up on your screen; this is normal and they can be ignored.
 
-3. If you are using a bash shell, you can register `pulchra` as an alias for your PULCHRA executable by running:
+3. Add an environment variable with the path to your PULCHRA executable to your shell configuration file by running:
 
     ```bash
-    echo "alias pulchra='$(realpath pulchra)'" >> ~/.bashrc
-    source ~/.bashrc
+    echo "export PULCHRA_PATH='$(realpath pulchra)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
+    source ~/.bashrc # Or ~/.zshrc, depending on the shell
+    echo $PULCHRA_PATH # to check if the variable has been set correctly
     ```
+
+    this will allow Ensemblify to know where your PULCHRA executable is located.
+
 </details>
 
 <details>  
@@ -284,6 +320,8 @@ To download and compile the GROMACS source code from their [website](https://ftp
     source /usr/local/gromacs/bin/GMXRC
     ```
 
+    environment variables that will allow Ensemblify to know where GROMACS is located will have already been added to your shell configuration file.
+
 </details>
 
 <details>  
@@ -315,12 +353,15 @@ For UNIX or Linux users:
     unzip Pepsi-SAXS-Linux.zip
     ```
 
-3. If you are using a bash shell, you can register `pepsisaxs` as an alias for your Pepsi-SAXS executable by running:
+3. Add an environment variable with the path to your Pepsi-SAXS executable to your shell configuration file by running:
 
     ```bash
-    echo "alias pepsisaxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
-    source ~/.bashrc
+    echo "export PEPSI_SAXS_PATH='$(realpath Pepsi-SAXS)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
+    source ~/.bashrc # Or ~/.zshrc, depending on the shell
+    echo $PEPSI_SAXS_PATH # to check if the variable has been set correctly
     ```
+
+    this will allow Ensemblify to know where your Pepsi-SAXS executable is located.
 
 For MacOS users:
 
@@ -340,12 +381,16 @@ For MacOS users:
     unzip Pepsi-SAXS-MacOS.zip
     ```
 
-3. If you are using a bash shell, you can register `pepsisaxs` as an alias for your Pepsi-SAXS executable by running:
+3. Add an environment variable with the path to your Pepsi-SAXS executable to your shell configuration file by running:
 
     ```bash
-    echo "alias pepsisaxs='$(realpath Pepsi-SAXS)'" >> ~/.bashrc
-    source ~/.bashrc
+    echo "export PEPSI_SAXS_PATH='$(realpath Pepsi-SAXS)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
+    source ~/.bashrc # Or ~/.zshrc, depending on the shell
+    echo $PEPSI_SAXS_PATH # to check if the variable has been set correctly
     ```
+
+    this will allow Ensemblify to know where your Pepsi-SAXS executable is located.
+
 </details>
 
 <details>  
@@ -362,9 +407,9 @@ To compile the provided BIFT source code, you can follow these commands:
 1. Navigate to where the BIFT source code is located:
     
     ```bash
-    cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/BIFT/
+    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/BIFT/
+     # cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/BIFT/
     ```
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/BIFT/ -->
 
 2. Compile the BIFT source code:
 
@@ -373,12 +418,16 @@ To compile the provided BIFT source code, you can follow these commands:
     ```
     the `-march=native` flag may be replaced with `-m64` or `-m32`, and it may be necessary to include the `-static` flag depending on which system you are on.
 
-3. If you are using a bash shell, you can register `bift` as an alias for your bift executable by running:
+3. Add an environment variable with the path to your BIFT executable to your shell configuration file by running:
 
     ```bash
-    echo "alias bift='$(realpath bift)'" >> ~/.bashrc
-    source ~/.bashrc
+    echo "export BIFT_PATH='$(realpath bift)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
+    source ~/.bashrc # Or ~/.zshrc, depending on the shell
+    echo $BIFT_PATH # to check if the variable has been set correctly
     ```
+
+    this will allow Ensemblify to know where your BIFT executable is located.
+
 </details>
 </details>
 
@@ -539,7 +588,7 @@ Using the `ensemblify` command in a terminal:
 Inside a Python script or Jupyter Notebook:
 
     import ensemblify as ey
-    ey.reweigh_ensemble('trajectory.xtc','topology.pdb','trajectory_name','experimental_SAXS_data.dat')
+    ey.reweight_ensemble('trajectory.xtc','topology.pdb','trajectory_name','experimental_SAXS_data.dat')
 
 Check the interactive notebook for detailed usage examples: 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/05_reweighting_module.ipynb)

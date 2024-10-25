@@ -13,7 +13,8 @@ For the full version, please refer to the source link provided above.
 
 License:
 ---------
-This software is distributed under the MIT License, detailed in the ./BIFT/LICENCE file.
+This software is distributed under the GNU General Public License, as detailed in the ./BIFT/LICENCE
+file.
 
 Modifications:
 --------------

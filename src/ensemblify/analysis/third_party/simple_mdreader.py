@@ -1,24 +1,6 @@
 """
-Third-Party Software Notice
-
-The ./mdreader-master directory contains all files from the mdreader software distribution.
-Source: https://github.com/mnmelo/MDreader
-
-License:
----------
-This software is distributed under the GNU Public License, detailed in the 
-./mdreader-master/LICENSE file.
-
-Modifications:
---------------
-The simple_mdreader.py file is a modified version of the original source code file
-./mdreader-master/mdreader.py, and contains a modified version of the original MDReader class,
-SimpleMDReader. The main changes made consisted in removing functionalities that were not used
-through Ensemblify, updating compatibility with recent versions of numpy, removing support for
-Python versions <=2.7 and documenting and styling the code to be consistent with the rest of 
-Ensemblify's source code. The functionality of the code remained essentially the same, so any
-novel or interesting code implementations spotted can be fully attributed to MDReader's original
-creator, Manuel M. Melo.
+The code below was adapted from https://github.com/mnmelo/MDreader.
+See the THIRD_PARTY_NOTICE_mdreader.txt file for more details.
 """
 # IMPORTS
 ## Standard Library Imports

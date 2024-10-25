@@ -1,3 +1,13 @@
+"""
+The code below was adapted from https://github.com/KULL-Centre/BME.
+See the THIRD_PARTY_NOTICE_BME.txt file for more details.
+
+Reference:
+    S. Bottaro , T. Bengsten and K. Lindorff-Larsen, "Integrating Molecular Simulation and
+    Experimental Data: A Bayesian/Maximum Entropy Reweighting Approach," pp. 219-240, Feb.
+    2020. In: Z. Gáspári, (eds) *Structural Bioinformatics*, *Methods in Molecular Biology*,
+    vol. 2112, Humana, New York, NY. (https://doi.org/10.1007/978-1-0716-0270-6_15)
+"""
 # IMPORTS
 ## Standard Library Imports
 import sys

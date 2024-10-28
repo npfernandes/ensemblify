@@ -101,7 +101,7 @@ To install the `ensemblify` Python package, you can follow these commands:
 
     ```bash
     conda activate ensemblify_env
-    pip install -e .
+    pip install .
     ```
 
 <!-- If you want to create a new `ensemblify_env` environment with Ensemblify and all its necessary python dependencies already installed you can use the provided conda environment file by running:

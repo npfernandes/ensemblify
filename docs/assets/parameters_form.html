@@ -270,12 +270,6 @@
         </div>
         <input type="text" id="outputPath" placeholder="Path to output directory" required><br>
     
-        <h2>FASPR Path*</h2>
-        <input type="text" id="fasprPath" placeholder="Path to FASPR executable" required><br>
-    
-        <h2>Pulchra Path*</h2>
-        <input type="text" id="pulchraPath" placeholder="Path to Pulchra (changed version) executable" required><br>
-
         <h2>AlphaFold</h2>&nbsp;
         <div class="tooltip-icon">&#9432;
           <span class="tooltip-text">
@@ -348,6 +342,12 @@
         
         <div id="advancedParametersContainer" style="display: none;">  
           <br>
+          <h2>FASPR Path</h2>
+          <input type="text" id="fasprPath" placeholder="Path to FASPR executable"><br>
+      
+          <h2>Pulchra Path</h2>
+          <input type="text" id="pulchraPath" placeholder="Path to Pulchra (changed version) executable"><br>
+
           <h2>Core amount</h2>
           <input type="number" id="cores" min="1" max="32" placeholder="Number of processor cores to use. Defaults to all cores in machine minus 1"><br>
           

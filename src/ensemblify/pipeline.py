@@ -12,7 +12,7 @@ import ensemblify as ey
 def ensemblify_pipeline(
     parameters: str,
     analysis: bool = True,
-    exp_saxs_data: str | None = None):
+    exp_data: str | None = None):
     """Function that uses all the functionalities of the ensemblify Python library. Consists of
     4 main steps: Ensemble Generation, Trajectory Creation, Trajectory Analysis and Ensemble
     Reweighting.
@@ -23,7 +23,7 @@ def ensemblify_pipeline(
         analysis:
             whether to perform the analysis of the ensemble. Defaults to True.
         exp_saxs_data:
-            path to a .dat file with experimental SAXS data of the protein being ensembled.
+            path to a .dat file with experimental SAXS data of the protein being ensemblified.
             If given, reweighting of the generated ensemble will be performed based on this data.
             Defaults to None.
     """
@@ -66,23 +66,23 @@ def ensemblify_pipeline(
     # Analyze trajectory
     if analysis:
         start = timer()
-        structural_metrics_data = ey.analyze_trajectory(trajectory_ids=[JOB_NAME],
-                                                        trajectories=[trajectory_path],
-                                                        topologies=[topology_path],
+        structural_metrics_data = ey.analyze_trajectory(trajectory_ids=JOB_NAME,
+                                                        trajectories=trajectory_path,
+                                                        topologies=topology_path,
                                                         output_directory=ANALYSIS_DIR)
         end = timer()
         print((f' ----------------- Trajectory Analysis took: {round(end-start,3)} s '
                 '-----------------'))
 
         # Reweigh ensemble with exp data
-        if exp_saxs_data is not None:
+        if exp_data is not None:
             start = timer()
-            ey.reweigh_ensemble(trajectory_id=JOB_NAME,
-                                trajectory=trajectory_path,
-                                topology=topology_path,
-                                exp_saxs_data=exp_saxs_data,
-                                output_dir=REWEIGHTING_DIR,
-                                calculated_metrics_data=structural_metrics_data)
+            ey.reweight_ensemble(trajectory_id=JOB_NAME,
+                                 trajectory=trajectory_path,
+                                 topology=topology_path,
+                                 exp_saxs_data=exp_data,
+                                 output_dir=REWEIGHTING_DIR,
+                                 calculated_metrics_data=structural_metrics_data)
             end = timer()
             print((f' ----------------- Ensemble Reweighting took: {round(end-start,3)} s '
                     '-----------------'))

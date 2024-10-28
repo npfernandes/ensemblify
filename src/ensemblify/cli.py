@@ -14,7 +14,7 @@ Run \'ensemblify help\' for more information.
 '''
 
 ENSEMBLIFY_HELP_MSG = '''
-usage: ensemblify {generation,conversion,analysis,reweighting,clash_checking,help} [module options]
+usage: ensemblify {generation,conversion,analysis,reweighting,clash_checking,pipeline,help} [module options]
 
 Command-line tool to access the modules of the Ensemblify Python library.
 
@@ -26,6 +26,7 @@ positional arguments:
     analysis (a, ana)          Access the analysis module.
     reweighting (r, rew)       Access the reweighting module.
     clash_checking (cch)       Access the clash checking module.
+    pipeline (pip)             Access the pipeline module.
 
 '''
 
@@ -89,7 +90,7 @@ class CustomHelpFormatter(argparse.HelpFormatter):
         for subaction in self._iter_indented_subactions(action):
             parts.append(self._format_action(subaction))
 
-        if action_header.endswith(('gen)\n','con)\n','ana)\n','rew)\n')):
+        if action_header.endswith(('gen)\n','con)\n','ana)\n','rew)\n','cch)\n','pip)\n')):
             metavar_msg = '    ' + parts[0].strip()
             help_msg = parts[1].lstrip()
 
@@ -113,7 +114,8 @@ def main():
                                                           'modules of the Ensemblify Python '
                                                           'library.'),
                                              usage=('ensemblify {generation,conversion,analysis,'
-                                                    'reweighting,clash_checking} [module options]'),
+                                                    'reweighting,clash_checking,pipeline}'
+                                                    ' [module options]'),
                                              add_help=False) # required
 
     initial_parser.add_argument('module', choices=['generation', 'g', 'gen',
@@ -121,6 +123,7 @@ def main():
                                                    'analysis', 'a', 'ana',
                                                    'reweighting', 'r', 'rew',
                                                    'clash_checking', 'cch',
+                                                   'pipeline', 'pip',
                                                    'h', 'help'])
 
     # Print error message if no arguments are provided
@@ -145,6 +148,28 @@ def main():
     # Expose the help option since initial parser has no help menu
     subparsers.add_parser(name='help',
                           aliases=['h'])
+
+    # Subparser for the 'pipeline' module with aliases
+    parser_pipeline = subparsers.add_parser(name='pipeline',
+                                            help='Access the pipeline module',
+                                            aliases=['pip'],
+                                            usage='ensemblify {pipeline,pip} [options]',
+                                            description=('The pipeline module of the '
+                                                         'Ensemblify Python library.'),
+                                            formatter_class=CustomHelpFormatter)
+
+    parser_pipeline.add_argument('-p', '--parameters',
+                                 type=str, required=True, metavar='',
+                                 help='Path to parameters file (.yaml).')
+
+    parser_pipeline.add_argument('-a', '--analysis',
+                                 action='store_true', default=True, type=str, metavar='',
+                                 help=('(Optional) Whether to perform the analysis of the '
+                                       'ensemble. Defaults to True.'))
+    
+    parser_pipeline.add_argument('-e', '--expdata',
+                                 default=None, type=str, metavar='',
+                                 help=('(Optional) Path to experimental SAXS data file (.dat).'))
 
     # Subparser for the 'clash_checking' module with aliases
     parser_clash_check = subparsers.add_parser(name='clash_checking',
@@ -308,6 +333,16 @@ def main():
     # Handle the different modules based on the parsed arguments
     if full_args.module in ['help','h']:
         print(ENSEMBLIFY_HELP_MSG)
+
+    elif full_args.module in ['pipeline','pip']:
+        # from ensemblify.pipeline import ensemblify_pipeline
+        # ensemblify_pipeline(parameters=full_args.parameters,
+        #                     analysis=full_args.analysis,
+        #                     exp_data=full_args.expdata)
+
+        print(full_args.parameters)
+        print(full_args.analysis)
+        print(full_args.expdata)
 
     elif full_args.module in ['clash_checking', 'cch']:
         # from ensemblify.clash_checking import check_steric_clashes

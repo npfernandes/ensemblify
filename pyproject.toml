@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "ensemblify"
 version = "1.0.0"
 authors = [
-  { name="Nuno Fernandes", email="nmpfernandes@itqb.unl.pt" },
+  { name="Nuno P. Fernandes", email="nmpfernandes@itqb.unl.pt" },
 ]
 description = "A Python package for generating ensembles of intrinsically disordered regions of AlphaFold or user defined models."
 readme = "README.md"

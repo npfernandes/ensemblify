@@ -10,6 +10,7 @@ from concurrent.futures import ProcessPoolExecutor
 from subprocess import CalledProcessError
 
 ## Third Party Imports
+import yaml
 from tqdm import tqdm
 
 ## Local Imports
@@ -163,7 +164,7 @@ def check_report_pdb_clashes(
 
 def check_steric_clashes(
     ensemble_dir: str,
-    sampling_targets: dict[str,tuple[tuple[str,tuple[int,...],str,str]]] | None = None,
+    sampling_targets: str | dict[str,tuple[tuple[str,tuple[int,...],str,str]]] | None = None,
     input_structure: str | None = None,
 ) -> tuple[str,str]:
     """Check a generated ensemble for steric clashes, outputting clash reports.
@@ -175,8 +176,10 @@ def check_steric_clashes(
         ensemble_dir:
             path to directory where ensemble .pdb structures are stored.
         sampling_targets:
-            mapping of chains to sampled regions following Ensemblify parameters style. If
-            provided, clashes are only checked for in these regions. Defaults to None.
+            mapping of chains to sampled regions following Ensemblify parameters style or path to
+            this mapping in .yaml format. If a path is provided, it can either be solely the
+            mapping or a full Ensemblify parameters file. If provided, clashes are only checked
+            for in these regions. Defaults to None.
         input_structure:
             path to input structure used to generate the ensemble. If provided, steric clashes
             present in this structure (only in sampled regions, if sampling targets is provided)
@@ -191,6 +194,17 @@ def check_steric_clashes(
                 path to file with detailed ensemble clash report, i.e. how many clashes were
                 detected in each structure and the atoms involved in the detected clash.
     """
+    # Setup sampling targets
+    if isinstance(sampling_targets,str):
+        with open(sampling_targets,'r',encoding='utf-8-sig') as smp_targets_file:
+            content = yaml.safe_load(smp_targets_file)
+            try:
+                smp_targets = content['sampling_targets']
+            except KeyError:
+                smp_targets = content
+    else:
+        smp_targets = sampling_targets
+
     # Create clash checking directory
     clash_checking_directory = os.path.join(ensemble_dir,'clash_checking')
     if not os.path.isdir(clash_checking_directory):
@@ -205,7 +219,7 @@ def check_steric_clashes(
     clash_report_detailed = os.path.join(clash_checking_directory,'clash_report_detailed.txt')
 
     # Setup multiprocessing variables
-    sampling_targets_all = [sampling_targets] * ensemble_size
+    sampling_targets_all = [smp_targets] * ensemble_size
     if input_structure is not None:
         input_processing_directory = os.path.join(clash_checking_directory,'input_processing')
         if not os.path.isdir(input_processing_directory):

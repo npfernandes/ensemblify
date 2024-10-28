@@ -19,9 +19,9 @@ GLOBAL_CONFIG = {
                                'FRAG': 'FRAG'},
     'ALPHA_HELIX_CANON': (-57,-47), # (Phi,Psi); Lehninger principles of biochemistry (2021)
     'BETA_STRAND_CANON': (-135,135), # (Phi,Psi); Wikipedia Beta strand # FIXME
-    'FASPR_PATH': os.environ['FASPR_PATH'], # get faspr environment variable
-    'PULCHRA_PATH': os.environ['PULCHRA_PATH'], # get pulchra environment variable
-    'PEPSI_SAXS_PATH': os.environ['PEPSI_SAXS_PATH'], # get pepsi-saxs environment variable
+    'FASPR_PATH': os.environ.get('FASPR_PATH'), # get faspr environment variable
+    'PULCHRA_PATH': os.environ.get('PULCHRA_PATH'), # get pulchra environment variable
+    'PEPSI_SAXS_PATH': os.environ.get('PEPSI_SAXS_PATH'), # get pepsi-saxs environment variable
     'BIFT_PATH': os.environ.get('BIFT_PATH'), # get bift environment variable (optional)
     'PLOTLY_DISPLAY_CONFIG': {'displaylogo': False,
                               'toImageButtonOptions': {'format': 'svg', # defaults to svg download

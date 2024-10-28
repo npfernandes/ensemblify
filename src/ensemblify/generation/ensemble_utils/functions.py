@@ -3,6 +3,7 @@
 # IMPORTS
 ## Standard Library Imports
 import json
+import re
 from copy import deepcopy
 from typing import Optional, Union
 
@@ -238,20 +239,40 @@ def get_targets_from_plddt(parameters: dict) -> dict[str,list[int]]:
 
 
 def setup_pose(input_structure: str) -> pyrosetta.rosetta.core.pose.Pose:
-    """Initialize a Pose object from a sequence or a PDB file.
+    """Initialize a Pose object from a sequence, a .txt file containing the sequence, a PDB file
+    or from a UniProt Accession ID.
      
-    The created Pose object is changed to 'centroid' configuration.
+    The created Pose object is then changed to 'centroid' configuration.
 
     Args:
         input_structure:
-            filepath to the input .pdb structure or .txt sequence.
+            filepath to the input .pdb structure or .txt sequence, the actual sequence string or
+            a UniProt Accession ID.
 
     Returns:
         initial_pose (pyrosetta.rosetta.core.pose.Pose):
             our initial Pose for sampling.
     """
-    # Returns PackedPose so we need to convert to Pose
-    initial_pose = io.to_pose(io.pose_from_file(input_structure))
+    initial_pose = None
+    if input_structure.endswith('.pdb'):
+        # Returns PackedPose so we need to convert to Pose
+        initial_pose = io.to_pose(io.pose_from_file(input_structure))
+
+    elif input_structure.endswith('.txt'):
+        with open(input_structure,'r',encoding='utf-8') as input_sequence:
+            # Returns PackedPose so we need to convert to Pose
+            initial_pose = io.to_pose(io.pose_from_sequence(input_sequence.read()))
+
+    else:
+        uniprotid_pattern = re.compile(r'[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}')
+        uniprotid_match = re.match(uniprotid_pattern,input_structure)
+        if uniprotid_match is not None:
+            # AFDB CODE # TODO
+            pass
+        else:
+            initial_pose = io.to_pose(io.pose_from_sequence(input_structure))
+
+    assert initial_pose is not None, 'Invalid input structure!'
 
     # Swap to centroid conformation
     SwitchResidueTypeSetMover('centroid').apply(initial_pose)

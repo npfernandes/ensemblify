@@ -199,7 +199,7 @@ def check_steric_clashes(
         with open(sampling_targets,'r',encoding='utf-8-sig') as smp_targets_file:
             content = yaml.safe_load(smp_targets_file)
             try:
-                smp_targets = content['sampling_targets']
+                smp_targets = content['targets']
             except KeyError:
                 smp_targets = content
     else:

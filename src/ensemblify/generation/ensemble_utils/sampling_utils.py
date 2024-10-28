@@ -155,10 +155,8 @@ def setup_sampling_parameters(
         prepared_parameters:
             the updated params dictionary.
     """
-    with open(parameters_file,'r',encoding='utf-8-sig') as f:
-        document = f.read()
-    params = yaml.safe_load(document)
-    prepared_parameters = deepcopy(params)
+    with open(parameters_file,'r',encoding='utf-8-sig') as document:
+        prepared_parameters = yaml.safe_load(document)
 
     if prepared_parameters['alphafold']:
         # Get list of target residues considering pldTT threshold

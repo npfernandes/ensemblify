@@ -274,13 +274,6 @@
         <input type="text" id="fasprPath" placeholder="Path to FASPR executable" required><br>
     
         <h2>Pulchra Path*</h2>
-        <div class="tooltip-icon">&#9432;
-          <span class="tooltip-text">
-            To change PULCHRA 3.07 to the required version, add:<br>
-            display_conflicts(res, grid, xgrid, ygrid, zgrid);<br>
-            in line 3015 of pulchra.c and recompile the tool.
-          </span>
-        </div>
         <input type="text" id="pulchraPath" placeholder="Path to Pulchra (changed version) executable" required><br>
 
         <h2>AlphaFold</h2>&nbsp;
@@ -487,7 +480,7 @@
               <span class="tooltip-text">
                 If residue's pLDDT is below threshold,<br>
                 sample them only if they make up a<br>
-                contigous region of at least this size.
+                contiguous region of at least this size.
               </span>
             </div>
           </fieldset>
@@ -722,6 +715,8 @@
       
       <label>Residue Range:</label>
       <input type="text" class="inputResidueRange1" placeholder="[50,100]">
+      
+      &nbsp;>|<&nbsp;
       
       <label>Chain:</label>
       <input type="text" class="inputChain2" placeholder=" B">

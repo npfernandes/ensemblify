@@ -185,21 +185,27 @@ FASPR is an ultra-fast and accurate program for deterministic protein sidechain 
 
 For UNIX or Linux users:
 
-1. Navigate to where the FASPR source code is located:
+1. Activate your `ensemblify_env` conda environment:
+
+    ```bash
+    conda activate ensemblify_env
+    ```
+    If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
+
+2. Navigate to where the FASPR source code is located:
 
     ```bash
     conda activate ensemblify_env
     cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/
-     # cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
     ```
 
-2. Compile the FASPR source code:
+3. Compile the FASPR source code:
 
     ```bash
     g++ -O3 --fast-math -o FASPR src/*.cpp
     ```
 
-3. You can add an environment variable with the path to your FASPR executable to your shell configuration file by running:
+4. You can add an environment variable with the path to your FASPR executable to your shell configuration file by running:
 
     ```bash
     echo "export FASPR_PATH='$(realpath FASPR)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
@@ -211,16 +217,20 @@ For UNIX or Linux users:
 
 For MacOS users:
 
-1. Navigate to where the FASPR source code is located:
+1. Activate your `ensemblify_env` conda environment:
+
+    ```bash
+    conda activate ensemblify_env
+    ```
+    If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
+
+2. Navigate to where the FASPR source code is located:
 
     ```bash
     cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/
-     # cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/FASPR-master/
     ```
 
-    ```
-
-2. Compile the FASPR source code:
+3. Compile the FASPR source code:
 
     ```bash
     g++ -03 -fast-math -o FASPR src/*.cpp
@@ -232,7 +242,7 @@ For MacOS users:
     g++ -03 -o FASPR src/*.cpp
     ```
 
-3. Add an environment variable with the path to your FASPR executable to your shell configuration file by running:
+4. Add an environment variable with the path to your FASPR executable to your shell configuration file by running:
 
     ```bash
     echo "export FASPR_PATH='$(realpath FASPR)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
@@ -253,21 +263,27 @@ For MacOS users:
 
 PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing full-atom protein models from reduced representations [[4]](#ref4). To compile the provided PULCHRA modified source-code, you can follow these commands:
 
-1. Navigate to where the PULCHRA source code is located:
+1. Activate your `ensemblify_env` conda environment:
+
+    ```bash
+    conda activate ensemblify_env
+    ```
+    If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
+
+2. Navigate to where the PULCHRA source code is located:
 
     ```bash
     cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/pulchra-master/
-     # cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/pulchra-master/
     ```
 
-2. Compile the PULCHRA source code:
+3. Compile the PULCHRA source code:
 
     ```bash
     cc -O3 -o pulchra pulchra_CHANGED.c pulchra_data.c -lm
     ```
     Do not be alarmed if some warnings show up on your screen; this is normal and they can be ignored.
 
-3. Add an environment variable with the path to your PULCHRA executable to your shell configuration file by running:
+4. Add an environment variable with the path to your PULCHRA executable to your shell configuration file by running:
 
     ```bash
     echo "export PULCHRA_PATH='$(realpath pulchra)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
@@ -297,8 +313,6 @@ To download and compile the GROMACS source code from their [website](https://ftp
     mkdir -p ~/software/GROMACS
     cd ~/software/GROMACS
     ```
-<!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/GROMACS/ -->
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/GROMACS/ -->
 
 2. Download the GROMACS source code from their website:
 
@@ -343,8 +357,6 @@ For UNIX or Linux users:
     mkdir -p ~/software/Pepsi-SAXS/
     cd ~/software/Pepsi-SAXS/
     ```
-<!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/ -->
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/Linux_3.0/ -->
 
 2. Download and extract the Pepsi-SAXS Linux executable:
 
@@ -371,8 +383,6 @@ For MacOS users:
     mkdir -p ~/software/Pepsi-SAXS/
     cd ~/software/Pepsi-SAXS/
     ```
-<!-- mkdir $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/ -->
-<!-- cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/Pepsi-SAXS/MacOS_2.6/ -->
 
 2. Download and extract the Pepsi-SAXS MacOS executable:
 
@@ -404,21 +414,27 @@ Bayesian indirect Fourier transformation (BIFT) of small-angle experimental data
 
 To compile the provided BIFT source code, you can follow these commands:
 
-1. Navigate to where the BIFT source code is located:
+1. Activate your `ensemblify_env` conda environment:
+
+    ```bash
+    conda activate ensemblify_env
+    ```
+    If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
+
+2. Navigate to where the BIFT source code is located:
     
     ```bash
     cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/BIFT/
-     # cd ~/ensemblify_installation/ensemblify-main/src/ensemblify/third_party/BIFT/
     ```
 
-2. Compile the BIFT source code:
+3. Compile the BIFT source code:
 
     ```bash
     gfortran -march=native -O3 bift.f -o bift
     ```
     the `-march=native` flag may be replaced with `-m64` or `-m32`, and it may be necessary to include the `-static` flag depending on which system you are on.
 
-3. Add an environment variable with the path to your BIFT executable to your shell configuration file by running:
+4. Add an environment variable with the path to your BIFT executable to your shell configuration file by running:
 
     ```bash
     echo "export BIFT_PATH='$(realpath bift)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell

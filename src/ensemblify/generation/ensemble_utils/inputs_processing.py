@@ -17,14 +17,57 @@ from ensemblify.generation.ensemble_utils.pdb_processing import (
 )
 from ensemblify.utils import df_from_pdb, df_to_pdb
 
-# CUSTOM EXCEPTIONS
-class InvalidParameterType(Exception):
-    """The given type is invalid for this parameter."""
-    pass
+# CONSTANTS
+VALID_PARAMS_TYPES = {
+    'job_name' : str,
+    'sequence' : str,
+    'alphafold' : bool,
+    'pae': str,
+    'size' : int,
+    'databases' : dict,
+    'targets' : dict,
+    'restraints' : dict,
+    'core_amount' : int,
+    'output_path' : str,
+    'faspr_path' : str,
+    'pulchra_path' : str,
+    'scorefxn': dict,
+    'minimizer' : dict,
+    'sampler_params' : dict,
+    'constraints' : dict,
+    'constraints_violation': dict,
+    'plddt_params': dict,
+    'pae_params': dict
+}
 
-class EmptyParameter(Exception):
-    """This parameter cannot be empty."""
-    pass
+ADVANCED_PARAMS_DEFAULTS = {
+    'alphafold': False,
+    'pae': None,
+    'restraints': {'ss_bias': None,
+                    'contacts': None},
+    'core_amount': os.cpu_count() - 1, 
+    'output_path': os.getcwd(),
+    'scorefxn': {'id': 'score0',
+                    'weight': 1.0},
+    'minimizer': {'id': 'dfpmin_armijo_nonmonotone',
+                    'tolerance': 0.001,
+                    'max_iters': 5000,
+                    'finalcycles': 5},
+    'constraints': {'weight': 1.0,
+                    'stdev': 10.0,
+                    'tolerance': 0.001},
+    'constraints_violation': {'threshold': 0.015,
+                                'maxres': 20},
+    'plddt_params': {'threshold': 70,
+                        'contiguous_res': 4},
+    'pae_params': {'cutoff': 10.0,
+                    'flatten_cutoff': 10.0,
+                    'flatten_value': 10.0,
+                    'weight': 1.0,
+                    'tolerance': 0.001,
+                    'adjacency_threshold': 8,
+                    'plddt_scaling_factor': 1.0}
+}
 
 # FUNCTIONS
 def process_input_pdb(
@@ -156,7 +199,7 @@ def setup_ensemble_gen_params(input_params: dict, inputs_dir: str) -> tuple[str,
             parameters following the Ensemblify template.
         inputs_dir:
             path to directory where files and .logs resulting from input processing will be stored.
-    
+
     Returns:
         A tuple (processed_parameters_path, input_clashes) where:
             processed_parameters_path:
@@ -213,61 +256,11 @@ def read_input_parameters(parameter_path: str) -> dict:
             filepath to the parameter .yaml file.
 
     Returns:
-        validated_params:
+        params:
             dictionary with all the parameters validated for correct python types.
     """
-    VALID_PARAMS_TYPES = {
-        'job_name' : str,
-        'sequence' : str,
-        'alphafold' : bool,
-        'pae': str,
-        'size' : int,
-        'databases' : dict,
-        'targets' : dict,
-        'restraints' : dict,
-        'core_amount' : int,
-        'output_path' : str,
-        'faspr_path' : str,
-        'pulchra_path' : str,
-        'scorefxn': dict,
-        'minimizer' : dict,
-        'sampler_params' : dict,
-        'constraints' : dict,
-        'constraints_violation': dict,
-        'plddt_params': dict,
-        'pae_params': dict
-    }
-
-    ADVANCED_PARAMS_DEFAULTS = {
-        'alphafold': False,
-        'pae': None,
-        'restraints': {'ss_bias': None,
-                       'contacts': None},
-        'core_amount': os.cpu_count() - 1, 
-        'output_path': os.getcwd(),
-        'scorefxn': {'id': 'score0',
-                     'weight': 1.0},
-        'minimizer': {'id': 'dfpmin_armijo_nonmonotone',
-                      'tolerance': 0.001,
-                      'max_iters': 5000,
-                      'finalcycles': 5},
-        'constraints': {'weight': 1.0,
-                        'stdev': 10.0,
-                        'tolerance': 0.001},
-        'constraints_violation': {'threshold': 0.015,
-                                  'maxres': 20},
-        'plddt_params': {'threshold': 70,
-                         'contiguous_res': 4},
-        'pae_params': {'cutoff': 10.0,
-                       'flatten_cutoff': 10.0,
-                       'flatten_value': 10.0,
-                       'weight': 1.0,
-                       'tolerance': 0.001,
-                       'adjacency_threshold': 8,
-                       'plddt_scaling_factor': 1.0}
-    }
-
-    params = yaml.safe_load(open(parameter_path,'r',encoding='utf-8-sig'))
+    with open(parameter_path,'r',encoding='utf-8-sig') as parameters_file:
+        params = yaml.safe_load(parameters_file)
 
     for key in params:
         # Check parameter types
@@ -275,9 +268,9 @@ def read_input_parameters(parameter_path: str) -> dict:
             try:
                 params[key] = ADVANCED_PARAMS_DEFAULTS[key]
             except KeyError as e:
-                raise EmptyParameter(f'{key} cannot be empty!') from e
+                raise AssertionError(f'{key} cannot be empty!') from e
         elif not isinstance(params[key],VALID_PARAMS_TYPES[key]):
-            raise InvalidParameterType(f'{key} must be of type {VALID_PARAMS_TYPES[key]} !')
+            raise AssertionError(f'{key} must be of type {VALID_PARAMS_TYPES[key]} !')
 
         # Always leave one core free
         elif key =='core_amount' and params[key] >= os.cpu_count():
@@ -287,123 +280,131 @@ def read_input_parameters(parameter_path: str) -> dict:
         elif key == 'databases':
             dbs = params[key]
             for db_id in dbs:
-                if not isinstance(dbs[db_id],str):
-                    raise InvalidParameterType('Database Path must be of type str !')
-                if not (dbs[db_id].endswith('.pkl') or
+                assert isinstance(dbs[db_id],str), 'Database Path must be of type str !'
+                assert (dbs[db_id].endswith('.pkl') or
                         dbs[db_id].endswith('.csv') or
-                        dbs[db_id].endswith('.h5')):
-                    raise InvalidParameterType('Database must be a .pkl, .csv or .h5 file!')
+                        dbs[db_id].endswith('.parquet')), ('Database must be a .pkl, '
+                                                           '.csv or .parquet file!')
 
         elif key == 'restraints':
             restraints = params[key]
             for restraint_id in restraints:
-                if (not isinstance(restraints[restraint_id],list) and
-                     restraints[restraint_id] is not None):
-                    raise InvalidParameterType('Restraints must be of type list !')
+                assert (isinstance(restraints[restraint_id],list) and
+                        restraints[restraint_id] is not None), 'Restraints must be of type list !'
 
         elif key == 'scorefxn':
             scorefxn_params = params[key]
-            if not isinstance(scorefxn_params,dict):
-                raise InvalidParameterType('Score function parameters must be of type dict!')
+            assert isinstance(scorefxn_params,dict), ('Score function parameters must be of '
+                                                      'type dict!')
             for scorefxn_param in scorefxn_params:
-                if (scorefxn_param == 'id' and
-                    not isinstance(scorefxn_params[scorefxn_param],str)):
-                    raise InvalidParameterType('Score function id must be of type str!')
-                elif (scorefxn_param == 'weight' and
-                      not isinstance(scorefxn_params[scorefxn_param],float)):
-                    raise InvalidParameterType('Score function weight must be of type float!')
+                if scorefxn_param == 'id':
+                    assert isinstance(scorefxn_params[scorefxn_param],str), ('Score function id '
+                                                                             'must be of type str!')
+                elif scorefxn_param == 'weight':
+                    assert isinstance(scorefxn_params[scorefxn_param],float), ('Score function '
+                                                                               'weight must be '
+                                                                               'of type float!')
 
         elif key == 'minimizer':
             minimizer_params = params[key]
-            if not isinstance(minimizer_params,dict):
-                raise InvalidParameterType('Minimizer parameters must be of type dict!')
+            assert isinstance(minimizer_params,dict), ('Minimizer parameters must '
+                                                       'be of type dict!')
             for minimizer_param in minimizer_params:
-                if (minimizer_param == 'id' and
-                    not isinstance(minimizer_params[minimizer_param],str)):
-                    raise InvalidParameterType('Minimizer id must be of type str!')
-                elif (minimizer_param == 'tolerance' and
-                      not isinstance(minimizer_params[minimizer_param],float)):
-                    raise InvalidParameterType('Minimizer tolerance must be of type float!')
-                elif (minimizer_param == 'max_iters' and
-                      not isinstance(minimizer_params[minimizer_param],int)):
-                    raise InvalidParameterType('Minimizer maximum iterations must be of type int!')
-                elif (minimizer_param == 'finalcycles' and
-                      not isinstance(minimizer_params[minimizer_param],int)):
-                    raise InvalidParameterType('Minimizer final cycles must be of type int!')
+                if minimizer_param == 'id':
+                    assert isinstance(minimizer_params[minimizer_param],str), ('Minimizer id must '
+                                                                               'be of type str!')
+                elif minimizer_param == 'tolerance':
+                    assert isinstance(minimizer_params[minimizer_param],float), ('Minimizer '
+                                                                                 'tolerance must '
+                                                                                 'be of type '
+                                                                                 'float!')
+                elif minimizer_param == 'max_iters':
+                    assert isinstance(minimizer_params[minimizer_param],int), ('Minimizer maximum '
+                                                                               'iterations must '
+                                                                               'be of type int!')
+                elif minimizer_param == 'finalcycles':
+                    assert isinstance(minimizer_params[minimizer_param],int), ('Minimizer final '
+                                                                               'cycles must be of '
+                                                                               'type int!')
 
         elif key == 'sampler_params':
             sampler_params = params[key]
             for sampler_id in sampler_params:
-                if not isinstance(sampler_params[sampler_id],dict):
-                    raise InvalidParameterType('Sampler Parameters must be of type dict !')
+                assert isinstance(sampler_params[sampler_id],dict), ('Sampler Parameters must be '
+                                                                     'of type dict !')
                 for smp_param_id in sampler_params[sampler_id]:
-                    if not isinstance(sampler_params[sampler_id][smp_param_id],int):
-                        raise InvalidParameterType('Sampler Parameters must be of type int !')
+                    assert isinstance(sampler_params[sampler_id][smp_param_id],int), ('Sampler '
+                                                                                      'Parameters '
+                                                                                      'must be of '
+                                                                                      'type int !')
 
         elif key == 'constraints':
             constraints_params = params[key]
-            if not isinstance(constraints_params,dict):
-                raise InvalidParameterType('Constraints parameters must be of type dict!')
+            assert isinstance(constraints_params,dict), ('Constraints parameters must be of '
+                                                         'type dict!')
             for constraints_param in constraints_params:
-                if (constraints_param == 'weight' and
-                    not isinstance(constraints_params[constraints_param],float)):
-                    raise InvalidParameterType('Constraints weight must be of type float!')
-                elif (constraints_param == 'stdev' and
-                      not isinstance(constraints_params[constraints_param],float)):
-                    raise InvalidParameterType('Constraints stdev must be of type float!')
-                elif (constraints_param == 'tolerance' and
-                      not isinstance(constraints_params[constraints_param],float)):
-                    raise InvalidParameterType('Constraints tolerance must be of type float!')
+                if constraints_param == 'weight':
+                    assert isinstance(constraints_params[constraints_param],float), ('Constraints '
+                                                                                     'weight must '
+                                                                                     'be of type '
+                                                                                     'float!')
+                elif constraints_param == 'stdev':
+                    assert isinstance(constraints_params[constraints_param],float), ('Constraints '
+                                                                                     'stdev must '
+                                                                                     'be of type '
+                                                                                     'float!')
+                elif constraints_param == 'tolerance':
+                    assert isinstance(constraints_params[constraints_param],float), ('Constraints '
+                                                                                     'tolerance '
+                                                                                     'must be of '
+                                                                                     'type float!')
 
         elif key == 'constraint_violation':
             constraint_violation_params = params[key]
-            if not isinstance(scorefxn_params,dict):
-                raise InvalidParameterType('Constraints violation parameters must be of type dict!')
+            assert isinstance(scorefxn_params,dict), ('Constraints violation parameters must be '
+                                                      'of type dict!')
             for constraint_violation_param in constraint_violation_params:
-                if (constraint_violation_param == 'threshold' and
-                    not isinstance(constraint_violation_params[constraint_violation_param],float)):
-                    raise InvalidParameterType('Constraints violation threshold\
-                                               must be of type float!')
-                elif (constraint_violation_param == 'maxres' and
-                      not isinstance(constraint_violation_params[constraint_violation_param],int)):
-                    raise InvalidParameterType('Constraints violation maximum residues\
-                                                must be of type int!')
+                if constraint_violation_param == 'threshold':
+                    assert isinstance(constraint_violation_params[constraint_violation_param],
+                                      float), ('Constraints violation threshold must be of type '
+                                               'float!')
+                elif constraint_violation_param == 'maxres':
+                    assert isinstance(constraint_violation_params[constraint_violation_param],
+                                      int), ('Constraints violation maximum residues must be of '
+                                             'type int!')
 
         elif key == 'plddt_params':
             plddt_params = params[key]
-            if not isinstance(plddt_params,dict):
-                raise InvalidParameterType('plDDT parameters must be of type dict!')
+            assert isinstance(plddt_params,dict), ('plDDT parameters must be of type dict!')
             for plddt_param in plddt_params:
-                if (plddt_param == 'threshold' and
-                    not isinstance(plddt_params[plddt_param],int)):
-                    raise InvalidParameterType('plDDT threshold must be of type int!')
-                elif (plddt_param == 'contiguous_res' and
-                      not isinstance(plddt_params[plddt_param],int)):
-                    raise InvalidParameterType('plDDT contigous residues must be of type int!')
+                if plddt_param == 'threshold':
+                    assert isinstance(plddt_params[plddt_param],int), ('plDDT threshold must be '
+                                                                       'of type int!')
+                elif plddt_param == 'contiguous_res':
+                    assert isinstance(plddt_params[plddt_param],int), ('plDDT contigous residues '
+                                                                       'must be of type int!')
 
         elif key == 'pae_params':
             pae_params = params[key]
-            if not isinstance(pae_params,dict):
-                raise InvalidParameterType('PAE parameters must be of type dict!')
+            assert isinstance(pae_params,dict), ('PAE parameters must be of type dict!')
             for pae_param in pae_params:
-                if (pae_param == 'cutoff' and
-                    not isinstance(pae_params[pae_param],float)):
-                    raise InvalidParameterType('PAE cutoff must be of type float!')
-                elif (pae_param == 'flatten_cutoff' and
-                      not isinstance(pae_params[pae_param],float)):
-                    raise InvalidParameterType('PAE flatten cutoff must be of type float!')
-                elif (pae_param == 'weight' and
-                      not isinstance(pae_params[pae_param],float)):
-                    raise InvalidParameterType('PAE weight must be of type float!')
-                elif (pae_param == 'tolerance' and
-                      not isinstance(pae_params[pae_param],float)):
-                    raise InvalidParameterType('PAE tolerance must be of type float!')
-                elif (pae_param == 'adjacency_threshold' and
-                      not isinstance(pae_params[pae_param],int)):
-                    raise InvalidParameterType('PAE adjacency threshold must be of type int!')
-                elif (pae_param == 'plddt_scaling_factor' and
-                      not isinstance(pae_params[pae_param],float)):
-                    raise InvalidParameterType('PAE pLDDT scaling factor must be of type float!')
+                if pae_param == 'cutoff':
+                    assert isinstance(pae_params[pae_param],float), ('PAE cutoff must be of type '
+                                                                     'float!')
+                elif pae_param == 'flatten_cutoff':
+                    assert isinstance(pae_params[pae_param],float), ('PAE flatten cutoff must be '
+                                                                     'of type float!')
+                elif pae_param == 'weight':
+                    assert isinstance(pae_params[pae_param],float), ('PAE weight must be of type '
+                                                                     'float!')
+                elif pae_param == 'tolerance':
+                    assert isinstance(pae_params[pae_param],float), ('PAE tolerance must be of '
+                                                                     'type float!')
+                elif pae_param == 'adjacency_threshold':
+                    assert isinstance(pae_params[pae_param],int), ('PAE adjacency threshold must '
+                                                                   'be of type int!')
+                elif pae_param == 'plddt_scaling_factor':
+                    assert isinstance(pae_params[pae_param],float), ('PAE pLDDT scaling factor '
+                                                                     'must be of type float!')
 
-    validated_params = copy.deepcopy(params)
-    return validated_params
+    return params

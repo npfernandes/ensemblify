@@ -2,6 +2,7 @@
 
 # IMPORTS
 ## Standard Library Imports
+import importlib.resources
 import math
 import os
 import warnings
@@ -202,9 +203,7 @@ def create_ramachandran_figure(
     rama_fig = go.Figure()
 
     # Add Ramachandran Reference Contours
-    rama_ref_data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                      'rama_ref_data.npy')
-    rama_ref_data = np.load(rama_ref_data_path).flatten()
+    rama_ref_data = np.load(importlib.resources.files('ensemblify.analysis').joinpath('rama_ref_data.npy').open('rb')).flatten()
     # Ramachandran Regions Reference:
     # https://github.com/MDAnalysis/mdanalysis/blob/develop/package/MDAnalysis/analysis/data/rama_ref_data.npy
 
@@ -653,7 +652,7 @@ def create_contact_map_fig(
                             y=1.05,
                             showarrow=False)
 
-    cmap_fig.update_layout(width=900,
+    cmap_fig.update_layout(width=930,
                            height=900,
                            plot_bgcolor='#FFFFFF',
                            font=dict(family='Helvetica',
@@ -1028,7 +1027,7 @@ def create_distance_matrix_fig(
                                y=1.05,
                                showarrow=False)
 
-    dmatrix_fig.update_layout(width=900,
+    dmatrix_fig.update_layout(width=930,
                               height=900,
                               plot_bgcolor='#FFFFFF',
                               font=dict(family='Helvetica',

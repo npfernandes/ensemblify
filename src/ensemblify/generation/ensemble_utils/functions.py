@@ -3,7 +3,6 @@
 # IMPORTS
 ## Standard Library Imports
 import json
-import re
 from copy import deepcopy
 from typing import Optional, Union
 
@@ -239,15 +238,13 @@ def get_targets_from_plddt(parameters: dict) -> dict[str,list[int]]:
 
 
 def setup_pose(input_structure: str) -> pyrosetta.rosetta.core.pose.Pose:
-    """Initialize a Pose object from a sequence, a .txt file containing the sequence, a PDB file
-    or from a UniProt Accession ID.
+    """Initialize a Pose object from a sequence, a .txt file containing the sequence or a PDB file.
      
     The created Pose object is then changed to 'centroid' configuration.
 
     Args:
         input_structure:
-            filepath to the input .pdb structure or .txt sequence, the actual sequence string or
-            a UniProt Accession ID.
+            filepath to the input .pdb structure, .txt with sequence or the actual sequence string.
 
     Returns:
         initial_pose (pyrosetta.rosetta.core.pose.Pose):
@@ -261,16 +258,10 @@ def setup_pose(input_structure: str) -> pyrosetta.rosetta.core.pose.Pose:
     elif input_structure.endswith('.txt'):
         with open(input_structure,'r',encoding='utf-8') as input_sequence:
             # Returns PackedPose so we need to convert to Pose
-            initial_pose = io.to_pose(io.pose_from_sequence(input_sequence.read()))
+            initial_pose = io.to_pose(io.pose_from_sequence(input_sequence.read().strip()))
 
     else:
-        uniprotid_pattern = re.compile(r'[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}')
-        uniprotid_match = re.match(uniprotid_pattern,input_structure)
-        if uniprotid_match is not None:
-            # AFDB CODE # TODO
-            pass
-        else:
-            initial_pose = io.to_pose(io.pose_from_sequence(input_structure))
+        initial_pose = io.to_pose(io.pose_from_sequence(input_structure))
 
     assert initial_pose is not None, 'Invalid input structure!'
 
@@ -471,15 +462,20 @@ def apply_pae_constraints(
             how far away two residues need to be to consider their PAE value. Neighbours are skipped
             as PAE is best used for determining between domain or between chain confidence.
         plddt_scaling_factor:
-            any constraints setup between residues where one of them has a low pLDDT and another a high
-            pLDDT will be scaled by multiplying its weight by this factor. The higher this value the weaker
-            those constraints will be.
+            any constraints setup between residues where one of them has a low pLDDT and another a
+            high pLDDT will be scaled by multiplying its weight by this factor. The higher this
+            value the weaker those constraints will be.
     """
 
-    # Get error matrix
+    # Get PAE Matrix
     with open(pae_filepath,'r',encoding='utf-8-sig') as f:
         pae_content = json.load(f)
 
+    # Check if PAE Matrix comes from UniProt accession download, correct its type if so
+    if isinstance(pae_content,list):
+        pae_content = pae_content[0]
+
+    # Read PAE Matrix
     try:
         pae_matrix = np.array(pae_content['predicted_aligned_error'])
     except KeyError:

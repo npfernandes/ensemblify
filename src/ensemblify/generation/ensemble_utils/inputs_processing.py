@@ -5,6 +5,7 @@
 import copy
 import os
 import re
+import requests
 import shutil
 
 ## Third Party Imports
@@ -186,10 +187,49 @@ def register_input_clashes(input_clashes_file: str | None) -> list[tuple[str,str
     return clashes_input
 
 
+def get_protein_info(uniprot_accession: str) -> dict:
+    """Get information about a protein from the AlphaFold Database using a given UniProt accession.
+
+    Args:
+        uniprot_accession:
+            UniProt accession to use in request for AlphaFold's Database API.
+
+    Returns:
+        protein_info:
+            information about the protein identified by the given UniProt accession, including
+            links to its .pdb structure and .json PAE matrix.
+    
+    Adapted from:
+        https://github.com/PDBeurope/afdb-notebooks/blob/main/AFDB_API.ipynb
+    """
+    api_endpoint = 'https://alphafold.ebi.ac.uk/api/prediction/'
+    url = f'{api_endpoint}{uniprot_accession}'  # Construct the URL for API
+
+    try:
+        # Use a timeout to handle potential connection issues
+        response = requests.get(url, timeout=10)
+
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            protein_info = response.json()[0]
+            return protein_info
+        else:
+            # Raise an exception for better error handling
+            response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f'Error: {e}')
+
+
 def setup_ensemble_gen_params(input_params: dict, inputs_dir: str) -> tuple[str,str | None]:
     """Update sampling input parameters, store steric clashes present in input structure.
     
-    - 'sequence' field is updated with the path to the processed input structure.
+        If a UniProt accession is given in either the sequence of pae fields, replace it with the
+    corresponding downloaded .pdb or .json file.
+
+    - 'sequence' field is updated with the path to the processed input structure. If a UniProt
+    accession is provided, replace it with the corresponding downloaded .pdb file.
+    - 'pae' field is updated with the path to the downloaded .json PAE matrix file, if a UniProt
+    accession is provided.
     - 'output_path' field is updated with the ensemble directory inside the created directory named 'job_name'.
     - File with the updated parameters is saved to the inputs directory.
     - Input structure is processed and any steric clashes present after processing are stored in a file so they can later be ignored on non-sampled regions of structures resulting from the sampling process.
@@ -209,15 +249,134 @@ def setup_ensemble_gen_params(input_params: dict, inputs_dir: str) -> tuple[str,
     """
     input_params_processed = copy.deepcopy(input_params)
 
+
+
+    # TODO Abstract this into functions and implement it
+    # # Setup input sequence
+    # input_sequence = prepared_parameters['sequence']
+    # if not (input_sequence.endswith('.pdb') or input_sequence.endswith('.txt')):
+
+    #     # Check if we need to retrieve sequence from UniProt accession
+    #     uniprotid_pattern = re.compile(r'[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}')
+
+    #     uniprotid_match_sequence = re.search(uniprotid_pattern,
+    #                                          input_sequence)
+
+    #     if uniprotid_match_sequence is not None:
+    #         # Get protein info from UniProt accession
+    #         protein_info = get_protein_info(uniprotid_match_sequence.group(0))
+
+    #         # Extract PDB URL
+    #         pdb_url = protein_info.get('pdbUrl')
+
+    #         # Download .pdb file
+    #         try:
+    #             # Use a timeout to handle potential connection issues
+    #             response = requests.get(pdb_url, timeout=10)
+
+    #             # Check if the request was successful (status code 200)
+    #             if response.status_code == 200:
+    #                 pdb_content = response.content
+    #             else:
+    #                 # Raise an exception for better error handling
+    #                 response.raise_for_status()
+    #         except requests.exceptions.RequestException as e:
+    #             print(f'Error: {e}')
+
+    #         # Write .pdb file
+    #         input_pdb_path = os.path.join(prepared_parameters['output_path'],
+    #                                       'inputs',
+    #                                       f'{uniprotid_match_sequence.group(0)}_structure.pdb')
+
+    #         with open(input_pdb_path,'wb') as t:
+    #             t.write(pdb_content)
+
+    #         # Update sequence with .pdb
+    #         prepared_parameters['sequence'] = input_pdb_path
+
+    # # Setup PAE matrix
+    # input_pae_matrix = prepared_parameters['pae']
+    # if input_pae_matrix is not None and not input_pae_matrix.endswith('.json'):
+
+    #     # Check if we need to retrieve sequence from UniProt accession
+    #     uniprotid_pattern = re.compile(r'[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}')
+
+    #     uniprotid_match_paematrix = re.search(uniprotid_pattern,
+    #                                           input_pae_matrix)
+
+    #     if uniprotid_match_paematrix is not None:
+    #         try: # if we already did it above
+    #             # Extract PAE URL
+    #             pae_url = protein_info.get('paeDocUrl')
+
+    #             # Download PAE file
+    #             try:
+    #                 # Use a timeout to handle potential connection issues
+    #                 response = requests.get(pae_url, timeout=10)
+
+    #                 # Check if the request was successful (status code 200)
+    #                 if response.status_code == 200:
+    #                     pae_content = response.content
+    #                 else:
+    #                     # Raise an exception for better error handling
+    #                     response.raise_for_status()
+    #             except requests.exceptions.RequestException as e:
+    #                 print(f'Error: {e}')
+
+    #             # Write .pdb file
+    #             pae_matrix_path = os.path.join(prepared_parameters['output_path'],
+    #                                            'inputs',
+    #                                            f'{uniprotid_match_paematrix.group(0)}_pae_matrix.json')
+
+    #             with open(pae_matrix_path,'wb') as t:
+    #                 t.write(pae_content)
+
+    #             # Update sequence with PAE
+    #             prepared_parameters['pae'] = pae_matrix_path
+
+    #         except NameError:
+    #             # Get protein info from UniProt accession
+    #             protein_info = get_protein_info(uniprotid_match_paematrix.group(0))
+
+    #             # Extract PAE URL
+    #             pae_url = protein_info.get('paeDocUrl')
+
+    #             # Download PAE file
+    #             try:
+    #                 # Use a timeout to handle potential connection issues
+    #                 response = requests.get(pae_url, timeout=10)
+
+    #                 # Check if the request was successful (status code 200)
+    #                 if response.status_code == 200:
+    #                     pae_content = response.content
+    #                 else:
+    #                     # Raise an exception for better error handling
+    #                     response.raise_for_status()
+    #             except requests.exceptions.RequestException as e:
+    #                 print(f'Error: {e}')
+
+    #             # Write .pdb file
+    #             pae_matrix_path = os.path.join(prepared_parameters['output_path'],
+    #                                            'inputs',
+    #                                            f'{uniprotid_match_paematrix.group(0)}_pae_matrix.json')
+
+    #             with open(pae_matrix_path,'wb') as t:
+    #                 t.write(pae_content)
+
+    #             # Update sequence with PAE
+    #             prepared_parameters['pae'] = pae_matrix_path
+
+
+
     # Process input .pdb through FASPR and PULCHRA
     input_sequence = input_params_processed['sequence']
     if input_sequence.endswith('.pdb'):
         # Apply FASPR and PULCHRA to input pdb
-        (input_clashes,
-         new_input_pdb) = process_input_pdb(faspr_path=input_params_processed['faspr_path'],
-                                            pulchra_path=input_params_processed['pulchra_path'],
-                                            inputs_dir=inputs_dir,
-                                            input_pdb=input_sequence)
+        input_clashes,\
+        new_input_pdb = process_input_pdb(faspr_path=input_params_processed['faspr_path'],
+                                          pulchra_path=input_params_processed['pulchra_path'],
+                                          inputs_dir=inputs_dir,
+                                          input_pdb=input_sequence)
 
         # Update input pdb with filepath to processed pdb
         input_params_processed['sequence'] = f'{new_input_pdb}'
@@ -289,8 +448,9 @@ def read_input_parameters(parameter_path: str) -> dict:
         elif key == 'restraints':
             restraints = params[key]
             for restraint_id in restraints:
-                assert (isinstance(restraints[restraint_id],list) and
-                        restraints[restraint_id] is not None), 'Restraints must be of type list !'
+                if restraints[restraint_id] is not None:
+                    assert isinstance(restraints[restraint_id],list), ('Restraints must be of '
+                                                                       'type list !')
 
         elif key == 'scorefxn':
             scorefxn_params = params[key]

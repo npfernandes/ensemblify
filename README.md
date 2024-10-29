@@ -194,7 +194,6 @@ For UNIX or Linux users:
 2. Navigate to where the FASPR source code is located:
 
     ```bash
-    conda activate ensemblify_env
     cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/
     ```
 

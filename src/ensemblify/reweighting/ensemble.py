@@ -43,7 +43,7 @@ def reweight_ensemble(
     topology: str,
     trajectory_id: str,
     exp_saxs_data: str,
-    output_dir: str = None,
+    output_dir: str = os.getcwd(),
     thetas: list[int] = None,
     calculated_cmatrix: pd.DataFrame | str = None,
     calculated_dmatrix: pd.DataFrame | str = None,
@@ -73,7 +73,7 @@ def reweight_ensemble(
             path to .dat file with experimental SAXS data.
         output_dir:
             path to directory where interactive .html plots and reweighting output files will be
-            stored. Defaults to current working directory.
+            stored. Is created if it does not exist. Defaults to current working directory.
         thetas:
             list of values to try as the theta parameter in BME. The ensemble will be reweighted
             each time using a different theta value. The effect of different theta values can be
@@ -117,9 +117,7 @@ def reweight_ensemble(
         thetas = [1, 10, 20, 50, 75, 100, 200, 400, 750, 1000, 5000, 10000]
 
     # Setup output directory
-    if output_dir is None:
-        output_dir = os.getcwd()
-    elif not os.path.isdir(output_dir):
+    if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 
     # Setup directory for reweighting files

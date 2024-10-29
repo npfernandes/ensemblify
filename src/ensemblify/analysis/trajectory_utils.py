@@ -113,7 +113,7 @@ def calc_cm_dist(
 def calculate_ramachandran_data(
     trajectory: str,
     topology: str,
-    output_path: str | None = None,
+    output_path: str | None = os.getcwd(),
     ) -> pd.DataFrame:
     """Calculate a dihedral angles matrix from trajectory and topology files.
 
@@ -134,10 +134,6 @@ def calculate_ramachandran_data(
         dihedrals_matrix:
             DataFrame with Phi and Psi values of each residue for each frame of the trajectory.
     """
-    # Setup output directory
-    if output_path is None:
-        output_path = os.getcwd()
-
     # Create Universe
     u = mda.Universe(topology, trajectory)
     protein = u.select_atoms('protein')
@@ -206,7 +202,9 @@ def create_ramachandran_figure(
     rama_fig = go.Figure()
 
     # Add Ramachandran Reference Contours
-    rama_ref_data = np.load(os.path.join(os.path.dirname(os.path.realpath(__file__)),'rama_ref_data.npy')).flatten()
+    rama_ref_data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                      'rama_ref_data.npy')
+    rama_ref_data = np.load(rama_ref_data_path).flatten()
     # Ramachandran Regions Reference:
     # https://github.com/MDAnalysis/mdanalysis/blob/develop/package/MDAnalysis/analysis/data/rama_ref_data.npy
 
@@ -399,7 +397,7 @@ def calculate_contact_matrix(
     trajectory: str,
     topology: str,
     weights: np.ndarray | None = None,
-    output_path: str | None = None,
+    output_path: str | None = os.getcwd(),
     ) -> pd.DataFrame:
     """Calculate a contact frequency matrix from a trajectory and topology files.
     
@@ -424,10 +422,6 @@ def calculate_contact_matrix(
         contact_matrix:
             DataFrame with the frequency of each residue contact in the trajectory.
     """
-    # Setup output directory
-    if output_path is None:
-        output_path = os.getcwd()
-
     # Setup Universe object
     u = mda.Universe(topology,trajectory)
     trajectory_size = len(u.trajectory)
@@ -773,7 +767,7 @@ def calculate_distance_matrix(
     trajectory: str,
     topology: str,
     weights: np.ndarray | None = None,
-    output_path: str | None = None,
+    output_path: str | None = os.getcwd(),
     ) -> pd.DataFrame:
     """Calculate an alpha carbon average distance matrix from a trajectory and topology files.
     
@@ -800,10 +794,6 @@ def calculate_distance_matrix(
             DataFrame with the average distance between each pair of alpha carbons in the
             trajectory.
     """
-    # Setup output directory
-    if output_path is None:
-        output_path = os.getcwd()
-
     # Setup Universe object
     u = mda.Universe(topology,trajectory)
     trajectory_size = len(u.trajectory)
@@ -1790,15 +1780,18 @@ def create_metrics_fig(
                                              y=[x for x in np.arange(0,
                                                                      np.interp(mean_value,
                                                                                scatter_trace.x,
-                                                                               scatter_trace.y)+0.001,
-                                                                               0.001)],
+                                                                               scatter_trace.y)
+                                                                               + 0.001,
+                                                                     0.001)],
                                              mode='markers',
                                              marker_color=hist_trace.marker.color,
-                                             hovertext=f'Avg: {round(mean_value,2)} &plusmn; {round(mean_value_stderr,2)}',
+                                             hovertext=(f'Avg: {round(mean_value,2)} &plusmn; '
+                                                        f'{round(mean_value_stderr,2)}'),
                                              hoverinfo='text',
                                              hoverlabel_bgcolor=hist_trace.marker.color,
                                              fill='toself',
-                                             name=f'Avg: {round(mean_value,2)} &plusmn; {round(mean_value_stderr,2)}',
+                                             name=(f'Avg: {round(mean_value,2)} &plusmn; '
+                                                   f'{round(mean_value_stderr,2)}'),
                                              opacity=0,
                                              showlegend=False),
                                   row=nrows,
@@ -1972,7 +1965,7 @@ def calculate_analysis_data(
     trajectories: list[str],
     topologies: list[str],
     trajectory_ids: list[str],
-    output_directory: str | None = None,
+    output_directory: str | None = os.getcwd(),
     ramachandran_data: bool = True,
     distancematrices: bool = True,
     contactmatrices: bool = True,
@@ -2031,10 +2024,6 @@ def calculate_analysis_data(
                     'StructuralMetrics' : [StructuralMetrics1,StructuralMetrics2,
                                            StructuralMetrics3]}
     """
-    # Setup output directory
-    if output_directory is None:
-        output_directory = os.getcwd()
-
     # Calculate analysis data
     data = {'DistanceMatrices' : [],
             'ContactMatrices' : [],
@@ -2110,7 +2099,7 @@ def create_analysis_figures(
     analysis_data: dict[str,list[pd.DataFrame]] | None,
     topologies: list[str],
     trajectory_ids: list[str],
-    output_directory: str | None = None,
+    output_directory: str | None = os.getcwd(),
     color_palette: list[str] | None = None,
     ) -> dict[str,list[go.Figure]]:
     """Create interactive figures given analysis data for one or more pairs of trajectory,topology
@@ -2139,10 +2128,6 @@ def create_analysis_figures(
                     'SecondaryStructureFrequencies' : [SSFrequency1,SSFrequency2,SSFrequency3],
                     'StructuralMetrics' : [StructuralMetrics1,StructuralMetrics2,StructuralMetrics3] }
     """
-    # Setup output directory
-    if output_directory is None:
-        output_directory = os.getcwd()
-    
     # Setup color palette
     if color_palette is None:
         color_palette = ['#636EFA','#EF553B','#00CC96','#AB63FA','#FFA15A',
@@ -2154,17 +2139,16 @@ def create_analysis_figures(
                          'ContactMatrices' : [],
                          'SecondaryStructureFrequencies' : [],
                          'StructuralMetrics' : [] }
-        data_ids = ['distance_matrix.csv','contact_matrix.csv','ss_frequency.csv','structural_metrics.csv']
         data_ids_2_data = {'distance_matrix.csv': 'DistanceMatrices',
                            'contact_matrix.csv': 'ContactMatrices',
                            'ss_frequency.csv': 'SecondaryStructureFrequencies',
                            'structural_metrics.csv': 'StructuralMetrics'}
-        for data_id in data_ids:
+        for data_id, data_name in data_ids_2_data.items():
             for trajectory_id in trajectory_ids:
                 try:
                     filename = os.path.join(output_directory,f'{trajectory_id}_{data_id}')
                     calculated_data = pd.read_csv(filename,index_col=0)
-                    analysis_data[data_ids_2_data[data_id]].append(calculated_data)
+                    analysis_data[data_name].append(calculated_data)
                 except FileNotFoundError:
                     continue
                 else:

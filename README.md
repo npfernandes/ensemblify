@@ -85,16 +85,15 @@ To install the `ensemblify` Python package, you can follow these commands:
 
     ```bash
     cd ensemblify_main
-    conda env create -f environment.yml
+    conda create -f environment.yml
     ```
 
     or by creating the environment and installing the necessary python packages manually (not recommended):
 
     ```bash
-    conda env create --name ensemblify_env python=3.10
+    conda create --channel=conda-forge --name ensemblify_env python=3.10 MDAnalysis=2.6.1 mdtraj=1.9.9 numpy=1.26.4 pandas=2.2.2 scikit-learn=1.4.2 scipy=1.12.0 tqdm=4.66.2
     conda activate ensemblify_env
-    conda install --channel=conda-forge biopython=1.81 MDAnalysis=2.6.1 mdtraj=1.9.9 numpy=1.26.4 pandas=2.2.2 plotly=5.19.0 pyyaml=6.0.1 scikit-sklearn=1.4.2 scipy=1.12.0 tqdm=4.66.2
-    pip install ray["default"]=2.33.0
+    pip install biopython==1.81 plotly==5.19.0 pyyaml==6.0.1 "ray[default]"==2.33.0
     ```
 
 3. Install the `ensemblify` python package into your newly created environment.

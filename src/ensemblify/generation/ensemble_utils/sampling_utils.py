@@ -2,11 +2,11 @@
 
 # IMPORTS
 ## Standard Library Imports
-from copy import deepcopy
-from timeit import default_timer as timer
 import logging
 import logging.config
 import os
+from copy import deepcopy
+from timeit import default_timer as timer
 
 ## Third Party Imports
 import pandas as pd
@@ -136,9 +136,7 @@ def check_contained_in(
     return elements_in_container
 
 
-def setup_sampling_parameters(
-    parameters_file: str,
-) -> dict:
+def setup_sampling_parameters(parameters_file: str) -> dict:
     """ 
     Update the parameters dictionary before sampling.
     
@@ -284,7 +282,8 @@ def setup_sampling_initial_pose(
     cs = initial_pose.constraint_set()
     if cs.has_constraints():
         logger.info('Saving applied constraints to file...')
-        ConstraintIO.write_constraints(os.path.join(os.path.split(sampling_log)[0],'constraints.cst'),
+        ConstraintIO.write_constraints(os.path.join(os.path.split(sampling_log)[0],
+                                                    'constraints.cst'),
                                        cs,
                                        initial_pose)
 
@@ -336,7 +335,8 @@ def sample_pdb(
             Identifier to differentiate between different decoys of the same batch in a
             multiprocessing context. Defaults to ''.
         log_file:
-            Path to the PyRosetta .log file. Defaults to os.path.join(os.getcwd(),'pyrosetta.log').
+            Path to the PyRosetta .log file. Defaults to 'pyrosetta.log' in current working
+            directory.
         ss_bias:
             Secondary Structure Bias with the desired percentage of total structures to respect
             this bias. Defaults to None.

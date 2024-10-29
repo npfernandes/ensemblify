@@ -244,8 +244,8 @@ def run_sampling(
                 continue
 
         final_log_msg = (f'There are {len(os.listdir(VALID_PDBS_DIR))} valid pdbs, '
-                        f'{clashed_pdbs+disrespectful_pdbs} were discarded '
-                        f'( {clashed_pdbs} clashed | {disrespectful_pdbs} violated constraints).')
+                         f'{clashed_pdbs+disrespectful_pdbs} were discarded '
+                         f'( {clashed_pdbs} clashed | {disrespectful_pdbs} violated constraints).')
 
         logger.info(final_log_msg)
         print(final_log_msg)

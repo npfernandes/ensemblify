@@ -24,7 +24,8 @@ or as a library inside a Python script or Jupyter notebook:
     import ensemblify as ey
     ey.do_cool_stuff()
 
-Check the [Usage](#-usage) section for more details or explore the interactive Quick Reference Guide notebook: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/01_quick_reference_guide.ipynb)
+Check the [Usage](#-usage) section for more details.
+You can also check out the interactive Quick Reference Guide notebook: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/01_quick_reference_guide.ipynb)
 
 ## 🔎 How does Ensemblify work?
 A general overview of Ensemblify, descriptions of employed methods and applications can be found in the Ensemblify paper:

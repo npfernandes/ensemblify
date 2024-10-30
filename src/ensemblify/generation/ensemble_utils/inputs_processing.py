@@ -220,6 +220,36 @@ def get_protein_info(uniprot_accession: str) -> dict:
         print(f'Error: {e}')
 
 
+def download_from_url(url: str) -> str:
+    """Download the contents of a url.
+
+    Args:
+        url:
+            url path.
+    
+    Returns:
+        content:
+            content of url.
+    
+    Raises:
+        RequestException with HTTPError if request timed out or encountered an issue.
+    """
+    # Download file
+    try:
+        # Use a timeout to handle potential connection issues
+        response = requests.get(url, timeout=10)
+
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            content = response.content
+            return content
+        else:
+            # Raise an exception for better error handling
+            response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f'Error: {e}')
+
+
 def setup_ensemble_gen_params(input_params: dict, inputs_dir: str) -> tuple[str,str | None]:
     """Update sampling input parameters, store steric clashes present in input structure.
     
@@ -249,124 +279,63 @@ def setup_ensemble_gen_params(input_params: dict, inputs_dir: str) -> tuple[str,
     """
     input_params_processed = copy.deepcopy(input_params)
 
+    # Check if there are any UniProt Accessions in user inputs
+    input_sequence = input_params_processed['sequence']
+    input_pae_matrix = input_params_processed['pae']
+    uniprotid_pattern = re.compile(r'[OPQ][0-9][A-Z0-9]{3}[0-9]|'
+                                   r'[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}')
+    uniprotid_match_sequence = re.search(uniprotid_pattern,input_sequence)
+    uniprotid_match_paematrix = re.search(uniprotid_pattern,input_pae_matrix)
 
+    # Update input .pdb structure if match found
+    if uniprotid_match_sequence is not None:
+        # Get protein info from UniProt accession
+        protein_info = get_protein_info(uniprotid_match_sequence.group(0))
 
-    # TODO Abstract this into functions and implement it
-    # # Setup input sequence
-    # input_sequence = prepared_parameters['sequence']
-    # if not (input_sequence.endswith('.pdb') or input_sequence.endswith('.txt')):
+        # Extract PDB content
+        pdb_url = protein_info.get('pdbUrl')
+        pdb_content = download_from_url(pdb_url)
 
-    #     # Check if we need to retrieve sequence from UniProt accession
-    #     uniprotid_pattern = re.compile(r'[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}')
+        # Write .pdb file
+        input_pdb_path = os.path.join(input_params_processed['output_path'],
+                                      input_params_processed['job_name'],
+                                      'ensemble',
+                                      'inputs',
+                                      f'{uniprotid_match_sequence.group(0)}_structure.pdb')
+        with open(input_pdb_path,'wb') as t:
+            t.write(pdb_content)
 
-    #     uniprotid_match_sequence = re.search(uniprotid_pattern,
-    #                                          input_sequence)
+        # Update sequence with .pdb
+        input_params_processed['sequence'] = input_pdb_path
 
-    #     if uniprotid_match_sequence is not None:
-    #         # Get protein info from UniProt accession
-    #         protein_info = get_protein_info(uniprotid_match_sequence.group(0))
+    # Update input PAE matrix if match found
+    if uniprotid_match_paematrix is not None:
+        try:
+            # Extract PAE URL
+            pae_url = protein_info.get('paeDocUrl')
 
-    #         # Extract PDB URL
-    #         pdb_url = protein_info.get('pdbUrl')
+        except NameError:
+            # Get protein info from UniProt accession
+            protein_info = get_protein_info(uniprotid_match_paematrix.group(0))
 
-    #         # Download .pdb file
-    #         try:
-    #             # Use a timeout to handle potential connection issues
-    #             response = requests.get(pdb_url, timeout=10)
+            # Extract PAE URL
+            pae_url = protein_info.get('paeDocUrl')
 
-    #             # Check if the request was successful (status code 200)
-    #             if response.status_code == 200:
-    #                 pdb_content = response.content
-    #             else:
-    #                 # Raise an exception for better error handling
-    #                 response.raise_for_status()
-    #         except requests.exceptions.RequestException as e:
-    #             print(f'Error: {e}')
+        finally:
+            # Extract PAE content
+            pae_content = download_from_url(pae_url)
 
-    #         # Write .pdb file
-    #         input_pdb_path = os.path.join(prepared_parameters['output_path'],
-    #                                       'inputs',
-    #                                       f'{uniprotid_match_sequence.group(0)}_structure.pdb')
+            # Write PAE .json file
+            pae_matrix_path = os.path.join(input_params_processed['output_path'],
+                                           input_params_processed['job_name'],
+                                           'ensemble',
+                                           'inputs',
+                                           f'{uniprotid_match_paematrix.group(0)}_pae_matrix.json')
+            with open(pae_matrix_path,'wb') as t:
+                t.write(pae_content)
 
-    #         with open(input_pdb_path,'wb') as t:
-    #             t.write(pdb_content)
-
-    #         # Update sequence with .pdb
-    #         prepared_parameters['sequence'] = input_pdb_path
-
-    # # Setup PAE matrix
-    # input_pae_matrix = prepared_parameters['pae']
-    # if input_pae_matrix is not None and not input_pae_matrix.endswith('.json'):
-
-    #     # Check if we need to retrieve sequence from UniProt accession
-    #     uniprotid_pattern = re.compile(r'[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}')
-
-    #     uniprotid_match_paematrix = re.search(uniprotid_pattern,
-    #                                           input_pae_matrix)
-
-    #     if uniprotid_match_paematrix is not None:
-    #         try: # if we already did it above
-    #             # Extract PAE URL
-    #             pae_url = protein_info.get('paeDocUrl')
-
-    #             # Download PAE file
-    #             try:
-    #                 # Use a timeout to handle potential connection issues
-    #                 response = requests.get(pae_url, timeout=10)
-
-    #                 # Check if the request was successful (status code 200)
-    #                 if response.status_code == 200:
-    #                     pae_content = response.content
-    #                 else:
-    #                     # Raise an exception for better error handling
-    #                     response.raise_for_status()
-    #             except requests.exceptions.RequestException as e:
-    #                 print(f'Error: {e}')
-
-    #             # Write .pdb file
-    #             pae_matrix_path = os.path.join(prepared_parameters['output_path'],
-    #                                            'inputs',
-    #                                            f'{uniprotid_match_paematrix.group(0)}_pae_matrix.json')
-
-    #             with open(pae_matrix_path,'wb') as t:
-    #                 t.write(pae_content)
-
-    #             # Update sequence with PAE
-    #             prepared_parameters['pae'] = pae_matrix_path
-
-    #         except NameError:
-    #             # Get protein info from UniProt accession
-    #             protein_info = get_protein_info(uniprotid_match_paematrix.group(0))
-
-    #             # Extract PAE URL
-    #             pae_url = protein_info.get('paeDocUrl')
-
-    #             # Download PAE file
-    #             try:
-    #                 # Use a timeout to handle potential connection issues
-    #                 response = requests.get(pae_url, timeout=10)
-
-    #                 # Check if the request was successful (status code 200)
-    #                 if response.status_code == 200:
-    #                     pae_content = response.content
-    #                 else:
-    #                     # Raise an exception for better error handling
-    #                     response.raise_for_status()
-    #             except requests.exceptions.RequestException as e:
-    #                 print(f'Error: {e}')
-
-    #             # Write .pdb file
-    #             pae_matrix_path = os.path.join(prepared_parameters['output_path'],
-    #                                            'inputs',
-    #                                            f'{uniprotid_match_paematrix.group(0)}_pae_matrix.json')
-
-    #             with open(pae_matrix_path,'wb') as t:
-    #                 t.write(pae_content)
-
-    #             # Update sequence with PAE
-    #             prepared_parameters['pae'] = pae_matrix_path
-
-
+            # Update sequence with PAE
+            input_params_processed['pae'] = pae_matrix_path
 
     # Process input .pdb through FASPR and PULCHRA
     input_sequence = input_params_processed['sequence']

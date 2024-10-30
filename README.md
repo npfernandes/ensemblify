@@ -25,6 +25,7 @@ or as a library inside a Python script or Jupyter notebook:
     ey.do_cool_stuff()
 
 Check the [Usage](#-usage) section for more details.
+
 You can also check out the interactive Quick Reference Guide notebook: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/01_quick_reference_guide.ipynb)
 
 ## 🔎 How does Ensemblify work?

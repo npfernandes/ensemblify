@@ -68,21 +68,6 @@ To install the `ensemblify` Python package, you can follow these commands:
       cd ensemblify_main
       ```
 
-<!-- 1. Choose your current working directory, where the `ensemblify` package will be installed. If you prefer, in your home directory you can create a new directory dedicated to the ensemblify installation and navigate into it by running:
-
-    ```bash
-    mkdir -p ~/ensemblify_installation
-    cd ~/ensemblify_installation
-    ```
-
-2. Download and extract the `ensemblify` source code from this repository:
-
-    ```bash
-    wget https://github.com/npfernandes/ensemblify/archive/refs/heads/main.zip
-    unzip main.zip
-    cd ensemblify_main
-    ``` -->
-
 2. Create your `ensemblify_env` [Conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) with all of Ensemblify's python dependencies installed by using the provided [environment file](environment.yml) (recommended):
 
     ```bash
@@ -105,20 +90,13 @@ To install the `ensemblify` Python package, you can follow these commands:
     pip install .
     ```
 
-<!-- If you want to create a new `ensemblify_env` environment with Ensemblify and all its necessary python dependencies already installed you can use the provided conda environment file by running:
-
-    wget https://raw.githubusercontent.com/npfernandes/ensemblify/main/environment.yml
-    conda env create -f environment.yml -->
-
-<!-- The `ensemblify_env` environment should be activated before installing Ensemblify in the usual manner:
-
-    conda activate ensemblify_env    
-    conda install ensemblify
-
-Alternatively, Ensemblify is available via the Python Package Index:
+    Alternatively, Ensemblify is available via the Python Package Index:
     
+    ```bash
     conda activate ensemblify_env   
-    pip install ensemblify --upgrade -->
+    pip install -U ensemblify
+    ```
+
 </details>
 
 <details><summary>

@@ -23,6 +23,20 @@ from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.reweighting.third_party import simple_BME
 from ensemblify.utils import kde
 
+# CONSTANTS
+ERROR_READ_MSG = 'Error in reading {} from file.'
+SUCCESSFUL_READ_MSG = '{} has been read from file.'
+PROVIDED_MSG = '{} data has been provided.'
+NOT_PROVIDED_MSG = 'No {} data was provided.'
+ALLOWED_DATA_MSG_TAGS = ('cmatrix','dmatrix','ss_freq','structural_metrics')
+DATA_NAMES = {'cmatrix': 'contact matrix',
+              'dmatrix': 'distance matrix',
+              'ss_freq': 'secondary structure assignment frequency matrix',
+              'structural_metrics': 'structural metrics distributions'}
+FOUND_EXP_SAXS_MSG = 'Found processed experimental SAXS data.'
+FOUND_EXP_CALC_SAXS_MSG = 'Found processed experimental SAXS data and calculated SAXS data.'
+FOUND_RW_DATA_MSG = 'Found calculated BME reweighting data with theta values: {}'
+
 # FUNCTIONS
 def process_exp_data(experimental_data_path: str) -> str:
     """Check formatting and units in input experimental data file.
@@ -166,7 +180,7 @@ def ibme(
     calc_file: str,
     output_dir: str,
     ) -> tuple[int,tuple[float,float,float],np.ndarray]:
-    """Perform the Iterative Bayesian Maximum Entropy (BME) algorithm on calculated SAXS data,
+    """Apply the Iterative Bayesian Maximum Entropy (BME) algorithm on calculated SAXS data,
     given a value for the theta parameter.
 
     The used algorithm is explained in:
@@ -1000,51 +1014,30 @@ def attempt_read_data(
         pd.DataFrame:
             desired data in DataFrame format.
     """
-    allowed_data_msg_tags = ['cmatrix','dmatrix', 'ss_freq','structural_metrics']
-    assert data_msg_tag in allowed_data_msg_tags, ('Data message tag must be in '
-                                                   f'{allowed_data_msg_tags} !')
-
-    # Setup messages to console
-    if data_msg_tag == 'cmatrix':
-        ATTEMPTING_READ_MSG = 'Attempting to read contact matrix from file...'
-        SUCCESSFUL_READ_MSG = 'Contact matrix has been read from file.'
-        PROVIDED_MSG = 'Contact matrix data has been provided.'
-        NOT_PROVIDED_MSG = 'No contact matrix data was provided.'
-    elif data_msg_tag == 'dmatrix':
-        ATTEMPTING_READ_MSG = 'Attempting to read distance matrix from file...'
-        SUCCESSFUL_READ_MSG = 'Distance matrix has been read from file.'
-        PROVIDED_MSG = 'Distance matrix data has been provided.'
-        NOT_PROVIDED_MSG = 'No distance matrix data was provided.'
-    elif data_msg_tag == 'ss_freq':
-        ATTEMPTING_READ_MSG = ('Attempting to read secondary structure assignment frequency '
-                               'matrix from file...')
-        SUCCESSFUL_READ_MSG = ('Secondary structure assignment frequency matrix has been read '
-                               'from file.')
-        PROVIDED_MSG = 'Secondary structure assignment frequency matrix data has been provided.'
-        NOT_PROVIDED_MSG = 'No secondary structure assignment frequency matrix data was provided.'
-    elif data_msg_tag == 'structural_metrics':
-        ATTEMPTING_READ_MSG = 'Attempting to read structural metrics distributions from file...'
-        SUCCESSFUL_READ_MSG = 'Structural metrics distributions have been read from file.'
-        PROVIDED_MSG = 'Structural metrics distributions data has been provided.'
-        NOT_PROVIDED_MSG = 'No structural metrics distributions data was provided.'
+    assert data_msg_tag in ALLOWED_DATA_MSG_TAGS, ('Data message tag must be in '
+                                                   f'{ALLOWED_DATA_MSG_TAGS} !')
+    data_name = DATA_NAMES[data_msg_tag]
 
     # Attempt read of data
     if isinstance(data,str):
-        print(ATTEMPTING_READ_MSG)
-        assert data.endswith('.csv'), ('Calculated data must be'
-                                       ' provided in .csv format!')
-        data_df = pd.read_csv(data,index_col=0)
-        print(SUCCESSFUL_READ_MSG)
+        assert data.endswith('.csv'), ('Calculated data must be in provided .csv format!')
+        try:
+            data_df = pd.read_csv(data,index_col=0)
+        except:
+            print(ERROR_READ_MSG.format(data_name))
+            data_df = calc_fn(*args,**kwargs)
+        else:
+            print(SUCCESSFUL_READ_MSG.format(data_name.capitalize()))
     elif isinstance(data,pd.DataFrame):
-        print(PROVIDED_MSG)
+        print(PROVIDED_MSG,format(data_name.capitalize()))
         data_df = data
     else:
-        print(NOT_PROVIDED_MSG)
+        print(NOT_PROVIDED_MSG.format(data_name))
         data_df = calc_fn(*args,**kwargs)
     return data_df
 
 
-def attempt_read_reweigthing_data(
+def attempt_read_reweighting_data(
     reweighting_output_directory: str,
     trajectory_id: str,
     ) -> tuple[str|None, str|None, np.ndarray|None,
@@ -1070,24 +1063,27 @@ def attempt_read_reweigthing_data(
     calc_saxs_file = os.path.join(reweighting_output_directory,f'{trajectory_id}_calc_saxs.dat')
     if not os.path.isfile(calc_saxs_file):
         calc_saxs_file = None
+        print(FOUND_EXP_SAXS_MSG)
         return exp_saxs_file, None, None, None, None
 
     # Check for BME reweighting results
     bme_results_dir = os.path.join(reweighting_output_directory,'bme_reweighting_results')
     if not os.path.isdir(bme_results_dir):
+        print(FOUND_EXP_CALC_SAXS_MSG)
         return exp_saxs_file, calc_saxs_file, None, None, None
 
     ## Check which theta values are present (if any)
-    theta_values = set()
+    theta_values = []
     for theta_log in glob.glob(os.path.join(bme_results_dir,'ibme_t*.log')):
         theta_log_prefix = os.path.split(theta_log)[1].split('_')[1]
         if '.log' not in theta_log_prefix:
             theta_value = int(theta_log_prefix[1:])
-            theta_values.add(theta_value)
+            if theta_value not in theta_values:
+                theta_values.append(theta_value)
+
     if not theta_values:
+        print(FOUND_EXP_CALC_SAXS_MSG)
         return exp_saxs_file, calc_saxs_file, None, None, None
-    else:
-        thetas_array = np.array(sorted(list(theta_values)))
 
     ## Check which weights/stats are present (if any)
     ## weights = 'ibme_t{THETA_VALUE}.weights.dat'
@@ -1096,15 +1092,15 @@ def attempt_read_reweigthing_data(
     all_weights = []
     all_stats = []
 
-    for theta in sorted(list(theta_values)):
+    for theta in sorted(theta_values):
         # Get weights
         weights_files = glob.glob(os.path.join(bme_results_dir,f'ibme_t{theta}_*.weights.dat'))
-
         try:
             weights = np.loadtxt(weights_files[0],
                                  usecols=1)
             all_weights.append(weights)
         except (IndexError, FileNotFoundError):
+            print(FOUND_EXP_CALC_SAXS_MSG)
             return exp_saxs_file, calc_saxs_file, None, None, None
 
         # Get stats
@@ -1120,12 +1116,17 @@ def attempt_read_reweigthing_data(
             stats = (chi2_before,chi2_after,phi)
             all_stats.append(stats)
         except (IndexError, FileNotFoundError):
+            print(FOUND_EXP_CALC_SAXS_MSG)
             return exp_saxs_file, calc_saxs_file, None, None, None
 
     if len(all_weights) != len(theta_values) or len(all_stats) != len(theta_values):
+        print(FOUND_EXP_CALC_SAXS_MSG)
         return exp_saxs_file, calc_saxs_file, None, None, None
 
     weights = np.array(all_weights)
     stats = np.array(all_stats)
+    thetas_array = np.array(sorted(theta_values))
+
+    print(FOUND_RW_DATA_MSG.format(sorted(theta_values)))
 
     return exp_saxs_file, calc_saxs_file, thetas_array, stats, weights

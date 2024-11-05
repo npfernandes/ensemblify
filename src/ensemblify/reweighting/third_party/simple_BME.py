@@ -43,7 +43,7 @@ class SimpleReweight:
         self.w_opt = None
         self.lambdas = None
 
-        self.logfile = f'{name}.log'
+        self.log_fd = open(f'{name}.log','w',encoding='utf-8')
 
         self.labels = None
         self.experiment =  None
@@ -89,8 +89,7 @@ class SimpleReweight:
 
     def _write_log(self, msg: str):
         """Write message to log file."""
-        with open(self.logfile,'w',encoding='utf-8') as log_fh:
-            log_fh.write(msg)
+        self.log_fd.write(msg)
 
     def read_file(
         self,
@@ -336,7 +335,7 @@ class SimpleReweight:
         iterations: int = 50,
         offset: bool = True,
         ) -> tuple[float | float | float | np.ndarray | np.ndarray]:
-        """_summary_
+        """Iterative BME.
 
         Args:
             theta:

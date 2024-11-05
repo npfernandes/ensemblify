@@ -456,7 +456,7 @@ def calculate_contact_matrix(
     # Convert calculated averaged matrix to DataFrame
     contact_matrix = pd.DataFrame(data=contact_matrix_array,
                                   index=list(range(1,contact_matrix_array.shape[0]+1)),
-                                  columns=list(range(1,contact_matrix_array.shape[0]+1)))
+                                  columns=[str(x) for x in range(1,contact_matrix_array.shape[0]+1)])
 
     # Save contact matrix
     if os.path.isdir(output_path):
@@ -511,6 +511,9 @@ def create_contact_map_fig(
         cmap_fig:
             Ploty Figure object displaying a contact map.
     """
+    assert not(reweighted and difference), ('Contact Map Figure can\'t simultaneously be '
+                                            'difference and reweighted!')
+    
     if isinstance(contact_matrix,str):
         assert contact_matrix.endswith('.csv'), 'Contact matrix file must be in .csv format!'
         contact_matrix = pd.read_csv(contact_matrix,index_col=0)
@@ -652,7 +655,7 @@ def create_contact_map_fig(
                             y=1.05,
                             showarrow=False)
 
-    cmap_fig.update_layout(width=930,
+    cmap_fig.update_layout(width=920,
                            height=900,
                            plot_bgcolor='#FFFFFF',
                            font=dict(family='Helvetica',
@@ -827,8 +830,8 @@ def calculate_distance_matrix(
     # Convert calculated averaged matrix to DataFrame
     distance_matrix = pd.DataFrame(data=distance_matrix_array,
                                    index=list(range(1,distance_matrix_array.shape[0]+1)),
-                                   columns=list(range(1,distance_matrix_array.shape[0]+1)))
-
+                                   columns=[str(x) for x in range(1,distance_matrix_array.shape[0]+1)])
+    
     # Save distance matrix
     if os.path.isdir(output_path):
         if weights is None:
@@ -851,6 +854,7 @@ def create_distance_matrix_fig(
     trajectory_id: str | None = None,
     output_path: str | None = None,
     max_colorbar: int | None = None,
+    min_colorbar: int | None = None,
     reweighted: bool = False,
     difference: bool = False,
     ) -> go.Figure:
@@ -873,19 +877,24 @@ def create_distance_matrix_fig(
             If directory, written file is named 'distance_matrix.html', optionally with
             trajectory_id prefix. Defaults to None.
         max_colorbar:
-            maximum limit for the angstrom distance colorbar. Defaults to None, in which case it is
+            maximum limit for the distance colorbar. Defaults to None, in which case it is
+            derived from the data.
+        min_colorbar:
+            minimum limit for the distance colorbar. Defaults to None, in which case it is
             derived from the data.
         reweighted:
-            boolean stating whether we are creating a reweighted distance matrix figure or a default
-            one. Defaults to False.
+            boolean stating whether we are creating a reweighted distance matrix figure or a
+            default one. Defaults to False.
         difference:
-            boolean stating whether we are creating a difference distance matrix figure or a default
-            one. Defaults to False.
+            boolean stating whether we are creating a difference distance matrix figure or a
+            default one. Defaults to False.
 
     Returns:
         dmatrix_fig:
             Ploty Figure object displaying a distance matrix.
     """
+    assert not(reweighted and difference), ('Distance Matrix Figure can\'t simultaneously be '
+                                            'difference and reweighted!')
     if isinstance(distance_matrix,str):
         assert distance_matrix.endswith('.csv'), 'Distance matrix file must be in .csv format!'
         distance_matrix = pd.read_csv(distance_matrix,index_col=0)
@@ -949,7 +958,9 @@ def create_distance_matrix_fig(
                                          hoverinfo='text',
                                          hovertext=hovertext,
                                          colorscale=px.colors.diverging.RdBu,
+                                         zmin=min_colorbar,
                                          zmid=0,
+                                         zmax=max_colorbar,
                                          reversescale=True))
 
     # Setup chain dividers lines
@@ -1027,7 +1038,7 @@ def create_distance_matrix_fig(
                                y=1.05,
                                showarrow=False)
 
-    dmatrix_fig.update_layout(width=930,
+    dmatrix_fig.update_layout(width=920,
                               height=900,
                               plot_bgcolor='#FFFFFF',
                               font=dict(family='Helvetica',
@@ -1154,7 +1165,7 @@ def calculate_ss_assignment(
             ss_assign.to_csv(output_path)
         else:
             print(('Secondary structure assignment matrix was not saved to disk, '
-                'output path must be a directory or .csv filepath!'))
+                   'output path must be a directory or .csv filepath!'))
 
     return ss_assign
 
@@ -1177,7 +1188,7 @@ def calculate_ss_frequency(
             assignment reweighting. If None, uniform weights are used.
         output_path:
             path to output .csv file or output directory. If directory, written file is named
-            'ss_assignment.csv'. Defaults to current working directory.
+            'ss_frequency.csv'. Defaults to current working directory.
 
     Returns:
         frequency:
@@ -1192,20 +1203,19 @@ def calculate_ss_frequency(
         frequency = ss_assignment.apply(lambda x: pd.Series(x).value_counts())
         frequency = frequency.fillna(0)
         frequency = frequency / ss_assignment.shape[0]
-        frequency.columns = [int(x) for x in frequency.columns]
     else:
         # Count the frequency of each secondary structure element and reweigh it
         frequency = pd.DataFrame([[0.0]*ss_assignment.shape[1]]*3,
                                  index=['C','E','H'],
-                                 columns=[int(x) for x in ss_assignment.columns])
+                                 columns=[x for x in ss_assignment.columns])
         for row_idx in tqdm(range(ss_assignment.shape[0]),
                             desc='Calculating reweighted secondary structure frequencies... ',
                             total=ss_assignment.shape[0]):
             row_series = ss_assignment.iloc[row_idx,:]
             weight = weights[row_idx]
-            for col_idx in range(1,frequency.shape[1]+1):
-                ssa_label = row_series.iloc[col_idx-1]
-                frequency.loc[ssa_label,col_idx] += weight
+            for col_idx,col_label in enumerate(frequency.columns):
+                ssa_label = row_series.iloc[col_idx]
+                frequency.loc[ssa_label,col_label] += weight
 
     # Save ss assignment frequency
     if os.path.isdir(output_path):
@@ -1261,6 +1271,9 @@ def create_ss_frequency_figure(
             a stacked line plot with the secondary structure frequencies of each secondary
             structure type for each residue in the structure.
     """
+    assert not(reweighted and difference), ('Secondary Structure Frequency Figure can\'t '
+                                            'simultaneously be difference and reweighted!')
+
     if isinstance(ss_frequency,str):
         assert ss_frequency.endswith('.csv'), ('Secondary structure assignment frequency '
                                                 'matrix must be in .csv format!')
@@ -1299,8 +1312,7 @@ def create_ss_frequency_figure(
             # Create hovertext
             hovertext = [f'x: {x_label}<br />y: {round(ss_frequency.loc[structure].iloc[i],5)}'
                           for i,x_label in enumerate(x_labels)]
-            ss_freq_fig.add_trace(go.Scatter(x=list(range(ss_frequency.columns[0],
-                                                          ss_frequency.columns[-1]+1)),
+            ss_freq_fig.add_trace(go.Scatter(x=list(range(1,len(ss_frequency.columns)+1)),
                                              y=ss_frequency.loc[structure],
                                              mode='lines',
                                              marker_color=color,
@@ -1308,9 +1320,10 @@ def create_ss_frequency_figure(
                                              name=structure,
                                              hoverinfo='text',
                                              hovertext=hovertext))
+
     else:
         for structure,color in zip(ss_frequency.index,colors):
-            ss_freq_fig.add_trace(go.Scatter(x=ss_frequency.columns,
+            ss_freq_fig.add_trace(go.Scatter(x=[int(x) for x in ss_frequency.columns],
                                              y=ss_frequency.loc[structure],
                                              mode='lines',
                                              stackgroup='one', # remove for non stacked plot
@@ -1484,7 +1497,7 @@ def calculate_metrics_data(
     dmax: bool = True,
     eed: bool = True,
     cm_dist: dict[str,tuple[str,str]] | None = None,
-    output_path: str | None = None,
+    output_path: str | None = os.getcwd(),
     ) -> pd.DataFrame:
     """Calculate structural metrics for each frame of a trajectory.
 
@@ -1508,7 +1521,7 @@ def calculate_metrics_data(
             MDAnalysis selections.
         output_path:
             path to output .csv file or output directory. If directory, written file is named
-            'structural_metrics.csv'.
+            'structural_metrics.csv'. Defaults to current working directory.
 
     Returns:
         traj_analysis:

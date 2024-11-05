@@ -79,6 +79,8 @@ def traj2saxs(
 
     # Save calculated SAXS data
     calc_saxs_file = os.path.join(os.path.split(exp_saxs_file)[0],f'{trajectory_id}_calc_saxs.dat')
-    np.savetxt(calc_saxs_file, all_calc_saxs,encoding='utf-8')
+    np.savetxt(calc_saxs_file,
+               all_calc_saxs,
+               encoding='utf-8')
 
     return calc_saxs_file

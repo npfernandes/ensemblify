@@ -1,4 +1,4 @@
-"""Reweigh a conformational ensemble using experimental data."""
+"""Reweight a conformational ensemble using experimental data."""
 
 # IMPORTS
 ## Standard Library Imports
@@ -27,7 +27,7 @@ from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.conversion import traj2saxs
 from ensemblify.reweighting.ensemble_utils import (
     attempt_read_data,
-    attempt_read_reweigthing_data,
+    attempt_read_reweighting_data,
     average_saxs_profiles,
     bme_ensemble_reweighting,
     create_effective_frames_fit_fig,
@@ -43,16 +43,16 @@ def reweight_ensemble(
     topology: str,
     trajectory_id: str,
     exp_saxs_data: str,
-    output_dir: str = os.getcwd(),
-    thetas: list[int] = None,
-    calculated_cmatrix: pd.DataFrame | str = None,
-    calculated_dmatrix: pd.DataFrame | str = None,
-    calculated_ss_frequency: pd.DataFrame | str = None,
-    calculated_metrics_data: pd.DataFrame | str = None,
-    compare_rg: bool = True,
-    compare_dmax: bool = True,
-    compare_eed: bool = True,
-    compare_cmdist: bool = None,
+    output_dir: str | None = os.getcwd(),
+    thetas: list[int] | None = None,
+    calculated_cmatrix: pd.DataFrame | str | None = None,
+    calculated_dmatrix: pd.DataFrame | str | None = None,
+    calculated_ss_frequency: pd.DataFrame | str | None = None,
+    calculated_metrics_data: pd.DataFrame | str | None = None,
+    compare_rg: bool | None = True,
+    compare_dmax: bool | None = True,
+    compare_eed: bool | None = True,
+    compare_cmdist: bool | None = None,
     ):
     """Apply Bayesian Maximum Entropy (BME) reweighting to a conformational ensemble, given
     experimental SAXS data.
@@ -131,10 +131,10 @@ def reweight_ensemble(
     calc_saxs_file,\
     thetas_array,\
     stats,\
-    weights = attempt_read_reweigthing_data(reweighting_output_directory=output_dir,
+    weights = attempt_read_reweighting_data(reweighting_output_directory=output_dir,
                                             trajectory_id=trajectory_id)
 
-    if exp_saxs_file is None or calc_saxs_file is None:
+    if exp_saxs_file is None:
         # Copy experimental data file into output dir before working on it
         exp_saxs_data_copy = os.path.join(output_dir,
                                         f'{trajectory_id}_exp_saxs_input.dat')
@@ -157,14 +157,12 @@ def reweight_ensemble(
                        np.loadtxt(processed_exp_data),
                        header=' DATA=SAXS')
 
+    if calc_saxs_file is None:
         # Calculate SAXS data from ensemble
         calc_saxs_file = traj2saxs(trajectory=trajectory,
                                    topology=topology,
                                    trajectory_id=trajectory_id,
                                    exp_saxs_file=exp_saxs_file)
-
-    else:
-        print('Found processed experimental SAXS data and calculated SAXS data.')
 
     if thetas_array is None or stats is None or weights is None:
         # Reweigh ensemble using different theta values
@@ -177,13 +175,6 @@ def reweight_ensemble(
                                                   thetas=thetas_array,
                                                   output_dir=reweighting_dir)
 
-    else:
-        print(f'Found calculated BME reweighting data with theta values: {list(thetas_array)}')
-
-    print(('Please analyse the provided interactive figure (effective_frames_fit.html) and '
-           'input the desired value for the theta parameter.'),
-           flush=True)
-
     effective_frames_fit_fig = create_effective_frames_fit_fig(stats=stats,
                                                                thetas=thetas_array,
                                                                title_text=trajectory_id)
@@ -191,81 +182,47 @@ def reweight_ensemble(
     effective_frames_fit_fig.write_html(os.path.join(output_dir,'effective_frames_fit.html'),
                                         config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
 
-    # Capture chosen theta value
-    chosen_theta = int(input('Choose theta:'))
-    print(f'Chosen theta value: {chosen_theta}.')
+    print(('Please analyze the provided interactive figure (effective_frames_fit.html) and '
+           'input the desired value(s) for the theta parameter.\nIf more than one '
+           'value, please separate them using a comma.'),
+           flush=True)
+
+    # Capture chosen theta values
+    input_choices = input('Choose theta(s):').split(',')
+    print(f'Chosen theta value(s): {", ".join(input_choices)}.')
+    chosen_thetas = [int(x) for x in input_choices]
 
     # Plot L curve with chosen theta(s)
     chosen_thetas_fig = create_effective_frames_fit_fig(stats=stats,
                                                         thetas=thetas_array,
-                                                        choices=chosen_theta,
-                                                        title_text=f'{trajectory_id} BME '
-                                                                    'Reweighting')
+                                                        choices=chosen_thetas,
+                                                        title_text=(f'{trajectory_id} BME '
+                                                                    'Reweighting'))
 
-    # Extract correct set of weights using index for chosen theta
-    chosen_weight_set = weights[np.where(thetas_array == chosen_theta)[0][0]]
+    # Extract correct set(s) of weights using index(es) for chosen theta(s)
+    choice_idxs = [np.where(thetas_array == x)[0][0] for x in chosen_thetas]
+    chosen_weight_sets = [ weights[i] for i in choice_idxs]
 
-    # Grab reweighted SAXS data using choice theta
-    rw_calc_saxs_file = glob.glob(os.path.join(reweighting_dir,
-                                               f'ibme_t{chosen_theta}_*.calc.dat'))[0]
+    # Calculate prior and posterior average SAXS intensities
+    common_i_prior = None
+    i_posts = []
 
-    # Calculate uniform (prior) and  reweighted (posterior) average SAXS profiles
-    i_prior, i_post = average_saxs_profiles(exp_saxs_file=exp_saxs_file,
-                                            calc_saxs_file=calc_saxs_file,
-                                            rw_calc_saxs_file=rw_calc_saxs_file,
-                                            weights=chosen_weight_set)
+    for chosen_theta,chosen_weight_set in zip(chosen_thetas,chosen_weight_sets):
+        # Grab reweighted SAXS data using choice theta
+        rw_calc_saxs_file = glob.glob(os.path.join(reweighting_dir,
+                                                   f'ibme_t{chosen_theta}_*.calc.dat'))[0]
 
-    # print(('Please analyse the provided interactive figure (effective_frames_fit.html) and '
-    #        'input the desired value(s) for the theta parameter.\nIf more than one '
-    #        'value, please separate them using a comma.'),
-    #        flush=True)
+        # Calculate uniform (prior) and  reweighted (posterior) average SAXS profiles
+        i_prior, i_post = average_saxs_profiles(exp_saxs_file=exp_saxs_file,
+                                                calc_saxs_file=calc_saxs_file,
+                                                rw_calc_saxs_file=rw_calc_saxs_file,
+                                                weights=chosen_weight_set)
 
-    # effective_frames_fit_fig = create_effective_frames_fit_fig(stats=stats,
-    #                                                            thetas=thetas_array,
-    #                                                            choices=None,
-    #                                                            title_text=trajectory_id)
+        common_i_prior = i_prior
+        i_posts.append(i_post)
 
-    # effective_frames_fit_fig.write_html(os.path.join(output_dir,'effective_frames_fit.html'),
-    #                                     config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
-
-    # # Capture chosen theta values
-    # input_choices = input('Choose theta(s):').split(',')
-    # print(f'Chosen theta value(s): {",".join(input_choices)}.')
-    # chosen_thetas = [int(x) for x in input_choices]
-
-    # # Plot L curve with chosen theta(s)
-    # chosen_thetas_fig = create_effective_frames_fit_fig(stats=stats,
-    #                                                     thetas=thetas_array,
-    #                                                     choices=chosen_thetas,
-    #                                                     title_text=f'{trajectory_id} BME Reweighting')
-
-    # # Extract correct set(s) of weights using index(es) for chosen theta(s)
-    # choice_idxs = [np.where(thetas_array == x)[0][0] for x in chosen_thetas]
-    # chosen_weight_sets = [ weights[i] for i in choice_idxs]
-
-    # # Calculate reweighted SAXS curves
-    # print(f'Calculating {trajectory_id} reweighted SAXS curve(s)...')
-
-    # # Calculate reweighted curve for each theta + weights
-    # i_posts = []
-    # common_i_prior = None
-    # for chosen_theta,chosen_weight_set in zip(chosen_thetas,chosen_weight_sets):
-
-    #     # Take reweighted SAXS data using choice theta, and corresponding weights
-    #     rw_calc_saxs_file = glob.glob(os.path.join(reweighting_dir,
-    #                                                f'ibme_t{chosen_theta}_*.calc.dat'))[0]
-
-    #     # Calculate prior and posterior SAXS profiles
-    #     i_prior, i_post = average_saxs_profiles(exp_saxs_file=exp_saxs_file,
-    #                                             calc_saxs_file=calc_saxs_file,
-    #                                             rw_calc_saxs_file=rw_calc_saxs_file,
-    #                                             weights=chosen_weight_set)
-
-    #     common_i_prior = i_prior
-    #     i_posts.append(i_post)
-
-
-    # Calculate Contact Maps
+    # Calculate Contact Matrices
+    ## Uniform
     cmatrix = attempt_read_data(data=calculated_cmatrix,
                                 data_msg_tag='cmatrix',
                                 calc_fn=calculate_contact_matrix,
@@ -273,17 +230,23 @@ def reweight_ensemble(
                                 topology=topology,
                                 output_path=os.path.join(output_dir,
                                                          f'{trajectory_id}_contact_matrix.csv'))
-
-    rw_cmatrix = calculate_contact_matrix(trajectory=trajectory,
-                                          topology=topology,
-                                          weights=chosen_weight_set,
-                                          output_path=os.path.join(output_dir,
-                                                                   f'{trajectory_id}_contact_'
-                                                                    'matrix_reweighted.csv'))
-
-    diff_cmatrix = rw_cmatrix - cmatrix
+    ## Reweighted
+    rw_cmatrices = []
+    diff_cmatrices = []
+    for chosen_theta,chosen_weight_set in zip(chosen_thetas,chosen_weight_sets):
+        rw_cmatrix = calculate_contact_matrix(trajectory=trajectory,
+                                              topology=topology,
+                                              weights=chosen_weight_set,
+                                              output_path=os.path.join(output_dir,
+                                                                       f'{trajectory_id}'
+                                                                       '_contact_matrix_'
+                                                                       f't{chosen_theta}_'
+                                                                       'reweighted.csv'))
+        rw_cmatrices.append(rw_cmatrix)
+        diff_cmatrices.append(rw_cmatrix - cmatrix)
 
     # Calculate Distance Matrices
+    ## Uniform
     dmatrix = attempt_read_data(data=calculated_dmatrix,
                                 data_msg_tag='dmatrix',
                                 calc_fn=calculate_distance_matrix,
@@ -291,17 +254,23 @@ def reweight_ensemble(
                                 topology=topology,
                                 output_path=os.path.join(output_dir,
                                                          f'{trajectory_id}_distance_matrix.csv'))
+    ## Reweighted
+    rw_dmatrices = []
+    diff_dmatrices = []
+    for chosen_theta,chosen_weight_set in zip(chosen_thetas,chosen_weight_sets):
+        rw_dmatrix = calculate_distance_matrix(trajectory=trajectory,
+                                               topology=topology,
+                                               weights=chosen_weight_set,
+                                               output_path=os.path.join(output_dir,
+                                                                        f'{trajectory_id}'
+                                                                        '_distance_matrix_'
+                                                                        f't{chosen_theta}_'
+                                                                        'reweighted.csv'))
+        rw_dmatrices.append(rw_dmatrix)
+        diff_dmatrices.append(rw_dmatrix - dmatrix)
 
-    rw_dmatrix = calculate_distance_matrix(trajectory=trajectory,
-                                           topology=topology,
-                                           weights=chosen_weight_set,
-                                           output_path=os.path.join(output_dir,
-                                                                    f'{trajectory_id}_distance_'
-                                                                     'matrix_reweighted.csv'))
-
-    diff_dmatrix = rw_dmatrix - dmatrix
-
-    # Calculate Secondary Structure Assignment
+    # Calculate Secondary Structure Assignment Frequency Matrices
+    ## Uniform
     ssfreq = attempt_read_data(data=calculated_ss_frequency,
                                data_msg_tag='ss_freq',
                                calc_fn=calculate_ss_frequency,
@@ -310,16 +279,22 @@ def reweight_ensemble(
                                output_path=os.path.join(output_dir,
                                                         f'{trajectory_id}_ss_frequency.csv'))
 
-    rw_ssfreq = calculate_ss_frequency(trajectory=trajectory,
-                                       topology=topology,
-                                       weights=chosen_weight_set,
-                                       output_path=os.path.join(output_dir,
-                                                                f'{trajectory_id}_ss_frequency_'
-                                                                 'reweighted.csv'))
+    ## Reweighted
+    rw_ssfreqs = []
+    diff_ssfreqs = []
+    for chosen_theta,chosen_weight_set in zip(chosen_thetas,chosen_weight_sets):
+        rw_ssfreq = calculate_ss_frequency(trajectory=trajectory,
+                                           topology=topology,
+                                           weights=chosen_weight_set,
+                                           output_path=os.path.join(output_dir,
+                                                                    f'{trajectory_id}'
+                                                                    '_ss_frequency_'
+                                                                    f't{chosen_theta}_'
+                                                                    'reweighted.csv'))
+        rw_ssfreqs.append(rw_ssfreq)
+        diff_ssfreqs.append(rw_ssfreq - ssfreq)
 
-    diff_ssfreq = rw_ssfreq - ssfreq
-
-    # Calculate Structural Metrics Distributions
+    # Calculate Uniform Structural Metrics Distributions
     metrics = attempt_read_data(data=calculated_metrics_data,
                                 data_msg_tag='structural_metrics',
                                 calc_fn=calculate_metrics_data,
@@ -330,8 +305,9 @@ def reweight_ensemble(
                                 eed=compare_eed,
                                 cm_dist=compare_cmdist,
                                 output_path=os.path.join(output_dir,
-                                                         f'{trajectory_id}_structural_'
-                                                          'metrics.csv'))
+                                                         f'{trajectory_id}'
+                                                         '_structural_metrics.csv'))
+
 
     # Create interactive figures
     print(f'Creating {trajectory_id} reweighted interactive figures...')
@@ -340,77 +316,122 @@ def reweight_ensemble(
     ## Read experimental data
     q, i_exp, err = np.loadtxt(exp_saxs_file,
                                unpack=True)
+    ## Create Figure
     rw_fits_fig = create_reweighting_fits_fig(q=q,
                                               i_exp=i_exp,
                                               err=err,
-                                              i_prior=i_prior,
-                                              i_posts=i_post,
+                                              i_prior=common_i_prior,
+                                              i_posts=i_posts,
                                               title_text=f'{trajectory_id} Reweighted Fittings')
 
+    # Create nested dictionary to split up reweighted figures according to theta values
+    theta_2_reweighted_figures = {}
+    for chosen_theta in chosen_thetas:
+        theta_2_reweighted_figures[chosen_theta] = {'cmap': None,
+                                                    'rw_cmap': None,
+                                                    'diff_cmap': None,
+                                                    'dmatrix': None,
+                                                    'rw_dmatrix': None,
+                                                    'diff_dmatrix': None,
+                                                    'ssfreq': None,
+                                                    'rw_ssfreq': None,
+                                                    'diff_ssfreq': None
+                                                    }
     # Contact Maps
-    cmap_fig = create_contact_map_fig(contact_matrix=cmatrix,
-                                      topology=topology,
-                                      trajectory_id=trajectory_id,
-                                      output_path=output_dir)
+    for chosen_theta, rw_cm, diff_cm in zip(chosen_thetas, rw_cmatrices,diff_cmatrices):
+        ## Uniform
+        cmap_fig = create_contact_map_fig(contact_matrix=cmatrix,
+                                          topology=topology,
+                                          trajectory_id=trajectory_id,
+                                          output_path=output_dir)
+        theta_2_reweighted_figures[chosen_theta]['cmap'] = cmap_fig
 
-    rw_cmap_fig = create_contact_map_fig(contact_matrix=rw_cmatrix,
-                                         topology=topology,
-                                         trajectory_id=trajectory_id,
-                                         output_path=output_dir,
-                                         reweighted=True)
-
-    diff_cmaps_fig = create_contact_map_fig(contact_matrix=diff_cmatrix,
-                                            topology=topology,
-                                            trajectory_id=trajectory_id,
-                                            output_path=output_dir,
-                                            difference=True)
-
-    # Distance Matrices
-    ## Get maximum of colorbar
-    max_data = max(np.max(dmatrix.values),
-                   np.max(rw_dmatrix.values))
-    max_colorbar = 5*(math.ceil(max_data/5))
-
-    dmatrix_fig = create_distance_matrix_fig(distance_matrix=dmatrix,
+        ## Reweighted
+        rw_cmap_fig = create_contact_map_fig(contact_matrix=rw_cm,
                                              topology=topology,
                                              trajectory_id=trajectory_id,
                                              output_path=output_dir,
-                                             max_colorbar=max_colorbar)
+                                             reweighted=True)
+        theta_2_reweighted_figures[chosen_theta]['rw_cmap'] = rw_cmap_fig
 
-    rw_dmatrix_fig = create_distance_matrix_fig(distance_matrix=rw_dmatrix,
-                                                topology=topology,
-                                                trajectory_id=trajectory_id,
-                                                output_path=output_dir,
-                                                max_colorbar=max_colorbar,
-                                                reweighted=True)
-
-    diff_dmatrices_fig = create_distance_matrix_fig(distance_matrix=diff_dmatrix,
-                                                    topology=topology,
-                                                    trajectory_id=trajectory_id,
-                                                    output_path=output_dir,
-                                                    difference=True)
-
-    # Secondary Structure Frequencies
-    ssfreq_fig = create_ss_frequency_figure(ss_frequency=ssfreq,
-                                            topology=topology,
-                                            trajectory_id=trajectory_id,
-                                            output_path=output_dir)
-
-    rw_ssfreq_fig = create_ss_frequency_figure(ss_frequency=rw_ssfreq,
+        diff_cmap_fig = create_contact_map_fig(contact_matrix=diff_cm,
                                                topology=topology,
                                                trajectory_id=trajectory_id,
                                                output_path=output_dir,
-                                               reweighted=True)
+                                               difference=True)
+        theta_2_reweighted_figures[chosen_theta]['diff_cmap'] = diff_cmap_fig
 
-    diff_ssfreqs_fig = create_ss_frequency_figure(ss_frequency=diff_ssfreq,
-                                                  topology=topology,
-                                                  trajectory_id=trajectory_id,
-                                                  output_path=output_dir,
-                                                  difference=True)
+    # Distance Matrices
+    ## Get maximum of colorbar
+    max_data = max(list(map(np.max,[dmatrix] + rw_dmatrices)))
+    max_colorbar = 5*(math.ceil(max_data/5))
+    print(f'{max_colorbar=}')
+    ## Get max/min of difference colorbar
+    max_diff_data = max(list(map(np.max,diff_dmatrices)))
+    min_diff_data = min(list(map(np.min,diff_dmatrices)))
+    max_diff_colorbar = 2*(math.ceil(max_diff_data/2))
+    min_diff_colorbar = -2*(math.floor(min_diff_data/-2))
 
-    # Structural Metrics Distributions
+    if abs(max_diff_colorbar) > abs(min_diff_colorbar):
+        min_diff_colorbar = - max_diff_colorbar
+    else:
+        max_diff_colorbar = - min_diff_colorbar
+
+    ## Create figures
+    for chosen_theta, rw_dm, diff_dm in zip(chosen_thetas,rw_dmatrices,diff_dmatrices):
+        ## Uniform
+        dmatrix_fig = create_distance_matrix_fig(distance_matrix=dmatrix,
+                                                 topology=topology,
+                                                 trajectory_id=trajectory_id,
+                                                 output_path=output_dir,
+                                                 max_colorbar=max_colorbar)
+        theta_2_reweighted_figures[chosen_theta]['dmatrix'] = dmatrix_fig
+
+        ## Reweighted
+        rw_dmatrix_fig = create_distance_matrix_fig(distance_matrix=rw_dm,
+                                                    topology=topology,
+                                                    trajectory_id=trajectory_id,
+                                                    output_path=output_dir,
+                                                    max_colorbar=max_colorbar,
+                                                    reweighted=True)
+        theta_2_reweighted_figures[chosen_theta]['rw_dmatrix'] = rw_dmatrix_fig
+
+        diff_dmatrix_fig = create_distance_matrix_fig(distance_matrix=diff_dm,
+                                                      topology=topology,
+                                                      trajectory_id=trajectory_id,
+                                                      output_path=output_dir,
+                                                      max_colorbar=max_diff_colorbar,
+                                                      min_colorbar=min_diff_colorbar,
+                                                      difference=True)
+        theta_2_reweighted_figures[chosen_theta]['diff_dmatrix'] = diff_dmatrix_fig
+
+    # Secondary Structure Frequencies
+    for chosen_theta, rw_ssf, diff_ssf in zip(chosen_thetas,rw_ssfreqs,diff_ssfreqs):
+        ## Uniform
+        ssfreq_fig = create_ss_frequency_figure(ss_frequency=ssfreq,
+                                                topology=topology,
+                                                trajectory_id=trajectory_id,
+                                                output_path=output_dir)
+        theta_2_reweighted_figures[chosen_theta]['ssfreq'] = ssfreq_fig
+
+        ## Reweighted
+        rw_ssfreq_fig = create_ss_frequency_figure(ss_frequency=rw_ssf,
+                                                   topology=topology,
+                                                   trajectory_id=trajectory_id,
+                                                   output_path=output_dir,
+                                                   reweighted=True)
+        theta_2_reweighted_figures[chosen_theta]['rw_ssfreq'] = rw_ssfreq_fig
+
+        diff_ssfreq_fig = create_ss_frequency_figure(ss_frequency=diff_ssf,
+                                                     topology=topology,
+                                                     trajectory_id=trajectory_id,
+                                                     output_path=output_dir,
+                                                     difference=True)
+        theta_2_reweighted_figures[chosen_theta]['diff_ssfreq'] = diff_ssfreq_fig
+
+    # Structural Metrics Distributions (Uniform + Reweighted)
     rw_metrics_fig = create_reweighting_metrics_fig(metrics=metrics,
-                                                    weight_sets=chosen_weight_set,
+                                                    weight_sets=chosen_weight_sets,
                                                     title_text=f'{trajectory_id} Reweighted '
                                                                 'Structural Metrics')
 
@@ -429,53 +450,94 @@ def reweight_ensemble(
                                       include_plotlyjs=False,
                                       div_id='rw_fits')
 
+    # Create nested dictionary to split up reweighted divs according to theta values
+    theta_2_reweighted_divs = {}
+    for chosen_theta in chosen_thetas:
+        theta_2_reweighted_divs[chosen_theta] = {'cmap': None,
+                                                 'rw_cmap': None,
+                                                 'diff_cmap': None,
+                                                 'dmatrix': None,
+                                                 'rw_dmatrix': None,
+                                                 'diff_dmatrix': None,
+                                                 'ssfreq': None,
+                                                 'rw_ssfreq': None,
+                                                 'diff_ssfreq': None
+                                                 }
+
     # Contact Maps
-    cmap_div = cmap_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
-                                full_html=False,
-                                include_plotlyjs=False,
-                                div_id='cmap')
-
-    rw_cmap_div = rw_cmap_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
-                                      full_html=False,
-                                      include_plotlyjs=False,
-                                      div_id='rw_cmap')
-
-    diff_cmaps_div = diff_cmaps_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
-                                            full_html=False,
-                                            include_plotlyjs=False,
-                                            div_id='diff_cmaps')
-
-    # Distance Matrices
-    dmatrix_div = dmatrix_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
-                                      full_html=False,
-                                      include_plotlyjs=False,
-                                      div_id='dmatrix')
-
-    rw_dmatrix_div = rw_dmatrix_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
-                                            full_html=False,
-                                            include_plotlyjs=False,
-                                            div_id='rw_dmatrix')
-
-    diff_dmatrices_div = diff_dmatrices_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
-                                                    full_html=False,
-                                                    include_plotlyjs=False,
-                                                    div_id='diff_dmatrices')
-
-    # Secondary Structure Frequencies
-    ssfreq_div = ssfreq_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
+    for i,chosen_theta in enumerate(chosen_thetas):
+        ## Uniform
+        cmap_fig = theta_2_reweighted_figures[chosen_theta]['cmap']
+        cmap_div = cmap_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
                                     full_html=False,
                                     include_plotlyjs=False,
-                                    div_id='ssfreq')
+                                    div_id=f'cmap_{i+1}')
+        theta_2_reweighted_divs[chosen_theta]['cmap'] = cmap_div
 
-    rw_ssfreq_div = rw_ssfreq_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
+        ## Reweighted
+        rw_cmap_fig = theta_2_reweighted_figures[chosen_theta]['rw_cmap']
+        rw_cmap_div = rw_cmap_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
                                           full_html=False,
                                           include_plotlyjs=False,
-                                          div_id='rw_ssfreq')
+                                          div_id=f'rw_cmap_{i+1}')
+        theta_2_reweighted_divs[chosen_theta]['rw_cmap'] = rw_cmap_div
 
-    diff_ssfreqs_div = diff_ssfreqs_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
+        diff_cmap_fig = theta_2_reweighted_figures[chosen_theta]['diff_cmap']
+        diff_cmap_div = diff_cmap_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
+                                              full_html=False,
+                                              include_plotlyjs=False,
+                                              div_id=f'diff_cmap_{i+1}')
+        theta_2_reweighted_divs[chosen_theta]['diff_cmap'] = diff_cmap_div
+
+    # Distance Matrices
+    for i,chosen_theta in enumerate(chosen_thetas):
+        ## Uniform
+        dmatrix_fig = theta_2_reweighted_figures[chosen_theta]['dmatrix']
+        dmatrix_div = dmatrix_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
+                                        full_html=False,
+                                        include_plotlyjs=False,
+                                        div_id=f'dmatrix_{i+1}')
+        theta_2_reweighted_divs[chosen_theta]['dmatrix'] = dmatrix_div
+
+        ## Reweighted
+        rw_dmatrix_fig = theta_2_reweighted_figures[chosen_theta]['rw_dmatrix']
+        rw_dmatrix_div = rw_dmatrix_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
                                                 full_html=False,
                                                 include_plotlyjs=False,
-                                                div_id='diff_ssfreqs')
+                                                div_id=f'rw_dmatrix_{i+1}')
+        theta_2_reweighted_divs[chosen_theta]['rw_dmatrix'] = rw_dmatrix_div
+
+        diff_dmatrix_fig = theta_2_reweighted_figures[chosen_theta]['diff_dmatrix']
+        diff_dmatrix_div = diff_dmatrix_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
+                                                    full_html=False,
+                                                    include_plotlyjs=False,
+                                                    div_id=f'diff_dmatrix_{i+1}')
+        theta_2_reweighted_divs[chosen_theta]['diff_dmatrix'] = diff_dmatrix_div
+
+    # Secondary Structure Frequencies
+    for i,chosen_theta in enumerate(chosen_thetas):
+        ## Uniform
+        ssfreq_fig = theta_2_reweighted_figures[chosen_theta]['ssfreq']
+        ssfreq_div = ssfreq_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
+                                        full_html=False,
+                                        include_plotlyjs=False,
+                                        div_id=f'ssfreq_{i+1}')
+        theta_2_reweighted_divs[chosen_theta]['ssfreq'] = ssfreq_div
+
+        ## Reweighted
+        rw_ssfreq_fig = theta_2_reweighted_figures[chosen_theta]['rw_ssfreq']
+        rw_ssfreq_div = rw_ssfreq_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
+                                              full_html=False,
+                                              include_plotlyjs=False,
+                                              div_id=f'rw_ssfreq_{i+1}')
+        theta_2_reweighted_divs[chosen_theta]['rw_ssfreq'] = rw_ssfreq_div
+
+        diff_ssfreq_fig = theta_2_reweighted_figures[chosen_theta]['diff_ssfreq']
+        diff_ssfreq_div = diff_ssfreq_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
+                                                  full_html=False,
+                                                  include_plotlyjs=False,
+                                                  div_id=f'diff_ssfreq_{i+1}')
+        theta_2_reweighted_divs[chosen_theta]['diff_ssfreq'] = diff_ssfreq_div
 
     # Structural Metrics Distributions
     rw_metrics_div = rw_metrics_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
@@ -484,6 +546,70 @@ def reweight_ensemble(
                                             div_id='rw_metrics')
 
     # Build html
+    theta_2_dashboard_divs = {}
+    for chosen_theta in chosen_thetas:
+        theta_2_dashboard_divs[chosen_theta] = {'title': '',
+                                                'cmap_div': '',
+                                                'dmatrix_div': '',
+                                                'ssfreq_div': ''}
+
+    for chosen_theta in chosen_thetas:
+        theta_2_dashboard_divs[chosen_theta]['title'] += (f'{trajectory_id} '
+                                                          'BME Reweighting '
+                                                          'with \u03B8='
+                                                          f'{chosen_theta}')
+
+        # Create Contact Map Div
+        cmap_div = theta_2_reweighted_divs[chosen_theta]['cmap']
+        rw_cmap_div = theta_2_reweighted_divs[chosen_theta]['rw_cmap']
+        diff_cmap_div = theta_2_reweighted_divs[chosen_theta]['diff_cmap']
+        cmap_div_str = cmap_div + ('&nbsp;' * 9) \
+                       + rw_cmap_div + ('&nbsp;' * 9) \
+                       + diff_cmap_div
+        theta_2_dashboard_divs[chosen_theta]['cmap_div'] += cmap_div_str
+
+        # Create Distance Matrix Div
+        dmatrix_div = theta_2_reweighted_divs[chosen_theta]['dmatrix']
+        rw_dmatrix_div = theta_2_reweighted_divs[chosen_theta]['rw_dmatrix']
+        diff_dmatrix_div = theta_2_reweighted_divs[chosen_theta]['diff_dmatrix']
+        dmatrix_div_str = dmatrix_div + ('&nbsp;' * 9) \
+                          + rw_dmatrix_div + ('&nbsp;' * 9) \
+                          + diff_dmatrix_div
+        theta_2_dashboard_divs[chosen_theta]['dmatrix_div'] += dmatrix_div_str
+
+        # Create Secondary Structure Frequency Div
+        ssfreq_div = theta_2_reweighted_divs[chosen_theta]['ssfreq']
+        rw_ssfreq_div = theta_2_reweighted_divs[chosen_theta]['rw_ssfreq']
+        diff_ssfreq_div = theta_2_reweighted_divs[chosen_theta]['diff_ssfreq']
+        ssfreq_div_str = ssfreq_div + ('&nbsp;' * 9) \
+                         + rw_ssfreq_div + ('&nbsp;' * 9) \
+                         + diff_ssfreq_div
+        theta_2_dashboard_divs[chosen_theta]['ssfreq_div'] += ssfreq_div_str
+
+    theta_divs = ''
+    for chosen_theta in chosen_thetas:
+        div_str = f'''
+            <div>
+            <p style="text-align:center; font-family:Helvetica; font-size:48px;">
+            {theta_2_dashboard_divs[chosen_theta]['title']}
+            </p>
+            </div>
+            <div class="flex-container">
+                {theta_2_dashboard_divs[chosen_theta]['cmap_div']}
+            </div>
+            <br><br>
+            <div class="flex-container">
+                {theta_2_dashboard_divs[chosen_theta]['dmatrix_div']}
+            </div>
+            <br><br>
+            <div class="flex-container">
+                {theta_2_dashboard_divs[chosen_theta]['ssfreq_div']}
+            </div>
+            <br><br><br>
+            '''
+        theta_divs += div_str
+
+    ## Build dashboard
     dashboard_html = f'''
     <!DOCTYPE html>
     <html>
@@ -507,32 +633,11 @@ def reweight_ensemble(
             </div>
             <br><br><br>
             <div class="flex-container">
-                {cmap_div}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {rw_cmap_div}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {diff_cmaps_div}
-            </div>
-            <br><br><br>
-            <div class="flex-container">
-                {dmatrix_div}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {rw_dmatrix_div}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {diff_dmatrices_div}
-            </div>
-            <br><br><br>
-            <div class="flex-container">
-                {ssfreq_div}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {rw_ssfreq_div}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {diff_ssfreqs_div}
-            </div>
-            <br><br><br>
-            <div class="flex-container">
                 {rw_metrics_div}
             </div>
+            <br><br><br>
+            {theta_divs}
+            <br>
         </body>
     </html>
     '''
@@ -545,10 +650,10 @@ def reweight_ensemble(
           'reweighting_dashboard.html figure for analysis.')
 
 if __name__ == '__main__':
-    # from ensemblify import update_config
+    from ensemblify import update_config
 
-    # update_config({'PEPSI_SAXS_PATH': '/home/tiagogomes/software/Pepsi-SAXS',
-    #                'BIFT_PATH': '/home/tiagogomes/software/bift'})
+    update_config({'PEPSI_SAXS_PATH': '/home/tiagogomes/software/Pepsi-SAXS',
+                   'BIFT_PATH': '/home/tiagogomes/software/bift'})
 
     reweight_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
                       topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb',

@@ -20,13 +20,13 @@ Example applications
   The `ensemblify.conversion.ensemble2traj` function can be used to create a .xtc trajectory file
   from an ensemble of .pdb files. For example, we can create a trajectory from the set of .pdb
   structures of Histatin5, an intrinsically disordered protein (IDP) with 24 aminoacid residues.
-  The required directory where Hst5 .pdb structures are stored is included within the example
-  data files:
+  Assuming that the path to the directory where Hst5 .pdb structures are stored and the path to
+  the directory where the created .xtc trajectory file will be stored are assigned to variables
+  named, respectively, HST5_ENSEMBLE_DIR and HST5_TRAJECTORY_DIR, you should run:
 
 ```
 >>> import ensemblify as ey
->>> from ensemblify.datafiles import HST5_ENSEMBLE_DIR
->>> ey.ensemble2traj(HST5_ENSEMBLE_DIR,os.getcwd(),'Hst5')
+>>> ey.ensemble2traj(HST5_ENSEMBLE_DIR,HST5_TRAJECTORY_DIR,'Hst5')
 ```
 
 - Calculate a theoretical SAXS curve from a trajectory
@@ -34,11 +34,11 @@ Example applications
   The `ensemblify.conversion.traj2saxs` function can be used to back-calculate an average SAXS
   curve from a .xtc trajectory file. For example, we can calculate a SAXS curve from a .xtc
   trajectory file of Histatin5, an intrinsically disordered protein (IDP) with 24 aminoacid
-  residues. The required Hst5 .xtc trajectory file is included within the example data files:
+  residues. Assuming the path to the required Hst5 .xtc trajectory file is assigned to a variable
+  named HST5_TRAJECTORY, you should run:
 
 ```
 >>> import ensemblify as ey
->>> from ensemblify.datafiles import HST5_TRAJECTORY
 >>> ey.traj2saxs(HST5_TRAJECTORY)
 ```
 

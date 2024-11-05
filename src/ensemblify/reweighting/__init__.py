@@ -18,13 +18,13 @@ Example applications
   ---------------------
   The `ensemblify.generation.reweight_ensemble` function can be used to reweight a conformational
   ensemble using an experimental SAXS data file. For example, we can reweight the ensemble
-  of Histatin5, an intrinsically disordered protein (IDP) with 24 aminoacid residues, using
-  experimental SAXS data of Hst5. The required Hst5 .xtc trajectory file and Hst5 .dat experimental
-  SAXS data are included within the example data files:
+  of Histatin5 (Hst5), an intrinsically disordered protein (IDP) with 24 aminoacid residues, using
+  experimental SAXS data of Hst5. Assuming the path to the required Hst5 .xtc trajectory file and
+  path to the required Hst5 .dat experimental SAXS data file are assigned to variables named,
+  respectively, HST5_TRAJECTORY and HST5_SAXS, you should run:
 
 ```
 >>> import ensemblify as ey
->>> from ensemblify.datafiles import HST5_TRAJECTORY,HST5_SAXS
 >>> ey.reweight_ensemble(HST5_TRAJECTORY,HST5_SAXS)
 ```
 

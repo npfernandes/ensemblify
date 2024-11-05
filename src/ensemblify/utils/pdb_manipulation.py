@@ -61,7 +61,7 @@ def df_from_pdb(pdb: str) -> pd.DataFrame:
     return df
 
 
-def df_to_pdb(df: pd.DataFrame,output_pdb_filename: str):
+def df_to_pdb(df: pd.DataFrame, output_pdb_filename: str):
     """Write content of a DataFrame containing PDB file info as a .pdb file using BioPDB.
 
     Args:

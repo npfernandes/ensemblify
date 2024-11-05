@@ -16,7 +16,7 @@ def ensemble2traj(
     job_name: str,
     ensemble_dir: str,
     trajectory_dir: str,
-    trajectory_size: int = 10000,
+    trajectory_size: int | None = 10000,
     ) -> tuple[str,str]:
     """Create a trajectory (.xtc) file from an ensemble of .pdb files.
     

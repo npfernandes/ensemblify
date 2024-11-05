@@ -18,12 +18,11 @@ Example applications
   --------------------
   The `ensemblify.generation.generate_ensemble` function can be used to generate a conformational
   ensemble from a .yaml parameters file. For example, we can generate an ensemble for Histatin5,
-  an intrinsically disordered protein (IDP) with 24 aminoacid residues. The required input
-  parameters file is included within the example data files:
+  an intrinsically disordered protein (IDP) with 24 aminoacid residues. Assuming the path to the
+  required input parameters file is assigned to a variable named HST5_PARAMS, you should run:
 
 ```
 >>> import ensemblify as ey
->>> from ensemblify.datafiles import HST5_PARAMS
 >>> ey.generate_ensemble(HST5_PARAMS)
 ```
 

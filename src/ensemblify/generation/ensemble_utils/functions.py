@@ -676,6 +676,10 @@ def setup_fold_tree(
             residues between which AtomPairConstraints will be applied.
         contacts:
             residue ranges where two chains are interacting.
+    
+    Reference:
+        See https://docs.rosettacommons.org/demos/latest/tutorials/fold_tree/fold_tree
+        for more information about the Rosetta FoldTree.
     """
     # Prepare working pose
     ft_pose = Pose()

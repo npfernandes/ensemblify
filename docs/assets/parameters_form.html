@@ -294,7 +294,7 @@
           <input type="checkbox" id="PAECheckbox"style="display:inline-block">&nbsp;
           <div class="tooltip-icon">&#9432;
             <span class="tooltip-text">
-              Any restraints derived from Sampling Targets or defined<br>
+              Any constraints derived from Sampling Targets or defined<br>
               in Constraints will be ignored and constraints created from<br>
               the given PAE matrix will be used instead.If you want to<br>
               customize how these constraints are created, check the<br>
@@ -304,13 +304,13 @@
           <input type="text" id="PAEPath" placeholder="Path to PAE matrix .json file from AlphaFold output" style="display:none;">
         </fieldset>
 
-        <h2>Restraint(s)</h2>&nbsp;
+        <h2>Constraint(s)</h2>&nbsp;
         <div class="tooltip-icon">&#9432;
           <span class="tooltip-text">
             Ways to bias sampling towards desired structural properties.
           </span>
         </div>
-        <fieldset id="restraints">
+        <fieldset id="constraints">
           <label><b>Secondary Structure Bias</b> ( <input type="number" style="display:inline-block" class="inputSSPercentage" min="1" max="100" value="100" placeholder="100">   %  )</label>
           <div class="tooltip-icon">&#9432;
             <span class="tooltip-text">
@@ -795,15 +795,15 @@
       });
       targets = targets.slice(0,-1);
 
-      // Collect restraints data
+      // Collect constraints data
 
         // Collect secondary structures data
         var ssBiasesMap = new Map();
-        Array.from(document.getElementById('dynamicSecondaryStructuresContainer').querySelectorAll('.dynamicSecondaryStructure')).forEach(function (restraint) {
-            var chain = restraint.querySelector('.inputChain').value;
-            var residueRange = restraint.querySelector('.inputResidueRange').value;
-            var secondaryStructure = restraint.querySelector('#secondarystructureSelect').value;
-            var percentage = restraint.querySelector('.inputSSPercentage').value;
+        Array.from(document.getElementById('dynamicSecondaryStructuresContainer').querySelectorAll('.dynamicSecondaryStructure')).forEach(function (constraint) {
+            var chain = constraint.querySelector('.inputChain').value;
+            var residueRange = constraint.querySelector('.inputResidueRange').value;
+            var secondaryStructure = constraint.querySelector('#secondarystructureSelect').value;
+            var percentage = constraint.querySelector('.inputSSPercentage').value;
 
             // Check if the chain is already in the map
             if (ssBiasesMap.has(chain)) {
@@ -844,13 +844,11 @@ alphafold:
   ${document.getElementById('plddt').checked}
 pae:
   ${document.getElementById('PAEPath').value}
-restraints:
+constraints:
   ss_bias :
     ${ssBiases}
   contacts :
     ${contacts}
-  other_experimental_info :
-    # Add your logic to collect other experimental information
 output_path:
   ${document.getElementById('outputPath').value}
 faspr_path:
@@ -903,5 +901,3 @@ pae_params:
   </script>
 </body>
 </html>
-
-

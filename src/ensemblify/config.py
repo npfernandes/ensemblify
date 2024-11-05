@@ -55,6 +55,3 @@ def update_config(new_config: dict):
 
     """
     GLOBAL_CONFIG.update(new_config)
-
-def get_software_path():
-    pass

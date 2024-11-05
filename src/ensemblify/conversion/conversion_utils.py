@@ -137,6 +137,8 @@ def calc_saxs_data(
 
     # Calculate SAXS data for this frame
     pepsi_saxs_path = GLOBAL_CONFIG['PEPSI_SAXS_PATH']
+    assert pepsi_saxs_path is not None, 'Pepsi-SAXS installation not found!'
+
     pepsi_comm = f'{pepsi_saxs_path} {frame_file} {exp_saxs_file} -o {output_file} -cst -x'
     subprocess.run(pepsi_comm.split(),
                    stdout=open(calc_saxs_log,'a',encoding='utf-8'),
@@ -150,5 +152,3 @@ def calc_saxs_data(
     os.remove(output_file)
 
     return calc_saxs
-
-

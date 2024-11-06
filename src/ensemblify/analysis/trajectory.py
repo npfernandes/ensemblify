@@ -17,14 +17,14 @@ def analyze_trajectory(
     trajectories: list[str] | str,
     topologies: list[str] | str,
     trajectory_ids: list[str] | str,
-    output_directory: str = None,
-    ramachandran_data: bool = True,
-    distancematrices: bool = True,
-    contactmatrices: bool = True,
-    ssfrequencies: bool = True,
-    rg: bool = True,
-    dmax: bool = True,
-    eed: bool = True,
+    output_directory: str | None = os.getcwd(),
+    ramachandran_data: bool | None = True,
+    distancematrices: bool | None = True,
+    contactmatrices: bool | None = True,
+    ssfrequencies: bool | None = True,
+    rg: bool | None = True,
+    dmax: bool | None = True,
+    eed: bool | None = True,
     cm_dist: dict | None = None,
     color_palette: list[str] | None = None,
     ) -> dict[str,pd.DataFrame]:
@@ -92,9 +92,7 @@ def analyze_trajectory(
         trajectory_ids = list(trajectory_ids)
 
     # Setup output directory
-    if output_directory is None:
-        output_directory = os.getcwd()
-    elif not os.path.isdir(output_directory):
+    if not os.path.isdir(output_directory):
         os.mkdir(output_directory)
 
     # Setup color palette
@@ -127,7 +125,8 @@ def analyze_trajectory(
     ### Offline Interactive Html ###
     ################################
     print(f'Building {trajectory_ids} analysis dashboard...')
-    # Build divs for html
+    # Build HTML divs
+
     # DISTANCE MATRICES
     distance_matrices = figures['DistanceMatrices']
     if distance_matrices:
@@ -177,7 +176,7 @@ def analyze_trajectory(
     else:
         metrics_div = ''
 
-    # Build html
+    # Build html dashboard
     dashboard_html = f'''
     <!DOCTYPE html>
     <html>

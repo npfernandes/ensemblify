@@ -3,7 +3,6 @@
 # IMPORTS
 ## Standard Library Imports
 import glob
-import math
 import os
 import shutil
 import subprocess
@@ -34,7 +33,9 @@ from ensemblify.reweighting.ensemble_utils import (
     create_reweighting_fits_fig,
     create_reweighting_metrics_fig,
     correct_exp_error,
+    get_array_extremum,
     process_exp_data,
+    round_to_nearest_multiple,
 )
 
 # FUNCTIONS
@@ -203,6 +204,7 @@ def reweight_ensemble(
     choice_idxs = [np.where(thetas_array == x)[0][0] for x in chosen_thetas]
     chosen_weight_sets = [ weights[i] for i in choice_idxs]
 
+    ##################################################################### CALCULATE REWEIGHTING FIGURES DATA #####################################################################
     # Calculate prior and posterior average SAXS intensities
     common_i_prior = None
     i_posts = []
@@ -308,7 +310,7 @@ def reweight_ensemble(
                                                          f'{trajectory_id}'
                                                          '_structural_metrics.csv'))
 
-
+    ##################################################################### CREATE REWEIGHTING FIGURES #####################################################################
     # Create interactive figures
     print(f'Creating {trajectory_id} reweighted interactive figures...')
 
@@ -363,14 +365,14 @@ def reweight_ensemble(
 
     # Distance Matrices
     ## Get maximum of colorbar
-    max_data = max(list(map(np.max,[dmatrix] + rw_dmatrices)))
-    max_colorbar = 5*(math.ceil(max_data/5))
-    print(f'{max_colorbar=}')
+    max_data = get_array_extremum([dmatrix] + rw_dmatrices)
+    max_colorbar = round_to_nearest_multiple(max_data,5)
+
     ## Get max/min of difference colorbar
-    max_diff_data = max(list(map(np.max,diff_dmatrices)))
-    min_diff_data = min(list(map(np.min,diff_dmatrices)))
-    max_diff_colorbar = 2*(math.ceil(max_diff_data/2))
-    min_diff_colorbar = -2*(math.floor(min_diff_data/-2))
+    max_diff_data = get_array_extremum(diff_dmatrices)
+    min_diff_data = get_array_extremum(diff_dmatrices,get_max=False)
+    max_diff_colorbar = round_to_nearest_multiple(max_diff_data,2)
+    min_diff_colorbar = round_to_nearest_multiple(min_diff_data,-2,up=False)
 
     if abs(max_diff_colorbar) > abs(min_diff_colorbar):
         min_diff_colorbar = - max_diff_colorbar
@@ -435,6 +437,7 @@ def reweight_ensemble(
                                                     title_text=f'{trajectory_id} Reweighted '
                                                                 'Structural Metrics')
 
+    ##################################################################### BUILD REWEIGHTING FIGURES HTML DIVS #####################################################################
     # Build HTML dashboard
     print(f'Building {trajectory_id} reweighting dashboard...')
 
@@ -450,9 +453,10 @@ def reweight_ensemble(
                                       include_plotlyjs=False,
                                       div_id='rw_fits')
 
-    # Create nested dictionary to split up reweighted divs according to theta values
+    # Build Reweighted Figures Divs
     theta_2_reweighted_divs = {}
-    for chosen_theta in chosen_thetas:
+    for i,chosen_theta in enumerate(chosen_thetas):
+        # Nested dict to split up reweighted divs according to theta values
         theta_2_reweighted_divs[chosen_theta] = {'cmap': None,
                                                  'rw_cmap': None,
                                                  'diff_cmap': None,
@@ -464,8 +468,7 @@ def reweight_ensemble(
                                                  'diff_ssfreq': None
                                                  }
 
-    # Contact Maps
-    for i,chosen_theta in enumerate(chosen_thetas):
+        # Contact Maps
         ## Uniform
         cmap_fig = theta_2_reweighted_figures[chosen_theta]['cmap']
         cmap_div = cmap_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
@@ -489,8 +492,7 @@ def reweight_ensemble(
                                               div_id=f'diff_cmap_{i+1}')
         theta_2_reweighted_divs[chosen_theta]['diff_cmap'] = diff_cmap_div
 
-    # Distance Matrices
-    for i,chosen_theta in enumerate(chosen_thetas):
+        # Distance Matrices
         ## Uniform
         dmatrix_fig = theta_2_reweighted_figures[chosen_theta]['dmatrix']
         dmatrix_div = dmatrix_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
@@ -514,8 +516,7 @@ def reweight_ensemble(
                                                     div_id=f'diff_dmatrix_{i+1}')
         theta_2_reweighted_divs[chosen_theta]['diff_dmatrix'] = diff_dmatrix_div
 
-    # Secondary Structure Frequencies
-    for i,chosen_theta in enumerate(chosen_thetas):
+        # Secondary Structure Frequencies
         ## Uniform
         ssfreq_fig = theta_2_reweighted_figures[chosen_theta]['ssfreq']
         ssfreq_div = ssfreq_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
@@ -545,7 +546,7 @@ def reweight_ensemble(
                                             include_plotlyjs=False,
                                             div_id='rw_metrics')
 
-    # Build html
+    ## Build final dashboard divs
     theta_2_dashboard_divs = {}
     for chosen_theta in chosen_thetas:
         theta_2_dashboard_divs[chosen_theta] = {'title': '',
@@ -553,7 +554,6 @@ def reweight_ensemble(
                                                 'dmatrix_div': '',
                                                 'ssfreq_div': ''}
 
-    for chosen_theta in chosen_thetas:
         theta_2_dashboard_divs[chosen_theta]['title'] += (f'{trajectory_id} '
                                                           'BME Reweighting '
                                                           'with \u03B8='
@@ -609,6 +609,7 @@ def reweight_ensemble(
             '''
         theta_divs += div_str
 
+    ##################################################################### BUILD/SAVE REWEIGHTING FINAL HTML DASHBOARD #####################################################################
     ## Build dashboard
     dashboard_html = f'''
     <!DOCTYPE html>

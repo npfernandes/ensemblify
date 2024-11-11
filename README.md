@@ -47,30 +47,30 @@ You can create a new virtual environment using your favorite virtual environment
 
 To install the `ensemblify` Python package, you can follow these commands:
 
-1. Get the `ensemblify` source code. To do this you can clone this repository using git and `cd` into it:
+1. Get the `ensemblify` source code. To do this you:
 
     - Install Git if you haven't already:
       - On LINUX: `sudo apt-get install git`
       - On macOS: Install Xcode Command Line Tools or use Homebrew: `brew install git`
 
-    - Clone this repository:
+    - Clone this repository and `cd` into it:
 
       ```bash
       git clone https://github.com/npfernandes/ensemblify.git
-      cd ensemblify_main
+      cd ensemblify
       ```
 
 2. Create your `ensemblify_env` [Conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) with all of Ensemblify's python dependencies installed by using the provided [environment file](environment.yml) (recommended):
 
     ```bash
-    cd ensemblify_main
-    conda create -f environment.yml
+    conda env create -f environment_LINUX.yml # or environment_MACOS.yml, for MacOS users
+    conda activate ensemblify_env
     ```
 
     or by creating the environment and installing the necessary python packages manually (not recommended):
 
     ```bash
-    conda create --channel=conda-forge --name ensemblify_env python=3.10 MDAnalysis=2.6.1 mdtraj=1.9.9 numpy=1.26.4 pandas=2.2.2 pyarrow=13.0.0 scikit-learn=1.4.2 scipy=1.12.0 tqdm=4.66.2
+    conda env create --channel=conda-forge --name ensemblify_env python=3.10 MDAnalysis=2.6.1 mdtraj=1.9.9 numpy=1.26.4 pandas=2.2.2 pyarrow=13.0.0 scikit-learn=1.4.2 scipy=1.12.0 tqdm=4.66.2
     conda activate ensemblify_env
     pip install biopython==1.81 plotly==5.19.0 pyyaml==6.0.1 "ray[default]"==2.33.0
     ```
@@ -78,11 +78,11 @@ To install the `ensemblify` Python package, you can follow these commands:
 3. Install the `ensemblify` python package into your newly created environment.
 
     ```bash
-    conda activate ensemblify_env
     pip install .
     ```
 
-    Alternatively, Ensemblify is available via the Python Package Index:
+
+Alternatively, Ensemblify is available via the Python Package Index:
     
     ```bash
     conda activate ensemblify_env   

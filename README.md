@@ -47,7 +47,7 @@ You can create a new virtual environment using your favorite virtual environment
 
 To install the `ensemblify` Python package, you can follow these commands:
 
-1. Get the `ensemblify` source code. To do this you can either clone this repository using git:
+1. Get the `ensemblify` source code. To do this you can clone this repository using git and `cd` into it:
 
     - Install Git if you haven't already:
       - On LINUX: `sudo apt-get install git`
@@ -57,14 +57,6 @@ To install the `ensemblify` Python package, you can follow these commands:
 
       ```bash
       git clone https://github.com/npfernandes/ensemblify.git
-      cd ensemblify_main
-      ```
-
-    or download this repository and extract the `ensemblify` source-code:
-
-      ```bash
-      wget https://github.com/npfernandes/ensemblify/archive/refs/heads/main.zip
-      unzip main.zip
       cd ensemblify_main
       ```
 

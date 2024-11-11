@@ -556,8 +556,8 @@ def reweight_ensemble(
 
         theta_2_dashboard_divs[chosen_theta]['title'] += (f'{trajectory_id} '
                                                           'BME Reweighting '
-                                                          'with \u03B8='
-                                                          f'{chosen_theta}')
+                                                          '[\u03B8='
+                                                          f'{chosen_theta}]')
 
         # Create Contact Map Div
         cmap_div = theta_2_reweighted_divs[chosen_theta]['cmap']
@@ -656,13 +656,25 @@ if __name__ == '__main__':
     update_config({'PEPSI_SAXS_PATH': '/home/tiagogomes/software/Pepsi-SAXS',
                    'BIFT_PATH': '/home/tiagogomes/software/bift'})
 
-    reweight_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
-                      topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb',
-                      trajectory_id='Hst5',
-                      exp_saxs_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/bift_Hst5.dat',
-                      output_dir='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting',
-                      calculated_cmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_contact_matrix.csv',
-                      calculated_dmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_distance_matrix.csv',
-                      calculated_ss_frequency='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_ss_frequency.csv',
-                      calculated_metrics_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_structural_metrics.csv'
+    # reweight_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
+    #                   topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb',
+    #                   trajectory_id='Hst5',
+    #                   exp_saxs_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/bift_Hst5.dat',
+    #                   output_dir='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting',
+    #                   calculated_cmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_contact_matrix.csv',
+    #                   calculated_dmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_distance_matrix.csv',
+    #                   calculated_ss_frequency='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_ss_frequency.csv',
+    #                   calculated_metrics_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_structural_metrics.csv'
+    #                 )
+
+    reweight_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORIES/SMAD4/SMAD4_trajectory.xtc',
+                      topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORIES/SMAD4/SMAD4_top.pdb',
+                      trajectory_id='SMAD4',
+                      exp_saxs_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/smad4FL_clean_copy.dat',
+                      output_dir='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/REWEIGHTING/SMAD4',
+                      calculated_cmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORY_ANALYSIS/SMAD4/SMAD4_contact_matrix.csv',
+                      calculated_dmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORY_ANALYSIS/SMAD4/SMAD4_distance_matrix.csv',
+                      #calculated_ss_frequency='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_ss_frequency.csv',
+                      calculated_metrics_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORY_ANALYSIS/SMAD4/SMAD4_structural_metrics.csv'
                     )
+    

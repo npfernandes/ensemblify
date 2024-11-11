@@ -37,8 +37,7 @@ def kde(
     """
     # By default weights are uniform
     if weights is None:
-        weights = np.full(len(data),
-                          1)
+        weights = np.full(len(data),1/len(data))
 
     # Calculate the probability density function of our data
     # through Kernel Density Estimation using the provided weights

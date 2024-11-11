@@ -239,6 +239,9 @@ class SimpleReweight:
                            self.w0)
             self.standardized = True
 
+        tmax = np.log((sys.float_info.max) / 5.)
+        theta_sigma2 = theta * self.weights * self.experiment[:,1]**2
+
         def maxent(lambdas: np.ndarray) -> tuple[float,float]:
             # weights
             arg = -np.sum(lambdas[np.newaxis,:] * self.calculated,axis=1) - tmax + np.log(self.w0)
@@ -275,13 +278,6 @@ class SimpleReweight:
             else:
                 bounds.append([0.0,None])
 
-        opt = {'maxiter': 50000,
-               'disp': False}
-
-        tmax = np.log((sys.float_info.max) / 5.)
-
-        theta_sigma2 = theta * self.weights * self.experiment[:,1]**2
-
         chi2_before  = bt.calc_chi(self.experiment,
                                    self.calculated,
                                    self.w0)
@@ -290,7 +286,10 @@ class SimpleReweight:
                          f'{self.calculated.shape[0]} samples. Theta={theta} \n'))
         self._write_log(f'CHI2 before optimization: {chi2_before:8.4f} \n')
 
+        opt = {'maxiter': 50000,
+               'disp': False}
         mini_method = 'L-BFGS-B'
+
         start_time = time.time()
 
         result = minimize(maxent,

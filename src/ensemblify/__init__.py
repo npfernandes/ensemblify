@@ -50,9 +50,9 @@ Utilities
     View Ensemblify's current general configuration.
 `update_config()`
     Update Ensemblify's current general configuration.
-`check_steric_clashes()`
+`clash_checking.check_steric_clashes()`
     Check an already generated ensemble for steric clashes, reporting any found.
-`pipeline()`
+`pipeline.ensemblify_pipeline()`
     Function to use all of Ensemblify's functionalities sequentially.
 
 Citation
@@ -63,27 +63,13 @@ When using Ensemblify in published work, please cite
     PUB
 
 """
-
-from ensemblify.analysis import analyze_trajectory
-from ensemblify.clash_checking import check_steric_clashes
 from ensemblify.config import show_config, update_config
-from ensemblify.conversion import ensemble2traj, traj2saxs
-from ensemblify.generation import generate_ensemble
-from ensemblify.pipeline import ensemblify_pipeline
-from ensemblify.reweighting import reweight_ensemble
 from ensemblify.utils import df_from_pdb, df_to_pdb, extract_pdb_info
 
 __version__ = '1.0.0'
 
-__all__ = ['analyze_trajectory',
-           'ensemble2traj',
-           'traj2saxs',
-           'generate_ensemble',
-           'reweight_ensemble',
-           'check_steric_clashes',
-           'df_from_pdb',
+__all__ = ['df_from_pdb',
            'df_to_pdb',
            'extract_pdb_info',
-           'ensemblify_pipeline',
            'show_config',
            'update_config']

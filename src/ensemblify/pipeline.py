@@ -6,7 +6,10 @@ import os
 from timeit import default_timer as timer
 
 ## Local Imports
-import ensemblify as ey
+from ensemblify.analysis import analyze_trajectory
+from ensemblify.conversion import ensemble2traj
+from ensemblify.generation import generate_ensemble
+from ensemblify.reweighting import reweight_ensemble
 
 # FUNCTIONS
 def ensemblify_pipeline(
@@ -50,26 +53,26 @@ def ensemblify_pipeline(
 
     # Generate ensemble
     start = timer()
-    valid_pdbs_dir = ey.generate_ensemble(parameters_path=parameters)
+    valid_pdbs_dir = generate_ensemble(parameters_path=parameters)
     end = timer()
     print(f' ----------------- Ensemble generation took {round(end-start,3)} s -----------------' )
 
     # Create trajectory
     start = timer()
-    trajectory_path, topology_path = ey.ensemble2traj(job_name=JOB_NAME,
-                                                      ensemble_dir=valid_pdbs_dir,
-                                                      trajectory_dir=TRAJECTORY_DIR,
-                                                      trajectory_size=ENSEMBLE_SIZE)
+    trajectory_path, topology_path = ensemble2traj(job_name=JOB_NAME,
+                                                   ensemble_dir=valid_pdbs_dir,
+                                                   trajectory_dir=TRAJECTORY_DIR,
+                                                   trajectory_size=ENSEMBLE_SIZE)
     end = timer()
     print(f' ----------------- Trajectory Creation took: {round(end-start,3)} s -----------------' )
 
     # Analyze trajectory
     if analysis:
         start = timer()
-        structural_metrics_data = ey.analyze_trajectory(trajectory_ids=JOB_NAME,
-                                                        trajectories=trajectory_path,
-                                                        topologies=topology_path,
-                                                        output_directory=ANALYSIS_DIR)
+        structural_metrics_data = analyze_trajectory(trajectory_ids=JOB_NAME,
+                                                     trajectories=trajectory_path,
+                                                     topologies=topology_path,
+                                                     output_directory=ANALYSIS_DIR)
         end = timer()
         print((f' ----------------- Trajectory Analysis took: {round(end-start,3)} s '
                 '-----------------'))
@@ -77,12 +80,12 @@ def ensemblify_pipeline(
         # Reweigh ensemble with exp data
         if exp_data is not None:
             start = timer()
-            ey.reweight_ensemble(trajectory_id=JOB_NAME,
-                                 trajectory=trajectory_path,
-                                 topology=topology_path,
-                                 exp_saxs_data=exp_data,
-                                 output_dir=REWEIGHTING_DIR,
-                                 calculated_metrics_data=structural_metrics_data)
+            reweight_ensemble(trajectory_id=JOB_NAME,
+                              trajectory=trajectory_path,
+                              topology=topology_path,
+                              exp_saxs_data=exp_data,
+                              output_dir=REWEIGHTING_DIR,
+                              calculated_metrics_data=structural_metrics_data)
             end = timer()
             print((f' ----------------- Ensemble Reweighting took: {round(end-start,3)} s '
                     '-----------------'))

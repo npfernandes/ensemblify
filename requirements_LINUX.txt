@@ -222,9 +222,6 @@ pydantic-core=2.23.4=pypi_0
 pyedr=0.8.0=pyhd8ed1ab_0
 pygments=2.18.0=pypi_0
 pyparsing=3.2.0=pyhd8ed1ab_1
-pyrosetta=2024.42+release.3366cf78a3=pypi_0
-pyrosetta-distributed=0.0.3=pypi_0
-pyrosetta-installer=0.1.2=pypi_0
 pytables=3.10.1=py310hbb5d6fa_1
 python=3.10.15=h4a871b0_2_cpython
 python-dateutil=2.9.0=pyhd8ed1ab_0

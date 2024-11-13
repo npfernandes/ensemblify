@@ -12,6 +12,7 @@ import shutil
 import yaml
 
 ## Local Imports
+from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.generation.ensemble_utils.pdb_processing import (
     apply_faspr_single, apply_pulchra_single, apply_rewrite_single,
     apply_restore_single
@@ -46,6 +47,8 @@ ADVANCED_PARAMS_DEFAULTS = {
     'pae': None,
     'restraints': {'ss_bias': None,
                     'contacts': None},
+    'faspr_path': None,
+    'pulchra_path': None,
     'core_amount': os.cpu_count() - 1, 
     'output_path': os.getcwd(),
     'scorefxn': {'id': 'score0',
@@ -124,6 +127,13 @@ def process_input_pdb(
         os.remove(PULCHRA_LOG)
     if os.path.isfile(clashes_file):
         os.remove(clashes_file)
+
+    # Setup FASPR and PULCHRA paths
+    if faspr_path is None:
+        faspr_path = GLOBAL_CONFIG['FASPR_PATH']
+
+    if pulchra_path is None:
+        pulchra_path = GLOBAL_CONFIG['PULCHRA_PATH']
 
     # Process input pdb
     FASPR_PDB = apply_faspr_single(faspr_path=faspr_path,

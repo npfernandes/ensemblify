@@ -36,7 +36,7 @@ def generate_ensemble(parameters_path: str):
 
     # Setup ensemble output folder
     ENSEMBLE_DIR = os.path.join(OUTPUT_DIR_JOB,'ensemble')
-    assert not os.path.isdir(ENSEMBLE_DIR), 'Are you trying to overwrite an existing ensemble?'
+    assert not os.path.isdir(ENSEMBLE_DIR), 'You are trying to overwrite an existing ensemble!'
     os.mkdir(ENSEMBLE_DIR) # make
 
     # Create directory in our script output folder to store the given inputs, original and processed

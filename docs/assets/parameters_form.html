@@ -202,7 +202,7 @@
   
   <div class="container">
     <div id="content">
-      <form id="yamlForm">
+      <form id="yamlForm" onsubmit="return false;">
     
         <h2>Job Name*</h2>
         <input type="text" id="jobName" placeholder="Name for generated files and folders" required><br>
@@ -304,13 +304,13 @@
           <input type="text" id="PAEPath" placeholder="Path to PAE matrix .json file from AlphaFold output" style="display:none;">
         </fieldset>
 
-        <h2>Constraint(s)</h2>&nbsp;
+        <h2>Restraint(s)</h2>&nbsp;
         <div class="tooltip-icon">&#9432;
           <span class="tooltip-text">
             Ways to bias sampling towards desired structural properties.
           </span>
         </div>
-        <fieldset id="constraints">
+        <fieldset id="restraints">
           <label><b>Secondary Structure Bias</b> ( <input type="number" style="display:inline-block" class="inputSSPercentage" min="1" max="100" value="100" placeholder="100">   %  )</label>
           <div class="tooltip-icon">&#9432;
             <span class="tooltip-text">
@@ -411,10 +411,10 @@
           <h2>Monte Carlo Sampler Parameters</h2>
           <fieldset id="samplerParameters">
               <label>Temperature:</label>
-              <input type="number" id="samplerTemperature" value="200" placeholder="200">
+              <input type="number" id="MCTemperature" value="200" placeholder="200">
               <br>
               <label>Maximum Loops:</label>
-              <input type="number" id="samplerMaxLoops" value="200" placeholder="200">
+              <input type="number" id="MCMaxLoops" value="200" placeholder="200">
           </fieldset>
 
           <h2>Constraints</h2>&nbsp;
@@ -429,7 +429,7 @@
           </div>
           <fieldset id="constraintsParameters">
             <label>Weight:</label>
-            <input type="number" id ="constraintsweight" value="1" placeholder="1">&nbsp;
+            <input type="number" id ="constraintsweight" value="1.0" placeholder="1.0">&nbsp;
             <div class="tooltip-icon">&#9432;
               <span class="tooltip-text">
                 Weight of the AtomPairConstraint<br>
@@ -437,7 +437,7 @@
               </span>
             </div><br>
             <label>Standard deviation:</label>
-            <input type="number" id ="constraintsstdev" value="10" placeholder="10"><br>
+            <input type="number" id ="constraintsstdev" value="10.0" placeholder="10.0"><br>
             <label>Tolerance:</label>
             <input type="number" id ="constraintstolerance" value="0.001" placeholder="0.001"><br>
           </fieldset>
@@ -496,14 +496,14 @@
           </div>
           <fieldset id="PAEParameters">
             <label>Cutoff:</label>
-            <input type="number" id ="PAEcutoff" value="10" placeholder="10">&nbsp;
+            <input type="number" id ="PAEcutoff" value="10.0" placeholder="10.0">&nbsp;
             <div class="tooltip-icon">&#9432;
               <span class="tooltip-text">
                 Only consider PAE values below this number.
               </span>
             </div><br>
             <label>Flatten cutoff:</label>
-            <input type="number" id ="PAEflattencutoff" value="10" placeholder="10">&nbsp;
+            <input type="number" id ="PAEflattencutoff" value="10.0" placeholder="10.0">&nbsp;
             <div class="tooltip-icon">&#9432;
               <span class="tooltip-text">
                 Any PAE values below this value will<br>
@@ -511,7 +511,7 @@
               </span>
             </div><br>
             <label>Flatten value:</label>
-            <input type="number" id ="PAEflattenvalue" value="10" placeholder="10">&nbsp;
+            <input type="number" id ="PAEflattenvalue" value="10.0" placeholder="10.0">&nbsp;
             <div class="tooltip-icon">&#9432;
               <span class="tooltip-text">
                 Any PAE values below flatten cutoff will<br>
@@ -545,7 +545,7 @@
               </span>
             </div><br>
             <label>pLDDT Scaling Factor:</label>
-            <input type="number" id ="PAEpLDDTscalingfactor" value="1.0" placeholder="1.0">&nbsp;
+            <input type="number" id ="PAEpLDDTscalingfactor" value="20.0" placeholder="20.0">&nbsp;
             <div class="tooltip-icon">&#9432;
               <span class="tooltip-text">
                 Constraints between high pLDDT and low<br>
@@ -556,7 +556,11 @@
             </div><br>
           </fieldset>
         </div>
-    
+
+        <div class="advancedParametersButtonContainer">
+          <button type="reset" id="ResetFormButton">Reset Form</button>
+        </div>
+
         <button type="yamlbutton" onclick="generateYAML()">Generate YAML</button>
     
       </form>
@@ -844,7 +848,7 @@ alphafold:
   ${document.getElementById('plddt').checked}
 pae:
   ${document.getElementById('PAEPath').value}
-constraints:
+restraints:
   ss_bias :
     ${ssBiases}
   contacts :
@@ -860,14 +864,15 @@ core_amount:
 scorefxn:
   id: ${document.getElementById('scorefxnid').value}
   weight: ${document.getElementById('scorefxweight').value}
-minimizer: # PyRosetta Minimizer (for MinMover)
+minimizer:
   id: ${document.getElementById('minimizeridSelect').value}
   tolerance: ${document.getElementById('minimizertol').value}
   max_iters: ${document.getElementById('minimizermaxiters').value}
   finalcycles: ${document.getElementById('minimizerfinalcycles').value}
-MC:
-  temperature: ${document.getElementById('MCTemperature').value}
-  max_loops: ${document.getElementById('MCMaxLoops').value}
+sampler_params:
+  MC:
+    temperature: ${document.getElementById('MCTemperature').value}
+    max_loops: ${document.getElementById('MCMaxLoops').value}
 constraints:
   weight: ${document.getElementById('constraintsweight').value}
   stdev: ${document.getElementById('constraintsstdev').value}
@@ -888,11 +893,22 @@ pae_params:
   plddt_scaling_factor: ${document.getElementById('PAEpLDDTscalingfactor').value}
 `;
 
+      // Prompt the user for a filename, with a default name suggested
+      var filename = prompt("Enter a filename for the YAML file:", `${document.getElementById('jobName').value}_params.yaml`);
+      if (!filename) {
+          return; // If the user cancels or enters nothing, don't proceed with download
+      }
+
+      // Ensure the filename ends with .yaml
+      if (!filename.endsWith(".yaml")) {
+          filename += ".yaml";
+      }
+      
       // Create and download YAML file
       var blob = new Blob([yamlContent], { type: 'text/yaml' });
       var a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'ensemblify_input_parameters.yaml';
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

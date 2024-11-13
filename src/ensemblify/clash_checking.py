@@ -268,4 +268,7 @@ def check_steric_clashes(
         simplified_report.seek(0,0)
         simplified_report.write(f'Total number of clashed pdbs: {clashed_pdbs}\n' + content)
 
+    print(('Ensemble steric clash check has finished. Please check the reports created in the '
+           'clash_checking directory.'))
+
     return clash_report, clash_report_detailed

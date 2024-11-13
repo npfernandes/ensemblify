@@ -33,10 +33,9 @@ from ensemblify.reweighting.ensemble_utils import (
     create_reweighting_fits_fig,
     create_reweighting_metrics_fig,
     correct_exp_error,
-    get_array_extremum,
     process_exp_data,
-    round_to_nearest_multiple,
 )
+from ensemblify.utils import get_array_extremum, round_to_nearest_multiple
 
 # FUNCTIONS
 def reweight_ensemble(

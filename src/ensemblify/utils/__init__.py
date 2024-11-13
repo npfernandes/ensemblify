@@ -76,9 +76,20 @@ Available Functions
 
       Calculate a Kernel Density Estimate (KDE) distribution for a given dataset.
 
+- `get_array_extremum`
+
+      Get maximum or minimum value of all elements of all provided arrays.
+
+- `round_to_nearest_multiple`
+
+      Round a number to the nearest (up or down) multiple of a given factor.
 """
 
-from ensemblify.utils.misc import kde
+from ensemblify.utils.misc import (
+    kde,
+    get_array_extremum,
+    round_to_nearest_multiple,
+)
 from ensemblify.utils.pdb_manipulation import (
     cleanup_pdbs,
     df_from_pdb,
@@ -90,4 +101,6 @@ __all__ = ['df_from_pdb',
            'df_to_pdb',
            'extract_pdb_info',
            'cleanup_pdbs',
-           'kde']
+           'kde',
+           'get_array_extremum',
+           'round_to_nearest_multiple']

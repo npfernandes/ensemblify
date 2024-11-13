@@ -2,6 +2,7 @@
 
 # IMPORTS
 ## Third Party Imports
+import math
 import numpy as np
 import scipy
 
@@ -65,3 +66,45 @@ def kde(
     avg_stderr = np.std(data, ddof=1) / np.sqrt(np.size(data)) # SEM
 
     return x_coords,norm_kde,avg,avg_stderr
+
+
+def get_array_extremum(arrays: list[np.ndarray], get_max: bool | None =True) -> float:
+    """Get maximum or minimum value of all elements of all provided arrays.
+
+    Args:
+        arrays:
+            list of arrays to analyze.
+        get_max:
+            Whether to get the maximum or minimum (if False) value. Defaults to True.
+
+    Returns:
+        ext:
+            maximum or minimum value.
+    """
+    if get_max:
+        ext = max(list(map(np.max,arrays)))
+    else:
+        ext = min(list(map(np.min,arrays)))
+    return ext
+
+
+def round_to_nearest_multiple(n: int, factor: int, up: bool | None = True) -> int:
+    """Round a number to the nearest (up or down) multiple of a given factor.
+
+    Args:
+        n:
+            number to round.
+        factor:
+            n will be rounded to multiple of this number.
+        up: 
+            whether to round up or down (if False). Defaults to True.
+
+    Returns:
+        rounded:
+            rounded number.
+    """
+    if up:
+        rounded = factor*(math.ceil(n/factor))
+    else:
+        rounded = factor*(math.floor(n/factor))
+    return rounded

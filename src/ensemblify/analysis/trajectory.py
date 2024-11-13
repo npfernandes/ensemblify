@@ -85,11 +85,11 @@ def analyze_trajectory(
     """
     # Setup trajectory,topology,trajectory_id
     if isinstance(trajectories,str):
-        trajectories = list(trajectories)
+        trajectories = [trajectories]
     if isinstance(topologies,str):
-        topologies = list(topologies)
+        topologies = [topologies]
     if isinstance(trajectory_ids,str):
-        trajectory_ids = list(trajectory_ids)
+        trajectory_ids = [trajectory_ids]
 
     # Setup output directory
     if not os.path.isdir(output_directory):

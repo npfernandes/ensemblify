@@ -14,8 +14,8 @@ from ensemblify.conversion.conversion_utils import join_pdbs, move_topol_pdb
 # FUNCTIONS
 def ensemble2traj(
     job_name: str,
-    ensemble_dir: str,
-    trajectory_dir: str,
+    ensemble_dir: str | None = os.getcwd(),
+    trajectory_dir: str | None = os.getcwd(),
     trajectory_size: int | None = 10000,
     ) -> tuple[str,str]:
     """Create a trajectory (.xtc) file from an ensemble of .pdb files.
@@ -29,7 +29,8 @@ def ensemble2traj(
         ensemble_dir:
             path to directory where all the .pdb files are stored.
         trajectory_dir:
-            path to directory where trajectory .xtc file will be created.
+            path to directory where trajectory .xtc file will be created. Will be created if it
+            does not exist. Defaults to current working directory.
         trajectory_size:
             number of randomly sampled .pdb files to use for trajectory creation.
     
@@ -40,6 +41,11 @@ def ensemble2traj(
             topology_path:
                 path to created topology .pdb file.
     """
+    assert not(ensemble_dir == os.getcwd() and
+               trajectory_dir == os.getcwd()), ('You must provide at least one of ensemble or '
+                                                'trajectory directory!')
+    assert ensemble_dir != trajectory_dir, ('Ensemble and trajectory directories '
+                                            'must be different!')
 
     # Create trajectory directory if non existent
     if not os.path.isdir(trajectory_dir):

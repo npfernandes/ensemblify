@@ -279,7 +279,7 @@ def create_ramachandran_figure(
                                       ticksuffix='\u00B0',
                                       ticklen=10,
                                       tickwidth=4,
-                                      showgrid=False), # Phi
+                                      showgrid=False),
                            yaxis=dict(title='\u03A8', # Psi
                                       range=[-180,180],
                                       tick0=-180,
@@ -479,8 +479,8 @@ def create_contact_map_fig(
     topology: str,
     trajectory_id: str | None = None,
     output_path: str | None = None,
-    reweighted: bool = False,
-    difference: bool = False,
+    reweighted: bool | None = False,
+    difference: bool | None = False,
     ) -> go.Figure:
     """Create a contact map Figure from a calculated contact matrix.
 
@@ -513,7 +513,7 @@ def create_contact_map_fig(
     """
     assert not(reweighted and difference), ('Contact Map Figure can\'t simultaneously be '
                                             'difference and reweighted!')
-    
+
     if isinstance(contact_matrix,str):
         assert contact_matrix.endswith('.csv'), 'Contact matrix file must be in .csv format!'
         contact_matrix = pd.read_csv(contact_matrix,index_col=0)
@@ -855,8 +855,8 @@ def create_distance_matrix_fig(
     output_path: str | None = None,
     max_colorbar: int | None = None,
     min_colorbar: int | None = None,
-    reweighted: bool = False,
-    difference: bool = False,
+    reweighted: bool | None = False,
+    difference: bool | None = False,
     ) -> go.Figure:
     """Create a distance matrix Figure from a calculated distance matrix.
 
@@ -1108,7 +1108,7 @@ def create_distance_matrix_fig(
 def calculate_ss_assignment(
     trajectory: str,
     topology: str,
-    output_path: str = None,
+    output_path: str | None = None,
     ) -> pd.DataFrame:
     """Calculate a secondary structure assignment matrix from a trajectory and topology files.
     
@@ -1174,7 +1174,7 @@ def calculate_ss_frequency(
     trajectory: str,
     topology: str,
     weights: np.ndarray | None = None,
-    output_path: str = os.getcwd(),
+    output_path: str | None = os.getcwd(),
     ) -> pd.DataFrame:
     """Calculate secondary structure assignment frequencies from a trajectory and topology files.
 
@@ -1493,9 +1493,9 @@ def create_ss_frequency_figure(
 def calculate_metrics_data(
     trajectory: str,
     topology: str,
-    rg: bool = True,
-    dmax: bool = True,
-    eed: bool = True,
+    rg: bool | None = True,
+    dmax: bool | None = True,
+    eed: bool | None = True,
     cm_dist: dict[str,tuple[str,str]] | None = None,
     output_path: str | None = os.getcwd(),
     ) -> pd.DataFrame:
@@ -1564,9 +1564,8 @@ def calculate_metrics_data(
 
     # Create trajectory analysis DataFrame
     metrics_array = np.dstack(tuple(values))
-    traj_analysis = pd.DataFrame(metrics_array.reshape(-1,
-                                                       metrics_array.shape[-1]),
-                                                       columns=column_ids)
+    traj_analysis = pd.DataFrame(metrics_array.reshape(-1,metrics_array.shape[-1]),
+                                 columns=column_ids)
 
     if output_path is not None:
         # Save structural metrics
@@ -1789,12 +1788,12 @@ def create_metrics_fig(
 
             # Allows for hovering the dashed line to get mean value
             metrics_fig.add_trace(go.Scatter(x=[mean_value],
-                                             y=[x for x in np.arange(0,
-                                                                     np.interp(mean_value,
-                                                                               scatter_trace.x,
-                                                                               scatter_trace.y)
-                                                                               + 0.001,
-                                                                     0.001)],
+                                             y=[y for y in
+                                                np.arange(0,
+                                                          np.interp(mean_value,
+                                                                    scatter_trace.x,
+                                                                    scatter_trace.y) + 0.001,
+                                                          0.001)],
                                              mode='markers',
                                              marker_color=hist_trace.marker.color,
                                              hovertext=(f'Avg: {round(mean_value,2)} &plusmn; '
@@ -2048,61 +2047,61 @@ def calculate_analysis_data(
         # Analysis not meant for interactive figures
         if ramachandran_data:
             print(f'Calculating ramachandran data for {trajectory_id}...')
-            ramachandran_data_output_path = os.path.join(output_directory,
-                                                         f'{trajectory_id}_ramachandran_data.csv')
+            rama_data_out = os.path.join(output_directory,
+                                         f'{trajectory_id}_ramachandran_data.csv')
 
             calculate_ramachandran_data(trajectory=trajectory,
                                         topology=topology,
-                                        output_path=ramachandran_data_output_path)
+                                        output_path=rama_data_out)
 
         # Analysis meant for interactive figures
         if distancematrices:
             print(f'Calculating distance matrix for {trajectory_id}...')
-            distance_matrix_output_path = os.path.join(output_directory,
-                                                      f'{trajectory_id}_distance_matrix.csv')
+            dmatrix_out = os.path.join(output_directory,
+                                       f'{trajectory_id}_distance_matrix.csv')
 
-            distance_matrix = calculate_distance_matrix(trajectory=trajectory,
-                                                        topology=topology,
-                                                        output_path=distance_matrix_output_path)
+            dmatrix = calculate_distance_matrix(trajectory=trajectory,
+                                                topology=topology,
+                                                output_path=dmatrix_out)
 
-            data['DistanceMatrices'].append(distance_matrix)
+            data['DistanceMatrices'].append(dmatrix)
 
         if contactmatrices:
             print(f'Calculating contact matrix for {trajectory_id}...')
-            contact_matrix_output_path = os.path.join(output_directory,
-                                                      f'{trajectory_id}_contact_matrix.csv')
+            cmatrix_out = os.path.join(output_directory,
+                                       f'{trajectory_id}_contact_matrix.csv')
 
-            contact_matrix = calculate_contact_matrix(trajectory=trajectory,
-                                                      topology=topology,
-                                                      output_path=contact_matrix_output_path)
+            cmatrix = calculate_contact_matrix(trajectory=trajectory,
+                                               topology=topology,
+                                               output_path=cmatrix_out)
 
-            data['ContactMatrices'].append(contact_matrix)
+            data['ContactMatrices'].append(cmatrix)
 
         if ssfrequencies:
             print('Calculating secondary structure assignment frequency matrix for '
                   f'{trajectory_id}...')
-            ss_frequency_output_path = os.path.join(output_directory,
-                                                     f'{trajectory_id}_ss_frequency.csv')
+            ssfreq_out = os.path.join(output_directory,
+                                      f'{trajectory_id}_ss_frequency.csv')
 
-            ss_frequency = calculate_ss_frequency(trajectory=trajectory,
-                                                  topology=topology,
-                                                  output_path=ss_frequency_output_path)
+            ssfreq = calculate_ss_frequency(trajectory=trajectory,
+                                            topology=topology,
+                                            output_path=ssfreq_out)
 
-            data['SecondaryStructureFrequencies'].append(ss_frequency)
+            data['SecondaryStructureFrequencies'].append(ssfreq)
 
         if rg or dmax or eed or cm_dist:
-            structural_metrics_output_path = os.path.join(output_directory,
-                                                          f'{trajectory_id}_structural_metrics.csv')
+            metrics_out = os.path.join(output_directory,
+                                       f'{trajectory_id}_structural_metrics.csv')
             print(f'Calculating structural metrics data for {trajectory_id}...')
-            structural_metrics = calculate_metrics_data(trajectory=trajectory,
-                                                        topology=topology,
-                                                        output_path=structural_metrics_output_path,
-                                                        rg=rg,
-                                                        dmax=dmax,
-                                                        eed=eed,
-                                                        cm_dist=cm_dist)
+            metrics = calculate_metrics_data(trajectory=trajectory,
+                                             topology=topology,
+                                             output_path=metrics_out,
+                                             rg=rg,
+                                             dmax=dmax,
+                                             eed=eed,
+                                             cm_dist=cm_dist)
 
-            data['StructuralMetrics'].append(structural_metrics)
+            data['StructuralMetrics'].append(metrics)
 
     return data
 
@@ -2176,49 +2175,49 @@ def create_analysis_figures(
         print(f'Creating {trajectory_id} analysis figures...')
 
         try:
-            distance_matrix = analysis_data['DistanceMatrices'][i]
+            dmatrix = analysis_data['DistanceMatrices'][i]
         except (KeyError,IndexError):
             pass
         else:
-            distance_matrix_fig_output_path = os.path.join(output_directory,
-                                                       f'{trajectory_id}_distance_matrix.html')
+            dmatrix_fig_out = os.path.join(output_directory,
+                                           f'{trajectory_id}_distance_matrix.html')
 
-            distance_matrix_fig = create_distance_matrix_fig(distance_matrix=distance_matrix,
-                                                             trajectory_id=trajectory_id,
-                                                             topology=topology,
-                                                             output_path=distance_matrix_fig_output_path)
-
-            figures['DistanceMatrices'].append(distance_matrix_fig)
-
-        try:
-            contact_matrix = analysis_data['ContactMatrices'][i]
-        except (KeyError,IndexError):
-            pass
-        else:
-            contact_map_fig_output_path = os.path.join(output_directory,
-                                                       f'{trajectory_id}_contact_map.html')
-
-            contact_map_fig = create_contact_map_fig(contact_matrix=contact_matrix,
+            dmatrix_fig = create_distance_matrix_fig(distance_matrix=dmatrix,
                                                      trajectory_id=trajectory_id,
                                                      topology=topology,
-                                                     output_path=contact_map_fig_output_path)
+                                                     output_path=dmatrix_fig_out)
 
-            figures['ContactMaps'].append(contact_map_fig)
+            figures['DistanceMatrices'].append(dmatrix_fig)
 
         try:
-            ss_frequency = analysis_data['SecondaryStructureFrequencies'][i]
+            cmatrix = analysis_data['ContactMatrices'][i]
         except (KeyError,IndexError):
             pass
         else:
-            ss_frequency_fig_output_path = os.path.join(output_directory,
-                                                        f'{trajectory_id}_ss_frequency.html')
+            cmap_fig_out = os.path.join(output_directory,
+                                        f'{trajectory_id}_contact_map.html')
 
-            ss_frequency_fig = create_ss_frequency_figure(ss_frequency=ss_frequency,
-                                                          topology=topology,
-                                                          trajectory_id=trajectory_id,
-                                                          output_path=ss_frequency_fig_output_path)
+            cmap_fig = create_contact_map_fig(contact_matrix=cmatrix,
+                                              trajectory_id=trajectory_id,
+                                              topology=topology,
+                                              output_path=cmap_fig_out)
 
-            figures['SecondaryStructureFrequencies'].append(ss_frequency_fig)
+            figures['ContactMaps'].append(cmap_fig)
+
+        try:
+            ssfreq = analysis_data['SecondaryStructureFrequencies'][i]
+        except (KeyError,IndexError):
+            pass
+        else:
+            ssfreq_fig_out = os.path.join(output_directory,
+                                          f'{trajectory_id}_ss_frequency.html')
+
+            ssfreq = create_ss_frequency_figure(ss_frequency=ssfreq,
+                                                topology=topology,
+                                                trajectory_id=trajectory_id,
+                                                output_path=ssfreq_fig_out)
+
+            figures['SecondaryStructureFrequencies'].append(ssfreq)
 
     total_box_traces = {}
     total_hist_traces = {}
@@ -2247,8 +2246,8 @@ def create_analysis_figures(
             total_avg_stderr_values[trajectory_id] = avg_stderr_values
 
     if total_box_traces:
-        metrics_fig_output_path = os.path.join(output_directory,
-                                               'structural_metrics.html')
+        metrics_fig_out = os.path.join(output_directory,
+                                       'structural_metrics.html')
 
         metrics_fig = create_metrics_fig(trajectory_ids=trajectory_ids,
                                          total_box_traces=total_box_traces,
@@ -2256,7 +2255,7 @@ def create_analysis_figures(
                                          total_scatter_traces=total_scatter_traces,
                                          total_avg_values=total_avg_values,
                                          total_avg_stderr_values=total_avg_stderr_values,
-                                         output_path=metrics_fig_output_path)
+                                         output_path=metrics_fig_out)
 
         figures['StructuralMetrics'] = metrics_fig
 

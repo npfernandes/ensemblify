@@ -97,12 +97,12 @@ def run_sampling(
     SAMPLING_TARGETS = HashableDict(PARAMETERS['targets'])
     OUTPUT_PATH = PARAMETERS['output_path']
 
-    if PARAMETERS['faspr_path'] is None:
+    if PARAMETERS['faspr_path'] is None or PARAMETERS['faspr_path'] == 'None':
         FASPR_PATH = GLOBAL_CONFIG['FASPR_PATH']
     else:
         FASPR_PATH = PARAMETERS['faspr_path']
 
-    if PARAMETERS['pulchra_path'] is None:
+    if PARAMETERS['pulchra_path'] is None or PARAMETERS['pulchra_path'] == 'None':
         PULCHRA_PATH = GLOBAL_CONFIG['PULCHRA_PATH']
     else:
         PULCHRA_PATH = PARAMETERS['pulchra_path']

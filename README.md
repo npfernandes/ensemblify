@@ -461,7 +461,7 @@ Your database must contain at least 4 columns: 3 containing the Phi, Psi and Ome
 
 # 💻 Usage
 
-Ensemblify offers four different modules, all of which can be acessed either through the command line or from inside a Python script or Jupyter Notebook.
+Ensemblify offers four main modules, all of which can be accessed either through the command line or from inside a Python script/Jupyter Notebook.
 
 <details>  
   <summary>

@@ -1,10 +1,12 @@
+<div align="justify">
+
 # Ensemblify: A Python package for generating ensembles of intrinsically disordered regions of AlphaFold or user defined models
 
 <img src="docs/assets/ensemblify_presentation.svg" width="100%"/>
 
 ## 💡 What is Ensemblify?
 
-**Ensemblify** is a python package that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (e.g intrinsically disordered regions (IDRs)).
+**Ensemblify** is a Python library that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (e.g intrinsically disordered regions (IDRs)).
 
 It supports both user-defined models and AlphaFold [[1]](#ref1) predictions, using predicted Local Distance Difference Test (pLDDT) and Predicted Aligned Error (PAE) confidence metrics to guide conformational sampling. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
 
@@ -26,7 +28,7 @@ or as a library inside a Python script or Jupyter notebook:
 
 Check the [Usage](#-usage) section for more details.
 
-You can also check out the interactive Quick Reference Guide notebook: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/01_quick_reference_guide.ipynb)
+You can also check out the interactive [Quick Reference Guide](examples/01_quick_reference_guide.ipynb) notebook.
 
 ## 🔎 How does Ensemblify work?
 A general overview of Ensemblify, descriptions of employed methods and applications can be found in the Ensemblify paper:
@@ -483,8 +485,7 @@ Inside a Python script or Jupyter Notebook:
     import ensemblify as ey
     ey.generate_ensemble('parameters_file.yaml')
 
-Check the interactive notebook for detailed usage examples: 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/02_generation_module.ipynb)
+Check the interactive [Generation Module](examples/02_generation_module.ipynb) notebook for detailed usage examples. 
 
 <details>  
   <summary>
@@ -526,8 +527,7 @@ Inside a Python script or Jupyter Notebook:
     import ensemblify as ey
     ey.ensemble2traj('trajectory_name','ensemble_dir','trajectory_dir')
 
-Check the interactive notebook for detailed usage examples: 
- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/03_conversion_module.ipynb)
+Check the interactive [Conversion Module](examples/03_conversion_module.ipynb) notebook for detailed usage examples.
 
 </details>
 
@@ -551,8 +551,7 @@ Inside a Python script or Jupyter Notebook:
     import ensemblify as ey
     ey.analyze_trajectory('trajectory.xtc','topology.pdb','trajectory_name')
 
-Check the interactive notebook for detailed usage examples: 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/04_analysis_module.ipynb)
+Check the interactive [Analysis Module](examples/04_analysis_module.ipynb) notebook for detailed usage examples.
 
 </details>
 
@@ -576,8 +575,7 @@ Inside a Python script or Jupyter Notebook:
     import ensemblify as ey
     ey.reweight_ensemble('trajectory.xtc','topology.pdb','trajectory_name','experimental_SAXS_data.dat')
 
-Check the interactive notebook for detailed usage examples: 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/npfernandes/ensemblify/blob/main/examples/05_reweighting_module.ipynb)
+Check the interactive [Reweighting Module](examples/05_reweighting_module.ipynb) notebook for detailed usage examples.
 
 </details>
 
@@ -629,3 +627,5 @@ We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS in
 <a id="ref11">[11]</a> J. M. Chandonia, N. K. Fox and S. E. Brenner, "SCOPe: classification of large macromolecular structures in the structural classification of proteins—extended database," *Nucleic Acids Research*, vol. 47, no. D1, pp. D475–D481, Jan. 2019 [[Link](https://doi.org/10.1093/nar/gky1134)]
 
 <a id="ref12">[12]</a> S. Bottaro , T. Bengsten and K. Lindorff-Larsen, "Integrating Molecular Simulation and Experimental Data: A Bayesian/Maximum Entropy Reweighting Approach," pp. 219-240, Feb. 2020. In: Z. Gáspári, (eds) *Structural Bioinformatics*, *Methods in Molecular Biology*, vol. 2112, Humana, New York, NY. [[Link](https://doi.org/10.1007/978-1-0716-0270-6_15)]
+
+</div>

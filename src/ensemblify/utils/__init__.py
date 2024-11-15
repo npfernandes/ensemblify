@@ -97,10 +97,10 @@ from ensemblify.utils.pdb_manipulation import (
     extract_pdb_info,
 )
 
-__all__ = ['df_from_pdb',
+__all__ = ['cleanup_pdbs',
+           'df_from_pdb',
            'df_to_pdb',
            'extract_pdb_info',
-           'cleanup_pdbs',
-           'kde',
            'get_array_extremum',
+           'kde',
            'round_to_nearest_multiple']

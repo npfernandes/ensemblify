@@ -106,16 +106,16 @@ from ensemblify.analysis.trajectory_utils import (
 
 __all__ = ['analyze_trajectory',
            'calculate_analysis_data',
-           'create_analysis_figures',
-           'calculate_ramachandran_data',
            'calculate_contact_matrix',
            'calculate_distance_matrix',
+           'calculate_metrics_data',
+           'calculate_ramachandran_data',
            'calculate_ss_assignment',
            'calculate_ss_frequency',
-           'calculate_metrics_data',
-           'create_ramachandran_figure',
+           'create_analysis_figures',
            'create_contact_map_fig',
            'create_distance_matrix_fig',
-           'create_ss_frequency_figure',
            'create_metrics_fig',
-           'create_metrics_traces']
+           'create_metrics_traces',
+           'create_ramachandran_figure',
+           'create_ss_frequency_figure']

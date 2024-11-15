@@ -57,6 +57,8 @@ def reweight_ensemble(
     """Apply Bayesian Maximum Entropy (BME) reweighting to a conformational ensemble, given
     experimental SAXS data.
 
+    Inside the output directory, a directory named trajectory_id will be created and that is where
+    all output files will be stored.
     If calculated metrics data is provided, it will not be recalculated.
     If data for the center mass distance is to be taken from the given calculated metrics data,
     the compare_cmdist mapping must be provided. The identifiers of this mapping will be matched
@@ -72,8 +74,9 @@ def reweight_ensemble(
         exp_saxs_data:
             path to .dat file with experimental SAXS data.
         output_dir:
-            path to directory where interactive .html plots and reweighting output files will be
-            stored. Is created if it does not exist. Defaults to current working directory.
+            path to output directory. Is created if it does not exist. Defaults to current working
+            directory. After output_dir is setup, a directory named trajectory_id is created inside
+            it, where the interactive .html plots and reweighting output files will be stored.
         thetas:
             list of values to try as the theta parameter in BME. The ensemble will be reweighted
             each time using a different theta value. The effect of different theta values can be
@@ -117,6 +120,9 @@ def reweight_ensemble(
         thetas = [1, 10, 20, 50, 75, 100, 200, 400, 750, 1000, 5000, 10000]
 
     # Setup output directory
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
+    output_dir = os.path.join(output_dir,trajectory_id)
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 
@@ -203,7 +209,10 @@ def reweight_ensemble(
     choice_idxs = [np.where(thetas_array == x)[0][0] for x in chosen_thetas]
     chosen_weight_sets = [ weights[i] for i in choice_idxs]
 
-    ##################################################################### CALCULATE REWEIGHTING FIGURES DATA #####################################################################
+    ##############################################################################################
+    ############################# CALCULATE REWEIGHTING FIGURES DATA #############################
+    ##############################################################################################
+
     # Calculate prior and posterior average SAXS intensities
     common_i_prior = None
     i_posts = []
@@ -309,7 +318,10 @@ def reweight_ensemble(
                                                          f'{trajectory_id}'
                                                          '_structural_metrics.csv'))
 
-    ##################################################################### CREATE REWEIGHTING FIGURES #####################################################################
+    ##############################################################################################
+    ################################# CREATE REWEIGHTING FIGURES #################################
+    ##############################################################################################
+
     # Create interactive figures
     print(f'Creating {trajectory_id} reweighted interactive figures...')
 
@@ -351,7 +363,11 @@ def reweight_ensemble(
         rw_cmap_fig = create_contact_map_fig(contact_matrix=rw_cm,
                                              topology=topology,
                                              trajectory_id=trajectory_id,
-                                             output_path=output_dir,
+                                             output_path=os.path.join(output_dir,
+                                                                      (f'{trajectory_id}_'
+                                                                       'contact_map_'
+                                                                       f'{chosen_theta}_'
+                                                                       'reweighted.html')),
                                              reweighted=True)
         theta_2_reweighted_figures[chosen_theta]['rw_cmap'] = rw_cmap_fig
 
@@ -392,7 +408,11 @@ def reweight_ensemble(
         rw_dmatrix_fig = create_distance_matrix_fig(distance_matrix=rw_dm,
                                                     topology=topology,
                                                     trajectory_id=trajectory_id,
-                                                    output_path=output_dir,
+                                                    output_path=os.path.join(output_dir,
+                                                                             (f'{trajectory_id}_'
+                                                                              'distance_matrix'
+                                                                              f'{chosen_theta}_'
+                                                                              'reweighted.html')),
                                                     max_colorbar=max_colorbar,
                                                     reweighted=True)
         theta_2_reweighted_figures[chosen_theta]['rw_dmatrix'] = rw_dmatrix_fig
@@ -419,7 +439,11 @@ def reweight_ensemble(
         rw_ssfreq_fig = create_ss_frequency_figure(ss_frequency=rw_ssf,
                                                    topology=topology,
                                                    trajectory_id=trajectory_id,
-                                                   output_path=output_dir,
+                                                   output_path=os.path.join(output_dir,
+                                                                            (f'{trajectory_id}_'
+                                                                             'ss_frequency_'
+                                                                             f'{chosen_theta}_'
+                                                                             'reweighted.html')),
                                                    reweighted=True)
         theta_2_reweighted_figures[chosen_theta]['rw_ssfreq'] = rw_ssfreq_fig
 
@@ -436,7 +460,10 @@ def reweight_ensemble(
                                                     title_text=f'{trajectory_id} Reweighted '
                                                                 'Structural Metrics')
 
-    ##################################################################### BUILD REWEIGHTING FIGURES HTML DIVS #####################################################################
+    ##############################################################################################
+    ############################# BUILD REWEIGHTING FIGURES HTML DIVS ############################
+    ##############################################################################################
+
     # Build HTML dashboard
     print(f'Building {trajectory_id} reweighting dashboard...')
 
@@ -608,7 +635,10 @@ def reweight_ensemble(
             '''
         theta_divs += div_str
 
-    ##################################################################### BUILD/SAVE REWEIGHTING FINAL HTML DASHBOARD #####################################################################
+    ##############################################################################################
+    ######################### BUILD/SAVE REWEIGHTING FINAL HTML DASHBOARD ########################
+    ##############################################################################################
+
     ## Build dashboard
     dashboard_html = f'''
     <!DOCTYPE html>
@@ -655,25 +685,24 @@ if __name__ == '__main__':
     update_config({'PEPSI_SAXS_PATH': '/home/tiagogomes/software/Pepsi-SAXS',
                    'BIFT_PATH': '/home/tiagogomes/software/bift'})
 
-    # reweight_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
-    #                   topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb',
-    #                   trajectory_id='Hst5',
-    #                   exp_saxs_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/bift_Hst5.dat',
-    #                   output_dir='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting',
-    #                   calculated_cmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_contact_matrix.csv',
-    #                   calculated_dmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_distance_matrix.csv',
-    #                   calculated_ss_frequency='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_ss_frequency.csv',
-    #                   calculated_metrics_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_structural_metrics.csv'
-    #                 )
-
-    reweight_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORIES/SMAD4/SMAD4_trajectory.xtc',
-                      topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORIES/SMAD4/SMAD4_top.pdb',
-                      trajectory_id='SMAD4',
-                      exp_saxs_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/smad4FL_clean_copy.dat',
-                      output_dir='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/REWEIGHTING/SMAD4',
-                      calculated_cmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORY_ANALYSIS/SMAD4/SMAD4_contact_matrix.csv',
-                      calculated_dmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORY_ANALYSIS/SMAD4/SMAD4_distance_matrix.csv',
-                      #calculated_ss_frequency='/home/tiagogomes/Desktop/projects/nuno_fernandes/NProtein_sarscov2/NProtein_365_TetramerClosed_Ensemble/testing_hst5_anal/reweighting/Hst5_ss_frequency.csv',
-                      calculated_metrics_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_from_AlphaFold/TRAJECTORY_ANALYSIS/SMAD4/SMAD4_structural_metrics.csv'
+    reweight_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
+                      topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb',
+                      trajectory_id='Hst5',
+                      exp_saxs_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/bift_Hst5.dat',
+                      output_dir='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/REWEIGHTING',
+                      calculated_cmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_contact_matrix.csv',
+                      calculated_dmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_distance_matrix.csv',
+                      calculated_ss_frequency='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_ss_frequency.csv',
+                      calculated_metrics_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_structural_metrics.csv'
                     )
-    
+
+    # reweight_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/THB_C2/THB_C2_trajectory.xtc',
+    #                   topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/THB_C2/THB_C2_top.pdb',
+    #                   trajectory_id='THB_C2',
+    #                   exp_saxs_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/bift_THB_C2.dat',
+    #                   output_dir='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/REWEIGHTING',
+    #                   calculated_cmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/THB_C2/THB_C2_contact_matrix.csv',
+    #                   calculated_dmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/THB_C2/THB_C2_distance_matrix.csv',
+    #                   calculated_ss_frequency='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/THB_C2/THB_C2_ss_frequency.csv',
+    #                   calculated_metrics_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/THB_C2/THB_C2_structural_metrics.csv'
+    #                 )

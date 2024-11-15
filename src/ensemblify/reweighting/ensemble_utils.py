@@ -691,11 +691,8 @@ def create_reweighting_fits_fig(
     fig.update_yaxes(row=2,
                      col=1,
                      title_text='q<sup>2</sup>Intensity',
-                     range=[0,
-                            np.max((q**2)*i_prior) + 0.1*np.max((q**2)*i_prior)],
-                     ticks='outside',
-                     ticklen=10,
-                     tickwidth=4,)
+                     range=[0, np.max((q**2)*i_prior) + 0.1*np.max((q**2)*i_prior)],
+                     ticks='',)
 
     ## Residuals
     fig.update_yaxes(row=2,
@@ -737,9 +734,14 @@ def create_reweighting_fits_fig(
                      mirror=True,
                      title_standoff=20)
 
-    # Fix yaxis title moving to the left
+    # Fix yaxis title moving to the left when we try to
+    # showticklabels=False by making its ticklabels invisible
     # see https://github.com/plotly/plotly.js/issues/6552
     fig.update_yaxes(row=1,
+                     tickfont=dict(color='rgba(0,0,0,0)',
+                                   size=1))
+    fig.update_yaxes(row=2,
+                     col=1,
                      tickfont=dict(color='rgba(0,0,0,0)',
                                    size=1))
 
@@ -808,7 +810,7 @@ def create_reweighting_metrics_fig(
     nrows = len(metrics.columns) // 2 + (len(metrics.columns) % 2 > 0)
     fig = make_subplots(rows=nrows,
                         cols=2,
-                        horizontal_spacing=0.35/2,
+                        horizontal_spacing=0.3/2,
                         vertical_spacing=0.45/2)
 
     # Iterate over the different metrics
@@ -890,9 +892,10 @@ def create_reweighting_metrics_fig(
 
             # Allows for hovering the dashed line to get average value
             fig.add_trace(go.Scatter(x=[av_rew],
-                                     y=[x for x in np.arange(0,
-                                                             np.interp(av_rew,x_rew,p_x_rew)+0.001,
-                                                             0.001)],
+                                     y=[x for x in
+                                        np.arange(0,
+                                                  np.interp(av_rew,x_rew,p_x_rew)+0.001,
+                                                  0.001)],
                                      mode='markers',
                                      marker_color=reweighted_trace.line.color,
                                      hovertext=(f'Avg: {round(av_rew,2)} &plusmn; '
@@ -906,14 +909,11 @@ def create_reweighting_metrics_fig(
                           col=col_num)
 
         # Set axis limits
-        x_min = min(np.min(x),
-                    *[np.min(x_rew) for x_rew in x_rews])
-        x_max = max(np.max(x),
-                    *[np.max(x_rew) for x_rew in x_rews])
+        x_min = min(np.min(x), *[np.min(x_rew) for x_rew in x_rews])
+        x_max = max(np.max(x), *[np.max(x_rew) for x_rew in x_rews])
         y_min = 0
         max_p_x_rews = max([np.max(p_x_rew) for p_x_rew in p_x_rews])
-        y_max = max(np.max(p_x)+np.max(p_x)*0.1,
-                    max_p_x_rews+max_p_x_rews*0.1)
+        y_max = max(np.max(p_x) + np.max(p_x)*0.1, max_p_x_rews + max_p_x_rews*0.1)
 
         # Set axis titles
         try:
@@ -942,15 +942,19 @@ def create_reweighting_metrics_fig(
             col_num += 1
 
     # Update Figure layout
-    fig.update_yaxes(ticks='outside',
-                     ticklen=10,
-                     tickwidth=4,
+    fig.update_yaxes(ticks='',
                      showline=True,
                      linewidth=4,
                      linecolor='black',
                      color='black',
                      mirror=True,
                      title_standoff=0)
+
+    # Fix yaxis title moving to the left when we try to
+    # showticklabels=False by making its ticklabels invisible
+    # see https://github.com/plotly/plotly.js/issues/6552
+    fig.update_yaxes(tickfont=dict(color='rgba(0,0,0,0)',
+                                   size=1))
 
     fig.update_xaxes(ticks='outside',
                      ticklen=10,
@@ -967,7 +971,7 @@ def create_reweighting_metrics_fig(
                                 color='black',
                                 size=34),
                       modebar_remove=['zoom','pan','select','lasso2d','zoomIn','zoomOut'],
-                      width=1400,
+                      width=1200,
                       height=1000,
                       margin=dict(t=80,
                                   b=0,

@@ -22,6 +22,7 @@ from plotly.subplots import make_subplots
 from tqdm import tqdm
 
 ## Local Imports
+from ensemblify.analysis.parula import PARULA_COLORSCALE
 from ensemblify.analysis.third_party.simple_mdreader import SimpleMDreader
 from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.utils import extract_pdb_info, kde
@@ -564,7 +565,11 @@ def create_contact_map_fig(
         for yi, yy in enumerate(x_labels):
             hovertext.append([])
             for xi, xx in enumerate(x_labels):
-                text = f'x: {xx}<br />y: {yy}<br />z: {round(contact_matrix.iat[yi,xi],3)}'
+                value = round(contact_matrix.iat[yi,xi],3)
+                if value != 0.0:
+                    text = f'x: {xx}<br />y: {yy}<br />z: {value}'
+                else:
+                    text = f'x: {xx}<br />y: {yy}<br />z: {contact_matrix.iat[yi,xi]}'
                 hovertext[-1].append(text)
 
         contact_matrix.replace(0,np.nan,inplace=True)
@@ -576,9 +581,8 @@ def create_contact_map_fig(
                                       hoverongaps=False,
                                       hoverinfo='text',
                                       hovertext=hovertext,
-                                      colorscale=px.colors.diverging.RdBu,
-                                      zmid=0,
-                                      reversescale=True))
+                                      colorscale=PARULA_COLORSCALE,
+                                      zmid=0))
 
     # Setup chain dividers lines
     num_res = len(contact_matrix.columns)
@@ -655,7 +659,7 @@ def create_contact_map_fig(
                             y=1.05,
                             showarrow=False)
 
-    cmap_fig.update_layout(width=920,
+    cmap_fig.update_layout(width=900,
                            height=900,
                            plot_bgcolor='#FFFFFF',
                            font=dict(family='Helvetica',
@@ -669,7 +673,8 @@ def create_contact_map_fig(
                                       ticks='outside',
                                       ticklen=10,
                                       tickwidth=4,
-                                      showgrid=False,),
+                                      showgrid=False,
+                                      constrain='domain',),
                            yaxis=dict(title='Residue',
                                       tickvals=tickvals,
                                       ticks='outside',
@@ -677,7 +682,8 @@ def create_contact_map_fig(
                                       tickwidth=4,
                                       showgrid=False,
                                       title_standoff=5,
-                                      scaleanchor='x'),
+                                      scaleanchor='x',
+                                      constrain='domain',),
                            shapes=shapes)
 
     cmap_fig.update_xaxes(showline=True,
@@ -946,7 +952,11 @@ def create_distance_matrix_fig(
         for yi, yy in enumerate(x_labels):
             hovertext.append([])
             for xi, xx in enumerate(x_labels):
-                text = f'x: {xx}<br />y: {yy}<br />z: {round(distance_matrix.iat[yi,xi],3)}'
+                value = round(distance_matrix.iat[yi,xi],3)
+                if value != 0.0:
+                    text = f'x: {xx}<br />y: {yy}<br />z: {value}'
+                else:
+                    text = f'x: {xx}<br />y: {yy}<br />z: {distance_matrix.iat[yi,xi]}'
                 hovertext[-1].append(text)
 
         distance_matrix.replace(0,np.nan,inplace=True)
@@ -957,11 +967,10 @@ def create_distance_matrix_fig(
                                          colorbar_title='&#197;',
                                          hoverinfo='text',
                                          hovertext=hovertext,
-                                         colorscale=px.colors.diverging.RdBu,
+                                         colorscale=PARULA_COLORSCALE,
                                          zmin=min_colorbar,
                                          zmid=0,
-                                         zmax=max_colorbar,
-                                         reversescale=True))
+                                         zmax=max_colorbar))
 
     # Setup chain dividers lines
     num_res = len(distance_matrix.columns)
@@ -1038,7 +1047,7 @@ def create_distance_matrix_fig(
                                y=1.05,
                                showarrow=False)
 
-    dmatrix_fig.update_layout(width=920,
+    dmatrix_fig.update_layout(width=900,
                               height=900,
                               plot_bgcolor='#FFFFFF',
                               font=dict(family='Helvetica',
@@ -1052,7 +1061,8 @@ def create_distance_matrix_fig(
                                          ticks='outside',
                                          ticklen=10,
                                          tickwidth=4,
-                                         showgrid=False,),
+                                         showgrid=False,
+                                         constrain='domain',),
                               yaxis=dict(title='Residue',
                                          tickvals=tickvals,
                                          ticks='outside',
@@ -1060,7 +1070,8 @@ def create_distance_matrix_fig(
                                          tickwidth=4,
                                          showgrid=False,
                                          title_standoff=5,
-                                         scaleanchor='x'),
+                                         scaleanchor='x',
+                                         constrain='domain',),
                               shapes=shapes)
 
     dmatrix_fig.update_xaxes(showline=True,
@@ -1393,12 +1404,12 @@ def create_ss_frequency_figure(
     # Update Figure Layout
     if difference:
         if trajectory_id is not None:
-            ss_freq_title = f'{trajectory_id} Difference Secondary Structure Frequencies'
+            ss_freq_title = f'{trajectory_id} Difference Sec. Struct. Frequencies'
         else:
             ss_freq_title = 'Difference Secondary Structure Frequencies'
     elif reweighted:
         if trajectory_id is not None:
-            ss_freq_title = f'{trajectory_id} Reweighted Secondary Structure Frequencies'
+            ss_freq_title = f'{trajectory_id} Reweighted Sec. Struct. Frequencies'
         else:
             ss_freq_title = 'Reweighted Secondary Structure Frequencies'
     else:
@@ -1632,20 +1643,28 @@ def create_metrics_traces(
     avg_stderr_values = []
 
     for col_name in metrics.columns:
-        hist_trace = go.Histogram(x=metrics[col_name],
+        data_array = np.array(metrics[col_name])
+
+        hist_bin_range = (math.floor(np.min(data_array)), math.ceil(np.max(data_array)))
+        hist_bin_edges = np.histogram_bin_edges(a=data_array,
+                                                range=hist_bin_range,
+                                                bins='fd')
+        hist_bin_size = hist_bin_edges[1] - hist_bin_edges[0]
+
+        hist_trace = go.Histogram(x=data_array,
                                   name=f'{trajectory_id}_{col_name}',
-                                  xbins=dict(start=min(metrics[col_name]),
-                                             # To include the last value in the last bin
-                                             end=max(metrics[col_name]) + 1,
-                                             size=1),
-                                  histnorm='probability density',
+                                  xbins=dict(start=hist_bin_range[0],
+                                             end=hist_bin_range[1],
+                                             size=hist_bin_size),
+                                  histnorm='probability',
                                   marker=dict(color=color),
                                   opacity=0.7,
                                   visible=False)
-
         hist_traces.append(hist_trace)
 
-        kde_x, kde_y, avg, avg_stderr = kde(data=np.array(metrics[col_name]))
+        kde_x, kde_y, avg, avg_stderr = kde(data=data_array)
+        avg_values.append(avg)
+        avg_stderr_values.append(avg_stderr)
 
         scatter_trace = go.Scatter(x=kde_x,
                                    y=kde_y,
@@ -1655,10 +1674,7 @@ def create_metrics_traces(
                                    line=dict(width=4),
                                    legend='legend',
                                    visible=True)
-
         scatter_traces.append(scatter_trace)
-        avg_values.append(avg)
-        avg_stderr_values.append(avg_stderr)
 
     return box_traces,hist_traces,scatter_traces,avg_values,avg_stderr_values
 
@@ -1945,17 +1961,18 @@ def create_metrics_fig(
                              title_standoff=30)
 
     metrics_fig.update_yaxes(showline=True,
-                             ticklen=10,
-                             tickwidth=4,
+                             ticks='',
                              linewidth=4,
                              linecolor='black',
                              color='black',
                              mirror=True,
-                             title_standoff=0)
+                             title_standoff=20)
 
-    metrics_fig.update_yaxes(row=nrows,
-                             col=1,
-                             title_standoff=0)
+    # Fix yaxis title moving to the left when we try to
+    # showticklabels=False by making its ticklabels invisible
+    # see https://github.com/plotly/plotly.js/issues/6552
+    metrics_fig.update_yaxes(tickfont=dict(color='rgba(0,0,0,0)',
+                                           size=1))
 
     # Save Structural Metrics figure
     if output_path is not None:

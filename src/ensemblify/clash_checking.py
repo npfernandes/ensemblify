@@ -249,12 +249,12 @@ def check_steric_clashes(
             nclashes = len(steric_clashes)
             if nclashes > 0:
                 clashed_pdbs += 1
-            with open(clash_report,'a',encoding='utf-8') as simplified_report:
-                simplified_report.write(f'{pdb2check} : {nclashes}\n')
-            with open(clash_report_detailed,'a',encoding='utf-8') as detailed_report:
-                detailed_report.write(f'{pdb2check} : {nclashes}\n')
-                for clash in steric_clashes:
-                    detailed_report.write(f'{str(clash)}\n')
+                with open(clash_report,'a',encoding='utf-8') as simplified_report:
+                    simplified_report.write(f'{pdb2check} : {nclashes}\n')
+                with open(clash_report_detailed,'a',encoding='utf-8') as detailed_report:
+                    detailed_report.write(f'{pdb2check} : {nclashes}\n')
+                    for clash in steric_clashes:
+                        detailed_report.write(f'{str(clash)}\n')
         else:
             erred_pdbs.append(pdb2check)
 

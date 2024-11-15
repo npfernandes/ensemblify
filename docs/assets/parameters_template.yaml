@@ -63,4 +63,4 @@ pae_params:
   weight: 1.0 # The stdev of AtomPairConstraints created from the PAE matrix is given by error x weight.
   tolerance: 0.001 # The tol of AtomPairConstraints created from the PAE matrix is given by this value.
   adjacency_threshold: 8 # How far away two residues need to be to consider their PAE value.
-  plddt_scaling_factor: 1.0 # Constraints between high pLDDT and low pLDDT residues will be made weaker through this scaling factor (high scaling factor -> weaker constraints)
+  plddt_scaling_factor: 20.0 # Constraints between high pLDDT and low pLDDT residues will be made weaker through this scaling factor (high scaling factor -> weaker constraints)

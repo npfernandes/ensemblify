@@ -109,6 +109,7 @@ def run_sampling(
 
     JOB_NAME = PARAMETERS['job_name']
     SS_BIAS = PARAMETERS['restraints']['ss_bias']
+    VARIANCE = PARAMETERS['variability']['variance']
     SAMPLER_PARAMS = HashableDict(PARAMETERS['sampler_params'])
     SCOREFXN_ID = PARAMETERS['scorefxn']['id']
     SCOREFXN_WEIGHT = PARAMETERS['scorefxn']['weight']
@@ -179,6 +180,7 @@ def run_sampling(
                                                     str(decoy_num),
                                                     PYROSETTA_LOG,
                                                     SS_BIAS,
+                                                    VARIANCE,
                                                     SAMPLER_PARAMS,
                                                     SCOREFXN_ID,
                                                     SCOREFXN_WEIGHT,
@@ -276,6 +278,7 @@ def run_sampling(
                                                 decoy_num,
                                                 PYROSETTA_LOG,
                                                 SS_BIAS,
+                                                VARIANCE,
                                                 SAMPLER_PARAMS,
                                                 SCOREFXN_ID,
                                                 SCOREFXN_WEIGHT,

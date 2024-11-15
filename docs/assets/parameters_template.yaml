@@ -42,6 +42,8 @@ minimizer: # PyRosetta Minimizer (for MinMover)
   tolerance: 0.001
   max_iters: 5000
   finalcycles: 5 # Number of final rounds of minimization to perform on each sampled structure.
+variability:
+  variance: 0.10 # Values are sampled from a gaussian distribution centred on the values found in the database and percentage variance equal to this value
 sampler_params:
   MC: # Dictionary of parameters for each sampler used in targets
     temperature: 200

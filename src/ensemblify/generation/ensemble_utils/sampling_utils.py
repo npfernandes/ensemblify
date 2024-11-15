@@ -307,6 +307,7 @@ def sample_pdb(
     decoy_num: str = '',
     log_file: str = os.path.join(os.getcwd(),'pyrosetta.log'),
     ss_bias: tuple[tuple[tuple[str,tuple[int,int],str],...],int] | None = None,
+    variance: float | None = 0.10,
     sampler_params: dict[str,dict[str,int]] = {'MC':{'temperature':200,'max_loops':200}},
     scorefxn_id: str = 'score0',
     scorefxn_weight: float = 1.0,
@@ -340,6 +341,10 @@ def sample_pdb(
         ss_bias:
             Secondary Structure Bias with the desired percentage of total structures to respect
             this bias. Defaults to None.
+        variance:
+            new dihedral angle values inserted into sampling regions are sampled from a Gaussian
+            distribution centred on the value found in database and percentage variance equal to
+            this value. Defaults to 0.10 (10%).
         sampler_params:
             Parameters for the used sampler, assumes MonteCarloSampler is used. Defaults to
             {'MC':{'temperature':200,'max_loops':200}}.
@@ -393,6 +398,7 @@ def sample_pdb(
                                max_iters=minimizer_maxiters)
     # Setup sampler
     samplers = setup_samplers(sampler_params=sampler_params,
+                              variance=variance,
                               scorefxn=scorefxn,
                               databases=databases,
                               log_file=log_file)

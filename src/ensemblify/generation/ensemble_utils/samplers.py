@@ -44,6 +44,7 @@ class MonteCarloSampler():
         databases: dict,
         mover_id: str,
         smp_params: dict[str,int],
+        variance: float,
         log_file: str):
         """Initializes the instance based on the given parameters.
         
@@ -57,13 +58,17 @@ class MonteCarloSampler():
                 identifier for which mover to use in this sampler object.
             smp_params:
                 parameters for the instantiated sampler.
+            variance:
+                new dihedral angle values inserted into sampling regions are sampled from a
+                Gaussian distribution centred on the value found in database and percentage
+                variance equal to this value.
             log_file:
                 path to .log file for warnings or error messages related to sampling.
         """
         self.scorefxn = scorefxn
         self.databases = databases
         self.params = smp_params  #smp_params is a dictionary
-        self.mover = setup_mover(mover_id,databases,log_file)
+        self.mover = setup_mover(mover_id,databases,variance,log_file)
         self.log_file = log_file
 
     def apply(self,
@@ -157,6 +162,7 @@ class MonteCarloSampler():
 # FUNCTIONS
 def setup_samplers(
     sampler_params: dict[str,dict[str,int]],
+    variance: float,
     scorefxn: pyrosetta.rosetta.core.scoring.ScoreFunction,
     databases: dict[str,dict[str,pd.DataFrame]],
     log_file: str,
@@ -183,11 +189,12 @@ def setup_samplers(
     samplers = {}
     for smp_id in sampler_ids:
         if smp_id == 'MC':
-            samplers[smp_id] = MonteCarloSampler(scorefxn,
-                                                 databases,
-                                                 'set_random_dihedrals',
-                                                 sampler_params['MC'],
-                                                 log_file)
+            samplers[smp_id] = MonteCarloSampler(scorefxn=scorefxn,
+                                                 databases=databases,
+                                                 mover_id='set_random_dihedrals',
+                                                 smp_params=sampler_params['MC'],
+                                                 variance=variance,
+                                                 log_file=log_file)
         # add more samplers here
 
     return samplers

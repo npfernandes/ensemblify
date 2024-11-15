@@ -35,6 +35,7 @@ VALID_PARAMS_TYPES = {
     'pulchra_path' : str,
     'scorefxn': dict,
     'minimizer' : dict,
+    'variability': dict,
     'sampler_params' : dict,
     'constraints' : dict,
     'constraints_violation': dict,
@@ -46,31 +47,34 @@ ADVANCED_PARAMS_DEFAULTS = {
     'alphafold': False,
     'pae': None,
     'restraints': {'ss_bias': None,
-                    'contacts': None},
+                   'contacts': None},
+    'output_path': os.getcwd(),
     'faspr_path': None,
     'pulchra_path': None,
     'core_amount': os.cpu_count() - 1, 
-    'output_path': os.getcwd(),
     'scorefxn': {'id': 'score0',
-                    'weight': 1.0},
+                 'weight': 1.0},
     'minimizer': {'id': 'dfpmin_armijo_nonmonotone',
                     'tolerance': 0.001,
                     'max_iters': 5000,
                     'finalcycles': 5},
+    'variability': {'variance': 0.10},
+    'sampler_params': {'MC': {'temperature': 200,
+                              'max_loops': 200}},
     'constraints': {'weight': 1.0,
                     'stdev': 10.0,
                     'tolerance': 0.001},
     'constraints_violation': {'threshold': 0.015,
-                                'maxres': 20},
+                              'maxres': 20},
     'plddt_params': {'threshold': 70,
-                        'contiguous_res': 4},
+                     'contiguous_res': 4},
     'pae_params': {'cutoff': 10.0,
-                    'flatten_cutoff': 10.0,
-                    'flatten_value': 10.0,
-                    'weight': 1.0,
-                    'tolerance': 0.001,
-                    'adjacency_threshold': 8,
-                    'plddt_scaling_factor': 20.0}
+                   'flatten_cutoff': 10.0,
+                   'flatten_value': 10.0,
+                   'weight': 1.0,
+                   'tolerance': 0.001,
+                   'adjacency_threshold': 8,
+                   'plddt_scaling_factor': 20.0}
 }
 
 # FUNCTIONS
@@ -295,7 +299,10 @@ def setup_ensemble_gen_params(input_params: dict, inputs_dir: str) -> tuple[str,
     uniprotid_pattern = re.compile(r'[OPQ][0-9][A-Z0-9]{3}[0-9]|'
                                    r'[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}')
     uniprotid_match_sequence = re.search(uniprotid_pattern,input_sequence)
-    uniprotid_match_paematrix = re.search(uniprotid_pattern,input_pae_matrix)
+    if input_pae_matrix is not None:
+        uniprotid_match_paematrix = re.search(uniprotid_pattern,input_pae_matrix)
+    else:
+        uniprotid_match_paematrix = None
 
     # Update input .pdb structure if match found
     if uniprotid_match_sequence is not None:
@@ -466,11 +473,24 @@ def read_input_parameters(parameter_path: str) -> dict:
                                                                                'cycles must be of '
                                                                                'type int!')
 
+        elif key == 'variability':
+            variability_params = params[key]
+            assert isinstance(variability_params,dict), ('Variability parameters must be of '
+                                                           'type dict!')
+            for variability_param in variability_params:
+                if variability_param == 'variance':
+                    assert isinstance(variability_params[variability_param],float), ('Variance '
+                                                                                     'must be of '
+                                                                                     'type '
+                                                                                     'float!')
+
         elif key == 'sampler_params':
             sampler_params = params[key]
+            assert isinstance(sampler_params,dict), ('Samplers parameters must be of type dict!')
             for sampler_id in sampler_params:
-                assert isinstance(sampler_params[sampler_id],dict), ('Sampler Parameters must be '
-                                                                     'of type dict !')
+                assert isinstance(sampler_params[sampler_id],dict), (f'{sampler_id} sampler '
+                                                                     'parameters must be of '
+                                                                     'type dict !')
                 for smp_param_id in sampler_params[sampler_id]:
                     assert isinstance(sampler_params[sampler_id][smp_param_id],int), ('Sampler '
                                                                                       'Parameters '

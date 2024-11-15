@@ -27,11 +27,15 @@ class SetRandomDihedralsMover(Mover):
             all the available databases to sample from. Mapping of database_ids to
             databases nested dicts, that map residue 1lettercodes to dihedral
             angle values dataframes.
+        variance (float):
+            new dihedral angle values inserted into sampling regions are sampled from a Gaussian
+            distribution centred on the value found in database and percentage variance equal to
+            this value.
         log_file (str):
             path to .log file for warnings or error messages related to sampling.
     """
 
-    def __init__(self, databases: dict[str,dict[str,pd.DataFrame]], log_file: str):
+    def __init__(self, databases: dict[str,dict[str,pd.DataFrame]], variance: float, log_file: str):
         """Initializes the instance from a dictionary of database(s) to sample from.
 
         Args:
@@ -43,6 +47,7 @@ class SetRandomDihedralsMover(Mover):
         """
         Mover.__init__(self)
         self.databases = databases
+        self.variance = variance
         self.log_file = log_file
 
     def get_name(self):
@@ -148,15 +153,16 @@ class SetRandomDihedralsMover(Mover):
 
                 # Perform the mover operation (change Phi/Psi/Omega angles)
                 # sample from a normal distribution to add diversity
-                pose.set_phi(target_resnum,np.random.normal(phi,abs(phi*0.10)))
-                pose.set_psi(target_resnum,np.random.normal(psi,abs(psi*0.10)))
-                pose.set_omega(target_resnum,np.random.normal(omg,abs(omg*0.10)))
+                pose.set_phi(target_resnum,np.random.normal(phi,abs(phi*self.variance)))
+                pose.set_psi(target_resnum,np.random.normal(psi,abs(psi*self.variance)))
+                pose.set_omega(target_resnum,np.random.normal(omg,abs(omg*self.variance)))
 
 
 # FUNCTIONS
 def setup_mover(
     mover_id: str,
     databases: dict[str,dict[str,pd.DataFrame]],
+    variance: float,
     log_file: str,
     ) -> pyrosetta.rosetta.protocols.moves.Mover:
     """Create custom PyRosetta Mover.
@@ -169,6 +175,10 @@ def setup_mover(
         databases:
             mapping of database_ids to databases nested dicts, that map residue 1lettercodes
             to dihedral angle values dataframes.
+        variance:
+            new dihedral angle values inserted into sampling regions are sampled from a Gaussian
+            distribution centred on the value found in database and percentage variance equal to
+            this value.
         log_file:
             path to .log file for warnings or error messages related to sampling.
 
@@ -177,5 +187,5 @@ def setup_mover(
             Custom PyRosetta Mover object.
     """
     if mover_id == 'set_random_dihedrals':
-        my_mover = SetRandomDihedralsMover(databases,log_file)
+        my_mover = SetRandomDihedralsMover(databases,variance,log_file)
     return my_mover

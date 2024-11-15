@@ -1,4 +1,4 @@
-# Ensemblify: A Python library for generating ensembles of intrinsically disordered regions of AlphaFold or user defined models
+# Ensemblify: A Python package for generating ensembles of intrinsically disordered regions of AlphaFold or user defined models
 
 <img src="docs/assets/ensemblify_presentation.svg" width="100%"/>
 
@@ -6,7 +6,7 @@
 
 ## 💡 What is Ensemblify?
 
-**Ensemblify** is a Python library that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (e.g intrinsically disordered regions (IDRs)).
+**Ensemblify** is a Python package that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (e.g intrinsically disordered regions (IDRs)).
 
 It supports both user-defined models and AlphaFold [[1]](#ref1) predictions, using predicted Local Distance Difference Test (pLDDT) and Predicted Aligned Error (PAE) confidence metrics to guide conformational sampling. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
 

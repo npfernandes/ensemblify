@@ -85,11 +85,11 @@ To install the `ensemblify` Python package, you can follow these commands:
 
 
 Alternatively, Ensemblify is available via the Python Package Index:
-    
-    ```bash
-    conda activate ensemblify_env   
-    pip install -U ensemblify
-    ```
+
+  ```bash
+  conda activate ensemblify_env   
+  pip install -U ensemblify
+  ```
 
 </details>
 

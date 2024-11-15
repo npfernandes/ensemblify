@@ -526,10 +526,9 @@ def create_contact_map_fig(
 
     # Start from the last chain as the .pdb was also parsed from the last res
     for chain_number in range(len(top_info.keys()),0,-1):
-        chain_info = top_info[chain_number] # (chain_letter, starting_res, chain_size)
-        resrange = [ x for x in range(chain_info[1],chain_info[1] + chain_info[2])]
-        resranges[chain_info[0]] = resrange
-        chain_letters.append(chain_info[0])
+        chain_letter, starting_res, chain_size = top_info[chain_number]
+        resranges[chain_letter] = [ x for x in range(starting_res, starting_res + chain_size)]
+        chain_letters.append(chain_letter)
 
     # Create tick labels that respect chain id
     if len(chain_letters) > 1:
@@ -595,6 +594,7 @@ def create_contact_map_fig(
         chain_begins.append(cum_res)
         chain_end = cum_res + chain_size
         chain_ends.append(chain_end)
+
         shapes.append(dict(type='line',
                            xref='x',
                            x0=chain_end-0.5,
@@ -1300,7 +1300,7 @@ def create_ss_frequency_figure(
     resranges = {}
     chain_letters = []
 
-    # Iterate through chains
+    # Start from the last chain as the .pdb was also parsed from the last res
     for chain_number in range(len(top_info.keys()),0,-1):
         chain_letter, starting_res, chain_size = top_info[chain_number]
         resranges[chain_letter] = [ x for x in range(starting_res, starting_res + chain_size)]
@@ -1339,13 +1339,18 @@ def create_ss_frequency_figure(
 
     else:
         for structure,color in zip(ss_frequency.index,colors):
-            ss_freq_fig.add_trace(go.Scatter(x=[int(x) for x in ss_frequency.columns],
+            # Create hovertext
+            hovertext = [f'x: {x_label}<br />y: {round(ss_frequency.loc[structure].iloc[i],5)}'
+                          for i,x_label in enumerate(x_labels)]
+            ss_freq_fig.add_trace(go.Scatter(x=list(range(1,len(ss_frequency.columns)+1)),
                                              y=ss_frequency.loc[structure],
                                              mode='lines',
                                              stackgroup='one', # remove for non stacked plot
                                              marker_color=color,
                                              line_width=0,
-                                             name=structure))
+                                             name=structure,
+                                             hoverinfo='text',
+                                             hovertext=hovertext))
 
     # Setup chain dividers lines
     num_res = len(ss_frequency.columns)
@@ -1361,13 +1366,13 @@ def create_ss_frequency_figure(
         chain_ends.append(chain_end)
 
         shapes.append(dict(type='line',
-                            xref='x',
-                            x0=cumulative_residues+len(resranges[chain_letter])-1,
-                            x1=cumulative_residues+len(resranges[chain_letter])-1,
-                            y0=0,
-                            y1=1,
-                            line=dict(color='black',
-                                      width=2)))
+                           xref='x',
+                           x0=chain_end,
+                           x1=chain_end,
+                           y0=0,
+                           y1=1,
+                           line=dict(color='black',
+                                     width=2)))
 
         cumulative_residues += chain_size
     chain_begins.append(num_res - len(resranges[chain_letters[-1]]) + 1)

@@ -937,12 +937,17 @@ def create_distance_matrix_fig(
     # Add our data
     if not difference:
         distance_matrix.replace(0,np.nan,inplace=True)
+
+        if max_colorbar is None:
+            max_colorbar = math.ceil(np.max(distance_matrix))
+
         dmatrix_fig.add_trace(go.Heatmap(z=distance_matrix,
                                          x=x_labels,
                                          y=y_labels,
                                          zmin=0,
                                          zmax=max_colorbar,
                                          colorbar_title='&#197;',
+                                         colorbar_ticklabeloverflow='allow',
                                          transpose=True,
                                          hoverongaps=False,
                                          colorscale=px.colors.sequential.Reds))

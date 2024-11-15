@@ -285,8 +285,8 @@
             <span class="tooltip-text">
               Residues contained in regions defined in Sampling Targets<br>
               will only be sampled if their pLDDT is below a threshold.<br>
-              If you want to change the pLDDT threshold, check the<br>
-              Advanced Parameters section.
+              If you want to change the pLDDT threshold from the default 70,<br>
+              check the Advanced Parameters section.
             </span>
           </div>
           <br>
@@ -295,10 +295,10 @@
           <div class="tooltip-icon">&#9432;
             <span class="tooltip-text">
               Any constraints derived from Sampling Targets or defined<br>
-              in Constraints will be ignored and constraints created from<br>
-              the given PAE matrix will be used instead.If you want to<br>
+              in Restraints will be ignored and constraints created from<br>
+              the given PAE matrix will be used instead. If you want to<br>
               customize how these constraints are created, check the<br>
-              Advanced Parameters section.
+              Advanced Parameters PAE section.
             </span>
           </div>
           <input type="text" id="PAEPath" placeholder="Path to PAE matrix .json file from AlphaFold output" style="display:none;">
@@ -345,8 +345,8 @@
           <h2>FASPR Path</h2>
           <input type="text" id="fasprPath" placeholder="Path to FASPR executable"><br>
       
-          <h2>Pulchra Path</h2>
-          <input type="text" id="pulchraPath" placeholder="Path to Pulchra (changed version) executable"><br>
+          <h2>PULCHRA Path</h2>
+          <input type="text" id="pulchraPath" placeholder="Path to PULCHRA executable"><br>
 
           <h2>Core amount</h2>
           <input type="number" id="cores" min="1" max="32" placeholder="Number of processor cores to use. Defaults to all cores in machine minus 1"><br>
@@ -408,6 +408,26 @@
             </div><br>
           </fieldset>
 
+          <h2>Variability</h2>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Ways to increase conformational sampling<br>
+              variability between sampled structures.
+            </span>
+          </div><br>
+          <fieldset id="variabilityParameters">
+            <label>Variance:</label>
+            <input type="number" id="variabilityvariance" value="0.10" placeholder="0.10">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                New dihedral angle values to insert into flexible<br>
+                regions are sampled from a Gaussian distribution<br>
+                centred on the values found in the database and<br>
+                percentage variance equal to this value.
+              </span>
+            </div><br>
+          </fieldset>
+
           <h2>Monte Carlo Sampler Parameters</h2>
           <fieldset id="samplerParameters">
               <label>Temperature:</label>
@@ -459,11 +479,12 @@
           <h2>pLDDT</h2>&nbsp;
           <div class="tooltip-icon">&#9432;
             <span class="tooltip-text" style="text-align: left;">
-              AlphaFold's confidence metric.<br>
-              pLDDT > 90: good backbone and sidechain prediction.<br>
-              70 < pLDDT < 90: good backbone prediction.<br>
-              50 < pLDDT < 70: should be treated with caution.<br>
-              pLDDT < 50: strong indication of disorder.
+              predicted Local Distance Difference Test (pLDDT),<br>
+              AlphaFold's confidence metric:<br>
+              - pLDDT > 90: good backbone and sidechain prediction.<br>
+              - 70 < pLDDT < 90: good backbone prediction.<br>
+              - 50 < pLDDT < 70: should be treated with caution.<br>
+              - pLDDT < 50: strong indication of disorder.
             </span>
           </div>
           <fieldset id="plddtParameters">
@@ -471,7 +492,7 @@
             <input type="number" id ="plddtthreshold" value="70" placeholder="70">&nbsp;
             <div class="tooltip-icon">&#9432;
               <span class="tooltip-text">
-                Sample residues with pLDDT below this number.
+                Only sample residues with pLDDT below this number.
               </span>
             </div><br>
             <label>Number of contiguous residues:</label>
@@ -488,7 +509,7 @@
           <h2>PAE</h2>&nbsp;
           <div class="tooltip-icon">&#9432;
             <span class="tooltip-text">
-              Predicted Aligned Error matrix.<br>
+              Predicted Aligned Error (PAE) matrix.<br>
               If PAE is generally low for a residue pair x, y from two<br>
               different domains, it indicates that AlphaFold predicts<br>
               well-defined relative positions and orientations for them. 
@@ -869,6 +890,8 @@ minimizer:
   tolerance: ${document.getElementById('minimizertol').value}
   max_iters: ${document.getElementById('minimizermaxiters').value}
   finalcycles: ${document.getElementById('minimizerfinalcycles').value}
+variability:
+  variance: ${document.getElementById('variabilityvariance').value}
 sampler_params:
   MC:
     temperature: ${document.getElementById('MCTemperature').value}

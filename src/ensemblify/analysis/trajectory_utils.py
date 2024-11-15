@@ -588,11 +588,12 @@ def create_contact_map_fig(
     chain_ends = [] # to be used in tickvals
     chain_begins = [] # to be used in tickvals
     shapes = []
-    cum_res = 0
+    cumulative_residues = 0
+
     for chain_letter in chain_letters[:-1]:
+        chain_begins.append(cumulative_residues)
         chain_size = len(resranges[chain_letter])
-        chain_begins.append(cum_res)
-        chain_end = cum_res + chain_size
+        chain_end = cumulative_residues + chain_size
         chain_ends.append(chain_end)
 
         shapes.append(dict(type='line',
@@ -611,14 +612,16 @@ def create_contact_map_fig(
                            x1=num_res+0.5,
                            line=dict(color='black',
                                      width=2)))
-        cum_res += chain_size
-    chain_begins.append(num_res-len(resranges[chain_letters[-1]]))
+        cumulative_residues += chain_size
+    chain_begins.append(num_res - len(resranges[chain_letters[-1]]))
+    chain_ends.append(num_res)
 
     # Setup tick values
-    tickvals = chain_begins
+    tickvals = []
     curr_chain = 0
-    curr_val = 0
+    curr_val = chain_begins[curr_chain]
     tick_step = num_res // len(chain_letters) // 4 # always 5 ticks per axis
+
     while curr_val <= num_res:
         try:
             chain_end = chain_ends[curr_chain]
@@ -627,6 +630,15 @@ def create_contact_map_fig(
         else:
             if chain_end - curr_val <= tick_step:
                 curr_chain += 1
+                try:
+                    curr_val = chain_begins[curr_chain]
+                    tickvals.append(curr_val)
+                except IndexError:
+                    if chain_ends[-1] - curr_val <= 3:
+                        tickvals.append(chain_ends[-1] - 1)
+                    else:
+                        tickvals.append(curr_val)
+                        tickvals.append(chain_ends[-1])
             else:
                 tickvals.append(curr_val)
         curr_val += tick_step
@@ -912,10 +924,9 @@ def create_distance_matrix_fig(
 
     # Start from the last chain as the .pdb was also parsed from the last res
     for chain_number in range(len(top_info.keys()),0,-1):
-        chain_info = top_info[chain_number] # (chain_letter, starting_res, chain_size)
-        resrange = [ x for x in range(chain_info[1],chain_info[1] + chain_info[2])]
-        resranges[chain_info[0]] = resrange
-        chain_letters.append(chain_info[0])
+        chain_letter, starting_res, chain_size = top_info[chain_number]
+        resranges[chain_letter] = [ x for x in range(starting_res, starting_res + chain_size)]
+        chain_letters.append(chain_letter)
 
     # Create tick labels that respect chain id
     if len(chain_letters) > 1:
@@ -982,12 +993,14 @@ def create_distance_matrix_fig(
     chain_ends = [] # to be used in tickvals
     chain_begins = [] # to be used in tickvals
     shapes = []
-    cum_res = 0
+    cumulative_residues = 0
+
     for chain_letter in chain_letters[:-1]:
+        chain_begins.append(cumulative_residues)
         chain_size = len(resranges[chain_letter])
-        chain_begins.append(cum_res)
-        chain_end = cum_res + chain_size
+        chain_end = cumulative_residues + chain_size
         chain_ends.append(chain_end)
+
         shapes.append(dict(type='line',
                            xref='x',
                            x0=chain_end-0.5,
@@ -1004,14 +1017,16 @@ def create_distance_matrix_fig(
                            x1=num_res+0.5,
                            line=dict(color='black',
                                      width=2)))
-        cum_res += chain_size
-    chain_begins.append(num_res-len(resranges[chain_letters[-1]]))
+        cumulative_residues += chain_size
+    chain_begins.append(num_res - len(resranges[chain_letters[-1]]))
+    chain_ends.append(num_res)
 
     # Setup tick values
-    tickvals = chain_begins
+    tickvals = []
     curr_chain = 0
-    curr_val = 0
+    curr_val = chain_begins[curr_chain]
     tick_step = num_res // len(chain_letters) // 4 # always 5 ticks per axis
+
     while curr_val <= num_res:
         try:
             chain_end = chain_ends[curr_chain]
@@ -1020,6 +1035,15 @@ def create_distance_matrix_fig(
         else:
             if chain_end - curr_val <= tick_step:
                 curr_chain += 1
+                try:
+                    curr_val = chain_begins[curr_chain]
+                    tickvals.append(curr_val)
+                except IndexError:
+                    if chain_ends[-1] - curr_val <= 3:
+                        tickvals.append(chain_ends[-1] - 1)
+                    else:
+                        tickvals.append(curr_val)
+                        tickvals.append(chain_ends[-1])
             else:
                 tickvals.append(curr_val)
         curr_val += tick_step

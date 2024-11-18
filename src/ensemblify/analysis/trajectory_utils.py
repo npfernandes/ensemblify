@@ -673,7 +673,7 @@ def create_contact_map_fig(
                                                           'any atoms of a residue pair'),
                                                     font=dict(color='gray',
                                                               size=24,))),
-                           margin_t=125, # to fit subtitle
+                           margin_t=150, # to fit subtitle
                            xaxis=dict(title='Residue',
                                       tickvals=tickvals,
                                       ticks='outside',
@@ -1072,7 +1072,7 @@ def create_distance_matrix_fig(
                                                              'carbons of a residue pair'),
                                                        font=dict(color='gray',
                                                                  size=24,))),
-                              margin_t=125, # to fit subtitle
+                              margin_t=150, # to fit subtitle
                               xaxis=dict(title='Residue',
                                          tickvals=tickvals,
                                          ticks='outside',
@@ -1460,7 +1460,7 @@ def create_ss_frequency_figure(
                                                              'each residue '),
                                                        font=dict(color='gray',
                                                                  size=24,))),
-                              margin_t=125, # to fit subtitle
+                              margin_t=150, # to fit subtitle
                               xaxis=dict(title='Residue',
                                          ticks='outside',
                                          tickvals=tickvals,

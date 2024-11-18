@@ -21,23 +21,23 @@ from ensemblify.utils import df_from_pdb, df_to_pdb
 
 # CONSTANTS
 VALID_PARAMS_TYPES = {
-    'job_name' : str,
-    'sequence' : str,
-    'alphafold' : bool,
+    'job_name': str,
+    'sequence': str,
+    'alphafold': bool,
     'pae': str,
-    'size' : int,
-    'databases' : dict,
-    'targets' : dict,
-    'restraints' : dict,
-    'core_amount' : int,
-    'output_path' : str,
-    'faspr_path' : str,
-    'pulchra_path' : str,
+    'size': int,
+    'databases': dict,
+    'targets': dict,
+    'restraints': dict,
+    'core_amount': int,
+    'output_path': str,
+    'faspr_path': str,
+    'pulchra_path': str,
     'scorefxn': dict,
-    'minimizer' : dict,
+    'minimizer': dict,
     'variability': dict,
-    'sampler_params' : dict,
-    'constraints' : dict,
+    'sampler_params': dict,
+    'constraints': dict,
     'constraints_violation': dict,
     'plddt_params': dict,
     'pae_params': dict
@@ -55,9 +55,9 @@ ADVANCED_PARAMS_DEFAULTS = {
     'scorefxn': {'id': 'score0',
                  'weight': 1.0},
     'minimizer': {'id': 'dfpmin_armijo_nonmonotone',
-                    'tolerance': 0.001,
-                    'max_iters': 5000,
-                    'finalcycles': 5},
+                  'tolerance': 0.001,
+                  'max_iters': 5000,
+                  'finalcycles': 5},
     'variability': {'variance': 0.10},
     'sampler_params': {'MC': {'temperature': 200,
                               'max_loops': 200}},
@@ -407,6 +407,14 @@ def read_input_parameters(parameter_path: str) -> dict:
     with open(parameter_path,'r',encoding='utf-8-sig') as parameters_file:
         params = yaml.safe_load(parameters_file)
 
+    # Fill in empty parameters
+    for key,default_value in ADVANCED_PARAMS_DEFAULTS.items():
+        try:
+            params[key]
+        except KeyError:
+            params[key] = default_value
+
+    # Check all parameters
     for key in params:
         # Check parameter types
         if params[key] is None:

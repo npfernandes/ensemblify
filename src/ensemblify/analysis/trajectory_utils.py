@@ -22,10 +22,10 @@ from plotly.subplots import make_subplots
 from tqdm import tqdm
 
 ## Local Imports
-from ensemblify.analysis.parula import PARULA_COLORSCALE
+from ensemblify.analysis.colors import PARULA_COLORSCALE
 from ensemblify.analysis.third_party.simple_mdreader import SimpleMDreader
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.utils import extract_pdb_info, kde
+from ensemblify.utils import extract_pdb_info, get_array_extremum, kde, round_to_nearest_multiple
 
 # FUNCTIONS
 def calc_rg(u: mda.Universe) -> float:
@@ -660,17 +660,6 @@ def create_contact_map_fig(
         else:
             cmap_title = 'Contact Map'
 
-    # Add subtitle
-    cmap_fig.add_annotation(text='Frequency of contacts between any atoms of a residue pair',
-                            font=dict(family='Helvetica',
-                                      color='#707070',
-                                      size=24),
-                            xref='paper',
-                            yref='paper',
-                            x=0.5,
-                            y=1.05,
-                            showarrow=False)
-
     cmap_fig.update_layout(width=900,
                            height=900,
                            plot_bgcolor='#FFFFFF',
@@ -679,7 +668,12 @@ def create_contact_map_fig(
                                      size=30),
                            modebar_remove=['zoom','pan','select','lasso2d','zoomIn','zoomOut'],
                            title=dict(text=cmap_title,
-                                      x=0.5),
+                                      x=0.5,
+                                      subtitle=dict(text=('Frequency of contacts between '
+                                                          'any atoms of a residue pair'),
+                                                    font=dict(color='gray',
+                                                              size=24,))),
+                           margin_t=125, # to fit subtitle
                            xaxis=dict(title='Residue',
                                       tickvals=tickvals,
                                       ticks='outside',
@@ -1065,17 +1059,6 @@ def create_distance_matrix_fig(
         else:
             dmatrix_title = 'Distance Matrix'
 
-    # Add subtitle
-    dmatrix_fig.add_annotation(text='Average distance between alpha carbons of a residue pair',
-                               font=dict(family='Helvetica',
-                                         color='#707070',
-                                         size=24),
-                               xref='paper',
-                               yref='paper',
-                               x=0.5,
-                               y=1.05,
-                               showarrow=False)
-
     dmatrix_fig.update_layout(width=900,
                               height=900,
                               plot_bgcolor='#FFFFFF',
@@ -1084,7 +1067,12 @@ def create_distance_matrix_fig(
                                         size=30),
                               modebar_remove=['zoom','pan','select','lasso2d','zoomIn','zoomOut'],
                               title=dict(text=dmatrix_title,
-                                         x=0.5),
+                                         x=0.5,
+                                         subtitle=dict(text=('Average distance between alpha '
+                                                             'carbons of a residue pair'),
+                                                       font=dict(color='gray',
+                                                                 size=24,))),
+                              margin_t=125, # to fit subtitle
                               xaxis=dict(title='Residue',
                                          tickvals=tickvals,
                                          ticks='outside',
@@ -1452,18 +1440,6 @@ def create_ss_frequency_figure(
         else:
             ss_freq_title = 'Secondary Structure Frequencies'
 
-    # Add subtitle
-    ss_freq_fig.add_annotation(text='Frequency of each secondary structure assignment code '
-                                    'for each residue',
-                               font=dict(family='Helvetica',
-                                         color='#707070',
-                                         size=24),
-                               xref='paper',
-                               yref='paper',
-                               x=0.5,
-                               y=1.07,
-                               showarrow=False)
-
     if difference:
         range_y = [-1,1]
     else:
@@ -1478,7 +1454,13 @@ def create_ss_frequency_figure(
                               paper_bgcolor='#FFFFFF',
                               modebar_remove=['zoom','pan','select','lasso2d','zoomIn','zoomOut'],
                               title=dict(text=ss_freq_title,
-                                         x=0.5),
+                                         x=0.5,
+                                         subtitle=dict(text=('Frequency of each secondary '
+                                                             'structure assignment code for '
+                                                             'each residue '),
+                                                       font=dict(color='gray',
+                                                                 size=24,))),
+                              margin_t=125, # to fit subtitle
                               xaxis=dict(title='Residue',
                                          ticks='outside',
                                          tickvals=tickvals,
@@ -1628,7 +1610,7 @@ def calculate_metrics_data(
 def create_metrics_traces(
     metrics: pd.DataFrame | str,
     trajectory_id: str,
-    color: str = '#000000',
+    color: str = '#636EFA',
     ) -> tuple[list[go.Box], list[go.Histogram], list[go.Scatter]]:
     """Create Ploty Box, Histogram and Scatter (KDE) traces to be used in the creation of
     a Structural Metrics Figure.
@@ -1640,7 +1622,8 @@ def create_metrics_traces(
         trajectory_id:
             prefix identifier for trace names.
         color:
-            hex code for the color the created traces will be. Defaults to black.
+            hex code for the color the created traces will be. Defaults to '#636EFA', or light
+            blue.
 
     Returns:
         A tuple (box_traces,hist_traces,scatter_traces) where:
@@ -1770,15 +1753,16 @@ def create_metrics_fig(
             x_axis_titles[metricname] = f'<i>D<sub>cm{cm_dist_count}</sub></i>'
 
     # Create metrics figure
+    row_titles = trajectory_ids+['']
     metrics_fig = make_subplots(rows=nrows,
                                 cols=nmetrics,
                                 row_heights=[0.75]*(nrows-1) + [1.75],
                                 column_titles=col_titles,
-                                row_titles=trajectory_ids+[''],
-                                horizontal_spacing=0.085)
+                                row_titles=row_titles,
+                                horizontal_spacing=0.255/nrows, #0.085,
+                                vertical_spacing=0.255/nmetrics)
 
-
-    # Add the Box traces for all rows except last
+    # Add the Box traces (all rows except last)
     for rownum in range(1,nrows):
         colnum = 1
         trajectory_id = trajectory_ids[rownum-1]
@@ -1945,7 +1929,7 @@ def create_metrics_fig(
                                     font_color='black',
                                     xanchor='center',
                                     x=1.06,
-                                    y=1.13)
+                                    y=1.10)
 
     toggle_mean_lines_button =  dict(type='buttons',
                                      buttons=[dict(method='relayout',
@@ -1966,7 +1950,7 @@ def create_metrics_fig(
                                      x=1.06,
                                      y=1.05)
 
-    metrics_fig.update_layout(height=200 + 100 *nrows-1 + 350,
+    metrics_fig.update_layout(height=200 + 150 *nrows-1 + 400,
                               width=610*nmetrics+450,
                               legend=dict(title='KDE Plots',
                                           yanchor='bottom',
@@ -2000,13 +1984,19 @@ def create_metrics_fig(
                              linecolor='black',
                              color='black',
                              mirror=True,
-                             title_standoff=20)
+                             title_standoff=15)
 
     # Fix yaxis title moving to the left when we try to
     # showticklabels=False by making its ticklabels invisible
     # see https://github.com/plotly/plotly.js/issues/6552
     metrics_fig.update_yaxes(tickfont=dict(color='rgba(0,0,0,0)',
                                            size=1))
+
+    # Reduce size of row titles in subplots
+    metrics_fig.for_each_annotation(lambda a: a.update(font_size=20,
+                                                       x=0.9825)
+                                    if a.text in row_titles
+                                    else ())
 
     # Save Structural Metrics figure
     if output_path is not None:
@@ -2106,17 +2096,6 @@ def calculate_analysis_data(
                                         output_path=rama_data_out)
 
         # Analysis meant for interactive figures
-        if distancematrices:
-            print(f'Calculating distance matrix for {trajectory_id}...')
-            dmatrix_out = os.path.join(output_directory,
-                                       f'{trajectory_id}_distance_matrix.csv')
-
-            dmatrix = calculate_distance_matrix(trajectory=trajectory,
-                                                topology=topology,
-                                                output_path=dmatrix_out)
-
-            data['DistanceMatrices'].append(dmatrix)
-
         if contactmatrices:
             print(f'Calculating contact matrix for {trajectory_id}...')
             cmatrix_out = os.path.join(output_directory,
@@ -2127,6 +2106,17 @@ def calculate_analysis_data(
                                                output_path=cmatrix_out)
 
             data['ContactMatrices'].append(cmatrix)
+
+        if distancematrices:
+            print(f'Calculating distance matrix for {trajectory_id}...')
+            dmatrix_out = os.path.join(output_directory,
+                                       f'{trajectory_id}_distance_matrix.csv')
+
+            dmatrix = calculate_distance_matrix(trajectory=trajectory,
+                                                topology=topology,
+                                                output_path=dmatrix_out)
+
+            data['DistanceMatrices'].append(dmatrix)
 
         if ssfrequencies:
             print('Calculating secondary structure assignment frequency matrix for '
@@ -2185,8 +2175,8 @@ def create_analysis_figures(
         figures:
             mapping of figure identifiers to lists of the created Figures, one for each trajectory
             outlined in the given analysis data. For example:
-            data = {'DistanceMatrices' : [DistanceMatrix1,DistanceMatrix2,DistanceMatrix3],
-                    'ContactMaps' : [ContactMap1,ContactMap2,ContactMap3],
+            data = {'ContactMaps' : [ContactMap1,ContactMap2,ContactMap3],
+                    'DistanceMatrices' : [DistanceMatrix1,DistanceMatrix2,DistanceMatrix3],
                     'SecondaryStructureFrequencies' : [SSFrequency1,SSFrequency2,SSFrequency3],
                     'StructuralMetrics' : [StructuralMetrics1,StructuralMetrics2,StructuralMetrics3] }
     """
@@ -2197,12 +2187,12 @@ def create_analysis_figures(
 
     # If data is not available check output directory for it
     if analysis_data is None:
-        analysis_data = {'DistanceMatrices' : [],
-                         'ContactMatrices' : [],
+        analysis_data = {'ContactMatrices' : [],
+                         'DistanceMatrices' : [],
                          'SecondaryStructureFrequencies' : [],
                          'StructuralMetrics' : [] }
-        data_ids_2_data = {'distance_matrix.csv': 'DistanceMatrices',
-                           'contact_matrix.csv': 'ContactMatrices',
+        data_ids_2_data = {'contact_matrix.csv': 'ContactMatrices',
+                           'distance_matrix.csv': 'DistanceMatrices',
                            'ss_frequency.csv': 'SecondaryStructureFrequencies',
                            'structural_metrics.csv': 'StructuralMetrics'}
         for data_id, data_name in data_ids_2_data.items():
@@ -2217,28 +2207,20 @@ def create_analysis_figures(
                     print(f'Found calculated {trajectory_id}_{data_id}')
 
     # Create figures
-    figures = {'DistanceMatrices' : [],
-               'ContactMaps' : [],
+    figures = {'ContactMaps' : [],
+               'DistanceMatrices' : [],
                'SecondaryStructureFrequencies' : [],
                'StructuralMetrics' : None }
 
+    ## Get maximum of DistanceMatrices colorbar
+    if analysis_data['DistanceMatrices']:
+        max_data = get_array_extremum(analysis_data['DistanceMatrices'])
+        max_colorbar = round_to_nearest_multiple(max_data,5)
+    else:
+        max_colorbar = None
+
     for i,(trajectory_id,topology,color) in enumerate(zip(trajectory_ids,topologies,color_palette)):
         print(f'Creating {trajectory_id} analysis figures...')
-
-        try:
-            dmatrix = analysis_data['DistanceMatrices'][i]
-        except (KeyError,IndexError):
-            pass
-        else:
-            dmatrix_fig_out = os.path.join(output_directory,
-                                           f'{trajectory_id}_distance_matrix.html')
-
-            dmatrix_fig = create_distance_matrix_fig(distance_matrix=dmatrix,
-                                                     trajectory_id=trajectory_id,
-                                                     topology=topology,
-                                                     output_path=dmatrix_fig_out)
-
-            figures['DistanceMatrices'].append(dmatrix_fig)
 
         try:
             cmatrix = analysis_data['ContactMatrices'][i]
@@ -2254,6 +2236,22 @@ def create_analysis_figures(
                                               output_path=cmap_fig_out)
 
             figures['ContactMaps'].append(cmap_fig)
+
+        try:
+            dmatrix = analysis_data['DistanceMatrices'][i]
+        except (KeyError,IndexError):
+            pass
+        else:
+            dmatrix_fig_out = os.path.join(output_directory,
+                                           f'{trajectory_id}_distance_matrix.html')
+
+            dmatrix_fig = create_distance_matrix_fig(distance_matrix=dmatrix,
+                                                     trajectory_id=trajectory_id,
+                                                     topology=topology,
+                                                     output_path=dmatrix_fig_out,
+                                                     max_colorbar=max_colorbar)
+
+            figures['DistanceMatrices'].append(dmatrix_fig)
 
         try:
             ssfreq = analysis_data['SecondaryStructureFrequencies'][i]

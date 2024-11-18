@@ -10,6 +10,7 @@ from plotly.offline import get_plotlyjs
 
 ## Local Imports
 from ensemblify.analysis.trajectory_utils import calculate_analysis_data, create_analysis_figures
+from ensemblify.analysis.colors import DEFAULT_TRACE_COLOR_PALETTE
 from ensemblify.config import GLOBAL_CONFIG
 
 # FUNCTIONS
@@ -97,8 +98,7 @@ def analyze_trajectory(
 
     # Setup color palette
     if color_palette is None:
-        color_palette = ['#636EFA','#EF553B','#00CC96','#AB63FA','#FFA15A',
-                         '#19D3F3','#FF6692','#B6E880','#FF97FF','#FECB52']
+        color_palette = DEFAULT_TRACE_COLOR_PALETTE
 
     # Calculate analysis data
     analysis_data = calculate_analysis_data(trajectories=trajectories,

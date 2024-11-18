@@ -25,7 +25,7 @@ dependencies = [
   "mdtraj == 1.9.9",
   "numpy == 1.26.4",
   "pandas == 2.2.2",
-  "plotly == 5.19.0",
+  "plotly == 5.23.0",
   "pyarrow == 13.0.0",
   "pyyaml == 6.0.1",
   "ray == 2.33.0",

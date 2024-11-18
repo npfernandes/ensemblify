@@ -1,10 +1,13 @@
 """
-Colorscale used in Ensemblify difference Contact Map and Distance Matrix.
+Color Palettes and Colorscales used in trajectory analysis Figures.
 
 Reference:
     https://plotly.com/python/v3/matplotlib-colorscales/
     https://github.com/BIDS/colormap/blob/master/parula.py
 """
+
+DEFAULT_TRACE_COLOR_PALETTE = ['#1f77b4', '#ff7f0e', '#2ca02c','#d62728', '#9467bd',
+                               '#8c564b', '#e377c2','#7f7f7f', '#bcbd22', '#17becf']
 
 PARULA_COLORSCALE = [[0.0, 'rgb(53, 42, 134)'],
                      [0.003937007874015748, 'rgb(53, 43, 138)'],

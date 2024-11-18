@@ -69,7 +69,7 @@ def kde(
 
 
 def get_array_extremum(arrays: list[np.ndarray], get_max: bool | None =True) -> float:
-    """Get maximum or minimum value of all elements of all provided arrays.
+    """Get maximum or minimum value of the set with all values of all provided arrays.
 
     Args:
         arrays:

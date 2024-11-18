@@ -26,7 +26,7 @@ positional arguments:
     analysis (a, ana)          Access the analysis module.
     reweighting (r, rew)       Access the reweighting module.
     clash_checking (cch)       Access the clash checking module.
-    pipeline (pip)             Access the pipeline module.
+    pipeline (ppl)             Access the pipeline module.
 
 '''
 

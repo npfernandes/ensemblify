@@ -367,7 +367,7 @@ def setup_ensemble_gen_params(input_params: dict, inputs_dir: str) -> tuple[str,
         # Update input pdb with filepath to processed pdb
         input_params_processed['sequence'] = f'{new_input_pdb}'
     else:
-        input_clashes = None # If given a .txt skip this step
+        input_clashes = None # If given a .txt or sequence string skip this step
 
     # Update output directory to ensemble folder
     OUTPUT_PATH = input_params_processed['output_path']

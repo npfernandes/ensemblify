@@ -1,6 +1,6 @@
 job_name: # Name to give the files/folders resulting from this script
   myprotein
-sequence: # Path to the input sequence, in .pdb or .txt format
+sequence: # Path to the input sequence, in .pdb or .txt format, or just the sequence string
   /home/username/myprotein.pdb
 size: # Size of ensemble to generate (1-10000)
   1

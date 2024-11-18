@@ -261,6 +261,7 @@ def setup_pose(input_structure: str) -> pyrosetta.rosetta.core.pose.Pose:
             initial_pose = io.to_pose(io.pose_from_sequence(input_sequence.read().strip()))
 
     else:
+        # Returns PackedPose so we need to convert to Pose
         initial_pose = io.to_pose(io.pose_from_sequence(input_structure))
 
     assert initial_pose is not None, 'Invalid input structure!'

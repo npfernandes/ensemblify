@@ -87,10 +87,6 @@ class SimpleReweight:
             print('# Overriding lambdas is not possible')
             sys.exit(1)
 
-    def _write_log(self, msg: str):
-        """Write message to log file."""
-        self.log_fd.write(msg)
-
     def read_file(
         self,
         exp_file: str,
@@ -121,7 +117,7 @@ class SimpleReweight:
         log = ''
         labels, exp, calc, log = bt.parse(exp_file,
                                          calc_file)
-        self._write_log(log)
+        self.log_fd.write(log)
 
         # remove datapoints if use_samples or use_data is not empty
         labels, exp, calc, log = bt.subsample(labels,
@@ -129,21 +125,21 @@ class SimpleReweight:
                                               calc,
                                               use_samples,
                                               use_data)
-        self._write_log(log)
+        self.log_fd.write(log)
 
         # Initialize uniform weights
         if self.w0 is None:
             self.w0 = np.ones(calc.shape[0]) / calc.shape[0]
-            self._write_log(f'Initialized uniform weights {calc.shape[0]}\n')
+            self.log_fd.write(f'Initialized uniform weights {calc.shape[0]}\n')
         else:
-            self._write_log('Warm start\n')
+            self.log_fd.write('Warm start\n')
 
         # do sanity checks
         log  = bt.check_data(labels,
                              exp,
                              calc,
                              self.w0)
-        self._write_log(log)
+        self.log_fd.write(log)
 
         return labels,exp,calc
 
@@ -239,9 +235,6 @@ class SimpleReweight:
                            self.w0)
             self.standardized = True
 
-        tmax = np.log((sys.float_info.max) / 5.)
-        theta_sigma2 = theta * self.weights * self.experiment[:,1]**2
-
         def maxent(lambdas: np.ndarray) -> tuple[float,float]:
             # weights
             arg = -np.sum(lambdas[np.newaxis,:] * self.calculated,axis=1) - tmax + np.log(self.w0)
@@ -267,7 +260,7 @@ class SimpleReweight:
 
         lambdas = np.zeros(self.experiment.shape[0],
                            dtype=np.longdouble)
-        self._write_log('Lagrange multipliers initialized from zero\n')
+        self.log_fd.write('Lagrange multipliers initialized from zero\n')
 
         bounds = []
         for j in range(self.experiment.shape[0]):
@@ -278,13 +271,17 @@ class SimpleReweight:
             else:
                 bounds.append([0.0,None])
 
+        tmax = np.log((sys.float_info.max) / 5.)
+        theta_sigma2 = theta * self.weights * self.experiment[:,1]**2
+
         chi2_before  = bt.calc_chi(self.experiment,
                                    self.calculated,
                                    self.w0)
 
-        self._write_log((f'Optimizing {self.experiment.shape[0]} data and '
-                         f'{self.calculated.shape[0]} samples. Theta={theta} \n'))
-        self._write_log(f'CHI2 before optimization: {chi2_before:8.4f} \n')
+        self.log_fd.write((f'Optimizing {self.experiment.shape[0]} data and '
+                           f'{self.calculated.shape[0]} samples. Theta={theta} \n'))
+        self.log_fd.write(f'CHI2 before optimization: {chi2_before:8.4f} \n')
+        self.log_fd.flush()
 
         opt = {'maxiter': 50000,
                'disp': False}
@@ -299,10 +296,10 @@ class SimpleReweight:
                           jac=True,
                           bounds=bounds)
 
-        self._write_log(f'Execution time: {(time.time() - start_time):.2f} seconds\n')
+        self.log_fd.write(f'Execution time: {(time.time() - start_time):.2f} seconds\n')
 
         if result.success:
-            self._write_log((f'Minimization using {mini_method} successful '
+            self.log_fd.write((f'Minimization using {mini_method} successful '
                              f'(iterations:{result.nit})\n'))
             arg = -np.sum(result.x[np.newaxis,:] * self.calculated,axis=1) - tmax
             w_opt = self.w0 * np.exp(arg)
@@ -316,15 +313,16 @@ class SimpleReweight:
             phi = np.exp(-bt.srel(self.w0,
                                   w_opt))
 
-            self._write_log(f'CHI2 after optimization: {chi2_after:8.4f} \n')
-            self._write_log(f'Fraction of effective frames: {phi:8.4f} \n')
-
+            self.log_fd.write(f'CHI2 after optimization: {chi2_after:8.4f} \n')
+            self.log_fd.write(f'Fraction of effective frames: {phi:8.4f} \n')
+            self.log_fd.flush()
             return chi2_before, chi2_after, phi
 
         else:
-            self._write_log(f'Minimization using {mini_method} failed\n')
-            self._write_log(f'Message: {result.message}\n')
+            self.log_fd.write(f'Minimization using {mini_method} failed\n')
+            self.log_fd.write(f'Message: {result.message}\n')
             self.niter = -1
+            self.log_fd.flush()
             return np.NaN, np.NaN, np.NaN
 
     def ibme(
@@ -411,7 +409,7 @@ class SimpleReweight:
                 log.append(line)
                 break
 
-        self._write_log(''.join(log)+ '\n')
+        self.log_fd.write(''.join(log)+ '\n')
 
         n1 = f'{self.name}_{it}.calc.dat'
         n2 = f'{self.name}_{it}.weights.dat'

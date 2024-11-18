@@ -136,7 +136,7 @@ def analyze_trajectory(
                                                             full_html=False,
                                                             include_plotlyjs=False,
                                                             div_id=f'distance_matrix_{i}'))
-        distance_matrices_div = '\n'.join(distance_matrices_htmls)
+        distance_matrices_div = f'{"&nbsp;" * 9}'.join(distance_matrices_htmls)
     else:
         distance_matrices_div = ''
 
@@ -149,7 +149,7 @@ def analyze_trajectory(
                                                        full_html=False,
                                                        include_plotlyjs=False,
                                                        div_id=f'contact_map_{i}'))
-        contact_maps_div = '\n'.join(contact_maps_htmls)
+        contact_maps_div = f'{"&nbsp;" * 9}'.join(contact_maps_htmls)
     else:
         contact_maps_div = ''
 
@@ -162,7 +162,7 @@ def analyze_trajectory(
                                                        full_html=False,
                                                        include_plotlyjs=False,
                                                        div_id=f'ss_frequency_{i}'))
-        ss_assigns_div = '\n'.join(ss_freqs_htmls)
+        ss_assigns_div = f'{"&nbsp;" * 9}'.join(ss_freqs_htmls)
     else:
         ss_assigns_div = ''
 
@@ -183,6 +183,25 @@ def analyze_trajectory(
         <head>
             <script type="text/javascript">{get_plotlyjs()}</script>
             <style>
+                @import url("https://fonts.googleapis.com/css2?family=Jersey+25&display=swap");
+        
+                header {{
+                    padding-top:5px;
+                    padding-bottom: 5px;
+                    font-family: "Jersey 25", sans-serif;
+                    font-size: 140px;
+                    text-align: center;
+                    background: radial-gradient(circle, rgba(0,38,66,1) 25%, rgba(48,77,109,1) 100%);
+                    color: white;
+                    display: inline-block;
+                    width: 100%;
+                    border-radius: 10px;
+                }}
+            
+                .header-container {{
+                    text-align: center;
+                }}
+                
                 .flex-container {{
                     display: flex;
                     flex-wrap: wrap;  /* wrap or nowrap */
@@ -193,6 +212,10 @@ def analyze_trajectory(
             </style>
         </head>
         <body>
+            <div class="header-container">
+            <header>Ensemblify Analysis</header>
+            </div>
+            <br>
             <div class="flex-container">
                 {contact_maps_div}
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -200,6 +223,7 @@ def analyze_trajectory(
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {ss_assigns_div}
             </div>
+            <br><br>
             <div class="metricsdiv">
             {metrics_div}
             </div>

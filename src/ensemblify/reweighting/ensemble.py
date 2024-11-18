@@ -589,8 +589,8 @@ def reweight_ensemble(
         cmap_div = theta_2_reweighted_divs[chosen_theta]['cmap']
         rw_cmap_div = theta_2_reweighted_divs[chosen_theta]['rw_cmap']
         diff_cmap_div = theta_2_reweighted_divs[chosen_theta]['diff_cmap']
-        cmap_div_str = cmap_div + ('&nbsp;' * 9) \
-                       + rw_cmap_div + ('&nbsp;' * 9) \
+        cmap_div_str = cmap_div + ('&nbsp;' * 6) \
+                       + rw_cmap_div + ('&nbsp;' * 6) \
                        + diff_cmap_div
         theta_2_dashboard_divs[chosen_theta]['cmap_div'] += cmap_div_str
 
@@ -598,8 +598,8 @@ def reweight_ensemble(
         dmatrix_div = theta_2_reweighted_divs[chosen_theta]['dmatrix']
         rw_dmatrix_div = theta_2_reweighted_divs[chosen_theta]['rw_dmatrix']
         diff_dmatrix_div = theta_2_reweighted_divs[chosen_theta]['diff_dmatrix']
-        dmatrix_div_str = dmatrix_div + ('&nbsp;' * 9) \
-                          + rw_dmatrix_div + ('&nbsp;' * 9) \
+        dmatrix_div_str = dmatrix_div + ('&nbsp;' * 6) \
+                          + rw_dmatrix_div + ('&nbsp;' * 6) \
                           + diff_dmatrix_div
         theta_2_dashboard_divs[chosen_theta]['dmatrix_div'] += dmatrix_div_str
 
@@ -607,31 +607,27 @@ def reweight_ensemble(
         ssfreq_div = theta_2_reweighted_divs[chosen_theta]['ssfreq']
         rw_ssfreq_div = theta_2_reweighted_divs[chosen_theta]['rw_ssfreq']
         diff_ssfreq_div = theta_2_reweighted_divs[chosen_theta]['diff_ssfreq']
-        ssfreq_div_str = ssfreq_div + ('&nbsp;' * 9) \
-                         + rw_ssfreq_div + ('&nbsp;' * 9) \
+        ssfreq_div_str = ssfreq_div + ('&nbsp;' * 6) \
+                         + rw_ssfreq_div + ('&nbsp;' * 6) \
                          + diff_ssfreq_div
         theta_2_dashboard_divs[chosen_theta]['ssfreq_div'] += ssfreq_div_str
 
     theta_divs = ''
     for chosen_theta in chosen_thetas:
         div_str = f'''
-            <div>
             <p style="text-align:center; font-family:Helvetica; font-size:48px;">
             {theta_2_dashboard_divs[chosen_theta]['title']}
             </p>
-            </div>
             <div class="flex-container">
                 {theta_2_dashboard_divs[chosen_theta]['cmap_div']}
             </div>
-            <br><br>
             <div class="flex-container">
                 {theta_2_dashboard_divs[chosen_theta]['dmatrix_div']}
             </div>
-            <br><br>
             <div class="flex-container">
                 {theta_2_dashboard_divs[chosen_theta]['ssfreq_div']}
             </div>
-            <br><br><br>
+            <br><br>
             '''
         theta_divs += div_str
 
@@ -646,26 +642,47 @@ def reweight_ensemble(
         <head>
             <script type="text/javascript">{get_plotlyjs()}</script>
             <style>
+            @import url("https://fonts.googleapis.com/css2?family=Jersey+25&display=swap");
+    
+            header {{
+                padding-top:5px;
+                padding-bottom: 5px;
+                font-family: "Jersey 25", sans-serif;
+                font-size: 140px;
+                text-align: center;
+                background: radial-gradient(circle, rgba(0,38,66,1) 25%, rgba(48,77,109,1) 100%);
+                color: white;
+                display: inline-block;
+                width: 100%;
+                border-radius: 10px;
+            }}
+        
+            .header-container {{
+                text-align: center;
+            }}
+
             .flex-container {{
                 display: flex;
+                justify-content: center;
+                align-items: center;
                 flex-wrap: wrap;  /* wrap or nowrap */
+                gap: 15px;
             }}
             </style>
         </head>
         <body>
+            <div class="header-container">
+            <header>Ensemblify Reweighting</header>
+            </div>
             <br>
             <div class="flex-container">
                 {chosen_theta_div}
-            </div>
-            <br><br><br>
-            <div class="flex-container">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {rw_fits_div}
-            </div>
-            <br><br><br>
-            <div class="flex-container">
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {rw_metrics_div}
             </div>
-            <br><br><br>
+            <br>
             {theta_divs}
             <br>
         </body>

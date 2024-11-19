@@ -613,18 +613,18 @@ def reweight_ensemble(
         theta_2_dashboard_divs[chosen_theta]['ssfreq_div'] += ssfreq_div_str
 
     theta_divs = ''
-    for chosen_theta in chosen_thetas:
+    for i,chosen_theta in enumerate(chosen_thetas):
         div_str = f'''
-            <p style="text-align:center; font-family:Helvetica; font-size:48px;">
-            {theta_2_dashboard_divs[chosen_theta]['title']}
-            </p>
-            <div class="flex-container">
+            <div class="header-container"><br><br><br>
+                <subheader>{theta_2_dashboard_divs[chosen_theta]['title']}</subheader>
+            </div>
+            <div class="flex-container" id="cmaps_container_{i+1}">
                 {theta_2_dashboard_divs[chosen_theta]['cmap_div']}
             </div>
-            <div class="flex-container">
+            <div class="flex-container" id="dmatrices_container_{i+1}">
                 {theta_2_dashboard_divs[chosen_theta]['dmatrix_div']}
             </div>
-            <div class="flex-container">
+            <div class="flex-container" id="ssfreqs_container_{i+1}">
                 {theta_2_dashboard_divs[chosen_theta]['ssfreq_div']}
             </div>
             <br><br>
@@ -656,7 +656,22 @@ def reweight_ensemble(
                 width: 100%;
                 border-radius: 10px;
             }}
-        
+
+            subheader {{
+                padding-top:25px;
+                padding-bottom: 25px;
+                padding-right: 25px;
+                padding-left: 25px;
+                font-family: Helvetica;
+                font-size: 60px;
+                text-align: center;
+                background: radial-gradient(circle, rgba(0,38,66,1) 25%, rgba(48,77,109,1) 100%);
+                color: white;
+                display: inline-block;
+                width: auto;
+                border-radius: 10px;
+            }}
+
             .header-container {{
                 text-align: center;
             }}
@@ -665,8 +680,9 @@ def reweight_ensemble(
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                flex-wrap: wrap;  /* wrap or nowrap */
-                gap: 15px;
+                flex-wrap: wrap;
+                column-gap: 10px;
+                row-gap: 20px;
             }}
             </style>
         </head>
@@ -676,11 +692,11 @@ def reweight_ensemble(
             </div>
             <br>
             <div class="flex-container">
-                {chosen_theta_div}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {rw_fits_div}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {rw_metrics_div}
+            {chosen_theta_div}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            {rw_fits_div}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            {rw_metrics_div}
             </div>
             <br>
             {theta_divs}
@@ -695,31 +711,3 @@ def reweight_ensemble(
 
     print('Ensemble reweighting has finished. Please refer to the interactive '
           'reweighting_dashboard.html figure for analysis.')
-
-if __name__ == '__main__':
-    from ensemblify import update_config
-
-    update_config({'PEPSI_SAXS_PATH': '/home/tiagogomes/software/Pepsi-SAXS',
-                   'BIFT_PATH': '/home/tiagogomes/software/bift'})
-
-    reweight_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
-                      topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb',
-                      trajectory_id='Hst5',
-                      exp_saxs_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/bift_Hst5.dat',
-                      output_dir='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/REWEIGHTING',
-                      calculated_cmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_contact_matrix.csv',
-                      calculated_dmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_distance_matrix.csv',
-                      calculated_ss_frequency='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_ss_frequency.csv',
-                      calculated_metrics_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_structural_metrics.csv'
-                    )
-
-    # reweight_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/THB_C2/THB_C2_trajectory.xtc',
-    #                   topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/THB_C2/THB_C2_top.pdb',
-    #                   trajectory_id='THB_C2',
-    #                   exp_saxs_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/bift_THB_C2.dat',
-    #                   output_dir='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/REWEIGHTING',
-    #                   calculated_cmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/THB_C2/THB_C2_contact_matrix.csv',
-    #                   calculated_dmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/THB_C2/THB_C2_distance_matrix.csv',
-    #                   calculated_ss_frequency='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/THB_C2/THB_C2_ss_frequency.csv',
-    #                   calculated_metrics_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/THB_C2/THB_C2_structural_metrics.csv'
-    #                 )

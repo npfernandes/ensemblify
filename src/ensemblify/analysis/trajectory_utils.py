@@ -1232,18 +1232,23 @@ def calculate_ss_frequency(
         frequency = frequency.fillna(0)
         frequency = frequency / ss_assignment.shape[0]
     else:
-        # Count the frequency of each secondary structure element and reweigh it
-        frequency = pd.DataFrame([[0.0]*ss_assignment.shape[1]]*3,
-                                 index=['C','E','H'],
-                                 columns=[x for x in ss_assignment.columns])
-        for row_idx in tqdm(range(ss_assignment.shape[0]),
-                            desc='Calculating reweighted secondary structure frequencies... ',
-                            total=ss_assignment.shape[0]):
-            row_series = ss_assignment.iloc[row_idx,:]
-            weight = weights[row_idx]
-            for col_idx,col_label in enumerate(frequency.columns):
-                ssa_label = row_series.iloc[col_idx]
-                frequency.loc[ssa_label,col_label] += weight
+        print('Calculating reweighted secondary structure assignment frequency matrix...')
+        # Iterate over each column and compute reweighted frequency
+        reweighted_freqs = {'C': [],
+                            'E': [],
+                            'H': []}
+        for label in ss_assignment:
+            c_weighted_sum = ((ss_assignment[label] == 'C') * weights).sum()
+            e_weighted_sum = ((ss_assignment[label] == 'E') * weights).sum()
+            h_weighted_sum = ((ss_assignment[label] == 'H') * weights).sum()
+
+            reweighted_freqs['C'].append(c_weighted_sum)
+            reweighted_freqs['E'].append(e_weighted_sum)
+            reweighted_freqs['H'].append(h_weighted_sum)
+
+        # Get frequency DataFrame
+        frequency = pd.DataFrame(reweighted_freqs,
+                                 index=ss_assignment.columns).T
 
     # Save ss assignment frequency
     if os.path.isdir(output_path):
@@ -1929,7 +1934,7 @@ def create_metrics_fig(
                                     font_color='black',
                                     xanchor='center',
                                     x=1.06,
-                                    y=1.10)
+                                    y=1.05)
 
     toggle_mean_lines_button =  dict(type='buttons',
                                      buttons=[dict(method='relayout',
@@ -1948,7 +1953,7 @@ def create_metrics_fig(
                                      font_color='black',
                                      xanchor='center',
                                      x=1.06,
-                                     y=1.05)
+                                     y=1)
 
     metrics_fig.update_layout(height=200 + 150 *nrows-1 + 400,
                               width=610*nmetrics+450,

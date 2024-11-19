@@ -39,7 +39,7 @@ def move_topol_pdb(
             path to the moved topology file.
     """
     topology_path = os.path.join(destination_path,f'{job_name}_top.pdb')
-    for pdb in glob.iglob(os.path.join(origin_path,'*.pdb')):
+    for pdb in glob.glob(os.path.join(origin_path,'*.pdb')):
         with open(pdb,'r',encoding='utf-8-sig') as f, open(topology_path,'w',encoding='utf-8') as t:
             t.write(f.read())
             break
@@ -53,7 +53,8 @@ def join_pdbs(
     ensemble_dir: str,
     n_models: int,
     ) -> str:
-    """Join all .pdb files in a directory into a single multimodel .pdb file.
+    """Join a randomly sampled number of .pdb files in a directory into a single multimodel
+    .pdb file.
 
     Args:
         job_name:

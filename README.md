@@ -478,12 +478,12 @@ To generate an ensemble, provide Ensemblify with the path to your parameters fil
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify gen -p parameters_file.yaml
+    ensemblify generation -p parameters_file.yaml
 
 Inside a Python script or Jupyter Notebook:
 
-    import ensemblify as ey
-    ey.generate_ensemble('parameters_file.yaml')
+    from ensemblify.generation import generate_ensemble
+    generate_ensemble('parameters_file.yaml')
 
 Check the interactive [Generation Module](examples/02_generation_module.ipynb) notebook for detailed usage examples. 
 
@@ -520,12 +520,12 @@ To do this, provide the name for your created trajectory, the directory where th
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify con -id trajectory_name -ed ensemble_dir -td trajectory_dir
+    ensemblify conversion -j trajectory_name -e ensemble_dir -t trajectory_dir
 
 Inside a Python script or Jupyter Notebook:
 
-    import ensemblify as ey
-    ey.ensemble2traj('trajectory_name','ensemble_dir','trajectory_dir')
+    from ensemblify.conversion import ensemble2traj
+    ensemble2traj('trajectory_name','ensemble_dir','trajectory_dir')
 
 Check the interactive [Conversion Module](examples/03_conversion_module.ipynb) notebook for detailed usage examples.
 
@@ -544,12 +544,12 @@ To do this, provide your ensemble in trajectory format, your trajectory's topolo
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify ana -traj trajectory.xtc -top topology.pdb -id trajectory_name
+    ensemblify analysis -trj trajectory.xtc -top topology.pdb -tid trajectory_name
 
 Inside a Python script or Jupyter Notebook:
 
-    import ensemblify as ey
-    ey.analyze_trajectory('trajectory.xtc','topology.pdb','trajectory_name')
+    from ensemblify.analysis import analyze_trajectory
+    analyze_trajectory('trajectory.xtc','topology.pdb','trajectory_name')
 
 Check the interactive [Analysis Module](examples/04_analysis_module.ipynb) notebook for detailed usage examples.
 
@@ -568,12 +568,12 @@ To do this, provide your ensemble in trajectory format, your trajectory's topolo
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify rew trajectory.xtc topology.pdb trajectory_name experimental_SAXS_data.dat
+    ensemblify reweighting -trj trajectory.xtc -top topology.pdb -tid trajectory_name -exp exp_SAXS_data.dat
 
 Inside a Python script or Jupyter Notebook:
 
-    import ensemblify as ey
-    ey.reweight_ensemble('trajectory.xtc','topology.pdb','trajectory_name','experimental_SAXS_data.dat')
+    from ensemblify.reweighting import reweight_ensemble
+    reweight_ensemble('trajectory.xtc','topology.pdb','trajectory_name','exp_SAXS_data.dat')
 
 Check the interactive [Reweighting Module](examples/05_reweighting_module.ipynb) notebook for detailed usage examples.
 
@@ -600,7 +600,7 @@ We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS in
 
 **Tiago Lopes Gomes** (Initial prototyping, Supervisor) [[GitHub]](https://github.com/TiagoLopesGomes?tab=repositories)
 
-**Tiago Cordeiro** (Supervisor) [[GitHub]](https://github.com/CordeiroLab?tab=repositories)
+**Tiago N. Cordeiro** (Supervisor) [[GitHub]](https://github.com/CordeiroLab?tab=repositories)
 
 # 📖 References
 

@@ -1733,7 +1733,7 @@ def create_metrics_fig(
             structural metrics dashboard for comparison between all the created traces.
     """
     # Get dimensions of dashboard
-    nrows = len(trajectory_ids) + 1
+    nrows = len(trajectory_ids) + 2 # last plot occupies 2 rows
     nmetrics = len(list(total_box_traces.values())[0]) #ncolumns of last row
 
     # Setup x_axis titles and column titles
@@ -1757,18 +1757,23 @@ def create_metrics_fig(
             col_titles.append(f'{metricname} (<i>D<sub>cm{cm_dist_count}</sub></i>)')
             x_axis_titles[metricname] = f'<i>D<sub>cm{cm_dist_count}</sub></i>'
 
+    # Setup Figure specs
+    specs = [[{}] * nmetrics] * (nrows)
+    specs[-2] = [{'rowspan': 2}] * nmetrics
+    specs[-1] = [None] * nmetrics
+
     # Create metrics figure
     row_titles = trajectory_ids+['']
     metrics_fig = make_subplots(rows=nrows,
                                 cols=nmetrics,
-                                row_heights=[0.75]*(nrows-1) + [1.75],
                                 column_titles=col_titles,
                                 row_titles=row_titles,
-                                horizontal_spacing=0.255/nrows, #0.085,
-                                vertical_spacing=0.255/nmetrics)
+                                horizontal_spacing=0.255/nmetrics,
+                                vertical_spacing=0.45/nrows,
+                                specs=specs)
 
-    # Add the Box traces (all rows except last)
-    for rownum in range(1,nrows):
+    # Add the Box traces (all rows except last 2)
+    for rownum in range(1,nrows-1):
         colnum = 1
         trajectory_id = trajectory_ids[rownum-1]
         for box_trace in total_box_traces[trajectory_id]:
@@ -1799,10 +1804,10 @@ def create_metrics_fig(
             hist_trace = total_hist_traces[trajectory_id][colnum-1]
             scatter_trace = total_scatter_traces[trajectory_id][colnum-1]
             metrics_fig.add_trace(hist_trace,
-                                  row=nrows,
+                                  row=nrows-1,
                                   col=colnum)
             metrics_fig.add_trace(scatter_trace,
-                                  row=nrows,
+                                  row=nrows-1,
                                   col=colnum)
 
             # Add mean dashed lines
@@ -1822,7 +1827,7 @@ def create_metrics_fig(
                                                  color=hist_trace.marker.color,
                                                  width=4)),
                                        legend='legend',
-                                       row=nrows,
+                                       row=nrows-1,
                                        col=colnum)
 
             # Allows for hovering the dashed line to get mean value
@@ -1844,7 +1849,7 @@ def create_metrics_fig(
                                                    f'{round(mean_value_stderr,2)}'),
                                              opacity=0,
                                              showlegend=False),
-                                  row=nrows,
+                                  row=nrows-1,
                                   col=colnum)
 
             # Store min and max values
@@ -1875,16 +1880,16 @@ def create_metrics_fig(
 
             metrics_fig.update_xaxes(ticks='outside',
                                      title_text=f'{metric_name} (&#197;)', # angstrom symbol
-                                     row=nrows,
+                                     row=nrows-1,
                                      col=colnum)
             metrics_fig.update_yaxes(ticks='outside',
                                      title_text=f'KDE ({metric_name})',
                                      rangemode='tozero',
-                                     row=nrows,
+                                     row=nrows-1,
                                      col=colnum)
 
     # Equalize x axis range
-    for rownum in range(1,nrows+1):
+    for rownum in range(1,nrows):
         for colnum, (min_val,max_val) in min_max_values.items():
             if min_val-round(max_val*0.05) > 0:
                 x_axis_min = min_val-round(max_val*0.05)
@@ -1932,9 +1937,10 @@ def create_metrics_fig(
                                     font_size=20,
                                     font_family='Helvetica',
                                     font_color='black',
-                                    xanchor='center',
-                                    x=1.06,
-                                    y=1.05)
+                                    xanchor='left',
+                                    x=1.02,
+                                    yanchor='bottom',
+                                    y=1.01)
 
     toggle_mean_lines_button =  dict(type='buttons',
                                      buttons=[dict(method='relayout',
@@ -1951,12 +1957,14 @@ def create_metrics_fig(
                                      font_size=20,
                                      font_family='Helvetica',
                                      font_color='black',
-                                     xanchor='center',
-                                     x=1.06,
+                                     xanchor='left',
+                                     x=1.02,
+                                     yanchor='top',
                                      y=1)
 
-    metrics_fig.update_layout(height=200 + 150 *nrows-1 + 400,
-                              width=610*nmetrics+450,
+
+    metrics_fig.update_layout(height=120 + (225 * nrows) + 0,
+                              width=140 + (580 * nmetrics) + 220,
                               legend=dict(title='KDE Plots',
                                           yanchor='bottom',
                                           y=0),

@@ -136,7 +136,7 @@ def analyze_trajectory(
                                                             full_html=False,
                                                             include_plotlyjs=False,
                                                             div_id=f'distance_matrix_{i}'))
-        distance_matrices_div = f'{"&nbsp;" * 9}'.join(distance_matrices_htmls)
+        distance_matrices_div = f'{"&nbsp;" * 6}'.join(distance_matrices_htmls)
     else:
         distance_matrices_div = ''
 
@@ -149,7 +149,7 @@ def analyze_trajectory(
                                                        full_html=False,
                                                        include_plotlyjs=False,
                                                        div_id=f'contact_map_{i}'))
-        contact_maps_div = f'{"&nbsp;" * 9}'.join(contact_maps_htmls)
+        contact_maps_div = f'{"&nbsp;" * 6}'.join(contact_maps_htmls)
     else:
         contact_maps_div = ''
 
@@ -162,7 +162,7 @@ def analyze_trajectory(
                                                        full_html=False,
                                                        include_plotlyjs=False,
                                                        div_id=f'ss_frequency_{i}'))
-        ss_assigns_div = f'{"&nbsp;" * 9}'.join(ss_freqs_htmls)
+        ss_assigns_div = f'{"&nbsp;" * 6}'.join(ss_freqs_htmls)
     else:
         ss_assigns_div = ''
 
@@ -177,6 +177,32 @@ def analyze_trajectory(
         metrics_div = ''
 
     # Build html dashboard
+    multi_traj_option = f'''
+        <div class="flex-container" id="cmaps_container">
+        {contact_maps_div}
+        </div>
+        <div class="flex-container" id="dmatrices_container">
+        {distance_matrices_div}
+        </div>
+        <div class="flex-container" id="ssfreqs_container">
+        {ss_assigns_div}
+        </div>
+    '''
+    single_traj_option = f'''
+        <div class="flex-container">
+        {contact_maps_div}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        {distance_matrices_div}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        {ss_assigns_div}
+        </div>
+    '''
+
+    if len(contact_maps) > 1 or len(distance_matrices) > 1 or len(ss_freqs) > 1:
+        figures_div = multi_traj_option
+    else:
+        figures_div = single_traj_option
+
     dashboard_html = f'''
     <!DOCTYPE html>
     <html>
@@ -204,10 +230,17 @@ def analyze_trajectory(
                 
                 .flex-container {{
                     display: flex;
-                    flex-wrap: wrap;  /* wrap or nowrap */
+                    justify-content: center;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    column-gap: 10px;
+                    row-gap: 20px;
                 }}
                 .metricsdiv {{
+                    display:flex;
                     width: auto;
+                    justify-content: center;
+                    align-items: center;
                 }}
             </style>
         </head>
@@ -216,17 +249,12 @@ def analyze_trajectory(
             <header>Ensemblify Analysis</header>
             </div>
             <br>
-            <div class="flex-container">
-                {contact_maps_div}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {distance_matrices_div}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {ss_assigns_div}
-            </div>
+            {figures_div}
             <br><br>
             <div class="metricsdiv">
             {metrics_div}
             </div>
+            <br>
         </body>
     </html>
     '''

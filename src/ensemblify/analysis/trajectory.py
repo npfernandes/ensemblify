@@ -9,7 +9,8 @@ import pandas as pd
 from plotly.offline import get_plotlyjs
 
 ## Local Imports
-from ensemblify.analysis.trajectory_utils import calculate_analysis_data, create_analysis_figures
+from ensemblify.analysis.data import calculate_analysis_data
+from ensemblify.analysis.figures import create_analysis_figures
 from ensemblify.analysis.colors import DEFAULT_TRACE_COLOR_PALETTE
 from ensemblify.config import GLOBAL_CONFIG
 
@@ -132,10 +133,12 @@ def analyze_trajectory(
     if distance_matrices:
         distance_matrices_htmls = []
         for i,cmap_fig in enumerate(distance_matrices):
-            distance_matrices_htmls.append(cmap_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
-                                                            full_html=False,
-                                                            include_plotlyjs=False,
-                                                            div_id=f'distance_matrix_{i}'))
+            distance_matrices_htmls.append(
+                cmap_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
+                                 full_html=False,
+                                 include_plotlyjs=False,
+                                 div_id=f'distance_matrix_{i}')
+                )
         distance_matrices_div = f'{"&nbsp;" * 6}'.join(distance_matrices_htmls)
     else:
         distance_matrices_div = ''
@@ -145,10 +148,12 @@ def analyze_trajectory(
     if contact_maps:
         contact_maps_htmls = []
         for i,cmap_fig in enumerate(contact_maps):
-            contact_maps_htmls.append(cmap_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
-                                                       full_html=False,
-                                                       include_plotlyjs=False,
-                                                       div_id=f'contact_map_{i}'))
+            contact_maps_htmls.append(
+                cmap_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
+                                 full_html=False,
+                                 include_plotlyjs=False,
+                                 div_id=f'contact_map_{i}')
+                )
         contact_maps_div = f'{"&nbsp;" * 6}'.join(contact_maps_htmls)
     else:
         contact_maps_div = ''
@@ -158,10 +163,12 @@ def analyze_trajectory(
     if ss_freqs:
         ss_freqs_htmls = []
         for i,ss_freqs_fig in enumerate(ss_freqs):
-            ss_freqs_htmls.append(ss_freqs_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
-                                                       full_html=False,
-                                                       include_plotlyjs=False,
-                                                       div_id=f'ss_frequency_{i}'))
+            ss_freqs_htmls.append(
+                ss_freqs_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
+                                     full_html=False,
+                                     include_plotlyjs=False,
+                                     div_id=f'ss_frequency_{i}')
+                )
         ss_assigns_div = f'{"&nbsp;" * 6}'.join(ss_freqs_htmls)
     else:
         ss_assigns_div = ''

@@ -96,10 +96,13 @@ Available Functions
 """
 
 from ensemblify.analysis.trajectory import analyze_trajectory
-from ensemblify.analysis.trajectory_utils import (
+from ensemblify.analysis.data import (
     calculate_analysis_data, calculate_contact_matrix, calculate_distance_matrix,
     calculate_metrics_data, calculate_ramachandran_data, calculate_ss_assignment,
-    calculate_ss_frequency, create_analysis_figures, create_contact_map_fig,
+    calculate_ss_frequency,
+)
+from ensemblify.analysis.figures import (
+    create_analysis_figures, create_contact_map_fig,
     create_distance_matrix_fig, create_metrics_fig, create_metrics_traces,
     create_ramachandran_figure, create_ss_frequency_figure
 )

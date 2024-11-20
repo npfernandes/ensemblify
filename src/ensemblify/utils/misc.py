@@ -28,13 +28,17 @@ def kde(
                 x axis coordinates corresponding to the calculated kde distribution.
             norm_kde:
                 normalized kde distribution.
-            avg:
-                average of the given dataset.
-            avg_stderr:
-                the standard error of the calculated average.
+            weighted_average:
+                weighted average of the given dataset.
+            weighted_standard_error:
+                weighted standard error of the calculated average.
 
     Adapted from:
         https://github.com/FrPsc/EnsembleLab/blob/main/EnsembleLab.ipynb
+    
+    Reference for standard error of weighted average:
+        https://seismo.berkeley.edu/~kirchner/Toolkits/Toolkit_12.pdf
+        Copyright © 2006 Prof. James Kirchner
     """
     # By default weights are uniform
     if weights is None:
@@ -58,14 +62,31 @@ def kde(
     # Make sure the kde distribution is normalized
     norm_kde = kde_dist/np.sum(kde_dist)
 
-    # Get the average of our data according to given weights
-    avg = np.average(data,
-                     weights=weights)
+    # Get the weighted average of our data
+    weighted_average = np.sum(weights * data) / np.sum(weights)
 
-    # Get the standard error of the calculated mean
-    avg_stderr = np.std(data, ddof=1) / np.sqrt(np.size(data)) # SEM
+    #####################################
+    ####### Readable code version #######
+    #####################################
 
-    return x_coords,norm_kde,avg,avg_stderr
+    # # Calculate effective N and correction factor
+    # effective_sample_size = np.sum(weights)**2 / np.sum(weights**2)
+    # correction = effective_sample_size/(effective_sample_size - 1)
+
+    # # Get the weighted variance of our data
+    # weighted_variance = np.sum(weights * (data - weighted_average) ** 2) / np.sum(weights)
+
+    # # Get the weighted standard error of our average
+    # weighted_standard_error = np.sqrt((correction * weighted_variance) / effective_sample_size)
+
+    #############################################################
+    ###### All in one operation to reduce information loss ######
+    #############################################################
+
+    # Calculate the standard error of the weighted average
+    weighted_standard_error = np.sqrt((((np.sum(weights)**2/np.sum(weights**2))/((np.sum(weights)**2/np.sum(weights**2))-1))*(np.sum(weights*(data-weighted_average)**2)/np.sum(weights)))/(np.sum(weights)**2/np.sum(weights**2)))
+
+    return x_coords,norm_kde,weighted_average,weighted_standard_error
 
 
 def get_array_extremum(arrays: list[np.ndarray], get_max: bool | None =True) -> float:

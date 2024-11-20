@@ -723,12 +723,12 @@ def create_ss_frequency_figure(
                                              hoverinfo='text',
                                              hovertext=hovertext))
 
-            # Setup Figure Layout
-            if trajectory_id is not None:
-                ss_freq_title = f'{trajectory_id} Difference Sec. Struct. Frequencies'
-            else:
-                ss_freq_title = 'Difference Secondary Structure Frequencies'
-            range_y = [-1,1]
+        # Setup Figure Layout
+        if trajectory_id is not None:
+            ss_freq_title = f'{trajectory_id} Difference Sec. Struct. Frequencies'
+        else:
+            ss_freq_title = 'Difference Secondary Structure Frequencies'
+        range_y = [-1,1]
     else:
         for structure,color in zip(ss_frequency.index,colors):
             # Create hovertext

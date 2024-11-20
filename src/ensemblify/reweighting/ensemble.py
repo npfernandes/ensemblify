@@ -24,16 +24,18 @@ from ensemblify.analysis import (
 )
 from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.conversion import traj2saxs
-from ensemblify.reweighting.ensemble_utils import (
-    attempt_read_data,
+from ensemblify.reweighting.data import (
+    attempt_read_calculated_data,
     attempt_read_reweighting_data,
     average_saxs_profiles,
     bme_ensemble_reweighting,
+    correct_exp_error,
+    process_exp_data,
+)
+from ensemblify.reweighting.figures import (
     create_effective_frames_fit_fig,
     create_reweighting_fits_fig,
     create_reweighting_metrics_fig,
-    correct_exp_error,
-    process_exp_data,
 )
 from ensemblify.utils import get_array_extremum, round_to_nearest_multiple
 
@@ -233,13 +235,14 @@ def reweight_ensemble(
 
     # Calculate Contact Matrices
     ## Uniform
-    cmatrix = attempt_read_data(data=calculated_cmatrix,
-                                data_msg_tag='cmatrix',
-                                calc_fn=calculate_contact_matrix,
-                                trajectory=trajectory,
-                                topology=topology,
-                                output_path=os.path.join(output_dir,
-                                                         f'{trajectory_id}_contact_matrix.csv'))
+    cmatrix = attempt_read_calculated_data(data=calculated_cmatrix,
+                                           data_msg_tag='cmatrix',
+                                           calc_fn=calculate_contact_matrix,
+                                           trajectory=trajectory,
+                                           topology=topology,
+                                           output_path=os.path.join(output_dir,
+                                                                    (f'{trajectory_id}_contact_'
+                                                                     'matrix.csv')))
     ## Reweighted
     rw_cmatrices = []
     diff_cmatrices = []
@@ -257,13 +260,14 @@ def reweight_ensemble(
 
     # Calculate Distance Matrices
     ## Uniform
-    dmatrix = attempt_read_data(data=calculated_dmatrix,
-                                data_msg_tag='dmatrix',
-                                calc_fn=calculate_distance_matrix,
-                                trajectory=trajectory,
-                                topology=topology,
-                                output_path=os.path.join(output_dir,
-                                                         f'{trajectory_id}_distance_matrix.csv'))
+    dmatrix = attempt_read_calculated_data(data=calculated_dmatrix,
+                                           data_msg_tag='dmatrix',
+                                           calc_fn=calculate_distance_matrix,
+                                           trajectory=trajectory,
+                                           topology=topology,
+                                           output_path=os.path.join(output_dir,
+                                                                    (f'{trajectory_id}_distance_'
+                                                                     'matrix.csv')))
     ## Reweighted
     rw_dmatrices = []
     diff_dmatrices = []
@@ -281,13 +285,14 @@ def reweight_ensemble(
 
     # Calculate Secondary Structure Assignment Frequency Matrices
     ## Uniform
-    ssfreq = attempt_read_data(data=calculated_ss_frequency,
-                               data_msg_tag='ss_freq',
-                               calc_fn=calculate_ss_frequency,
-                               trajectory=trajectory,
-                               topology=topology,
-                               output_path=os.path.join(output_dir,
-                                                        f'{trajectory_id}_ss_frequency.csv'))
+    ssfreq = attempt_read_calculated_data(data=calculated_ss_frequency,
+                                          data_msg_tag='ss_freq',
+                                          calc_fn=calculate_ss_frequency,
+                                          trajectory=trajectory,
+                                          topology=topology,
+                                          output_path=os.path.join(output_dir,
+                                                                   (f'{trajectory_id}_ss_frequency'
+                                                                    '.csv')))
 
     ## Reweighted
     rw_ssfreqs = []
@@ -305,18 +310,18 @@ def reweight_ensemble(
         diff_ssfreqs.append(rw_ssfreq - ssfreq)
 
     # Calculate Uniform Structural Metrics Distributions
-    metrics = attempt_read_data(data=calculated_metrics_data,
-                                data_msg_tag='structural_metrics',
-                                calc_fn=calculate_metrics_data,
-                                trajectory=trajectory,
-                                topology=topology,
-                                rg=compare_rg,
-                                dmax=compare_dmax,
-                                eed=compare_eed,
-                                cm_dist=compare_cmdist,
-                                output_path=os.path.join(output_dir,
-                                                         f'{trajectory_id}'
-                                                         '_structural_metrics.csv'))
+    metrics = attempt_read_calculated_data(data=calculated_metrics_data,
+                                           data_msg_tag='structural_metrics',
+                                           calc_fn=calculate_metrics_data,
+                                           trajectory=trajectory,
+                                           topology=topology,
+                                           rg=compare_rg,
+                                           dmax=compare_dmax,
+                                           eed=compare_eed,
+                                           cm_dist=compare_cmdist,
+                                           output_path=os.path.join(output_dir,
+                                                                    f'{trajectory_id}'
+                                                                    '_structural_metrics.csv'))
 
     ##############################################################################################
     ################################# CREATE REWEIGHTING FIGURES #################################
@@ -711,3 +716,20 @@ def reweight_ensemble(
 
     print('Ensemble reweighting has finished. Please refer to the interactive '
           'reweighting_dashboard.html figure for analysis.')
+
+if __name__ == '__main__':
+    from ensemblify import update_config
+
+    update_config({'PEPSI_SAXS_PATH': '/home/tiagogomes/software/Pepsi-SAXS',
+                   'BIFT_PATH': '/home/tiagogomes/software/bift'})
+
+    reweight_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
+                      topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb',
+                      trajectory_id='Hst5',
+                      exp_saxs_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/bift_Hst5.dat',
+                      output_dir='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/REWEIGHTING',
+                      calculated_cmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_contact_matrix.csv',
+                      calculated_dmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_distance_matrix.csv',
+                      calculated_ss_frequency='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_ss_frequency.csv',
+                      calculated_metrics_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_structural_metrics.csv'
+                    )

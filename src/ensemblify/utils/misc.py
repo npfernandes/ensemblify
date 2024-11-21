@@ -63,7 +63,7 @@ def kde(
     norm_kde = kde_dist/np.sum(kde_dist)
 
     # Get the weighted average of our data
-    weighted_average = np.sum(weights * data) / np.sum(weights)
+    weighted_average = np.average(data,weights=weights) # np.sum(weights * data) / np.sum(weights)
 
     #####################################
     ####### Readable code version #######

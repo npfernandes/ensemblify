@@ -135,10 +135,10 @@ class SimpleReweight:
             self.log_fd.write('Warm start\n')
 
         # do sanity checks
-        log  = bt.check_data(labels,
-                             exp,
-                             calc,
-                             self.w0)
+        log = bt.check_data(labels,
+                            exp,
+                            calc,
+                            self.w0)
         self.log_fd.write(log)
 
         return labels,exp,calc

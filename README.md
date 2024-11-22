@@ -306,7 +306,7 @@ To download and compile the GROMACS source code from their [website](https://ftp
     source /usr/local/gromacs/bin/GMXRC
     ```
 
-    environment variables that will allow Ensemblify to know where GROMACS is located will have already been added to your shell configuration file.
+    Environment variables that will allow Ensemblify to know where GROMACS is located will have already been added to your shell configuration file.
 
 </details>
 

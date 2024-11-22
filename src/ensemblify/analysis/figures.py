@@ -655,6 +655,7 @@ def create_distance_matrix_fig(
                                          hoverinfo='text',
                                          hovertext=hovertext,
                                          colorscale=PARULA_COLORSCALE,
+                                         reversescale=True,
                                          zmin=min_colorbar,
                                          zmid=0,
                                          zmax=max_colorbar))

@@ -173,8 +173,8 @@ def reweight_ensemble(
         # Reweigh ensemble using different theta values
         thetas_array = np.array(thetas)
 
-        print(f'Applying BME reweighting to {trajectory_id} ensemble with different values for '
-              'theta parameter...')
+        print((f'Applying BME reweighting to {trajectory_id} ensemble '
+               f'with theta values {thetas} ...'))
         stats, weights = bme_ensemble_reweighting(exp_saxs_file=exp_saxs_file,
                                                   calc_saxs_file=calc_saxs_file,
                                                   thetas=thetas_array,

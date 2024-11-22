@@ -368,7 +368,7 @@ def reweight_ensemble(
                                              output_path=os.path.join(output_dir,
                                                                       (f'{trajectory_id}_'
                                                                        'contact_map_'
-                                                                       f'{chosen_theta}_'
+                                                                       f't{chosen_theta}_'
                                                                        'reweighted.html')),
                                              reweighted=True)
         theta_2_reweighted_figures[chosen_theta]['rw_cmap'] = rw_cmap_fig
@@ -412,8 +412,8 @@ def reweight_ensemble(
                                                     trajectory_id=trajectory_id,
                                                     output_path=os.path.join(output_dir,
                                                                              (f'{trajectory_id}_'
-                                                                              'distance_matrix'
-                                                                              f'{chosen_theta}_'
+                                                                              'distance_matrix_'
+                                                                              f't{chosen_theta}_'
                                                                               'reweighted.html')),
                                                     max_colorbar=max_colorbar,
                                                     reweighted=True)
@@ -444,7 +444,7 @@ def reweight_ensemble(
                                                    output_path=os.path.join(output_dir,
                                                                             (f'{trajectory_id}_'
                                                                              'ss_frequency_'
-                                                                             f'{chosen_theta}_'
+                                                                             f't{chosen_theta}_'
                                                                              'reweighted.html')),
                                                    reweighted=True)
         theta_2_reweighted_figures[chosen_theta]['rw_ssfreq'] = rw_ssfreq_fig

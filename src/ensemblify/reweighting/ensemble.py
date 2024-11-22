@@ -124,9 +124,6 @@ def reweight_ensemble(
     # Setup output directory
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
-    output_dir = os.path.join(output_dir,trajectory_id)
-    if not os.path.isdir(output_dir):
-        os.mkdir(output_dir)
 
     # Setup directory for reweighting files
     reweighting_dir = os.path.join(output_dir,
@@ -196,7 +193,7 @@ def reweight_ensemble(
            flush=True)
 
     # Capture chosen theta values
-    input_choices = input('Choose theta(s):').split(',')
+    input_choices = input('Choose theta(s): ').split(',')
     print(f'Chosen theta value(s): {", ".join(input_choices)}.')
     chosen_thetas = [int(x) for x in input_choices]
 
@@ -718,11 +715,6 @@ def reweight_ensemble(
           'reweighting_dashboard.html figure for analysis.')
 
 if __name__ == '__main__':
-    from ensemblify import update_config
-
-    update_config({'PEPSI_SAXS_PATH': '/home/tiagogomes/software/Pepsi-SAXS',
-                   'BIFT_PATH': '/home/tiagogomes/software/bift'})
-
     reweight_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
                       topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb',
                       trajectory_id='Hst5',

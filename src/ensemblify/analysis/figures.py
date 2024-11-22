@@ -45,6 +45,62 @@ DEFAULT_LAYOUT = {
 }
 
 # FUNCTIONS
+def remove_self_neighbours(matrix: pd.DataFrame, n_neighbours: int | None = None) -> pd.DataFrame:
+    """Take a matrix and assign Numpy NaN values to the main and secondary diagonals according to
+    the number of neighbours.
+
+    If number of neighbours to ignore is not given, it is automatically determined.
+
+    Used to prepare a matrix for Figure creation.
+
+    Args:
+        matrix:
+            matrix to clean up.
+
+    Returns:
+        clean_df:
+            a copy of input matrix with main and secondary diagonals values replaced with np.nan.
+    """
+    # Get data
+    data = matrix.values
+    size = data.shape[0]
+
+    if n_neighbours is None:
+        # Determine number of neighbours
+        n_neighbours = 0
+        for i,j in zip(range(1,size+1),range(0,-size-1,-1)):
+            sup = data.trace(offset=i)
+            sub = data.trace(offset=j)
+            if sup == 0 and sub == 0:
+                n_neighbours += 1
+            else:
+                break
+
+    # Determine where to place NaN
+    rows,cols = np.diag_indices_from(data)
+    row_idxs, col_idxs = list(rows), list(cols)
+    idxs_2_nan = list(zip(row_idxs,col_idxs))
+
+    for n in range(1,n_neighbours+1):
+        for row_idx in row_idxs:
+            sup = row_idx + n
+            if 0 <= sup < size:
+                idxs_2_nan.append((row_idx,sup))
+                idxs_2_nan.append((sup,row_idx))
+            sub = row_idx - n
+            if 0 <= sub < size:
+                idxs_2_nan.append((row_idx,sub))
+                idxs_2_nan.append((sub,row_idx))
+
+    # Place NaN
+    for x,y in idxs_2_nan:
+        data[x,y] = np.nan
+
+    clean_df = pd.DataFrame(data=data)
+
+    return clean_df
+
+
 def get_figure_layout_elements(
     topology: str,
     num_res: int,
@@ -376,8 +432,11 @@ def create_contact_map_fig(
 
     # Add our data, setup Figure title
     if not difference:
-        contact_matrix.replace(0,np.nan,inplace=True)
-        cmap_fig.add_trace(go.Heatmap(z=contact_matrix,
+        # Assign np.nan to self and neighbour contacts
+        clean_contact_matrix = remove_self_neighbours(matrix=contact_matrix,
+                                                      n_neighbours=2)
+
+        cmap_fig.add_trace(go.Heatmap(z=clean_contact_matrix,
                                       zmin=0,
                                       zmax=1,
                                       x=x_labels,
@@ -409,8 +468,11 @@ def create_contact_map_fig(
                     text = f'x: {xx}<br />y: {yy}<br />z: {contact_matrix.iat[yi,xi]}'
                 hovertext[-1].append(text)
 
-        contact_matrix.replace(0,np.nan,inplace=True)
-        cmap_fig.add_trace(go.Heatmap(z=contact_matrix,
+        # Assign np.nan to self and neighbour contacts
+        clean_contact_matrix = remove_self_neighbours(matrix=contact_matrix,
+                                                      n_neighbours=2)
+
+        cmap_fig.add_trace(go.Heatmap(z=clean_contact_matrix,
                                       zmin=-1,
                                       zmax=1,
                                       x=x_labels,
@@ -539,12 +601,14 @@ def create_distance_matrix_fig(
 
     # Add our data
     if not difference:
-        distance_matrix.replace(0,np.nan,inplace=True)
+        # Assign np.nan to self and neighbour distances
+        clean_distance_matrix = remove_self_neighbours(matrix=distance_matrix,
+                                                       n_neighbours=2)
 
         if max_colorbar is None:
             max_colorbar = math.ceil(np.max(distance_matrix))
 
-        dmatrix_fig.add_trace(go.Heatmap(z=distance_matrix,
+        dmatrix_fig.add_trace(go.Heatmap(z=clean_distance_matrix,
                                          x=x_labels,
                                          y=y_labels,
                                          zmin=0,
@@ -553,7 +617,8 @@ def create_distance_matrix_fig(
                                          colorbar_ticklabeloverflow='allow',
                                          transpose=True,
                                          hoverongaps=False,
-                                         colorscale=px.colors.sequential.Reds))
+                                         colorscale=px.colors.sequential.Reds,
+                                         reversescale=True))
 
         if reweighted:
             if trajectory_id is not None:
@@ -578,8 +643,11 @@ def create_distance_matrix_fig(
                     text = f'x: {xx}<br />y: {yy}<br />z: {distance_matrix.iat[yi,xi]}'
                 hovertext[-1].append(text)
 
-        distance_matrix.replace(0,np.nan,inplace=True)
-        dmatrix_fig.add_trace(go.Heatmap(z=distance_matrix,
+        # Assign np.nan to self and neighbour distances
+        clean_distance_matrix = remove_self_neighbours(matrix=distance_matrix,
+                                                       n_neighbours=2)
+
+        dmatrix_fig.add_trace(go.Heatmap(z=clean_distance_matrix,
                                          x=x_labels,
                                          y=y_labels,
                                          hoverongaps=False,
@@ -929,11 +997,11 @@ def create_metrics_fig(
 
     Returns:
         metrics_fig:
-            structural metrics dashboard for comparison between all the created traces.
+            Structural Metrics Figure that allows for comparison between all the created traces.
     """
     # Get dimensions of dashboard
     nrows = len(trajectory_ids) + 2 # last plot occupies 2 rows
-    nmetrics = len(list(total_box_traces.values())[0]) #ncolumns of last row
+    ncolumns = len(list(total_box_traces.values())[0]) #ncolumns of last row
 
     # Setup x_axis titles and column titles
     x_axis_titles = {}
@@ -957,17 +1025,17 @@ def create_metrics_fig(
             x_axis_titles[metricname] = f'<i>D<sub>cm{cm_dist_count}</sub></i>'
 
     # Setup Figure specs
-    specs = [[{}] * nmetrics] * (nrows)
-    specs[-2] = [{'rowspan': 2}] * nmetrics
-    specs[-1] = [None] * nmetrics
+    specs = [[{}] * ncolumns] * (nrows)
+    specs[-2] = [{'rowspan': 2}] * ncolumns
+    specs[-1] = [None] * ncolumns
 
     # Create metrics figure
     row_titles = trajectory_ids+['']
     metrics_fig = make_subplots(rows=nrows,
-                                cols=nmetrics,
+                                cols=ncolumns,
                                 column_titles=col_titles,
                                 row_titles=row_titles,
-                                horizontal_spacing=0.255/nmetrics,
+                                horizontal_spacing=0.255/ncolumns,
                                 vertical_spacing=0.45/nrows,
                                 specs=specs)
 
@@ -998,7 +1066,7 @@ def create_metrics_fig(
     # Store min and max values for each column to have all x_axis with the same dimensions
     min_max_values = {}
     for trajectory_id in trajectory_ids:
-        for colnum in range(1,nmetrics+1): # On last row, go through all columns
+        for colnum in range(1,ncolumns+1):
 
             # Add traces
             hist_trace = total_hist_traces[trajectory_id][colnum-1]
@@ -1159,7 +1227,7 @@ def create_metrics_fig(
     metrics_fig.update_layout(**DEFAULT_LAYOUT)
 
     metrics_fig.update_layout(height=240 * nrows,
-                              width=620 * nmetrics,
+                              width=620 * ncolumns,
                               legend=dict(font_size=20,
                                           title='KDE Plots',
                                           yanchor='bottom',
@@ -1184,7 +1252,7 @@ def create_metrics_fig(
 
 
     # Update column titles position
-    for annotation in metrics_fig.layout.annotations[:nmetrics]:
+    for annotation in metrics_fig.layout.annotations[:ncolumns]:
         annotation['yshift'] = 10
 
     # Update column titles size
@@ -1209,6 +1277,59 @@ def create_metrics_fig(
                    'output path must be a directory or .html filepath!'))
 
     return metrics_fig
+
+
+def create_single_metrics_fig_directly(
+    metrics: pd.DataFrame | str,
+    trajectory_id: str | None = None,
+    ) -> go.Figure:
+    """Create a Structural Metrics Figure for a single trajectory directly from its trajectory
+    id and calculated metrics data.
+
+    Args:
+        metrics:
+            DataFrame where columns are the desired structural metrics and rows are the frames
+            of the trajectory or path to that DataFrame in .csv format.
+        trajectory_id:
+            prefix identifier for trace names.
+
+    Returns:
+        metrics_fig:
+            Structural Metrics Figure with the provided calculated metrics data.
+    """
+    if isinstance(metrics,str):
+        assert metrics.endswith('.csv'), ('Structural metrics matrix '
+                                          'must be in .csv format!')
+        metrics = pd.read_csv(metrics,index_col=0)
+
+    total_box_traces = {}
+    total_hist_traces = {}
+    total_scatter_traces = {}
+    total_avg_values = {}
+    total_avg_stderr_values = {}
+
+    box_traces,\
+    hist_traces,\
+    scatter_traces,\
+    avg_values,\
+    avg_stderr_values = create_metrics_traces(metrics=metrics,
+                                              trajectory_id=trajectory_id)
+
+    total_box_traces[trajectory_id] = box_traces
+    total_hist_traces[trajectory_id] = hist_traces
+    total_scatter_traces[trajectory_id] = scatter_traces
+    total_avg_values[trajectory_id] = avg_values
+    total_avg_stderr_values[trajectory_id] = avg_stderr_values
+
+    metrics_fig = create_metrics_fig(trajectory_ids=[trajectory_id],
+                                    total_box_traces=total_box_traces,
+                                    total_hist_traces=total_hist_traces,
+                                    total_scatter_traces=total_scatter_traces,
+                                    total_avg_values=total_avg_values,
+                                    total_avg_stderr_values=total_avg_stderr_values)
+
+    return metrics_fig
+
 
 def create_analysis_figures(
     analysis_data: dict[str,list[pd.DataFrame]] | None,

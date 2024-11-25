@@ -883,8 +883,8 @@ def create_ss_frequency_figure(
 def create_metrics_traces(
     metrics: pd.DataFrame | str,
     trajectory_id: str,
-    color: str = '#636EFA',
-    ) -> tuple[list[go.Box], list[go.Histogram], list[go.Scatter]]:
+    color: str = '#1f77b4',
+    ) -> tuple[list[go.Box], list[go.Histogram], list[go.Scatter], list[float], list[float]]:
     """Create Ploty Box, Histogram and Scatter (KDE) traces to be used in the creation of
     a Structural Metrics Figure.
 
@@ -909,6 +909,8 @@ def create_metrics_traces(
                 for each structural metric.
             avg_values:
                 a list of the values of the mean for each metric.
+            avg_stderr:
+                a list of the values of the standard error of the mean for each metric.
     """
     if isinstance(metrics,str):
         assert metrics.endswith('.csv'), ('Structural metrics matrix '

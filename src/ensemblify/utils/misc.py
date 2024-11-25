@@ -89,7 +89,7 @@ def kde(
     return x_coords,norm_kde,weighted_average,weighted_standard_error
 
 
-def get_array_extremum(arrays: list[np.ndarray], get_max: bool | None =True) -> float:
+def get_array_extremum(arrays: list[np.ndarray], get_max: bool | None = True) -> float:
     """Get maximum or minimum value of the set with all values of all provided arrays.
 
     Args:

@@ -93,6 +93,10 @@ Available Functions
 
       Create a Structural Metrics Figure from previously created Box, Histogram and Scatter traces.
 
+- `create_single_metrics_fig_directly`
+
+      Create a Structural Metrics Figure for a single trajectory, directly from its calculated
+      metrics data and trajectory ID.
 """
 
 from ensemblify.analysis.trajectory import analyze_trajectory
@@ -104,7 +108,8 @@ from ensemblify.analysis.data import (
 from ensemblify.analysis.figures import (
     create_analysis_figures, create_contact_map_fig,
     create_distance_matrix_fig, create_metrics_fig, create_metrics_traces,
-    create_ramachandran_figure, create_ss_frequency_figure
+    create_ramachandran_figure, create_single_metrics_fig_directly,
+    create_ss_frequency_figure
 )
 
 __all__ = ['analyze_trajectory',
@@ -121,4 +126,5 @@ __all__ = ['analyze_trajectory',
            'create_metrics_fig',
            'create_metrics_traces',
            'create_ramachandran_figure',
+           'create_single_metrics_fig_directly',
            'create_ss_frequency_figure']

@@ -1,3 +1,5 @@
+examples/input_parameters/generate_Hst5.yaml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

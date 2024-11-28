@@ -5,6 +5,8 @@
 import logging
 import logging.config
 import os
+import re
+import sys
 from copy import deepcopy
 from timeit import default_timer as timer
 
@@ -32,19 +34,19 @@ from ensemblify.generation.ensemble_utils.samplers import setup_samplers
 
 # FUNCTIONS
 def setup_sampling_logging(sampling_log: str) -> tuple[logging.Logger,str,str]:
-    """Setup logging handlers and files for pyrosetta sampling and dask.
+    """Setup logging handlers and files for PyRosetta sampling and Ray.
     
     Args:
         sampling_log:
             path to sampling .log file.
     
     Returns:
-        A tuple (logger, dask_log, pyrosetta_log) where:
+        A tuple (logger, ray_log, pyrosetta_log) where:
             logger: 
                 the Logger object associated with the sampling .log file
-            dask.log:
-                filepath to .log file with Dask log messages.
-            pyrosetta.log:
+            ray_log:
+                filepath to .log file with Ray log messages.
+            pyrosetta_log:
                 filepath to .log file with PyRosetta log messages.
     """
     ray_log = os.path.join(os.path.split(sampling_log)[0],'ray.log')
@@ -110,6 +112,19 @@ def setup_sampling_logging(sampling_log: str) -> tuple[logging.Logger,str,str]:
 def setup_ray_worker_logging():
     logger = logging.getLogger('ray')
     logger.setLevel(logging.ERROR)
+
+
+def remove_ansi(file: str):
+    """Replace a file with a copy of it without ANSI characters.
+
+    Args:
+        file:
+            path to text file to change.
+    """
+    with open(file,'r') as f:
+        clean_text = re.sub(r'\033\[[0-9;]*[mGKHF]','', f.read())
+    with open(file,'w') as t:
+        t.write(clean_text)
 
 
 def check_contained_in(
@@ -259,9 +274,8 @@ def setup_sampling_initial_pose(
 
     # Derive constraint targets from sampling targets
     logger.info('Deriving regions to constrain (if any)...')
-    c_targets = derive_constraint_targets(pose=initial_pose, # FIXME # TODO
-                                          sampling_targets=params['targets']) # FIXME # TODO
-    #c_targets = ((51, 174), (218, 236), (250, 365), (480, 603), (647, 665), (679, 794), (909, 1032), (1076, 1094), (1108, 1223), (1338, 1461), (1505, 1523), (1537, 1652)) # FIXME # TODO
+    c_targets = derive_constraint_targets(pose=initial_pose,
+                                          sampling_targets=params['targets'])
 
     # Apply constraints if needed
     if c_targets:
@@ -294,6 +308,28 @@ def setup_sampling_initial_pose(
     logger.info('Initial structure has been setup sucessfully.')
 
     return initial_pose
+
+
+def get_dbs_mem_size(databases: dict[str,pd.DataFrame]) -> int:
+    """Get a rough estimate of the size of a databases dictionary, in bytes.
+
+    Store the size of the databases dictionary and for each database, the database ID,
+    the database dictionary, the aminoacid ID and DataFrame.
+
+    Args:
+        databases:
+            mapping of database IDs to Ensemblify databases.
+
+    Returns:
+        int:
+            total memory size of each elements of the databases, in bytes.
+    """
+    total_mem = sys.getsizeof(databases)
+    for db_id,db in databases.items():
+        total_mem += sys.getsizeof(db_id) + sys.getsizeof(db)
+        for aa,df in db.items():
+            total_mem += sys.getsizeof(aa) + df.memory_usage(index=True,deep=True).sum()
+    return total_mem
 
 
 @ray.remote(num_returns=1,
@@ -385,7 +421,10 @@ def sample_pdb(
 
     # Setup score function
     scorefxn = pyrosetta.rosetta.core.scoring.ScoreFunctionFactory.create_score_function(scorefxn_id)
-    scorefxn.set_weight(pyrosetta.rosetta.core.scoring.ScoreType.vdw,scorefxn_weight)
+
+    # Set VdW weight in score function
+    vdw_cst = pyrosetta.rosetta.core.scoring.ScoreType.vdw
+    scorefxn.set_weight(vdw_cst,scorefxn_weight)
 
     # Set AtomPairConstraint weight in score function
     ap_cst = pyrosetta.rosetta.core.scoring.ScoreType.atom_pair_constraint
@@ -476,7 +515,7 @@ def sample_pdb(
         # Setup pdb file name
         output_filename = os.path.join(output_path,f'{decoy_num}_{job_name}.pdb')
 
-        #Output pose
+        # Output pose
         io.to_pose(working_pose).dump_pdb(output_filename)
         return output_filename
 

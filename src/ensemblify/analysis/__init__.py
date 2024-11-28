@@ -23,8 +23,8 @@ Example applications
   file is assigned to a variable named HST5_TRAJECTORY_PATH, you should run:
 
 ```
->>> import ensemblify as ey
->>> ey.analyze_trajectory(HST5_TRAJECTORY_PATH)
+>>> import ensemblify.analysis as ea
+>>> ea.analyze_trajectory(HST5_TRAJECTORY_PATH)
 ```
 
 Available Functions

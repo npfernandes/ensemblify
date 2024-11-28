@@ -25,8 +25,8 @@ Example applications
   named, respectively, HST5_ENSEMBLE_DIR and HST5_TRAJECTORY_DIR, you should run:
 
 ```
->>> import ensemblify as ey
->>> ey.ensemble2traj(HST5_ENSEMBLE_DIR,HST5_TRAJECTORY_DIR,'Hst5')
+>>> import ensemblify.conversion as ec
+>>> ec.ensemble2traj(HST5_ENSEMBLE_DIR,HST5_TRAJECTORY_DIR,'Hst5')
 ```
 
 - Calculate a theoretical SAXS curve from a trajectory
@@ -38,8 +38,8 @@ Example applications
   named HST5_TRAJECTORY, you should run:
 
 ```
->>> import ensemblify as ey
->>> ey.traj2saxs(HST5_TRAJECTORY)
+>>> import ensemblify.conversion as ec
+>>> ec.traj2saxs(HST5_TRAJECTORY)
 ```
 
 Available Functions

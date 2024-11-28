@@ -22,7 +22,7 @@ def traj2saxs(
     ) -> str:
     """Calculate a theoretical SAXS curve from a trajectory file using PEPSI-SAXS.
     
-    Calculation is done in chunks distributed across availabe processor cores.
+    Calculation is done in chunks distributed across available processor cores.
     A Universe object is created with the given trajectory and topology, which
     allows for writing of temporary individual .pdb files from trajectory frames
     that are then used for SAXS curve calculation at every frame.
@@ -51,12 +51,13 @@ def traj2saxs(
                      trajectory) # trajectory
 
     # Setup multiprocessing arguments
-    frame_indices = range(len(u.trajectory))
-    trajectory_ids = [trajectory_id] * len(frame_indices)
-    universes = [u] * len(frame_indices)
-    exp_saxs_files = [exp_saxs_file] * len(frame_indices)
-    calc_saxs_log = os.path.join(os.path.split(exp_saxs_file)[0],f'{trajectory_id}_calc_saxs.log')
-    calc_saxs_logs = [calc_saxs_log] * len(frame_indices)
+    frame_indices = range(u.trajectory.n_frames)
+    trajectory_ids = [trajectory_id] * u.trajectory.n_frames
+    universes = [u] * u.trajectory.n_frames
+    exp_saxs_files = [exp_saxs_file] * u.trajectory.n_frames
+    calc_saxs_log = os.path.join(os.path.split(exp_saxs_file)[0],
+                                 f'{trajectory_id}_calc_saxs.log')
+    calc_saxs_logs = [calc_saxs_log] * u.trajectory.n_frames
 
     # Calculate SAXS data in chunks
     with ProcessPoolExecutor() as ppe:
@@ -66,7 +67,7 @@ def traj2saxs(
                                              frame_indices,
                                              exp_saxs_files,
                                              calc_saxs_logs),
-                                     total=len(frame_indices),
+                                     total=u.trajectory.n_frames,
                                      desc=f'Calculating {trajectory_id} SAXS data... '))
 
     # Build the full SAXS data file

@@ -16,6 +16,8 @@ from ensemblify.generation.ensemble_utils.inputs_processing import register_inpu
 from ensemblify.generation.ensemble_utils.movers_utils import setup_databases
 from ensemblify.generation.ensemble_utils.pdb_processing import process_pdb
 from ensemblify.generation.ensemble_utils.sampling_utils import (
+    get_dbs_mem_size,
+    remove_ansi,
     sample_pdb,
     setup_ray_worker_logging,
     setup_sampling_initial_pose,
@@ -88,6 +90,7 @@ def run_sampling(
     initial_pose =  setup_sampling_initial_pose(params=PARAMETERS,
                                                 sampling_log=sampling_log)
     databases = HashableDict(setup_databases(PARAMETERS['databases']))
+    databases_mem_size = get_dbs_mem_size(databases=databases)
 
     # Setup sampling constants and variables
     logger.info('Setting up sampling...')
@@ -139,9 +142,12 @@ def run_sampling(
 
     # Setup Ray
     ray.init(num_cpus=PARAMETERS['core_amount'],
-             object_store_memory=1000000000,
+             object_store_memory=databases_mem_size+100000000, # +100MiB to store computed results
              log_to_driver=False,
              runtime_env={'worker_process_setup_hook': setup_ray_worker_logging})
+
+    # Remove ANSI characters from Ray Dashboard Address
+    remove_ansi(file=RAY_LOG)
 
     # Put input clashes information in Ray object store memory
     if clashes_input != []:
@@ -205,7 +211,7 @@ def run_sampling(
 
             # Returns the ObjectRefs that are ready
             finished_tasks, unfinished_obj_refs_batch = ray.wait(unfinished_obj_refs_batch,
-                                                                num_returns=1)
+                                                                 num_returns=1)
 
             for finished_task in finished_tasks:
                 try:
@@ -253,6 +259,7 @@ def run_sampling(
         print(final_log_msg)
         return None # exit
     else:
+        logger.info('Desired number of structurally biased structures has been reached.')
         # Do not cleanup purposefully (any leftover will be overwritten later anyway)
         logger.info(f'There are {len(os.listdir(VALID_PDBS_DIR))} valid pdbs, '
                     f'{clashed_pdbs+disrespectful_pdbs} were discarded '
@@ -348,3 +355,6 @@ def run_sampling(
 
     logger.info(final_log_msg)
     print(final_log_msg)
+
+    # Remove ANSI characters from Ray Log (just in case)
+    remove_ansi(file=RAY_LOG)

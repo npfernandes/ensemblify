@@ -89,10 +89,18 @@ def ensemble2traj(
 
         # From a multimodel .pdb file, create a .xtc trajectory file
         pbar.set_description(CREATE_TRJ_MSG.format(trajectory_id_msg))
-        subprocess.run(['gmx', 'trjconv', '-f', ensemble_pdb_path, '-o', f'{trajectory_path}'],
-                       stdout=open(trajectory_creation_log,'a',encoding='utf-8'),
-                       stderr=subprocess.STDOUT,
-                       check=True)
+        try:
+            subprocess.run(['gmx', 'trjconv',
+                            '-f', ensemble_pdb_path, '-o', f'{trajectory_path}'],
+                            stdout=open(trajectory_creation_log,'a',encoding='utf-8'),
+                            stderr=subprocess.STDOUT,
+                            check=True)
+        except FileNotFoundError:
+            subprocess.run([f'{os.environ.get("GMXBIN")}/gmx', 'trjconv',
+                            '-f', ensemble_pdb_path, '-o', f'{trajectory_path}'],
+                            stdout=open(trajectory_creation_log,'a',encoding='utf-8'),
+                            stderr=subprocess.STDOUT,
+                            check=True)
         pbar.update(1)
 
         # Remove created multi_model ensemble

@@ -22,8 +22,8 @@ Example applications
   required input parameters file is assigned to a variable named HST5_PARAMS, you should run:
 
 ```
->>> import ensemblify as ey
->>> ey.generate_ensemble(HST5_PARAMS)
+>>> import ensemblify.generation as eg
+>>> eg.generate_ensemble(HST5_PARAMS)
 ```
 
 Available Functions

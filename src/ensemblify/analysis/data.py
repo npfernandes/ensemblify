@@ -173,15 +173,14 @@ def calculate_contact_matrix(
     """
     # Setup Universe object
     u = mda.Universe(topology,trajectory)
-    trajectory_size = len(u.trajectory)
 
     # Setup multiprocessing variables
-    frame_idxs = np.array(range(trajectory_size))
-    universes = [u] * trajectory_size
+    frame_idxs = np.array(range(u.trajectory.n_frames))
+    universes = [u] * u.trajectory.n_frames
 
     if weights is None:
         # Setup multiprocessing variables
-        weights = np.array([1/trajectory_size] * trajectory_size )
+        weights = np.array([1/u.trajectory.n_frames] * u.trajectory.n_frames)
 
         # Calculate average distance matrix using multiprocessing
         with ProcessPoolExecutor() as ppe:
@@ -191,7 +190,7 @@ def calculate_contact_matrix(
                                                        frame_idxs,
                                                        weights),
                                                desc='Calculating contact matrix...',
-                                               total=trajectory_size))
+                                               total=u.trajectory.n_frames))
     else:
         # Calculate average distance matrix using multiprocessing
         with ProcessPoolExecutor() as ppe:
@@ -201,7 +200,7 @@ def calculate_contact_matrix(
                                                        frame_idxs,
                                                        weights),
                                                desc='Calculating reweighted contact matrix...',
-                                               total=trajectory_size))
+                                               total=u.trajectory.n_frames))
 
     # Convert calculated averaged matrix to DataFrame
     contact_matrix = pd.DataFrame(data=contact_matrix_array,
@@ -300,14 +299,13 @@ def calculate_distance_matrix(
     """
     # Setup Universe object
     u = mda.Universe(topology,trajectory)
-    trajectory_size = len(u.trajectory)
 
     # Setup multiprocessing variables
-    frame_idxs = np.array(range(trajectory_size))
-    universes = [u] * trajectory_size
+    frame_idxs = np.array(range(u.trajectory.n_frames))
+    universes = [u] * u.trajectory.n_frames
 
     if weights is None:
-        weights = np.array([1/trajectory_size] * trajectory_size )
+        weights = np.array([1/u.trajectory.n_frames] * u.trajectory.n_frames )
 
         # Calculate average distance matrix using multiprocessing
         with ProcessPoolExecutor() as ppe:
@@ -317,7 +315,7 @@ def calculate_distance_matrix(
                                                         frame_idxs,
                                                         weights),
                                                 desc='Calculating distance matrix... ',
-                                                total=trajectory_size))
+                                                total=u.trajectory.n_frames))
     else:
         # Calculate average distance matrix using multiprocessing
         with ProcessPoolExecutor() as ppe:
@@ -327,7 +325,7 @@ def calculate_distance_matrix(
                                                         frame_idxs,
                                                         weights),
                                                 desc='Calculating reweighted distance matrix... ',
-                                                total=trajectory_size))
+                                                total=u.trajectory.n_frames))
 
     # Convert calculated averaged matrix to DataFrame
     distance_matrix = pd.DataFrame(data=distance_matrix_array,

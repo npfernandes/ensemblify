@@ -24,8 +24,8 @@ Example applications
   respectively, HST5_TRAJECTORY and HST5_SAXS, you should run:
 
 ```
->>> import ensemblify as ey
->>> ey.reweight_ensemble(HST5_TRAJECTORY,HST5_SAXS)
+>>> import ensemblify.reweighting as er
+>>> er.reweight_ensemble(HST5_TRAJECTORY,HST5_SAXS)
 ```
 
 Available Functions

@@ -1,4 +1,4 @@
-"""Calculate a SAXS curve (.dat) from a trajectory file (.xtc)."""
+"""Calculate a set of SAXS curves (.dat) from a trajectory file (.xtc)."""
 
 # IMPORTS
 ## Standard Library Imports
@@ -20,7 +20,7 @@ def traj2saxs(
     trajectory_id: str,
     exp_saxs_file: str,
     ) -> str:
-    """Calculate a theoretical SAXS curve from a trajectory file using PEPSI-SAXS.
+    """Calculate a set of theoretical SAXS curves from a trajectory file using PEPSI-SAXS.
     
     Calculation is done in chunks distributed across available processor cores.
     A Universe object is created with the given trajectory and topology, which
@@ -40,8 +40,8 @@ def traj2saxs(
 
     Returns:
         calc_saxs_file:
-            path to the calculated SAXS curve file, with the data calculated for
-            every frame of the trajectory.
+            path to the file containing the set of calculated SAXS curves, one for every frame of
+            the trajectory.
 
     Adapted from:
         https://github.com/FrPsc/EnsembleLab/blob/main/EnsembleLab.ipynb

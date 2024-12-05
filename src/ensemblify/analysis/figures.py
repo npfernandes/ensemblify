@@ -105,6 +105,7 @@ def get_figure_layout_elements(
     topology: str,
     num_res: int,
     ssfreq: bool | None = False,
+    ssfreq_diff: bool | None = False,
     ) -> tuple[list[str],list[str],list[dict],list[int]]:
     """Create tick labels and values and lines to divide chain regions for a Figure.
 
@@ -117,6 +118,9 @@ def get_figure_layout_elements(
         ssfreq:
             Whether we are dealing with a secondary structure assignment frequency Figure or not.
             Defaults to False.
+        ssfreq_diff:
+            Whether we are dealing with a difference secondary structure assignment frequency Figure
+            or not. Defaults to False.
 
     Returns:
         A tuple x_labels,y_labels,chain_dividers,tickvals where:
@@ -172,14 +176,19 @@ def get_figure_layout_elements(
         chain_ends.append(chain_end)
 
         if ssfreq:
+            if ssfreq_diff:
+                y_min = -1
+            else:
+                y_min = 0
             chain_dividers.append(dict(type='line',
                                        xref='x',
                                        x0=chain_end+0.5,
                                        x1=chain_end+0.5,
-                                       y0=0,
+                                       y0=y_min,
                                        y1=1,
                                        line=dict(color='black',
                                                  width=2)))
+
         else:
             chain_dividers.append(dict(type='line',
                                        xref='x',
@@ -767,7 +776,8 @@ def create_ss_frequency_figure(
     chain_dividers,\
     tickvals = get_figure_layout_elements(topology=topology,
                                           num_res=len(ss_frequency.columns),
-                                          ssfreq=True)
+                                          ssfreq=True,
+                                          ssfreq_diff=difference)
 
     # Create Figure
     ss_freq_fig = go.Figure(layout=DEFAULT_LAYOUT)

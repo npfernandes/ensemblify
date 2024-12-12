@@ -539,7 +539,7 @@ def apply_pae_constraints(
                                        tol_in=tolerance)
             else:
                 fun = HarmonicFunc(x0_in=d,
-                                   sd_in=error*weight)
+                                   sd_in=error*weight*plddt_scaling_factor)
 
             apc = AtomPairConstraint(ca1,ca2,fun)
             working_cs.add_constraint(apc)

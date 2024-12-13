@@ -467,7 +467,6 @@ def apply_pae_constraints(
             high pLDDT will be scaled by multiplying its weight by this factor. The higher this
             value the weaker those constraints will be.
     """
-
     # Get PAE Matrix
     with open(pae_filepath,'r',encoding='utf-8-sig') as f:
         pae_content = json.load(f)
@@ -546,6 +545,7 @@ def apply_pae_constraints(
 
         elif r1_idx+1 not in low_plddt_res and r2_idx+1 not in low_plddt_res:
             # Add stronger (not weakened) constraints between res when both of them have high plddt
+            # This if clause also includes pairs of non-sampled residues, if they have low PAE
             error = pae_matrix[r1_idx, r2_idx]
             if error < flatten_cutoff:
                 error = flatten_value
@@ -563,8 +563,8 @@ def apply_pae_constraints(
             if tolerance is not None:
                 # Lower sd_in -> Higher apc value -> Higher Pose score => Stronger cst
                 fun = FlatHarmonicFunc(x0_in=d,
-                                    sd_in=error*weight,
-                                    tol_in=tolerance)
+                                       sd_in=error*weight,
+                                       tol_in=tolerance)
             else:
                 fun = HarmonicFunc(x0_in=d,
                                    sd_in=error*weight)

@@ -388,8 +388,8 @@ def sample_pdb(
             PyRosetta ScoreFunction identifier. Must pertain to a .wst weights file present in
             /.../pyrosetta/database/scoring/weights/ . Defaults to 'score0'.
         scorefxn_weight:
-            Weight for the Van der Waals term in the ScoreFunction. Will only have an effect if
-            the ScoreFunction has a Van der Waals term. Defaults to 1.0.
+            Weight for the repulsive Van der Waals term in the ScoreFunction. Will only have an
+            effect if the ScoreFunction has a repulsive Van der Waals term. Defaults to 1.0.
         minimizer_id:
             PyRosetta minimization algorithm identifier used in MinMover.
             Defaults to 'dfpmin_armijo_nonmonotone'.

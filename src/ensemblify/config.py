@@ -18,7 +18,7 @@ GLOBAL_CONFIG = {
                                'PSI3': 'PSI3',
                                'FRAG': 'FRAG'},
     'ALPHA_HELIX_CANON': (-57,-47), # (Phi,Psi); Lehninger principles of biochemistry (2021)
-    'BETA_STRAND_CANON': (-135,135), # (Phi,Psi); Wikipedia Beta strand # FIXME
+    'BETA_STRAND_CANON': (-139,135), # (Phi,Psi) antiparallel;  Lehninger principles of biochemistry (2021)
     'FASPR_PATH': os.environ.get('FASPR_PATH'), # get faspr environment variable
     'PULCHRA_PATH': os.environ.get('PULCHRA_PATH'), # get pulchra environment variable
     'PEPSI_SAXS_PATH': os.environ.get('PEPSI_SAXS_PATH'), # get pepsi-saxs environment variable

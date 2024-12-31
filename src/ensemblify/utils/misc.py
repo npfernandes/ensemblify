@@ -23,7 +23,7 @@ def kde(
             array with weights for each data point. Defaults to uniform weights.
 
     Returns:
-        A tuple (x_coords,norm_kde,avg) where:
+        A tuple (x_coords,norm_kde,weighted_average,weighted_standard_error) where:
             x_coords:
                 x axis coordinates corresponding to the calculated kde distribution.
             norm_kde:

@@ -92,7 +92,7 @@ def optimize_database(database: pd.DataFrame) -> dict[str,pd.DataFrame]:
             dihedral angle values in the optimized database.
     """
 
-    # Optimize our database, chaging datatypes to ones that are appropriate but use less memory
+    # Optimize our database, changing datatypes to ones that are appropriate but use less memory
     optimized_db = database.astype(DATABASE_OPTIMIZED_COL_DTYPES)
 
     # Freeup memory

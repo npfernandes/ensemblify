@@ -128,8 +128,8 @@ def calculate_contact_matrix_frame(
 
             # Calculate distance matrix
             distance_matrix = scipy.spatial.distance.cdist(current_res_atom_coordinates,
-                                                            target_res_atom_coordinates,
-                                                            'euclidean')
+                                                           target_res_atom_coordinates,
+                                                           'euclidean')
 
             if np.argwhere(distance_matrix < 4.5).shape[0] > 0:
                 # Add contacts on both halves of matrix
@@ -253,7 +253,9 @@ def calculate_distance_matrix_frame(
     ca_coordinates = ca_selection.positions
 
     # Calculate distance matrix
-    distance_matrix = scipy.spatial.distance.cdist(ca_coordinates,ca_coordinates,'euclidean')
+    distance_matrix = scipy.spatial.distance.cdist(ca_coordinates,
+                                                   ca_coordinates,
+                                                   'euclidean')
 
     # Ignore neighbours
     for ca1_idx, ca2_idx in np.argwhere(distance_matrix):

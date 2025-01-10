@@ -359,9 +359,9 @@ def sample_pdb(
 
     Args:
         ppose (pyrosetta.distributed.packed_pose.core.PackedPose):
-            reference to the initial structure for sampling present in the LocalCluster.
+            reference to the initial structure.
         databases:
-            reference to the databases dictionary present in the LocalCluster.
+            reference to the databases dictionary.
         targets:
             dictionary detailing the target regions for sampling in each chain.
         output_path:
@@ -471,7 +471,7 @@ def sample_pdb(
 
             # So we don't sample fragments with length 2
             target_prep = prep_target(seq_len=chain_end,
-                                        target=target)
+                                      target=target)
 
             if ss_bias is not None:
                 ssb = ss_bias[0]
@@ -489,7 +489,7 @@ def sample_pdb(
     end = timer()
     tqdm.write(f'[DECOY {decoy_num}] Sampling time: {end-start}')
 
-    # Remove clashes
+    # Perform energy minimization
     tqdm.write(f'[DECOY {decoy_num}] Minimizing ...')
     start = timer()
     for _ in range(minimizer_finalcycles):

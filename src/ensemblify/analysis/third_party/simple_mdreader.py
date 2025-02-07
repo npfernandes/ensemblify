@@ -84,16 +84,9 @@ class ThenNow:
         self.old = oldval
         self.new = newval
 
-    def fill(self, val):
-        # Fill variant for the initial case where we have to assign both at initialization.
-        self.set(val, val)
-
-    def update(self, val, fill=False):
-        if fill:
-            self.fill(val)
-        else:
-            self.old = self.new
-            self.new = val
+    def update(self, val):
+        self.old = self.new
+        self.new = val
 
 
 # SimpleMDreader Class
@@ -246,7 +239,7 @@ class SimpleMDreader(mda.Universe):
         needing to refer to it specifically.
 
         SimpleMDreader.p_num, SimpleMDreader.p_id and SimpleMDreader.p_scale_dt are important
-        here, read the class docstring for more information.
+        here if self.verbose is True, read the class docstring for more information.
         """
         self.iterframe = 0
 
@@ -301,15 +294,6 @@ class SimpleMDreader(mda.Universe):
         args and kwargs should be an iterable, resp. a dictionary, of arguments
             that will be passed (with the star, resp. double-star, operator) to
             fn. Default to the empty tuple and empty dict.
-        parallel can be set to False to force serial behavior. Setting it to
-            True forces default parallelization behavior, overriding previous
-            settings of self.p_num.
-        ret_type can be set to "last_per_worker" to specify that only the last
-            frame result per worker be returned. This is useful when dealing
-            with returned objects that are updated along the several frames.
-        Refer to the documentation on MDreader.iterate() for information on
-        which MDreader attributes to set to change default parallelization
-        options.
         """
         # Set function to call
         self.p_fn = fn

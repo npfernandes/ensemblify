@@ -129,6 +129,7 @@ def calc_chi(exp: np.ndarray, calc: np.ndarray, sample_weights: np.ndarray) -> f
 
     calc_avg = np.sum(calc*sample_weights[:,np.newaxis],
                       axis=0)
+    # exp is {I, sigma, bound} according to parse function
     diff = calc_avg-exp[:,0]
     ii = np.where(((diff<0) & (exp[:,2]<0)) | ((diff>0) & (exp[:,2]>0)))[0]
     ff = [1 if (exp[j,2] == 0 or j in ii) else 0 for j in range(exp.shape[0])]

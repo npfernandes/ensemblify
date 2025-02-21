@@ -363,20 +363,20 @@ def main():
                                           '(.csv).'))
 
     parser_reweighting.add_argument('-crg',
-                                    action ='store_true',
+                                    action ='store_false',
                                     help=('(Optional) Whether to calculate and compare '
                                           'uniform/reweighted radius of gyration distributions. '
-                                          'Defaults to False.'))
+                                          'Defaults to True.'))
 
     parser_reweighting.add_argument('-cdmax',
-                                    action ='store_true',
-                                    help=('(Optional) Calculate and compare uniform/reweighted '
-                                          'maximum distance distributions. Defaults to False.'))
+                                    action ='store_false',
+                                    help=('(Optional) Whether to calculate and compare uniform/reweighted '
+                                          'maximum distance distributions. Defaults to True.'))
 
     parser_reweighting.add_argument('-ceed',
-                                    action ='store_true',
-                                    help=('(Optional) Calculate and compare uniform/reweighted '
-                                          'end-to-end distance distributions. Defaults to False.'))
+                                    action ='store_false',
+                                    help=('(Optional) Whether to calculate and compare uniform/reweighted '
+                                          'end-to-end distance distributions. Defaults to True.'))
 
     parser_reweighting.add_argument('-ccmdist',
                                     nargs='+', type=str, metavar='',

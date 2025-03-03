@@ -45,7 +45,7 @@ A general overview of Ensemblify, descriptions of employed methods and applicati
 
 It is **heavily** recommended to install the `ensemblify` Python package in a dedicated virtual environment.
 
-You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html). We recommend [miniconda](https://docs.anaconda.com/miniconda/#quick-command-line-install), a free minimal installer for conda.
+You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html). We recommend [miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install), a free minimal installer for conda.
 
 To install the `ensemblify` Python package, you can follow these commands:
 

@@ -6,7 +6,7 @@
 
 ## 💡 What is Ensemblify?
 
-**Ensemblify** is a Python package that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (e.g intrinsically disordered regions (IDRs)).
+**Ensemblify** is a Python package that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (e.g. intrinsically disordered regions (IDRs)).
 
 It supports both user-defined models and AlphaFold [[1]](#ref1) predictions, using predicted Local Distance Difference Test (pLDDT) and Predicted Aligned Error (PAE) confidence metrics to guide conformational sampling. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
 
@@ -68,30 +68,28 @@ To install the `ensemblify` Python package, you can follow these commands:
     conda env create -f environment_LINUX.yml # or environment_MACOS.yml, for MacOS users
     conda activate ensemblify_env
     ```
-
-    or by creating the environment and installing the necessary python packages manually (not recommended):
+    <details><summary>or by creating the environment and installing the necessary python packages manually (not recommended):</summary>
 
     ```bash
     conda create --channel=conda-forge --name ensemblify_env python=3.10 MDAnalysis=2.6.1 mdtraj=1.9.9 numpy=1.26.4 pandas=2.2.2 pyarrow=13.0.0 scikit-learn=1.4.2 scipy=1.12.0 tqdm=4.66.2
     conda activate ensemblify_env
     pip install biopython==1.81 plotly==5.23.0 pyyaml==6.0.1 "ray[default]"==2.33.0
     ```
+    </details>
 
 3. Install the `ensemblify` python package into your newly created environment.
 
     ```bash
     pip install .
     ```
+</details>
 
-
-Alternatively, Ensemblify is available via the Python Package Index:
+<!-- Alternatively, Ensemblify is available via the Python Package Index:
 
   ```bash
   conda activate ensemblify_env   
   pip install -U ensemblify
-  ```
-
-</details>
+  ``` -->
 
 <details><summary>
 
@@ -116,7 +114,7 @@ Each of Ensemblify's modules has different dependencies to third party software,
   
   </summary>
 
-PyRosetta is a Python-based interface to the powerful Rosetta molecular modeling suite [[2]](#ref2). Its functionalities are used and extended through Ensemblify in order to generate conformational ensembles. You can install it by following these commands:
+PyRosetta is a Python-based interface to the powerful Rosetta molecular modeling suite [[2]](#ref2). Its functionalities are used through Ensemblify in order to generate conformational ensembles. You can install it by following these commands:
 
 1. Activate your `ensemblify_env` conda environment:
 
@@ -168,8 +166,12 @@ For UNIX or Linux users:
 2. Navigate to where the FASPR source code is located:
 
     ```bash
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/
+    cd src/ensemblify/third_party/FASPR-master/ # assuming this cloned repository is your current working directory
     ```
+
+    <!-- ```bash
+    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/
+    ``` -->
 
 3. Compile the FASPR source code:
 
@@ -199,8 +201,12 @@ For MacOS users:
 2. Navigate to where the FASPR source code is located:
 
     ```bash
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/
+    cd src/ensemblify/third_party/FASPR-master/ # assuming this cloned repository is your current working directory
     ```
+
+    <!-- ```bash
+    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/
+    ``` -->
 
 3. Compile the FASPR source code:
 
@@ -245,8 +251,12 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
 2. Navigate to where the PULCHRA source code is located:
 
     ```bash
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/pulchra-master/
+    cd src/ensemblify/third_party/pulchra-master/ # assuming this cloned repository is your current working directory
     ```
+
+    <!-- ```bash
+    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/pulchra-master/
+    ``` -->
 
 3. Compile the PULCHRA source code:
 
@@ -394,10 +404,14 @@ To compile the provided BIFT source code, you can follow these commands:
     If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
 
 2. Navigate to where the BIFT source code is located:
-    
+
     ```bash
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/BIFT/
+    cd src/ensemblify/third_party/BIFT/ # assuming this cloned repository is your current working directory
     ```
+
+    <!-- ```bash
+    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/BIFT/
+    ``` -->
 
 3. Compile the BIFT source code:
 

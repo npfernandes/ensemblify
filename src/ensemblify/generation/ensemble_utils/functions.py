@@ -689,30 +689,30 @@ def setup_fold_tree(
     #central_residues = [227,483] # N246DIMER (sets the fold tree manually)
     #central_residues = [227] # N246MONOMER
     #central_residues = [52,133,214] # NLINKERTRIMER
-    central_residues = [227,656,1085,1514] # NFullLengthTetramer (sets the fold tree manually)
+    #central_residues = [227,656,1085,1514] # NFullLengthTetramer (sets the fold tree manually)
     # Uncomment what is below (so that the FoldTree is set automatically)
 
-    # # Calculate the optimal central residues
-    # central_residues = []
-    # for i in range(1,ft_pose.num_chains()+1):
-    #     chain_start = ft_pose.chain_begin(i)
-    #     chain_end = ft_pose.chain_end(i)
-    #     ideal_central_res = (chain_start + chain_end) // 2
+    # Calculate the optimal central residues
+    central_residues = []
+    for i in range(1,ft_pose.num_chains()+1):
+        chain_start = ft_pose.chain_begin(i)
+        chain_end = ft_pose.chain_end(i)
+        ideal_central_res = (chain_start + chain_end) // 2
 
-    #     # Start from any value in constrained res range
-    #     central_res = constraint_targets[0][0]
+        # Start from any value in constrained res range
+        central_res = constraint_targets[0][0]
 
-    #     # Get how far the current res is from the ideal mid-point
-    #     minimum_distance = abs(central_res - ideal_central_res)
+        # Get how far the current res is from the ideal mid-point
+        minimum_distance = abs(central_res - ideal_central_res)
 
-    #     for res_range in constraint_targets:
-    #         for res in range(res_range[0],res_range[1]+1):
-    #             if ft_pose.chain(res) == i:
-    #                 dist = abs(res - ideal_central_res) # distance between residue numbers
-    #                 if dist < minimum_distance:
-    #                     minimum_distance = dist
-    #                     central_res = res
-    #     central_residues.append(central_res)
+        for res_range in constraint_targets:
+            for res in range(res_range[0],res_range[1]+1):
+                if ft_pose.chain(res) == i:
+                    dist = abs(res - ideal_central_res) # distance between residue numbers
+                    if dist < minimum_distance:
+                        minimum_distance = dist
+                        central_res = res
+        central_residues.append(central_res)
 
     # If there are contacts, use them to update central residues if needed
     # This is important in multi-chain proteins, to avoid cases where the central residue of a

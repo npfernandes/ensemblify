@@ -13,12 +13,14 @@ sys.path.insert(0, os.path.abspath('../src'))
 # -- Project information -----------------------------------------------------
 
 project = "Ensemblify"
-copyright = "2025, Nuno Fernandes"
-author = "Nuno Fernandes"
+copyright = "2025, Nuno P. Fernandes"
+author = "Nuno P. Fernandes"
+release = '1.0.0'
 
 # -- General configuration ---------------------------------------------------
 
 extensions = [
+    "autoapi.extension",
     "sphinx.ext.duration",
     "sphinx.ext.doctest",
     "sphinx.ext.autodoc",
@@ -29,11 +31,11 @@ extensions = [
     "sphinx_rtd_theme",
 ]
 
-intersphinx_mapping = {
-    "python": ("https://docs.python.org/3/", None),
-    "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
-}
-intersphinx_disabled_domains = ["std"]
+# intersphinx_mapping = {
+#     "python": ("https://docs.python.org/3/", None),
+#     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
+# }
+# intersphinx_disabled_domains = ["std"]
 
 templates_path = ["_templates"]
 
@@ -57,4 +59,8 @@ html_static_path = ["_static"]
 
 # -- Options for autodoc -----------------------------------------------------
 
-autodoc_mock_imports = ["MDAnalysis", "mdtraj", "numpy", "pandas", "pyarrow", "scikit-learn", "scipy", "tqdm", "biopython", "plotly", "pyyaml", "ray"]
+autodoc_mock_imports = ["ensemblify","MDAnalysis", "mdtraj", "numpy", "pandas", "pyarrow", "scikit-learn", "scipy", "tqdm", "biopython", "plotly", "pyyaml", "ray"]
+
+# -- Options for autoapi -----------------------------------------------------
+
+autoapi_dirs = ['../src/']

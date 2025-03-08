@@ -4,6 +4,7 @@
 #
 #    pip-compile docs/requirements.in
 #
+autoapi
 alabaster==1.0.0
     # via sphinx
 anyio==4.8.0

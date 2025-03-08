@@ -20,10 +20,11 @@ release = '1.0.0'
 # -- General configuration ---------------------------------------------------
 
 extensions = [
-    "autoapi.extension",
+    #"autoapi.extension",
     "sphinx.ext.duration",
     "sphinx.ext.doctest",
     "sphinx.ext.autodoc",
+    "sphinx.ext.inheritance_diagram",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
@@ -63,4 +64,4 @@ autodoc_mock_imports = ["ensemblify","MDAnalysis", "mdtraj", "numpy", "pandas", 
 
 # -- Options for autoapi -----------------------------------------------------
 
-autoapi_dirs = ['../src/']
+# autoapi_dirs = ['../src/']

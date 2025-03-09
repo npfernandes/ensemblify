@@ -61,6 +61,7 @@ html_static_path = ["_static"]
 # -- Options for autodoc -----------------------------------------------------
 
 autodoc_mock_imports = ["ensemblify","MDAnalysis", "mdtraj", "numpy", "pandas", "pyarrow", "scikit-learn", "scipy", "tqdm", "biopython", "plotly", "pyyaml", "ray"]
+autodoc_typehints = 'description'
 
 # -- Options for autoapi -----------------------------------------------------
 

@@ -1,4 +1,4 @@
 sphinx
-sphinx-autobuild
 sphinxcontrib-napoleon
+sphinx-autoapi
 furo

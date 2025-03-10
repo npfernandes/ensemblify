@@ -597,7 +597,7 @@ Check the interactive [Reweighting Module](examples/05_reweighting_module.ipynb)
 
 # 📚 Documentation
 
-Ensemblify's documentation is available at https://ensemblify.readthedocs.io/en/latest/ and as docstrings inside the source-code.
+Ensemblify's documentation is available at https://ensemblify.readthedocs.io/latest/ and as docstrings inside the source-code.
 
 # 🗨️ Citation and Publications
 

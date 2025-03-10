@@ -37,21 +37,21 @@ def add_intrachain_constraints(
 
     Args:
         pose (pyrosetta.rosetta.core.pose.Pose):
-            target Pose object for constraints.
-        constraint_targets:
-            residues between which AtomPairConstraints will be applied.
+            Target Pose object for constraints.
+        constraint_targets (tuple[tuple[int,int],...]):
+            Residues between which AtomPairConstraints will be applied.
         constraint_set (pyrosetta.rosetta.core.scoring.constraints.ConstraintSet):
-            set of constraints to later be applied to Pose.
+            Set of constraints to later be applied to Pose.
         constraint_function (pyrosetta.rosetta.core.scoring.func.HarmonicFunc | pyrosetta.rosetta.core.scoring.func.FlatHarmonicFunc):
-            function to use for each added constraint.
-        stdev:
-            standard deviation value to use in constraints.
-        tolerance:
-            tolerance value to use in constraints (if applicable). Defaults to None.
+            Function to use for each added constraint.
+        stdev (float):
+            Standard deviation value to use in constraints.
+        tolerance (float, optional):
+            Tolerance value to use in constraints (if applicable). Defaults to None.
     
     Returns:
-        working_cs (pyrosetta.rosetta.core.scoring.constraints.ConstraintSet):
-            updated constraint set, with intrachain constraints.
+        pyrosetta.rosetta.core.scoring.constraints.ConstraintSet:
+            Updated constraint set, with intrachain constraints.
     """
     AtomPairConstraint = constraints.AtomPairConstraint
     working_cs = constraints.ConstraintSet()
@@ -95,21 +95,21 @@ def add_contacts_constraints(
 
     Args:
         pose (pyrosetta.rosetta.core.pose.Pose):
-            target Pose object for constraints.
-        contacts:
-            residue ranges where two regions are interacting.
+            Target Pose object for constraints.
+        contacts (tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...]):
+            Residue ranges where two regions are interacting.
         constraint_set (pyrosetta.rosetta.core.scoring.constraints.ConstraintSet):
-            set of constraints to later be applied to Pose.
+            Set of constraints to later be applied to Pose.
         constraint_function (pyrosetta.rosetta.core.scoring.func.HarmonicFunc | pyrosetta.rosetta.core.scoring.func.FlatHarmonicFunc):
-            function to use for each added constraint.
-        stdev:
-            standard deviation value to use in constraints.
-        tolerance:
-            tolerance value to use in constraints (if applicable). Defaults to None.
+            Function to use for each added constraint.
+        stdev (float):
+            Standard deviation value to use in constraints.
+        tolerance (float, optional):
+            Tolerance value to use in constraints (if applicable). Defaults to None.
     
     Returns:
-        working_cs (pyrosetta.rosetta.core.scoring.constraints.ConstraintSet):
-            updated constraint set, with contact constraints.
+        pyrosetta.rosetta.core.scoring.constraints.ConstraintSet:
+            Updated constraint set, with contact constraints.
     """
     AtomPairConstraint = constraints.AtomPairConstraint # for interactions
 
@@ -169,14 +169,16 @@ def get_targets_from_plddt(parameters: dict) -> dict[str,list[int]]:
     i.e. have the pLDDT value for each residue in the .pdb B-Factor column.
 
     Args:
-        parameters:
-            dictionary following Ensemblify parameters template.
+        parameters (dict):
+            Dictionary following Ensemblify parameters template.
     
     Returns:
-        bfact_sampling_targets:
-            mapping of each chain to the residue numbers contained in it pertaining
+        dict[str,list[int]]:
+            Mapping of each chain to the residue numbers contained in it pertaining
             to sampled residues with pLDDT below the threshold. For example:
+
             {'A': [[234,235,236,237],[536,537,538,539]], 'B': [[124,125,126,127,128,129]] },
+
             when the contiguous_res parameter is equal to 4 residues.
     """
     # Get unfiltered sampling residues for each chain
@@ -242,12 +244,12 @@ def setup_pose(input_structure: str) -> pyrosetta.rosetta.core.pose.Pose:
     The created Pose object is then changed to 'centroid' configuration.
 
     Args:
-        input_structure:
-            filepath to the input .pdb structure, .txt with sequence or the actual sequence string.
+        input_structure (str):
+            Filepath to the input .pdb structure, .txt with sequence or the actual sequence string.
 
     Returns:
-        initial_pose (pyrosetta.rosetta.core.pose.Pose):
-            our initial Pose for sampling.
+        pyrosetta.rosetta.core.pose.Pose:
+            Our initial Pose for sampling.
     """
     initial_pose = None
     if input_structure.endswith('.pdb'):
@@ -282,19 +284,19 @@ def setup_minmover(
 
     Args:
         scorefxn (pyrosetta.rosetta.core.scoring.ScoreFunction):
-            score function used during sampling to evaluate our Pose conformations.
-        min_id:
-            identifier for the PyRosetta minimization algorithm.
-        tolerance:
-            value for the MinMover tolerance.
-        max_iters:
-            maximum iterations of the MinMover.
-        dofs:
-            defines what angles to set as flexible during minimization.
-            Defaults to backbone and sidechain.
+            Score function used during sampling to evaluate our Pose conformations.
+        min_id (str):
+            Identifier for the PyRosetta minimization algorithm.
+        tolerance (float):
+            Value for the MinMover tolerance.
+        max_iters (int):
+            Maximum iterations of the MinMover.
+        dofs (tuple[str,str], optional):
+            Defines what angles to set as flexible during minimization.
+            Defaults to backbone and sidechain, i.e. ('bb','chi').
 
     Returns:
-        min_mover (pyrosetta.rosetta.protocols.minimization_packing.MinMover):
+        pyrosetta.rosetta.protocols.minimization_packing.MinMover:
             PyRosetta MinMover for last minimization steps in the sampling process.
     """
     # Setup the MoveMap and MinMover for last minimization step
@@ -323,13 +325,13 @@ def derive_constraint_targets(
 
     Args:
         pose (pyrosetta.rosetta.core.pose.Pose):
-            initial Pose object for sampling.
-        sampling_targets:
-            dictionary detailing the target regions for sampling in each chain.
+            Initial Pose object for sampling.
+        sampling_targets (dict[str,tuple[tuple[str,tuple[int,...],str,str],...]):
+            Dictionary detailing the target regions for sampling in each chain.
 
     Returns:
-        constraint_targets:
-            all the residue numbers pairs representing regions on which to apply constraints.
+        tuple[tuple[int,int],...]:
+            All the residue number pairs representing regions on which to apply constraints.
     """
     targets = deepcopy(sampling_targets)
 
@@ -441,28 +443,28 @@ def apply_pae_constraints(
     
     Args:
         pose (pyrosetta.rosetta.core.pose.Pose):
-            the Pose constraints will be applied to.
-        pae_filepath:
-            path to the pae matrix .json file.
-        plddt_targets:
-            mapping of each chain to the residue numbers that
+            The Pose constraints will be applied to.
+        pae_filepath (str):
+            Path to the pae matrix .json file.
+        plddt_targets (dict):
+            Mapping of each chain to the residue numbers that
             will be sampled (pdb numbering), all with plddt below a threshold.
-        cutoff:
-            only consider PAE values below this number (low error).
-        flatten_cutoff:
-            any PAE values below this value will be changed to match flatten value.
-        flatten_value:
-            any PAE values below flatten cutoff will be changed to match this value.
-        weight:
-            along with the error value, determines the strength of the applied AtomPairConstraints
-        tolerance:
-            if given, defines the tolerance of the FlatHarmonicFunction of AtomPairConstraints
+        cutoff (float):
+            Only consider PAE values below this number (low error).
+        flatten_cutoff (float):
+            Any PAE values below this value will be changed to match flatten value.
+        flatten_value (float):
+            Any PAE values below flatten cutoff will be changed to match this value.
+        weight (float):
+            Along with the error value, determines the strength of the applied AtomPairConstraints
+        tolerance (float, optional):
+            Defines the tolerance of the FlatHarmonicFunction of AtomPairConstraints
             created from the PAE matrix. Defaults to None.
-        adjacency_threshold:
-            how far away two residues need to be to consider their PAE value. Neighbours are skipped
+        adjacency_threshold (int):
+            How far away two residues need to be to consider their PAE value. Neighbours are skipped
             as PAE is best used for determining between domain or between chain confidence.
-        plddt_scaling_factor:
-            any constraints setup between residues where one of them has a low pLDDT and another a
+        plddt_scaling_factor (float):
+            Any constraints setup between residues where one of them has a low pLDDT and another a
             high pLDDT will be scaled by multiplying its weight by this factor. The higher this
             value the weaker those constraints will be.
     """
@@ -596,15 +598,15 @@ def apply_constraints(
 
     Args:
         pose (pyrosetta.rosetta.core.pose.Pose):
-            target Pose object for constraints.
-        cst_targets:
-            residues between which AtomPairConstraints will be applied.
-        contacts:
-            residue ranges where two chains are interacting.
-        stdev:
-            standard deviation value to use in constraints.
-        tolerance:
-            tolerance value to use in constraints (if applicable). Defaults to None.
+            Target Pose object for constraints.
+        cst_targets (tuple[tuple[int,int],...]):
+            Residues between which AtomPairConstraints will be applied.
+        contacts (tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...]):
+            Residue ranges where two chains are interacting.
+        stdev (float):
+            Standard deviation value to use in constraints.
+        tolerance (float, optional):
+            Tolerance value to use in constraints (if applicable). Defaults to None.
     """
     cst_pose = Pose()
     cst_pose.detached_copy(pose)
@@ -660,6 +662,7 @@ def setup_fold_tree(
     Resulting FoldTree (2 chains example):
 
         Chain 1:  1 <----------- "central" res ------------> chain.size()
+
         Chain 2:  1 <----------- "central" res ------------> chain.size()
         
         Jump between the two "central" residues.
@@ -672,10 +675,10 @@ def setup_fold_tree(
     Args:
         pose (pyrosetta.rosetta.core.pose.Pose):
             Pose object whose FoldTree will be updated.
-        constraint_targets:
-            residues between which AtomPairConstraints will be applied.
-        contacts:
-            residue ranges where two chains are interacting.
+        constraint_targets (tuple[tuple[int,int],...]):
+            Residues between which AtomPairConstraints will be applied.
+        contacts (tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...]):
+            Residue ranges where two chains are interacting.
     
     Reference:
         See https://docs.rosettacommons.org/demos/latest/tutorials/fold_tree/fold_tree
@@ -821,7 +824,7 @@ def setup_fold_tree(
     pose.fold_tree(ft)
 
 
-def prep_target(seq_len: int,target: list[int]) -> list[int]:
+def _prep_target(seq_len: int,target: list[int]) -> list[int]:
     """In target, replace seq_len with seq_len -1 if it is present.
     
     Check the given target residue range. If the last residue of the
@@ -829,14 +832,14 @@ def prep_target(seq_len: int,target: list[int]) -> list[int]:
     attempting to sample a fragment with only two residues.
 
     Args:
-        seq_len:
-            length of the chain of the protein being sampled.
-        target:
-            range of target residues for MC sampler.
+        seq_len (int):
+            Length of the chain of the protein being sampled.
+        target (list[int]):
+            Range of target residues for MC sampler.
 
     Returns:
-        target_new:
-            updated range of target residues for MC sampler.
+        list[int]:
+            Updated range of target residues for MC sampler.
     """
     target_new = deepcopy(target)
 

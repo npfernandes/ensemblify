@@ -91,21 +91,21 @@ def process_input_pdb(
     of the clashes still present in the input pdb so those are ignored later.
 
     Args:
-        faspr_path:
-            path to the FASPR executable (or its alias).
-        pulchra_path:
-            path to the PULCHRA executable (or its alias).
-        inputs_dir:
-            path to directory where files and .logs resulting from input processing will be stored.
-        input_pdb:
-            path to the .pdb input structure to process.
+        faspr_path (str):
+            Path to the FASPR executable.
+        pulchra_path (str):
+            Path to the PULCHRA executable.
+        inputs_dir (str):
+            Path to directory where files and .logs resulting from input processing will be stored.
+        input_pdb (str):
+            Path to the .pdb input structure to process.
 
     Returns:
-        A tuple (clashes_file,processed_pdb) where:
-            clashes_file:
-                .log file with the output of applying PULCHRA to our input structure
-            processed_pdb:
-                is the .pdb file resulting from applying FASPR and PULCHRA to our input structure.
+        tuple[str,str]:
+            clashes_file (str):
+                Path to the .log file with the output of applying PULCHRA to our input structure.
+            processed_pdb (str):
+                Path to the .pdb file resulting from applying FASPR and PULCHRA to our input structure.
     """
 
     # Save input pdb into input directory, if chainID is empty replace with 'A'
@@ -172,14 +172,17 @@ def register_input_clashes(input_clashes_file: str | None) -> list[tuple[str,str
     """Register clashes in input structure to be ignored later.
 
     Args:
-        input_clashes_file:
-            path to the PULCHRA output file for the input structure.
+        input_clashes_file (str, optional):
+            Path to the PULCHRA output file for the input structure. If None, no clashes are
+            registered.
 
     Returns:
-        clashes_input:
-            list of clashes in the input structure. Can be empty list if input_clashes_file
+        list[tuple[str,str]]:
+            List of clashes in the input structure. Can be empty list if input_clashes_file
             is None. For example:
-            [ ('ARG[277]', 'GLY[287]'),('ARG[706]', 'GLY[716]'), ... ].
+
+            [ ('ARG[277]', 'GLY[287]'),('ARG[706]', 'GLY[716]'), ... ]
+
     """
     # Get steric clashes present in input .pdb
     clashes_input = []
@@ -205,12 +208,12 @@ def get_protein_info(uniprot_accession: str) -> dict:
     """Get information about a protein from the AlphaFold Database using a given UniProt accession.
 
     Args:
-        uniprot_accession:
+        uniprot_accession (str):
             UniProt accession to use in request for AlphaFold's Database API.
 
     Returns:
-        protein_info:
-            information about the protein identified by the given UniProt accession, including
+        dict:
+            Information about the protein identified by the given UniProt accession, including
             links to its .pdb structure and .json PAE matrix.
     
     Adapted from:
@@ -234,16 +237,16 @@ def get_protein_info(uniprot_accession: str) -> dict:
         print(f'Error: {e}')
 
 
-def download_from_url(url: str) -> str:
-    """Download the contents of a url.
+def _download_from_url(url: str) -> str:
+    """Download the contents of a URL.
 
     Args:
-        url:
-            url path.
+        url (str):
+            URL path.
     
     Returns:
-        content:
-            content of url.
+        str:
+            Content of URL.
     
     Raises:
         RequestException with HTTPError if request timed out or encountered an issue.
@@ -267,29 +270,33 @@ def download_from_url(url: str) -> str:
 def setup_ensemble_gen_params(input_params: dict, inputs_dir: str) -> tuple[str,str | None]:
     """Update sampling input parameters, store steric clashes present in input structure.
     
-        If a UniProt accession is given in either the sequence of pae fields, replace it with the
+    If a UniProt accession is given in either the sequence or PAE fields, replace it with the
     corresponding downloaded .pdb or .json file.
 
     - 'sequence' field is updated with the path to the processed input structure. If a UniProt
-    accession is provided, replace it with the corresponding downloaded .pdb file.
+      accession is provided, replace it with the corresponding downloaded .pdb file.
     - 'pae' field is updated with the path to the downloaded .json PAE matrix file, if a UniProt
-    accession is provided.
-    - 'output_path' field is updated with the ensemble directory inside the created directory named 'job_name'.
+      accession is provided.
+    - 'output_path' field is updated with the ensemble directory inside the created directory named
+      'job_name'.
     - File with the updated parameters is saved to the inputs directory.
-    - Input structure is processed and any steric clashes present after processing are stored in a file so they can later be ignored on non-sampled regions of structures resulting from the sampling process.
+    - Input structure is processed and any steric clashes present after processing are stored in a
+      file so they can later be ignored on non-sampled regions of structures resulting from the
+      sampling process.
+
 
     Args:
-        input_params:
-            parameters following the Ensemblify template.
-        inputs_dir:
-            path to directory where files and .logs resulting from input processing will be stored.
+        input_params (dict):
+            Parameters following the Ensemblify template.
+        inputs_dir (str):
+            Path to directory where files and .logs resulting from input processing will be stored.
 
     Returns:
-        A tuple (processed_parameters_path, input_clashes) where:
-            processed_parameters_path:
-                path to file where updated parameters are stored.
-            input_clashes:
-                path to file with PULCHRA output from processing input .pdb.
+        tuple[str,str] | None:
+            processed_parameters_path (str):
+                Path to file where updated parameters are stored.
+            input_clashes (str):
+                Path to file with PULCHRA output from processing input .pdb.
     """
     input_params_processed = copy.deepcopy(input_params)
 
@@ -311,7 +318,7 @@ def setup_ensemble_gen_params(input_params: dict, inputs_dir: str) -> tuple[str,
 
         # Extract PDB content
         pdb_url = protein_info.get('pdbUrl')
-        pdb_content = download_from_url(pdb_url)
+        pdb_content = _download_from_url(pdb_url)
 
         # Write .pdb file
         input_pdb_path = os.path.join(input_params_processed['output_path'],
@@ -340,7 +347,7 @@ def setup_ensemble_gen_params(input_params: dict, inputs_dir: str) -> tuple[str,
 
         finally:
             # Extract PAE content
-            pae_content = download_from_url(pae_url)
+            pae_content = _download_from_url(pae_url)
 
             # Write PAE .json file
             pae_matrix_path = os.path.join(input_params_processed['output_path'],
@@ -397,12 +404,12 @@ def read_input_parameters(parameter_path: str) -> dict:
     """Read input parameters and assert the validity of its contents.
 
     Args:
-        parameter_path:
-            filepath to the parameter .yaml file.
+        parameter_path (str):
+            Path to the parameter .yaml file.
 
     Returns:
-        params:
-            dictionary with all the parameters validated for correct python types.
+        dict:
+            Dictionary with all the parameters validated for correct Python types.
     """
     with open(parameter_path,'r',encoding='utf-8-sig') as parameters_file:
         params = yaml.safe_load(parameters_file)

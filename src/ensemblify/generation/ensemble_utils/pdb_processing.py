@@ -27,17 +27,17 @@ def check_clashes(
     Clashes are only considered when at least one residue belongs to a sampled region.
 
     Args:
-        sampled_pdb:
-            filepath to .pdb file output from conformational sampling.
-        pulchra_output_buffer:
-            stdout from applying PULCHRA to the sampled .pdb structure.
-        sampling_targets:
-            mapping of chain identifiers to sampled residue numbers.
-        input_clashes:
-            clashes present in the sampling input structure, that will be ignored if
+        sampled_pdb (str):
+            Filepath to .pdb file output from conformational sampling.
+        pulchra_output_buffer (str):
+            Stdout from applying PULCHRA to the sampled .pdb structure.
+        sampling_targets (dict[str,tuple[tuple[str,tuple[int,...],str,str]]]):
+            Mapping of chain identifiers to sampled residue numbers.
+        input_clashes (list[tuple[str,str]] | None):
+            Clashes present in the sampling input structure, that will be ignored if
             present in the given PULCHRA output.
     Returns:
-        clashed:
+        bool:
             True if the given PULCHRA output mentions clashes not already present in sampling
             input structure, False otherwise.
     """
@@ -102,13 +102,13 @@ def setup_logger(pdb: str, log_file: str) -> logging.Logger:
     """Setup a Logger object for this pdb, with output to log_file.
 
     Args:
-        pdb:
-            .pdb file to log, will be the name of the logger.
-        log_file:
-            filepath to log file.
+        pdb (str):
+            Path to .pdb file, will be the name of the logger.
+        log_file (str):
+            Filepath to log file.
 
     Returns:
-        logger:
+        logger (logging.Logger):
             Logger object.
     """
     # Create logger object named pdb
@@ -141,17 +141,18 @@ def apply_faspr_single(faspr_path: str,pdb: str) -> str | None:
     """Apply FASPR to a .pdb file. Log outcome.
 
     Args:
-        faspr_path:
-            path to FASPR executable or its alias.
-        pdb:
-            path to .pdb file.
+        faspr_path (str):
+            Path to FASPR executable or its alias.
+        pdb (str):
+            Path to .pdb file.
     
     Returns:
-        faspr_output_filepath:
-            path to .pdb file from FASPR output, with filename equal to
+        str | None:
+            Path to .pdb file from FASPR output, with filename equal to
             input .pdb with the suffix '_faspr' added.
         
-        Raises subprocess.CalledProcessError if FASPR was not applied succesfully.
+    Raises:
+        subprocess.CalledProcessError if FASPR was not applied succesfully.
     """
     # Setup logging and output
     logger = setup_logger(pdb,'faspr.log')
@@ -181,12 +182,12 @@ def apply_rewrite_single(pdb: str) -> str:
     The output modified version has the _rewrite suffix added to its name.
     
     Args:
-        pdb:
-            path to input .pdb file for conversion.
+        pdb (str):
+            Path to input .pdb file for conversion.
     
     Returns
-        rewrite_filename:
-            path to modified .pdb. Filename is the same as the input, with
+        str:
+            Path to modified .pdb. Filename is the same as the input, with
             _rewrite suffix added.
     """
     # Get information in .pdb as DataFrame
@@ -223,20 +224,21 @@ def apply_pulchra_single(pulchra_path: str,pdb: str) -> tuple[str,str] | tuple[N
     """Apply PULCHRA to a .pdb file. Log outcome.
 
     Args:
-        pulchra_path:
-            path to PULCHRA executable or its alias.
-        pdb:
-            path to .pdb file.
+        pulchra_path (str):
+            Path to PULCHRA executable or its alias.
+        pdb (str):
+            Path to .pdb file.
 
     Returns:
-        A tuple (rebuilt_filename,pulchra_output) where:
-            rebuilt_filename:
-                path to PULCHRA output structure. Same filename as input .pdb
+        tuple[str,str] | tuple[None,None]:
+            rebuilt_filename (str | None):
+                Path to PULCHRA output structure. Same filename as input .pdb
                 with added .rebuilt suffix.
-            pulchra_output:
-                pulchra stdout used for later clash checking.
+            pulchra_output (str | None):
+                PULCHRA stdout used for later clash checking.
         
-        Raises subprocess.CalledProcessError if PULCHRA was not applied sucessfully.
+    Raises:
+        subprocess.CalledProcessError if PULCHRA was not applied sucessfully.
     """
     # Setup logging and output
     logger = setup_logger(pdb,'pulchra.log')
@@ -269,15 +271,15 @@ def apply_restore_single(pdb: str,reference_pdb: str) -> str:
     of sampling process or the sampling input .pdb).
 
     Args:
-        pdb:
-            path to the PULCHRA output .pdb structure (ending in .rebuilt suffix).
-        reference_pdb:
-            path to .pdb file to use as reference for restoring the chains and
+        pdb (str):
+            Path to the PULCHRA output .pdb structure (ending in .rebuilt suffix).
+        reference_pdb (str):
+            Path to .pdb file to use as reference for restoring the chains and
             residue numbering.
     
     Returns:
-        restored_filename:
-            path to the .pdb structure with restored chain and residue numbering.
+        str:
+            Path to the .pdb structure with restored chain and residue numbering.
             Filename matches that of input, with _restores suffix added.
     """
 
@@ -357,30 +359,30 @@ def process_pdb(
     The resulting .pdb file is then rewritten into a single chain with sequential residue numbering
     before being passed into PULCHRA, as it does not support multi-chain structures.
     Clash checking is done by passing the structure through PULCHRA and checking its output.
-    The resulting .pdb file then has its chain and residue numbering information restored to
-    its original status, and if no clashes are present, False is returned, indicating whether the
-    structure is clashed or not.
+    If no clashes are present, the resulting .pdb file has its chain and residue numbering
+    information restored to its original status.
 
     Args:
-        sampled_pdb: 
-            sampled .pdb structure, unprocessed.
-        faspr_path:
-            path to FASPR executable or its alias.
-        pulchra_path:
-            path to PULCHRA executable or its alias.
-        input_clashes:
-            list of clashes present in the input structure that, if present, will be ignored.
-        sampling_targets:
-            mapping of chain letters to target regions for sampling.
-        valid_pds_dir:
-            path to directory where valid structures will be output.
-        goal_ensemble_size:
-            if the number of structures in valid pdbs directory is ever greater than this value
+        sampled_pdb (str, optional): 
+            Sampled .pdb structure, unprocessed.
+        faspr_path (str):
+            Path to FASPR executable or its alias.
+        pulchra_path (str):
+            Path to PULCHRA executable or its alias.
+        input_clashes (list[tuple[str,str]]):
+            List of clashes present in the input structure that, if present, will be ignored.
+        sampling_targets (dict[str,tuple[tuple[str,tuple[int,...],str,str]]]):
+            Mapping of chain letters to target regions for sampling.
+        valid_pds_dir (str):
+            Path to directory where valid structures will be output.
+        goal_ensemble_size (int):
+            If the number of structures in valid pdbs directory is ever greater than this value
             do not write any more structures into the directory.
     
     Returns:
-        clashed:
+        bool | None:
             True if the sampled .pdb structure has steric clashes, False otherwise.
+            None if an error occured.
     """
 
     if isinstance(sampled_pdb,type(None)):

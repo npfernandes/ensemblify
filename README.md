@@ -82,6 +82,7 @@ To install the `ensemblify` Python package, you can follow these commands:
     ```bash
     pip install .
     ```
+
 </details>
 
 <!-- Alternatively, Ensemblify is available via the Python Package Index:
@@ -514,6 +515,7 @@ An [.html form](https://github.com/npfernandes/ensemblify/releases/download/v0.0
   <summary><b>Parameters Form Preview</b></summary>
 
   ![alt text](docs/assets/parameters_form_preview.svg)
+
 </details>
 
 If you prefer to create your own parameters file from scratch, a [template file](docs/assets/parameters_template.yaml) is also provided.

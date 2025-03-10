@@ -27,16 +27,16 @@ def move_topol_pdb(
     file for future trajectory analysis.
 
     Args:
-        job_name:
-            prefix identifier for moved .pdb file.
-        origin_path:
-            directory where topology file of interest is located.
-        destination_path:
-            directory where topology file will be moved to.
+        job_name (str):
+            Prefix identifier for moved .pdb file.
+        origin_path (str):
+            Directory where topology file of interest is located.
+        destination_path (str):
+            Directory where topology file will be moved to.
     
     Returns:
-        topology_path:
-            path to the moved topology file.
+        str:
+            Path to the moved topology file.
     """
     topology_path = os.path.join(destination_path,f'{job_name}_top.pdb')
     for pdb in glob.glob(os.path.join(origin_path,'*.pdb')):
@@ -57,18 +57,18 @@ def join_pdbs(
     .pdb file.
 
     Args:
-        job_name:
-            prefix identifier for created multimodel .pdb file.
-        ensemble_dir:
-            path to directory where ensemble pdb will be created.
-        pdbs_dir:
-            path to directory where numbered .pdb files are stored.
-        n_models:
-            number of .pdb files to randomly sample from the specified directory.
+        job_name (str):
+            Prefix identifier for created multimodel .pdb file.
+        ensemble_dir (str):
+            Path to directory where ensemble pdb will be created.
+        pdbs_dir (str):
+            Path to directory where numbered .pdb files are stored.
+        n_models (int):
+            Number of .pdb files to randomly sample from the specified directory.
     
     Returns:
-        ensemble_path:
-            path to created multimodel ensemble .pdb file.
+        str:
+            Path to created multimodel ensemble .pdb file.
     """
     ensemble_path = os.path.join(ensemble_dir,f'{job_name}_ensemble.pdb')
     with open(ensemble_path,'x',encoding='utf-8') as output:
@@ -103,21 +103,21 @@ def calc_saxs_data(
     the current frame of the Universe object.
 
     Args:
-        trajectory_id:
-            prefix identifier for created files.
-        universe:
+        trajectory_id (str):
+            Prefix identifier for created files.
+        universe (mda.Universe):
             Universe object containing the trajectory being analyzed.
-        frame_index:
-            current frame being calculated.
-        exp_saxs_file:
-            path to .dat file with experimental SAXS data for the current
+        frame_index (int):
+            Current frame being calculated.
+        exp_saxs_file (str):
+            Path to .dat file with experimental SAXS data for the current
             protein to be used by PEPSI-SAXS.
-        calc_saxs_log:
-            path to .log file for the SAXS curve calculation of each frame.
+        calc_saxs_log (str):
+            Path to .log file for the SAXS curve calculation of each frame.
 
     Returns:
-        calc_saxs:
-            ndarray with the values for the SAXS curve calculated from this
+        np.ndarray:
+            Numpy ndarray with the values for the SAXS curve calculated from this
             frame of the trajectory in the Universe object.
     """
     # Setup tmp files

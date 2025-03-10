@@ -22,7 +22,7 @@ class MonteCarloSampler():
             PyRosetta score function to be used for evaluating Pose objects
             during sampling.
         databases (dict):
-            all the available databases to sample from. Mapping of database_ids to
+            All the available databases to sample from. Mapping of database_ids to
             databases nested dicts, that map residue 1lettercodes to dihedral
             angle values dataframes.
         mover (pyrosetta.rosetta.protocols.moves.Mover):
@@ -36,7 +36,7 @@ class MonteCarloSampler():
                     The maximum amount of attempts without accepting a Move before moving on to
                     the next residue to sample.
         log_file (str):
-            path to .log file for warnings or error messages related to sampling.
+            Path to .log file for warnings or error messages related to sampling.
     """
 
     def __init__(self,
@@ -51,19 +51,19 @@ class MonteCarloSampler():
         Args:
             scorefxn (pyrosetta.rosetta.core.scoring.ScoreFunction):
                 PyRosetta score function, with desired constraints already added.
-            databases:
-                mapping of database_ids to databases nested dicts, that map residue 1lettercodes
+            databases (dict):
+                Mapping of database_ids to databases nested dicts, that map residue 1lettercodes
                 to dihedral angle values dataframes.
-            mover_id:
-                identifier for which mover to use in this sampler object.
-            smp_params:
-                parameters for the instantiated sampler.
-            variance:
-                new dihedral angle values inserted into sampling regions are sampled from a
+            mover_id (str):
+                Identifier for which mover to use in this sampler object.
+            smp_params (dict[str,int]):
+                Parameters for the instantiated sampler.
+            variance (float):
+                New dihedral angle values inserted into sampling regions are sampled from a
                 Gaussian distribution centred on the value found in database and percentage
                 variance equal to this value.
-            log_file:
-                path to .log file for warnings or error messages related to sampling.
+            log_file (str):
+                Path to .log file for warnings or error messages related to sampling.
         """
         self.scorefxn = scorefxn
         self.databases = databases
@@ -83,17 +83,17 @@ class MonteCarloSampler():
         Args:
             pose (pyrosetta.rosetta.core.pose.Pose):
                 Pose to be modified during sampling.
-            target:
-                residue range on which sampling will be applied.
-            chain:
-                letter identifier for the current chain being sampled.
-            database_id:
-                identifier for which database to sample from.
-            ss_bias:
-                information about types of secondary structure biases, including which chain and
+            target (list[int]):
+                Residue range on which sampling will be applied.
+            chain (str):
+                Letter identifier for the current chain being sampled.
+            database_id (str):
+                Identifier for which database to sample from.
+            ss_bias (tuple[tuple[str,tuple[int,int],str],...] | None):
+                Information about types of secondary structure biases, including which chain and
                 residue numbers they should be applied on.
-            sampling_mode:
-                whether to sample the database considering neighbouring residues ('TRIPEPTIDE')
+            sampling_mode (str):
+                Whether to sample the database considering neighbouring residues ('TRIPEPTIDE')
                 or not ('SINGLERESIDUE').
 
         """
@@ -173,17 +173,17 @@ def setup_samplers(
     given a list of sampler_ids and certain parameters.
 
     Args:
-        sampler_params:
-            parameters for each sampler to setup.
+        sampler_params (dict[str,dict[str,int]):
+            Parameters for each sampler to setup.
         scorefxn (pyrosetta.rosetta.core.scoring.ScoreFunction):
             PyRosetta score function, with desired constraints already added.
-        databases:
-            mapping of database_ids to databases nested dicts, that map residue 1lettercodes
+        databases (dict[str,dict[str,pd.DataFrame]]):
+            Mapping of database_ids to databases nested dicts, that map residue 1lettercodes
             to dihedral angle values dataframes.
 
     Returns:
-        samplers:
-            mapping of sampler_ids to sampler objects to use during sampling.
+        dict[str,MonteCarloSampler]:
+            Mapping of sampler_ids to sampler objects to use during sampling.
     """
     sampler_ids = list(sampler_params.keys())
     samplers = {}

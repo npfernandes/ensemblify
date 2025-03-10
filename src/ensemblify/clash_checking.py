@@ -33,18 +33,18 @@ def process_pulchra_output(
     regions are provided).
 
     Args:
-        sampled_pdb:
-            filepath to .pdb file output from conformational sampling.
-        pulchra_output_buffer:
-            stdout from applying PULCHRA to the sampled .pdb structure.
-        sampling_targets:
-            mapping of chain identifiers to sampled residue numbers.
-        input_clashes:
-            clashes present in the sampling input structure, that will be ignored if
+        sampled_pdb (str):
+            Path to .pdb file output from conformational sampling.
+        pulchra_output_buffer (str):
+            Stdout from applying PULCHRA to the sampled .pdb structure.
+        sampling_targets (dict[str,tuple[tuple[str,tuple[int,...],str,str]]] | None):
+            Mapping of chain identifiers to sampled residue numbers.
+        input_clashes (list[tuple[str,str]] | None):
+            Clashes present in the sampling input structure, that will be ignored if
             present in the given PULCHRA output.
     Returns:
-        clashes_sampled_pdb:
-            list of clashes present in sampled .pdb file.
+        list[str]:
+            List of clashes present in sampled .pdb file.
     """
 
     # Setup regular expressions
@@ -121,21 +121,21 @@ def check_report_pdb_clashes(
     angstrom.
 
     Args:
-        pdb2check:
-            path to .pdb file to check for steric clashes.
-        sampling_targets:
-            mapping of chains to sampled regions following Ensemblify parameters style. If
+        pdb2check (str):
+            Path to .pdb file to check for steric clashes.
+        sampling_targets (dict[str,tuple[tuple[str,tuple[int,...],str,str]]] | None):
+            Mapping of chains to sampled regions following Ensemblify parameters style. If
             provided, clashes are only checked for in these regions. Defaults to None.
-        input_clashes: 
-            list of clashes detected in the ensemble generation input structure. If provided,
+        input_clashes (list[tuple[str,str]] | None): 
+            List of clashes detected in the ensemble generation input structure. If provided,
             clashes detailed here will be ignored if found in the .pdb to check (only in sampled
             regions, if sampling targets is provided). Defaults to None.
     Returns:
-        A tuple[pdb2check,steric_clashes] where:
-            pdb2check:
-                the path to the sampled .pdb to check for clashes.
-            steric_clashes:
-                list of clashes present in sampled .pdb file or None, if PULCHRA erred.
+        tuple[str,list[str] | None]:
+            pdb2check (str):
+                Path to the sampled .pdb to check for clashes.
+            steric_clashes (list[str] | None):
+                List of clashes present in sampled .pdb file or None, if PULCHRA erred.
     """
     # Rewrite .pdb into single chain and sequential numbering (for PULCHRA compatibility)
     rewrite_filename = apply_rewrite_single(pdb=pdb2check)
@@ -173,25 +173,25 @@ def check_steric_clashes(
     will be stored, as well as any files output by processing the input structure (if provided).
 
     Args:
-        ensemble_dir:
-            path to directory where ensemble .pdb structures are stored.
-        sampling_targets:
-            mapping of chains to sampled regions following Ensemblify parameters style or path to
+        ensemble_dir (str):
+            Path to directory where ensemble .pdb structures are stored.
+        sampling_targets (str | dict[str,tuple[tuple[str,tuple[int,...],str,str]]] | None):
+            Mapping of chains to sampled regions following Ensemblify parameters style or path to
             this mapping in .yaml format. If a path is provided, it can either be solely the
             mapping or a full Ensemblify parameters file. If provided, clashes are only checked
             for in these regions. Defaults to None.
-        input_structure:
-            path to input structure used to generate the ensemble. If provided, steric clashes
+        input_structure (str | None):
+            Path to input structure used to generate the ensemble. If provided, steric clashes
             present in this structure (only in sampled regions, if sampling targets is provided)
             are ignored if they are detected in any of the sampled structures. Defaults to None.
 
     Returns:
-        A tuple[clash_report,clash_report_detailed] where:
-            clash_report:
-                path to file with simplified ensemble clash report, i.e. total number of clashed
+        tuple[str,str]:
+            clash_report (str):
+                Path to file with simplified ensemble clash report, i.e. total number of clashed
                 structures and how many clashes were detected in each structure.
-            clash_report_detailed:
-                path to file with detailed ensemble clash report, i.e. how many clashes were
+            clash_report_detailed (str):
+                Path to file with detailed ensemble clash report, i.e. how many clashes were
                 detected in each structure and the atoms involved in the detected clash.
     """
     # Setup sampling targets

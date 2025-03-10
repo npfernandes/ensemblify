@@ -67,51 +67,53 @@ def reweight_ensemble(
     to column names of the given DataFrame, if present.
  
     Args:
-        trajectory:
-            path to .xtc trajectory file where conformational ensemble is stored.
-        topology:
-            path to .pdb topology file corresponding to any one frame of the ensemble.
-        trajectory_id:
-            prefix trajectory identifier to be added to plotted traces and output files.
-        exp_saxs_data:
-            path to .dat file with experimental SAXS data.
-        output_dir:
-            path to output directory. Is created if it does not exist. Defaults to current working
+        trajectory (str):
+            Path to .xtc trajectory file where conformational ensemble is stored.
+        topology (str):
+            Path to .pdb topology file corresponding to any one frame of the ensemble.
+        trajectory_id (str):
+            Prefix trajectory identifier to be added to plotted traces and output files.
+        exp_saxs_data (str):
+            Path to .dat file with experimental SAXS data.
+        output_dir (str):
+            Path to output directory. Is created if it does not exist. Defaults to current working
             directory. After output_dir is setup, a directory named trajectory_id is created inside
             it, where the interactive .html plots and reweighting output files will be stored.
-        thetas:
-            list of values to try as the theta parameter in BME. The ensemble will be reweighted
+        thetas (list[int]):
+            List of values to try as the theta parameter in BME. The ensemble will be reweighted
             each time using a different theta value. The effect of different theta values can be
             analyzed in the created effective frames figure.
-        calculated_cmatrix:
+        calculated_cmatrix (pd.DataFrame | str, optional):
             DataFrame with the calculated average contact matrix for the current trajectory or
             path to this file in .csv format. Defaults to None, and this data is calculated anew.
-        calculated_dmatrix:
+        calculated_dmatrix (pd.DataFrame | str, optional):
             DataFrame with the calculated average distance matrix for the current trajectory or
             path to this file in .csv format. Defaults to None, and this data is calculated anew.
-        calculated_ss_frequency:
+        calculated_ss_frequency (pd.DataFrame | str, optional):
             DataFrame with the calculated secondary structure assignment frequency matrix for the
             current trajectory or path to this file in .csv format. Defaults to None, and this data
             is calculated anew.
-        calculated_metrics_data:
+        calculated_metrics_data (pd.DataFrame | str, optional):
             DataFrame with calculated structural metrics (columns) for each frame of the trajectory
             (rows) or path to this DataFrame in .csv format. Defaults to None, and this data is
             calculated anew.
-        compare_rg:
-            whether to calculate/consider the radius of gyration when comparing structural metrics
+        compare_rg (bool, optional):
+            Whether to calculate/consider the radius of gyration when comparing structural metrics
             between uniform and reweighted conformational ensembles. Defaults to True.
-        compare_dmax:
-            whether to calculate/consider the maximum distance between any two alpha carbons when
+        compare_dmax (bool, optional):
+            Whether to calculate/consider the maximum distance between any two alpha carbons when
             comparing structural metrics between uniform and reweighted conformational ensembles.
             Defaults to True.
-        compare_eed:
-            whether to calculate/consider the distance from the N to C terminal when comparing
+        compare_eed (bool, optional):
+            Whether to calculate/consider the distance from the N to C terminal when comparing
             structural metrics between uniform and reweighted conformational ensembles. Defaults
             to True.
-        compare_cmdist:
-            mapping of identifiers to tuples with two selection strings for creating MDAnalysis
+        compare_cmdist (bool, optional):
+            Mapping of identifiers to tuples with two selection strings for creating MDAnalysis
             AtomGroups, whose center mass distance will be calculated. For example:
+
                 {'inter_domain' : ('resid 1:30', 'resid 110:140')}
+
             If None, no center mass distances are calculated or compared.
             See https://userguide.mdanalysis.org/stable/selections.html for more information about
             MDAnalysis selections.
@@ -713,15 +715,3 @@ def reweight_ensemble(
 
     print('Ensemble reweighting has finished. Please refer to the interactive '
           'reweighting_dashboard.html figure for analysis.')
-
-if __name__ == '__main__':
-    reweight_ensemble(trajectory='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_trajectory.xtc',
-                      topology='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORIES/Hst5/Hst5_top.pdb',
-                      trajectory_id='Hst5',
-                      exp_saxs_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/proteins_plus_saxs/SAXS/bift_Hst5.dat',
-                      output_dir='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/REWEIGHTING',
-                      calculated_cmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_contact_matrix.csv',
-                      calculated_dmatrix='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_distance_matrix.csv',
-                      calculated_ss_frequency='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_ss_frequency.csv',
-                      calculated_metrics_data='/home/tiagogomes/Desktop/projects/nuno_fernandes/Ensembles_Without_AlphaFold/TRAJECTORY_ANALYSIS/Hst5/Hst5_structural_metrics.csv'
-                    )

@@ -32,11 +32,12 @@ def read_database(database_path: str) -> pd.DataFrame:
     (depends on database file format).
 
     Args:
-        database_path:
-            filepath to database file.
+        database_path (str):
+            Filepath to database file.
 
     Returns:
-        database: database as a pandas.DataFrame.
+        pd.DataFrame:
+            Database as a pandas.DataFrame.
     """
     assert os.path.splitext(database_path)[1] \
           in ALLOWED_DATABASE_FORMATS, f'Database format must be in {ALLOWED_DATABASE_FORMATS}'
@@ -59,14 +60,16 @@ def read_database(database_path: str) -> pd.DataFrame:
     return database
 
 
-def trim_database(database: pd.DataFrame,columns_to_keep: list[str]):
+def trim_database(database: pd.DataFrame, columns_to_keep: list[str]):
     """Removes columns in a database whose names are not in a given list.
 
+    Modifies the database in place.
+
     Args:
-        database:
-            target database in DataFrame format.
-        columns_to_keep:
-            columns names to keep in the database.
+        database (pd.DataFrame):
+            Target database in DataFrame format.
+        columns_to_keep (list[str]):
+            Column names to keep in the database.
     """
     # Identify columns to drop
     columns_to_drop = list(set(database.columns) - set(columns_to_keep))
@@ -83,12 +86,12 @@ def optimize_database(database: pd.DataFrame) -> dict[str,pd.DataFrame]:
     into 20 pieces, one for each aminoacid residue.
 
     Args:
-        database:
-            unoptimized dihedral angle database.
+        database (pd.DataFrame):
+            Unoptimized dihedral angle database.
 
     Returns:
-        res_angles:
-            mapping of aminoacid 1lettercode to their corresponding
+        dict[str,pd.DataFrame]:
+            Mapping of aminoacid 1lettercode to their corresponding
             dihedral angle values in the optimized database.
     """
 
@@ -133,12 +136,12 @@ def setup_databases(databases_paths: dict[str,str]) -> dict[str,dict[str,pd.Data
     to use the least amount of memory possible.
 
     Args:
-        databases_paths:
-            mapping of database_ids to filepaths where the specified databases are stored.
+        databases_paths (dict[str,str]):
+            Mapping of database_ids to filepaths where the specified databases are stored.
 
     Returns:
-        databases:
-            mapping of database_ids to mappings of aminoacid 1lettercode to their
+        dict[str,dict[str,pd.DataFrame]]:
+            Mapping of database_ids to mappings of aminoacid 1lettercode to their
             corresponding dihedral angle values in the optimized database.
     """
     databases = {}
@@ -167,15 +170,17 @@ def get_ss_bounds(secondary_structure: str) -> tuple[tuple[int,int],tuple[int,in
     """Return the allowed range for the phi and psi angle values of a given secondary structure.
 
     Args:
-        secondary_structure:
-            identifier for a protein secondary structure.
+        secondary_structure (str):
+            Identifier for a protein secondary structure.
 
     Returns:
-        A tuple (phi_bounds,psi_bounds) where:
-            phi_bounds: tuple with the lower and upper bounds for phi dihedral angle values
-            for the secondary structure in question.
-            psi_bounds: tuple with the lower and upper bounds for psi dihedral angle values
-            for the secondary structure in question.
+        tuple[tuple[int,int],tuple[int,int]]:
+            phi_bounds (tuple[int,int]):
+                Tuple with the lower and upper bounds for phi dihedral angle values
+                for the secondary structure in question.
+            psi_bounds (tuple[int,int]):
+                Tuple with the lower and upper bounds for psi dihedral angle values
+                for the secondary structure in question.
     """
     assert secondary_structure in ALLOWED_SECONDARY_STRUCTURE, ('Desired secondary structure '
                                                                 'must be in '

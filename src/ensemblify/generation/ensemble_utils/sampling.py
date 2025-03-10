@@ -16,17 +16,17 @@ from ensemblify.generation.ensemble_utils.inputs_processing import register_inpu
 from ensemblify.generation.ensemble_utils.movers_utils import setup_databases
 from ensemblify.generation.ensemble_utils.pdb_processing import process_pdb
 from ensemblify.generation.ensemble_utils.sampling_utils import (
-    get_dbs_mem_size,
-    remove_ansi,
+    _get_dbs_mem_size,
+    _remove_ansi,
     sample_pdb,
-    setup_ray_worker_logging,
+    _setup_ray_worker_logging,
     setup_sampling_initial_pose,
     setup_sampling_logging,
     setup_sampling_parameters,
 )
 
 # CLASSES
-class HashableDict(dict):
+class _HashableDict(dict):
     """Take a Python dictionary and make it hashable.
     
     Appropriate for when we will NOT ever modify the dictionary after hashing.
@@ -54,14 +54,14 @@ def run_sampling(
     Additional log files will be created in the same directory as the provided log file.
 
     Args:
-        input_parameters:
-            path to parameters file following the Ensemblify template.
-        input_clashes_file:
-            path to Pulchra log file for the input structure.
-        valid_pdbs_dir:
-            path to the directory where sampled structures will be stored.
-        sampling_log:
-            path to the .log file for the sampling process.
+        input_parameters (str):
+            Path to parameters file following the Ensemblify template.
+        input_clashes_file (str):
+            Path to Pulchra log file for the input structure.
+        valid_pdbs_dir (str):
+            Path to the directory where sampled structures will be stored.
+        sampling_log (str):
+            Path to the .log file for the sampling process.
     """
     # Setup logging
     logger, RAY_LOG, PYROSETTA_LOG = setup_sampling_logging(sampling_log=sampling_log)
@@ -89,15 +89,15 @@ def run_sampling(
     clashes_input = register_input_clashes(input_clashes_file=input_clashes_file)
     initial_pose =  setup_sampling_initial_pose(params=PARAMETERS,
                                                 sampling_log=sampling_log)
-    databases = HashableDict(setup_databases(PARAMETERS['databases']))
-    databases_mem_size = get_dbs_mem_size(databases=databases)
+    databases = _HashableDict(setup_databases(PARAMETERS['databases']))
+    databases_mem_size = _get_dbs_mem_size(databases=databases)
 
     # Setup sampling constants and variables
     logger.info('Setting up sampling...')
 
     ## Assign constants
     VALID_PDBS_DIR = valid_pdbs_dir
-    SAMPLING_TARGETS = HashableDict(PARAMETERS['targets'])
+    SAMPLING_TARGETS = _HashableDict(PARAMETERS['targets'])
     OUTPUT_PATH = PARAMETERS['output_path']
 
     if PARAMETERS['faspr_path'] is None or PARAMETERS['faspr_path'] == 'None':
@@ -113,7 +113,7 @@ def run_sampling(
     JOB_NAME = PARAMETERS['job_name']
     SS_BIAS = PARAMETERS['restraints']['ss_bias']
     VARIANCE = PARAMETERS['variability']['variance']
-    SAMPLER_PARAMS = HashableDict(PARAMETERS['sampler_params'])
+    SAMPLER_PARAMS = _HashableDict(PARAMETERS['sampler_params'])
     SCOREFXN_ID = PARAMETERS['scorefxn']['id']
     SCOREFXN_WEIGHT = PARAMETERS['scorefxn']['weight']
     MINIMIZER_ID = PARAMETERS['minimizer']['id']
@@ -144,10 +144,10 @@ def run_sampling(
     ray.init(num_cpus=PARAMETERS['core_amount'],
              object_store_memory=databases_mem_size+100000000, # +100MiB to store computed results
              log_to_driver=False,
-             runtime_env={'worker_process_setup_hook': setup_ray_worker_logging})
+             runtime_env={'worker_process_setup_hook': _setup_ray_worker_logging})
 
     # Remove ANSI characters from Ray Dashboard Address
-    remove_ansi(file=RAY_LOG)
+    _remove_ansi(file=RAY_LOG)
 
     # Put input clashes information in Ray object store memory
     if clashes_input != []:
@@ -357,4 +357,4 @@ def run_sampling(
     print(final_log_msg)
 
     # Remove ANSI characters from Ray Log (just in case)
-    remove_ansi(file=RAY_LOG)
+    _remove_ansi(file=RAY_LOG)

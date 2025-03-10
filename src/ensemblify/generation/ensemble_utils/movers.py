@@ -17,33 +17,37 @@ from ensemblify.generation.ensemble_utils.movers_utils import get_ss_bounds
 # CLASSES
 class SetRandomDihedralsMover(Mover):
     """
-    Custom PyRosetta Mover object that sets random dihedral angles in
-    target residues, taken from a given database.
+    Custom PyRosetta Mover object that sets random dihedral angles in target residues, taken from
+    a given database.
 
     Inherits from pyrosetta.rosetta.protocols.moves.Mover.
 
     Attributes:
         databases (dict):
-            all the available databases to sample from. Mapping of database_ids to
+            All the available databases to sample from. Mapping of database_ids to
             databases nested dicts, that map residue 1lettercodes to dihedral
             angle values dataframes.
         variance (float):
-            new dihedral angle values inserted into sampling regions are sampled from a Gaussian
+            New dihedral angle values inserted into sampling regions are sampled from a Gaussian
             distribution centred on the value found in database and percentage variance equal to
             this value.
         log_file (str):
-            path to .log file for warnings or error messages related to sampling.
+            Path to .log file for warnings or error messages related to sampling.
     """
 
     def __init__(self, databases: dict[str,dict[str,pd.DataFrame]], variance: float, log_file: str):
         """Initializes the instance from a dictionary of database(s) to sample from.
 
         Args:
-            databases:
-                mapping of database_ids to databases nested dicts, that map residue 1lettercodes
+            databases (dict[str,dict[str,pd.DataFrame]]):
+                Mapping of database_ids to databases nested dicts, that map residue 1lettercodes
                 to dihedral angle values dataframes.
-            log_file:
-                path to .log file for warnings or error messages related to sampling.
+            variance (float):
+                New dihedral angle values inserted into sampling regions are sampled from a Gaussian
+                distribution centred on the value found in database and percentage variance equal to
+                this value.
+            log_file (str):
+                Path to .log file for warnings or error messages related to sampling.
         """
         Mover.__init__(self)
         self.databases = databases
@@ -65,15 +69,15 @@ class SetRandomDihedralsMover(Mover):
         Args:
             pose (pyrosetta.rosetta.core.pose.Pose):
                 Pose on which the mover will be applied.
-            target_resnum:
-                residue number where to apply the mover (PyRosetta Pose numbering).
-            database_id:
-                identifier for which database to sample from.
-            secondary_structure:
-                which secondary structure element to force in this target region.
+            target_resnum (int):
+                Residue number where to apply the mover (PyRosetta Pose numbering).
+            database_id (str):
+                Identifier for which database to sample from.
+            secondary_structure (str, optional):
+                Which secondary structure element to force in this target region.
                 If None, sample database without restraint.
-            sampling_mode:
-                whether to sample the database considering neighbouring residues ('TRIPEPTIDE')
+            sampling_mode (str):
+                Whether to sample the database considering neighbouring residues ('TRIPEPTIDE')
                 or not ('SINGLERESIDUE').
         """
         # Slice sequence given target res number
@@ -170,20 +174,20 @@ def setup_mover(
     Setup Mover object given a database to sample from and a mover id.
 
     Args:
-        mover_id:
-            identifier for which CustomMover to create.
-        databases:
-            mapping of database_ids to databases nested dicts, that map residue 1lettercodes
+        mover_id (str):
+            Identifier for which CustomMover to create.
+        databases (dict[str,dict[str,pd.DataFrame]]):
+            Mapping of database_ids to databases nested dicts, that map residue 1lettercodes
             to dihedral angle values dataframes.
-        variance:
-            new dihedral angle values inserted into sampling regions are sampled from a Gaussian
+        variance (float):
+            New dihedral angle values inserted into sampling regions are sampled from a Gaussian
             distribution centred on the value found in database and percentage variance equal to
             this value.
-        log_file:
-            path to .log file for warnings or error messages related to sampling.
+        log_file (str):
+            Path to .log file for warnings or error messages related to sampling.
 
     Returns:
-        my_mover (pyrosetta.rosetta.protocols.moves.Mover):
+        pyrosetta.rosetta.protocols.moves.Mover:
             Custom PyRosetta Mover object.
     """
     if mover_id == 'set_random_dihedrals':

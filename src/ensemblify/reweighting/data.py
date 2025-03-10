@@ -34,16 +34,16 @@ FOUND_EXP_CALC_SAXS_MSG = 'Found processed experimental SAXS data and calculated
 FOUND_RW_DATA_MSG = 'Found calculated BME reweighting data with theta values: {}'
 
 # FUNCTIONS
-def derive_traj_id_from_file(filename: str) -> str:
+def _derive_traj_id_from_file(filename: str) -> str:
     """Attempt to extract a trajectory identifier from a experimental data filename.
 
     Args:
-        filename:
-            name of file to extract trajectory identifier from.
+        filename (str):
+            Name of file to extract trajectory identifier from.
 
     Returns:
-        trajectory_id:
-            the text before the first underscore of filename, or the whole filename if
+        trajectory_id (str):
+            The text before the first underscore of filename, or the whole filename if
             no underscores are present.
     """
     trajectory_id = filename
@@ -67,11 +67,11 @@ def process_exp_data(experimental_data_path: str) -> str:
     range.
 
     Args:
-        experimental_data_path:
-            path to experimental SAXS data file.
+        experimental_data_path (str):
+            Path to experimental SAXS data file.
     Returns:
-        processed_exp_saxs:
-            path to experimental SAXS data file with any applied changes.
+        str:
+            Path to experimental SAXS data file with any applied changes.
     
     Adapted from:
         https://github.com/FrPsc/EnsembleLab/blob/main/EnsembleLab.ipynb
@@ -95,7 +95,7 @@ def process_exp_data(experimental_data_path: str) -> str:
         exp_saxs_input = exp_saxs_input[(exp_saxs_input[...,0] < 5)]
 
     # Save processed data
-    trajectory_id = derive_traj_id_from_file(filename=os.path.split(experimental_data_path)[1])
+    trajectory_id = _derive_traj_id_from_file(filename=os.path.split(experimental_data_path)[1])
     processed_exp_saxs = os.path.join(os.path.split(experimental_data_path)[0],
                                       f'{trajectory_id}_exp_saxs_input_processed.dat')
     np.savetxt(processed_exp_saxs,exp_saxs_input)
@@ -116,11 +116,11 @@ def correct_exp_error(experimental_data_path: str) -> str:
         54: 1281-1289. https://doi.org/10.1107/S1600576721006877
 
     Args:
-        experimental_data_path:
-            path to experimental SAXS data file.
+        experimental_data_path (str):
+            Path to experimental SAXS data file.
     Returns:
-        corrected_exp_saxs:
-            path to experimental SAXS data file with corrected errors.
+        str:
+            Path to experimental SAXS data file with corrected errors.
 
     Adapted from:
         https://github.com/FrPsc/EnsembleLab/blob/main/EnsembleLab.ipynb
@@ -145,7 +145,7 @@ def correct_exp_error(experimental_data_path: str) -> str:
         raise e
 
     # Save rescaled experimental data
-    trajectory_id = derive_traj_id_from_file(filename=experimental_data_file)
+    trajectory_id = _derive_traj_id_from_file(filename=experimental_data_file)
     corrected_exp_saxs = os.path.join(working_dir,
                                       f'{trajectory_id}_exp_saxs.dat')
     np.savetxt(corrected_exp_saxs,
@@ -190,32 +190,31 @@ def ibme(
         doi: 10.1007/978-1-0716-0270-6_15. PMID: 32006288.
 
     Args:
-        theta:
-            value for the theta parameter to be used in BME algorithm.
-        exp_file:
-            path to .dat file with experimental SAXS curve.
-        calc_file:
-            path to .dat file with SAXS curve calculated from an ensemble.
-        output_dir:
-            path to directory where all the files resulting from the reweighting procedure will be
+        theta (int):
+            Value for the theta parameter to be used in BME algorithm.
+        exp_file (str):
+            Path to .dat file with experimental SAXS curve.
+        calc_file (str):
+            Path to .dat file with SAXS curve calculated from an ensemble.
+        output_dir (str):
+            Path to directory where all the files resulting from the reweighting procedure will be
             stored.
 
     Returns:
-        A tuple (theta, stats, weights) where:
-            theta:
-                value for the theta parameter used in BME algorithm (same as input).
-            stats:
-                a tuple (chi2_before,chi2_after,phi) where:
-                    chi2_before:
-                        the value for the chisquare of fitting the ensemble with uniform
-                        weights to the experimental data.
-                    chi2_after:
-                        the value for the chisquare of fitting the reweighted ensemble to
-                        the experimental data.
-                    phi:
-                        the fraction of effective frames being used in the reweighted ensemble.
-            weights:
-                an array containing the new weights of the ensemble, one for each frame.
+        tuple[int,tuple[float,float,float],np.ndarray]:
+            theta (int):
+                Value for the theta parameter used in BME algorithm (same as input).
+            stats (tuple[float,float,float]):
+                chi2_before (float):
+                    The value for the chisquare of fitting the ensemble with uniform
+                    weights to the experimental data.
+                chi2_after (float):
+                    The value for the chisquare of fitting the reweighted ensemble to
+                    the experimental data.
+                phi (float):
+                    The fraction of effective frames being used in the reweighted ensemble.
+            weights (np.ndarray):
+                An array containing the new weights of the ensemble, one for each frame.
 
     Adapted from:
         https://github.com/FrPsc/EnsembleLab/blob/main/EnsembleLab.ipynb
@@ -257,6 +256,7 @@ def bme_ensemble_reweighting(
 
     Applies the iterative BME algorithm, explained in:
         https://github.com/KULL-Centre/BME/blob/main/notebook/example_04.ipynb
+
     The algorithm is applied using different theta values and the results for each value are stored.
 
     Reference:
@@ -265,32 +265,31 @@ def bme_ensemble_reweighting(
         doi: 10.1007/978-1-0716-0270-6_15. PMID: 32006288.
 
     Args:
-        exp_saxs_file:
-            path to .dat file with experimental SAXS data.
-        calc_saxs_file:
-            path to .dat file with SAXS data calculated from a conformational ensemble.
-        thetas:
-            values of theta to try when applying iBME.
-        output_dir:
-            path to directory where output files from reweighting protocol will be stored.
+        exp_saxs_file (str):
+            Path to .dat file with experimental SAXS data.
+        calc_saxs_file (str):
+            Path to .dat file with SAXS data calculated from a conformational ensemble.
+        thetas (list[int]):
+            Values of theta to try when applying iBME.
+        output_dir (str):
+            Path to directory where output files from reweighting protocol will be stored.
 
     Returns:
-        A tuple (stats,weights) where:
-            stats:
-                an array where each row corresponds to a different theta value with columns
+        tuple[np.ndarray,np.ndarray]:
+            stats (np.ndarray):
+                An array where each row corresponds to a different theta value with columns
                 (chi2_before,chi2_after,phi) where:
                     chi2_before:
-                        the value for the chisquare of fitting the ensemble with uniform
+                        The value for the chisquare of fitting the ensemble with uniform
                         weights to the experimental data.
                     chi2_after:
-                        the value for the chisquare of fitting the reweighted ensemble to
+                        The value for the chisquare of fitting the reweighted ensemble to
                         the experimental data.
                     phi:
-                        the fraction of effective frames being used in the reweighted ensemble.
-            weights:
-                an array where each row corresponds to a different theta value with column
-                contains the set of weights of
-                the ensemble, one for each frame.
+                        The fraction of effective frames being used in the reweighted ensemble.
+            weights (np.ndarray):
+                An array where each row corresponds to a different theta value with columns
+                containing the set of weights of the ensemble, one for each frame.
     """
     # Setup variables for parallel computing
     exp_file = os.path.abspath(exp_saxs_file)
@@ -323,22 +322,22 @@ def average_saxs_profiles(
     The uniform data is then scaled and offset by linear regression fitting to experimental data.
 
     Args:
-        exp_saxs_file:
-            path to .dat file with experimental SAXS data.
-        calc_saxs_file:
-            path to .dat file with SAXS data calculated from a conformational ensemble.
-        rw_calc_saxs_file:
-            path to .dat file with SAXS data calculated from a conformational ensemble considering
+        exp_saxs_file (str):
+            Path to .dat file with experimental SAXS data.
+        calc_saxs_file (str):
+            Path to .dat file with SAXS data calculated from a conformational ensemble.
+        rw_calc_saxs_file (str):
+            Path to .dat file with SAXS data calculated from a conformational ensemble considering
             the weights (from iBME) for each frame.
-        weights:
-            array resulting from iBME with weights for each data point. Defaults to uniform weights.
+        weights (np.ndarray):
+            Array resulting from iBME with weights for each data point. Defaults to uniform weights.
 
     Returns:
-        A tuple i_prior,i_post where:
-            i_prior:
+        tuple[float,float]:
+            i_prior (float):
                 an array of SAXS intensities averaged over all the frames of a SAXS data file
                 calculated from a conformational ensemble with uniform weights.
-            i_post:
+            i_post (float):
                 an array of SAXS intensities averaged over all the frames of a SAXS data file
                 calculated from a conformational ensemble with the provided set of weights.
     """
@@ -381,18 +380,18 @@ def attempt_read_calculated_data(
     is either read from file or calculated using the provided function and arguments.
 
     Args:
-        data:
-            a DataFrame with the desired data, the path to the data in .csv format or None.
-        data_msg_tag:
-            string identifier for which data we are working with so prints to console are
+        data (pd.DataFrame | str | None):
+            A DataFrame with the desired data, the path to the data in .csv format or None.
+        data_msg_tag (str):
+            String identifier for which data we are working with so prints to console are
             correct.
-        calc_fn:
-            an object with a __call__ method, e.g. a function to be used in calculating the
+        calc_fn (Callable):
+            An object with a __call__ method, e.g. a function to be used in calculating the
             data if it is not provided.
 
     Returns:
         pd.DataFrame:
-            desired data in DataFrame format.
+            Desired data in DataFrame format.
     """
     assert data_msg_tag in ALLOWED_DATA_MSG_TAGS, ('Data message tag must be in '
                                                    f'{ALLOWED_DATA_MSG_TAGS} !')
@@ -425,13 +424,22 @@ def attempt_read_reweighting_data(
     """Attempt to read reweighting data from output directory, returning None if not found.
 
     Args:
-        reweighting_output_directory:
-            directory where data should be searched.
-        trajectory_id:
-            prefix for filenames to look for in directory.
+        reweighting_output_directory (str):
+            Directory where data should be searched.
+        trajectory_id (str):
+            Prefix for filenames to look for in directory.
     Returns:
-        A tuple exp_saxs_file, calc_saxs_file, thetas_array, stats, weights where each variable
-        is either the corresponding data (if found) or None (if not found).
+        tuple[str|None, str|None, np.ndarray|None, np.ndarray|None, np.ndarray|None]:
+            exp_saxs_file (str | None):
+                The corresponding data (if found) or None (if not found).
+            calc_saxs_file (str | None):
+                The corresponding data (if found) or None (if not found).
+            thetas_array (np.ndarray | None):
+                The corresponding data (if found) or None (if not found).
+            stats (np.ndarray | None):
+                The corresponding data (if found) or None (if not found).
+            weights (np.ndarray | None):
+                The corresponding data (if found) or None (if not found).
     """
     # Check for experimental SAXS data file
     exp_saxs_file = os.path.join(reweighting_output_directory,f'{trajectory_id}_exp_saxs.dat')

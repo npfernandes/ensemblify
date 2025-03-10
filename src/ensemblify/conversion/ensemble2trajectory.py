@@ -31,23 +31,23 @@ def ensemble2traj(
     a .pdb topology file.
 
     Args:
-        ensemble_dir:
-            path to directory where all the .pdb files are stored. Defaults to current working
+        ensemble_dir (str):
+            Path to directory where all the .pdb files are stored. Defaults to current working
             directory.
-        trajectory_dir:
-            path to directory where trajectory .xtc file will be created. Will be created if it
+        trajectory_dir (str):
+            Path to directory where trajectory .xtc file will be created. Will be created if it
             does not exist. Defaults to current working directory.
-        trajectory_id:
-            prefix identifier for any created files.
-        trajectory_size:
-            number of randomly sampled .pdb files to use for trajectory creation.
+        trajectory_id (str):
+            Prefix identifier for any created files.
+        trajectory_size (int):
+            Number of randomly sampled .pdb files to use for trajectory creation.
     
     Returns:
-        A tuple(trajectory_path,topology_path) where:
-            trajectory_path:
-                path to created trajectory .xtc file.
-            topology_path:
-                path to created topology .pdb file.
+        tuple[str,str]:
+            trajectory_path (str):
+                Path to created trajectory .xtc file.
+            topology_path (str):
+                Path to created topology .pdb file.
     """
     assert not(ensemble_dir == os.getcwd() and
                trajectory_dir == os.getcwd()), ('You must provide at least one of ensemble or '

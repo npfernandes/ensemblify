@@ -33,16 +33,16 @@ def calculate_ramachandran_data(
     directory.
 
     Args:
-        trajectory:
-            path to .xtc trajectory file.
-        topology:
-            path to .pdb topology file.
-        output_path:
-            path to output .csv file or output directory. If directory, written file is named
+        trajectory (str):
+            Path to .xtc trajectory file.
+        topology (str):
+            Path to .pdb topology file.
+        output_path (str, optional):
+            Path to output .csv file or output directory. If directory, written file is named
             'ramachandran_data.csv'. Defaults to current working directory.
 
     Returns:
-        dihedrals_matrix:
+        pd.DataFrame:
             DataFrame with Phi and Psi values of each residue for each frame of the trajectory.
     """
     # Create Universe
@@ -89,18 +89,18 @@ def calculate_contact_matrix_frame(
     """Calculates a contact matrix for a frame of a trajectory.
 
     Args:
-        u:
+        u (mda.Universe):
             `MDAnalysis.Universe` object containing the trajectory being analyzed.
-        frame_idx:
-            number of the frame to be analyzed.
-        frame_weight:
-            contacts found in this frame will be assigned this value in the
+        frame_idx (int):
+            Number of the frame to be analyzed.
+        frame_weight (float):
+            Contacts found in this frame will be assigned this value in the
             resulting matrix instead of the default value of 1. In a uniformly
             weighted matrix, this value will be of 1 / number of trajectory frames.
 
     Returns:
         np.ndarray:
-            contact matrix for the current frame.
+            Contact matrix for the current frame.
     """
     # Point universe to frame of interest
     u.trajectory[frame_idx]
@@ -156,19 +156,19 @@ def calculate_contact_matrix(
     Uses multiprocessing whenever possible.
 
     Args:
-        trajectory:
-            path to .xtc trajectory file.
-        topology:
-            path to .pdb topology file.
-        weights:
-            array of weights to be used when calculating the contact matrix. If None, uniform
+        trajectory (str):
+            Path to .xtc trajectory file.
+        topology (str):
+            Path to .pdb topology file.
+        weights (np.ndarray, optional):
+            Array of weights to be used when calculating the contact matrix. If None, uniform
             weights are used.
-        output_path:
-            path to output .csv file or output directory. If directory, written file is named
+        output_path (str, optional):
+            Path to output .csv file or output directory. If directory, written file is named
             'contact_matrix.csv'. Defaults to current working directory.
 
     Returns:
-        contact_matrix:
+        pd.DataFrame:
             DataFrame with the frequency of each residue contact in the trajectory.
     """
     # Setup Universe object
@@ -231,17 +231,18 @@ def calculate_distance_matrix_frame(
     """Calculates a distance matrix for the alpha carbons of a trajectory frame.
 
     Args:
-        u:
+        u (mda.Universe):
             `MDAnalysis.Universe` object containing the trajectory being analyzed.
-        frame_idx:
-            number of the frame to be analyzed.
-        frame_weight:
-            distances calculated for this frame will be multiplied by this value
+        frame_idx (int):
+            Number of the frame to be analyzed.
+        frame_weight (float):
+            Distances calculated for this frame will be multiplied by this value
             in the resulting frame matrix. In a uniformly weighted matrix, calculated
             distances will be multiplied by 1 / number of trajectory frames.
 
     Returns:
-            np.ndarray: distance matrix for the current frame.
+        np.ndarray:
+            Distance matrix for the current frame.
     """
     # Point universe to frame of interest
     u.trajectory[frame_idx]
@@ -283,19 +284,19 @@ def calculate_distance_matrix(
     Uses multiprocessing whenever possible.
 
     Args:
-        trajectory:
-            path to .xtc trajectory file.
-        topology:
-            path to .pdb topology file.
-        weights:
-            array of weights to be used when calculating the distance matrix. If None, uniform
+        trajectory (str):
+            Path to .xtc trajectory file.
+        topology (str):
+            Path to .pdb topology file.
+        weights (np.ndarray, optional):
+            Array of weights to be used when calculating the distance matrix. If None, uniform
             weights are used.
-        output_path:
-            path to output .csv file or output directory. If directory, written file is named
+        output_path (str, optional):
+            Path to output .csv file or output directory. If directory, written file is named
             'distance_matrix.csv'. Defaults to current working directory.
 
     Returns:
-        distance_matrix:
+        pd.DataFrame:
             DataFrame with the average distance between each pair of alpha carbons in the
             trajectory.
     """
@@ -360,22 +361,26 @@ def calculate_ss_assignment(
     
     For each residue in each frame of the trajectory, calculate it's secondary structure
     assignment using DSSP. The simplified DSSP codes used here are:
+
         'H' : Helix. Either of the 'H', 'G', or 'I' codes.
+
         'E' : Strand. Either of the 'E', or 'B' codes.
+
         'C' : Coil. Either of the 'T', 'S' or ' ' codes.
+
     Optionally save the resulting matrix to output directory in .csv format.
 
     Args:
-        trajectory:
-            path to .xtc trajectory file.
-        topology:
-            path to .pdb topology file.
-        output_path:
-            path to output .csv file or output directory. If directory, written file is named
+        trajectory (str):
+            Path to .xtc trajectory file.
+        topology (str):
+            Path to .pdb topology file.
+        output_path (str, optional):
+            Path to output .csv file or output directory. If directory, written file is named
             'ss_assignment.csv'. Defaults to None, and no file is written.
 
     Returns:
-        ss_assign:
+        pd.DataFrame:
             DataFrame holding the secondary structure assignment matrix.
     """
     # Load trajectory
@@ -425,20 +430,20 @@ def calculate_ss_frequency(
     """Calculate secondary structure assignment frequencies from a trajectory and topology files.
 
     Args:
-        trajectory:
-            path to .xtc trajectory file.
-        topology:
-            path to .pdb topology file.
-        weights:
-            optional array of weight values to be used in secondary structure
+        trajectory (str):
+            Path to .xtc trajectory file.
+        topology (str):
+            Path to .pdb topology file.
+        weights (np.ndarray, optional):
+            Optional array of weight values to be used in secondary structure
             assignment reweighting. If None, uniform weights are used.
-        output_path:
-            path to output .csv file or output directory. If directory, written file is named
+        output_path (str, optional):
+            Path to output .csv file or output directory. If directory, written file is named
             'ss_frequency.csv'. Defaults to current working directory.
 
     Returns:
-        frequency:
-            secondary structure frequencies matrix for trajectory being analyzed.
+        pd.DataFrame:
+            Secondary structure frequencies matrix for trajectory being analyzed.
     """
     # Calculate ss assignment
     ss_assignment = calculate_ss_assignment(trajectory=trajectory,
@@ -488,12 +493,12 @@ def calc_rg(u: mda.Universe) -> float:
     """Calculate the radius of gyration of the current frame.
     
     Args:
-        u:
+        u (mda.Universe):
             Universe pointing to the current frame.
     
     Returns:
-        rg:
-            radius of gyration of the protein in the current frame.
+        float:
+            Radius of gyration of the protein in the current frame.
     """
     protein = u.select_atoms('protein')
     rg = protein.radius_of_gyration()
@@ -504,12 +509,12 @@ def calc_eed(u: mda.Universe) -> float:
     """Calculate the distance from the N to the C terminal in the current frame.
     
     Args:
-        u:
+        u (mda.Universe):
             Universe pointing to the current frame.
     
     Returns:
-        eed:
-            end-to-end distance of the protein in the current frame.
+        float:
+            End-to-end distance of the protein in the current frame.
 
     """
     nterm = u.select_atoms('protein and name N')[0]
@@ -522,11 +527,11 @@ def calc_dmax(u: mda.Universe) -> float:
     """Calculate the maximum of the distances between any two alpha carbons in the current frame.
 
     Args:
-        u:
+        u (mda.Universe):
             Universe pointing to the current frame.
     
     Returns:
-        dmax:
+        float:
             Maximum of the distances between any two alpha carbons of the protein in the current
             frame.
 
@@ -544,21 +549,20 @@ def calc_cm_dist(
     sel1: str,
     sel2: str,
     ) -> float:
-    """Calculate the distance between the center of mass of two atom selections
-    in the current frame.
+    """Calculate the distance between the center of mass of two atom selections in current frame.
 
     Args:
-        u:
+        u (mda.Universe):
             Universe pointing to the current frame.
-        sel1:
+        sel1 (str):
             MDAnalysis selection string for selecting an AtomGroup whose center of mass will be
             calculated.
-        sel2:
+        sel2 (str):
             MDAnalysis selection string for selecting an AtomGroup whose center of mass will be
             calculated.
     
     Returns:
-        cm_dist:
+        float:
             Center of mass distance between AtomGroups selected by sel1 and sel2.
 
     """
@@ -580,29 +584,31 @@ def calculate_metrics_data(
     """Calculate structural metrics for each frame of a trajectory.
 
     Args:
-        trajectory:
-            path to .xtc trajectory file.
-        topology:
-            path to .pdb topology file.
-        rg:
-            whether to calculate the radius of gyration of the protein.
-        dmax:
-            whether to calculate the maximum distance between any two alpha carbons in the protein.
-        eed:
-            whether to calculate the distance from the N to C terminal of the protein.
-        cm_dist:
-            mapping of identifiers to tuples with two selection strings for creating MDAnalysis
+        trajectory (str):
+            Path to .xtc trajectory file.
+        topology (str):
+            Path to .pdb topology file.
+        rg (bool, optional):
+            Whether to calculate the radius of gyration of the protein.
+        dmax (bool, optional):
+            Whether to calculate the maximum distance between any two alpha carbons in the protein.
+        eed (bool, optional):
+            Whether to calculate the distance from the N to C terminal of the protein.
+        cm_dist (dict[str,tuple[str,str]], optional):
+            Mapping of identifiers to tuples with two selection strings for creating MDAnalysis
             AtomGroups, whose center mass distance will be calculated. For example:
+
                 {'inter_domain' : ('resid 1:30', 'resid 110:140')}
+
             If None, no center mass distances are calculated.
             See https://userguide.mdanalysis.org/stable/selections.html for more information about
             MDAnalysis selections.
-        output_path:
-            path to output .csv file or output directory. If directory, written file is named
+        output_path (str, optional):
+            Path to output .csv file or output directory. If directory, written file is named
             'structural_metrics.csv'. Defaults to current working directory.
 
     Returns:
-        traj_analysis:
+        pd.DataFrame:
             DataFrame where columns are the desired structural metrics and rows are the frames
             of the trajectory.
     """
@@ -675,51 +681,54 @@ def calculate_analysis_data(
     """Calculate  structural data for each given pair of trajectory,topology files.
 
     Args:
-        trajectories:
-            list of paths to .xtc trajectory files.
-        topologies:
-            list of paths to .pdb topology files.
-        trajectory_ids:
-            prefix trajectory identifiers to distinguish between calculated data files.
-        output_directory:
-            path to directory where calculated data will be stored. Defaults to current
+        trajectories (list[str]):
+            List of paths to .xtc trajectory files.
+        topologies (list[str]):
+            List of paths to .pdb topology files.
+        trajectory_ids (list[str]):
+            Prefix trajectory identifiers to distinguish between calculated data files.
+        output_directory (str, optional):
+            Path to directory where calculated data will be stored. Defaults to current
             working directory.
-        ramachandran_data:
-            whether to calculate a dihedral angles matrix for each trajectory,topology 
+        ramachandran_data (bool):
+            Whether to calculate a dihedral angles matrix for each trajectory,topology 
             file pair.
-        distancematrices:
-            whether to calculate an alpha carbon distance matrix for each trajectory,topology
+        distancematrices (bool):
+            Whether to calculate an alpha carbon distance matrix for each trajectory,topology
             file pair.
-        contactmatrices:
-            whether to calculate a contact frequency matrix for each trajectory,topology
+        contactmatrices (bool):
+            Whether to calculate a contact frequency matrix for each trajectory,topology
             file pair.
-        ssfrequencies:
-            whether to calculate a secondary structure assignment frequency matrix for each
+        ssfrequencies (bool):
+            Whether to calculate a secondary structure assignment frequency matrix for each
             trajectory, topology file pair.
-        rg:
-            whether to calculate the radius of gyration for each trajectory,topology file pair.
-        dmax:
-            whether to calculate the maximum distance between any two alpha carbons for each
+        rg (bool):
+            Whether to calculate the radius of gyration for each trajectory,topology file pair.
+        dmax (bool):
+            Whether to calculate the maximum distance between any two alpha carbons for each
             trajectory,topology file pair.
-        eed:
-            whether to calculate the distance between the N and C terminal for each trajectory,
+        eed (bool):
+            Whether to calculate the distance between the N and C terminal for each trajectory,
             topology file pair.
-        cm_dist:
-            mapping of identifiers to tuples with two selection strings for creating MDAnalysis
+        cm_dist (dict[str,tuple[str,str]], optional):
+            Mapping of identifiers to tuples with two selection strings for creating MDAnalysis
             AtomGroups, whose center mass distance will be calculated. If None, no center mass
             distances are calculated. See https://userguide.mdanalysis.org/stable/selections.html
             for more information about MDAnalysis selections. For example:
+
             {'inter_domain' : ('resid 1:30', 'resid 110:140')}
 
     Returns:
-        data:
-            mapping of data identifiers to lists of DataFrames with the calculated analysis data,
+        dict[str,list[pd.DataFrame]]:
+            Mapping of data identifiers to lists of DataFrames with the calculated analysis data,
             one element for each given trajectory,topology,trajectory_id trio. For example:
-            data = {'DistanceMatrices' : [DistanceMatrix1,DistanceMatrix2,DistanceMatrix3],
-                    'ContactMatrices' : [ContactMatrix1,ContactMatrix2,ContactMatrix3],
-                    'SecondaryStructureFrequencies' : [SSFrequency1,SSFrequency2,SSFrequency3],
-                    'StructuralMetrics' : [StructuralMetrics1,StructuralMetrics2,
-                                           StructuralMetrics3]}
+
+            data = {
+            'DistanceMatrices' : [DistanceMatrix1,DistanceMatrix2,DistanceMatrix3],
+            'ContactMatrices' : [ContactMatrix1,ContactMatrix2,ContactMatrix3],
+            'SecondaryStructureFrequencies' : [SSFrequency1,SSFrequency2,SSFrequency3],
+            'StructuralMetrics' : [StructuralMetrics1,StructuralMetrics2, StructuralMetrics3]}
+
     """
     # Calculate analysis data
     data = {'DistanceMatrices' : [],

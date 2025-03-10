@@ -27,61 +27,63 @@ def analyze_trajectory(
     rg: bool | None = True,
     dmax: bool | None = True,
     eed: bool | None = True,
-    cm_dist: dict | None = None,
+    cm_dist: dict[str,tuple[str,str]] | None = None,
     color_palette: list[str] | None = None,
     ) -> dict[str,pd.DataFrame]:
     """Calculate structural data and create interactive figures for given trajectory and
     topology files.
 
     Args:
-        trajectories:
-            list of paths to .xtc trajectory files or string with the path to a single .xtc
+        trajectories (list[str] | str):
+            List of paths to .xtc trajectory files or string with the path to a single .xtc
             trajectory file.
-        topologies:
-            list of paths to .pdb topology files or string with the path to a single .pdb
+        topologies (list[str] | str):
+            List of paths to .pdb topology files or string with the path to a single .pdb
             topology file.
-        trajectory_ids:
-            list of prefix trajectory identifiers to distinguish between calculated data
+        trajectory_ids (list[str] | str):
+            List of prefix trajectory identifiers to distinguish between calculated data
             files or string with a single prefix trajectory identifier.
-        output_directory:
-            path to directory where calculated data and created figures will be stored.
+        output_directory (str):
+            Path to directory where calculated data and created figures will be stored.
             If it does not exist, it is created. Defaults to current working directory.
-        ramachandran_data:
-            whether to calculate a dihedral angles matrix for each trajectory,topology 
+        ramachandran_data (bool):
+            Whether to calculate a dihedral angles matrix for each trajectory,topology 
             file pair.
-        distancematrices:
-            whether to calculate an alpha carbon distance matrix for each trajectory,topology
+        distancematrices (bool):
+            Whether to calculate an alpha carbon distance matrix for each trajectory,topology
             file pair and create the corresponding distance matrix interactive figure.
-        contactmatrices:
-            whether to calculate a contact frequency matrix for each trajectory,topology
+        contactmatrices (bool):
+            Whether to calculate a contact frequency matrix for each trajectory,topology
             file pair and create the corresponding contact map interactive figure.
-        ssfrequencies:
-            whether to calculate a secondary structure assignment frequency matrix for each
+        ssfrequencies (bool):
+            Whether to calculate a secondary structure assignment frequency matrix for each
             trajectory, topology file pair and create the corresponding secondary structure
             frequency interactive figure.
-        rg:
-            whether to calculate and plot the radius of gyration for each trajectory,topology
+        rg (bool):
+            Whether to calculate and plot the radius of gyration for each trajectory,topology
             file pair.
-        dmax:
-            whether to calculate and plot the maximum distance between any two alpha carbons
+        dmax (bool):
+            Whether to calculate and plot the maximum distance between any two alpha carbons
             for each trajectory,topology file pair.
-        eed:
-            whether to calculate and plot the distance between the N and C terminal for each
+        eed (bool):
+            Whether to calculate and plot the distance between the N and C terminal for each
             trajectory, topology file pair.
-        cm_dist:
-            mapping of identifiers to tuples with two selection strings for creating MDAnalysis
+        cm_dist (dict[str,tuple[str,str]]):
+            Mapping of identifiers to tuples with two selection strings for creating MDAnalysis
             AtomGroups, whose center mass distance will be calculated and plotted. For example:
+
                 {'inter_domain' : ('resid 1:30', 'resid 110:140')}
+
             If None, no center mass distances are calculated.
             See https://userguide.mdanalysis.org/stable/selections.html for more information about
             MDAnalysis selections.
-        color_palette:
-            list of color hexcodes, to associate one with each trajectory in the created Structural
+        color_palette (list[str]):
+            List of color hexcodes, to associate one with each trajectory in the created Structural
             Metrics interactive dashboard.
 
     Returns:
-        analysis_data:
-            mapping of data identifiers to DataFrames containing the calculated analysis data for
+        dict[str,pd.DataFrame]:
+            Mapping of data identifiers to DataFrames containing the calculated analysis data for
             each frame of each given trajectory. For convenience, this is returned as a variable
             as well as saved to output directory.
     """

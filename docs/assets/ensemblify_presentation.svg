@@ -9,7 +9,7 @@
    id="svg1"
    inkscape:version="1.2.1 (9c6d41e, 2022-07-14)"
    sodipodi:docname="ensemblify_presentation.svg"
-   inkscape:export-filename="../../../../../ensemblify_presentation.png"
+   inkscape:export-filename="ensemblify_presentation.png"
    inkscape:export-xdpi="300"
    inkscape:export-ydpi="300"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -28,7 +28,7 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="1.2667276"
-     inkscape:cx="247.88281"
+     inkscape:cx="186.70154"
      inkscape:cy="278.6708"
      inkscape:window-width="2560"
      inkscape:window-height="1301"
@@ -1660,9 +1660,9 @@
            inkscape:label="Database Sampling Text"><tspan
              x="2320.6816"
              y="1757.8809"
-             id="tspan260684"><tspan
+             id="tspan1635"><tspan
                style="font-family:Arial;-inkscape-font-specification:Arial;text-align:start;fill:#000000"
-               id="tspan260682">Tripeptide database sampling of dihedral angle values 
+               id="tspan1633">Tripeptide database sampling of dihedral angle values 
 </tspan></tspan></text>
         <path
            d="m -129.02009,100.43705 c 0,0.0527 -0.0265,0.10549 -0.0794,0.13187 -0.17649,0.10551 -0.51181,0.29016 -0.75889,0.41325 -0.21179,0.10551 -0.50299,0.22861 -0.70595,0.31653 -0.0176,0.009 -0.0441,0.0176 -0.0618,0.0176 -0.0353,0 -0.0794,-0.0176 -0.10589,-0.044 -0.0441,-0.044 -0.0529,-0.10551 -0.0353,-0.16706 l 0.18531,-0.54514 c 0.009,-0.0352 0.0441,-0.0527 0.0794,-0.0527 h 0.44123 c 0.0353,0 0.0706,-0.0264 0.0706,-0.0703 0,-0.044 -0.0265,-0.0703 -0.0706,-0.0703 h -0.44123 c -0.0353,0 -0.0706,-0.0264 -0.0794,-0.0616 l -0.18531,-0.545135 c -0.0176,-0.0528 -0.009,-0.1143 0.0441,-0.15827 0.0441,-0.044 0.10589,-0.0528 0.15884,-0.0264 0.16766,0.0703 0.48534,0.21102 0.70595,0.31653 0.24708,0.123095 0.5824,0.316525 0.75889,0.413245 0.0529,0.0264 0.0794,0.0791 0.0794,0.1319 z"

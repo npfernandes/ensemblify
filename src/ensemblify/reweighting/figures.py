@@ -56,31 +56,31 @@ def create_effective_frames_fit_fig(
     the calculated+experimental data using different values for the theta parameter.
 
     Args:
-        stats:
-            an array where each row corresponds to a different theta value with columns
+        stats (np.ndarray):
+            An array where each row corresponds to a different theta value with columns
             (chi2_before,chi2_after,phi) where:
                 chi2_before:
-                    the value for the chisquare of fitting the ensemble with uniform
+                    The value for the chisquare of fitting the ensemble with uniform
                     weights to the experimental data.
                 chi2_after:
-                    the value for the chisquare of fitting the reweighted ensemble to
+                    The value for the chisquare of fitting the reweighted ensemble to
                     the experimental data.
                 phi:
-                    the fraction of effective frames being used in the reweighted ensemble.
-        thetas:
-            array of values for the theta parameter used when applying BME algorithm.
-        choices:
-            theta value(s) chosen for reweighting ensemble, corresponding data points will be
+                    The fraction of effective frames being used in the reweighted ensemble.
+        thetas (np.ndarray):
+            Array of values for the theta parameter used when applying BME algorithm.
+        choices (int | list[int] | None):
+            Theta value(s) chosen for reweighting ensemble, corresponding data points will be
             highlighted in the created Figure. Defaults to None.
-        title_text:
-            title for the created Figure. Defaults to None.
-        colors:
+        title_text (str | None):
+            Title for the created Figure. Defaults to None.
+        colors (list[str]):
             Hexcodes for the colors to use for highlighting theta values. Defaults to ['#E69F00',
             '#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7'].
 
     Returns:
-        fig:
-            the created plot, optionally with data points corresponding to highlighted theta
+        go.Figure:
+            The created plot, optionally with data points corresponding to highlighted theta
             values in different colors.
     """
     # Setup choices
@@ -164,27 +164,27 @@ def create_reweighting_fits_fig(
     calculated SAXS data, when fit to experimental data.
 
     Args:
-        q:
-            an array with momentum transfer values, common to all SAXS curves being deal with.
-        i_exp:
-            an array with experimentally measured SAXS intensities.
-        err:
-            an array with the experimental error of the provided experimental SAXS intensities.
-        i_prior:
-            an array of SAXS intensities averaged over all the frames of a SAXS data file
+        q (np.ndarray):
+            An array with momentum transfer values, common to all SAXS curves being deal with.
+        i_exp (np.ndarray):
+            An array with experimentally measured SAXS intensities.
+        err (np.ndarray):
+            An array with the experimental error of the provided experimental SAXS intensities.
+        i_prior (np.ndarray):
+            An array of SAXS intensities averaged over all the frames of a SAXS data file
             calculated from a conformational ensemble with uniform weights.
-        i_posts:
-            an array or list of arrays of SAXS intensities averaged over all the frames of a SAXS
+        i_posts (np.ndarray | list[np.ndarray]):
+            An array or list of arrays of SAXS intensities averaged over all the frames of a SAXS
             data file calculated from a conformational ensemble with the provided set of weights.
-        title_text:
-            a title for the created multiplot Figure. Defaults to None.
-        colors:
-            color to attribute to the plotted prior and posterior traces, in order of input.
+        title_text (str, optional):
+            A title for the created multiplot Figure. Defaults to None.
+        colors (list[str], optional):
+            Color to attribute to the plotted prior and posterior traces, in order of input.
             Defaults to ['#E69F00', '#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7'].
 
     Returns:
-        fig:
-            a multiplot Figure containing four plots:
+        go.Figure:
+            A multiplot Figure containing four plots:
                 - the fitting of i_prior and i_post(s) to the experimental SAXS data i_exp.
                 - the previous plot in log scale.
                 - Kraty plot for i_prior and i_post fitted to experimental data.
@@ -409,21 +409,21 @@ def create_reweighting_metrics_fig(
     uniform or unequal weights.
 
     Args:
-        metrics:
-            a DataFrame with the calculated structural metrics, one row per frame in the
+        metrics (pd.DataFrame):
+            A DataFrame with the calculated structural metrics, one row per frame in the
             conformational ensemble.
-        weight_sets:
-            an array or list of arrays containing the weights for calculating the probability
+        weight_sets (np.ndarray | list[np.ndarray]):
+            An array or list of arrays containing the weights for calculating the probability
             distributions of each structural metric, for each set of weights.
-        title_text:
-            title for the created Figure. Defaults to None.
-        colors:
-            hexcodes for colors to use for the traces relative to each i_post, in order of input.
+        title_text (str | None):
+            Title for the created Figure. Defaults to None.
+        colors (list[str]):
+            Hexcodes for colors to use for the traces relative to each i_post, in order of input.
             Defaults to ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7'].
 
     Returns:
-        fig:
-            a Figure plotting the structural metrics distributions for uniformly and unequally
+        go.Figure:
+            A Figure plotting the structural metrics distributions for uniformly and unequally
             weighted conformational ensembles.
     """
     # Setup weights

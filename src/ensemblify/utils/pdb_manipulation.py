@@ -18,12 +18,12 @@ def df_from_pdb(pdb: str) -> pd.DataFrame:
     """Convert the information in a .pdb file into a pandas DataFrame using BioPDB.
 
     Args:
-        pdb:
-            path to the .pdb file.
+        pdb (str):
+            Path to the .pdb file.
 
     Returns:
-        df:
-            the given pdb's information in DataFrame format.
+        pd.DataFrame:
+            The given pdb's information in DataFrame format.
     """
 
     # Create a PDBParser object to parse the PDB file
@@ -65,10 +65,10 @@ def df_to_pdb(df: pd.DataFrame, output_pdb_filename: str):
     """Write content of a DataFrame containing PDB file info as a .pdb file using BioPDB.
 
     Args:
-        df:
+        df (pd.DataFrame):
             DataFrame containing PDB information.
-        output_pdb_filename:
-            filepath for the output .pdb.
+        output_pdb_filename (str):
+            Path to the output .pdb.
     """
     # Create an instance of PDBIO to write the PDB file
     pdb_io = PDBIO()
@@ -119,11 +119,11 @@ def extract_pdb_info(pdb: str) -> dict[int,tuple[str,int,int]]:
     numbers and chain size.
 
     Args:
-        topology:
-            path to .pdb topology file.
+        topology (str):
+            Path to .pdb topology file.
     
     Returns:
-        ch_res:
+        dict[int,tuple[str,int,int]]:
             Mapping of chain numbers to their letter, starting residue number and chain size.
     """
     # Setup info dict
@@ -165,8 +165,8 @@ def cleanup_pdbs(pdbs: list[str]):
     """Delete all .pdb files in the given list.
 
     Args:
-        pdbs:
-            paths to .pdb files to delete.
+        pdbs (list[str]):
+            Paths to .pdb files to delete.
     """
     for leftover_pdb in pdbs:
         try:

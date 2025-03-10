@@ -1,6 +1,6 @@
 """
 Analysis - `ensemblify.analysis`
-=============================================
+================================
 
 :Author(s): Nuno P. Fernandes
 :Year: 2024
@@ -14,21 +14,24 @@ conformations, outputting an interactive graphical dashboard.
 Example applications
 --------------------
 
-- Analyze an ensemble in trajectory format
-  ----------------------------------------
-  The `ensemblify.analysis.analyze_trajectory` function can be used to create an interactive
-  analysis graphical dashboard from a conformational ensemble in .xtc trajectory format.
-  For example, we can analyze an ensemble of Histatin5, an intrinsically disordered protein
-  (IDP) with 24 aminoacid residues. Assuming that the path to the required Hst5 .xtc trajectory
-  file is assigned to a variable named HST5_TRAJECTORY_PATH, you should run:
+Analyze an ensemble in trajectory format
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The `ensemblify.analysis.analyze_trajectory` function can be used to create an interactive
+analysis graphical dashboard from a conformational ensemble in .xtc trajectory format.
 
-```
+For example, we can analyze an ensemble of Histatin5, an intrinsically disordered protein
+(IDP) with 24 aminoacid residues.
+
+Assuming that the path to the required Hst5 .xtc trajectory
+file is assigned to a variable named HST5_TRAJECTORY_PATH, you should run:
+
 >>> import ensemblify.analysis as ea
 >>> ea.analyze_trajectory(HST5_TRAJECTORY_PATH)
-```
+
 
 Available Functions
-----------------
+-------------------
+
 - `analyze_trajectory`
 
       Calculate structural data and create interactive figures for given trajectory and topology

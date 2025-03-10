@@ -45,7 +45,7 @@ DEFAULT_LAYOUT = {
 }
 
 # FUNCTIONS
-def remove_self_neighbours(matrix: pd.DataFrame, n_neighbours: int | None = None) -> pd.DataFrame:
+def _remove_self_neighbours(matrix: pd.DataFrame, n_neighbours: int | None = None) -> pd.DataFrame:
     """Take a matrix and assign Numpy NaN values to the main and secondary diagonals according to
     the number of neighbours.
 
@@ -54,12 +54,13 @@ def remove_self_neighbours(matrix: pd.DataFrame, n_neighbours: int | None = None
     Used to prepare a matrix for Figure creation.
 
     Args:
-        matrix:
-            matrix to clean up.
-
+        matrix (pd.DataFrame):
+            Matrix to clean up.
+        n_neighbours (int, optional):
+            Number of neighbours to ignore. Defaults to None.
     Returns:
-        clean_df:
-            a copy of input matrix with main and secondary diagonals values replaced with np.nan.
+        pd.DataFrame:
+            A copy of input matrix with main and secondary diagonals values replaced with np.nan.
     """
     # Get data
     data = matrix.values
@@ -101,7 +102,7 @@ def remove_self_neighbours(matrix: pd.DataFrame, n_neighbours: int | None = None
     return clean_df
 
 
-def get_figure_layout_elements(
+def _get_figure_layout_elements(
     topology: str,
     num_res: int,
     ssfreq: bool | None = False,
@@ -110,30 +111,30 @@ def get_figure_layout_elements(
     """Create tick labels and values and lines to divide chain regions for a Figure.
 
     Args:
-        topology:
-            topology file associated with the trajectory being analyzed.
-        num_res:
-            total number of residues in the analyzed system (equivalent to axis size in
+        topology (str):
+            Topology file associated with the trajectory being analyzed.
+        num_res (int):
+            Total number of residues in the analyzed system (equivalent to axis size in
             a Figure).
-        ssfreq:
+        ssfreq (bool, optional):
             Whether we are dealing with a secondary structure assignment frequency Figure or not.
             Defaults to False.
-        ssfreq_diff:
+        ssfreq_diff (bool, optional):
             Whether we are dealing with a difference secondary structure assignment frequency Figure
             or not. Defaults to False.
 
     Returns:
-        A tuple x_labels,y_labels,chain_dividers,tickvals where:
-            x_labels:
-                all the possible tick labels for the x axis.
-            y_labels:
-                all the possible tick labels for the y axis. Only relevant when not building a
+        tuple[list[str],list[str],list[dict],list[int]]:
+            x_labels (list[str]):
+                All the possible tick labels for the x axis.
+            y_labels (list[str]):
+                All the possible tick labels for the y axis. Only relevant when not building a
                 secondary structure assignment frequency Figure.
-            chain_dividers:
-                dictionaries to create Plotly shapes, i.e. lines to add to the Figure that separate
+            chain_dividers (list[dict]):
+                Dictionaries to create Plotly shapes, i.e. lines to add to the Figure that separate
                 between different protein chains.
-            tickvals:
-                where to place the ticks in the x axis.
+            tickvals (list[int]):
+                Where to place the ticks in the x axis.
     """
     # Extract info regarding chains and resnums
     top_info = extract_pdb_info(topology)
@@ -254,19 +255,19 @@ def create_ramachandran_figure(
     """Create a ramachandran plot Figure from a calculated dihedral angles matrix.
 
     Args:
-        dihedrals_matrix:
-            calculated dihedral angles matrix DataFrame or path to calculated matrix in .csv format.
+        dihedrals_matrix (pd.DataFrame | str):
+            Calculated dihedral angles matrix DataFrame or path to calculated matrix in .csv format.
             If difference is True, this should be the difference dihedral angles matrix between the
             uniformly weighted and the reweighted dihedral angles matrix.
-        trajectory_id:
-            used on Figure title and prefix for saved ramachandran plot filename. Defaults to None.
-        output_path:
-            path to output .html file or output directory where created Figure will be stored.
+        trajectory_id (str, optional):
+            Used on Figure title and prefix for saved ramachandran plot filename. Defaults to None.
+        output_path (str, optional):
+            Path to output .html file or output directory where created Figure will be stored.
             If directory, written file is named 'ramachandran_plot.html', optionally with
             trajectory_id prefix. Defaults to None.
 
     Returns:
-        rama_fig:
+        go.Figures:
             Ploty Figure object displaying a ramachandran plot.
     """
     if isinstance(dihedrals_matrix,str):
@@ -399,27 +400,27 @@ def create_contact_map_fig(
     residue numbers.
 
     Args:
-        contact_matrix:
-            calculated contact matrix DataFrame or path to calculated matrix in .csv format.
+        contact_matrix (pd.DataFrame | str):
+            Calculated contact matrix DataFrame or path to calculated matrix in .csv format.
             If difference is True, this should be the difference contact matrix between the
             uniformly weighted and the reweighted contact matrix.
-        topology:
-            path to topology .pdb file.
-        trajectory_id:
-            used on Figure title and prefix for saved contact map filename. Defaults to None.
-        output_path:
-            path to output .html file or output directory where created Figure will be stored.
+        topology (str):
+            Path to topology .pdb file.
+        trajectory_id (str, optional):
+            Used on Figure title and prefix for saved contact map filename. Defaults to None.
+        output_path (str, optional):
+            Path to output .html file or output directory where created Figure will be stored.
             If directory, written file is named 'contact_map.html', optionally with
             trajectory_id prefix. Defaults to None.
-        reweighted:
-            boolean stating whether we are creating a reweighted contact map figure or a default
+        reweighted (bool, optional):
+            Boolean stating whether we are creating a reweighted contact map figure or a default
             one. Defaults to False.
-        difference:
-            boolean stating whether we are creating a difference contact map figure or a default
+        difference (bool, optional):
+            Boolean stating whether we are creating a difference contact map figure or a default
             one. Defaults to False.
 
     Returns:
-        cmap_fig:
+        go.Figure:
             Ploty Figure object displaying a contact map.
     """
     assert not(reweighted and difference), ('Contact Map Figure can\'t simultaneously be '
@@ -433,8 +434,8 @@ def create_contact_map_fig(
     x_labels,\
     y_labels,\
     chain_dividers,\
-    tickvals = get_figure_layout_elements(topology=topology,
-                                          num_res=len(contact_matrix.columns))
+    tickvals = _get_figure_layout_elements(topology=topology,
+                                           num_res=len(contact_matrix.columns))
 
     # Create Contact Map Figure
     cmap_fig = go.Figure(layout=DEFAULT_LAYOUT)
@@ -442,8 +443,8 @@ def create_contact_map_fig(
     # Add our data, setup Figure title
     if not difference:
         # Assign np.nan to self and neighbour contacts
-        clean_contact_matrix = remove_self_neighbours(matrix=contact_matrix,
-                                                      n_neighbours=2)
+        clean_contact_matrix = _remove_self_neighbours(matrix=contact_matrix,
+                                                       n_neighbours=2)
 
         cmap_fig.add_trace(go.Heatmap(z=clean_contact_matrix,
                                       zmin=0,
@@ -478,7 +479,7 @@ def create_contact_map_fig(
                 hovertext[-1].append(text)
 
         # Assign np.nan to self and neighbour contacts
-        clean_contact_matrix = remove_self_neighbours(matrix=contact_matrix,
+        clean_contact_matrix = _remove_self_neighbours(matrix=contact_matrix,
                                                       n_neighbours=2)
 
         cmap_fig.add_trace(go.Heatmap(z=clean_contact_matrix,
@@ -563,33 +564,33 @@ def create_distance_matrix_fig(
     residue numbers.
 
     Args:
-        distance_matrix:
-            calculated distance matrix DataFrame or path to calculated matrix in .csv format.
+        distance_matrix (pd.DataFrame | str):
+            Calculated distance matrix DataFrame or path to calculated matrix in .csv format.
             If difference is True, this should be the difference distance matrix between the
             uniformly weighted and the reweighted distance matrix.
-        topology:
-            path to topology .pdb file.
-        trajectory_id:
-            used on Figure title and prefix for saved distance matrix filename. Defaults to None.
-        output_path:
-            path to output .html file or output directory where created Figure will be stored.
+        topology (str):
+            Path to topology .pdb file.
+        trajectory_id (str, optional):
+            Used on Figure title and prefix for saved distance matrix filename. Defaults to None.
+        output_path (str, optional):
+            Path to output .html file or output directory where created Figure will be stored.
             If directory, written file is named 'distance_matrix.html', optionally with
             trajectory_id prefix. Defaults to None.
-        max_colorbar:
-            maximum limit for the distance colorbar. Defaults to None, in which case it is
+        max_colorbar (int, optional):
+            Maximum limit for the distance colorbar. Defaults to None, in which case it is
             derived from the data.
-        min_colorbar:
-            minimum limit for the distance colorbar. Defaults to None, in which case it is
+        min_colorbar (int, optional):
+            Minimum limit for the distance colorbar. Defaults to None, in which case it is
             derived from the data.
-        reweighted:
-            boolean stating whether we are creating a reweighted distance matrix figure or a
+        reweighted (bool, optional):
+            Boolean stating whether we are creating a reweighted distance matrix figure or a
             default one. Defaults to False.
-        difference:
-            boolean stating whether we are creating a difference distance matrix figure or a
+        difference (bool, optional):
+            Boolean stating whether we are creating a difference distance matrix figure or a
             default one. Defaults to False.
 
     Returns:
-        dmatrix_fig:
+        go.Figure:
             Ploty Figure object displaying a distance matrix.
     """
     assert not(reweighted and difference), ('Distance Matrix Figure can\'t simultaneously be '
@@ -602,8 +603,8 @@ def create_distance_matrix_fig(
     x_labels,\
     y_labels,\
     chain_dividers,\
-    tickvals = get_figure_layout_elements(topology=topology,
-                                          num_res=len(distance_matrix.columns))
+    tickvals = _get_figure_layout_elements(topology=topology,
+                                           num_res=len(distance_matrix.columns))
 
     # Create Distance Matrix Figure
     dmatrix_fig = go.Figure(layout=DEFAULT_LAYOUT)
@@ -611,8 +612,8 @@ def create_distance_matrix_fig(
     # Add our data
     if not difference:
         # Assign np.nan to self and neighbour distances
-        clean_distance_matrix = remove_self_neighbours(matrix=distance_matrix,
-                                                       n_neighbours=2)
+        clean_distance_matrix = _remove_self_neighbours(matrix=distance_matrix,
+                                                        n_neighbours=2)
 
         if max_colorbar is None:
             max_colorbar = math.ceil(np.max(distance_matrix))
@@ -653,7 +654,7 @@ def create_distance_matrix_fig(
                 hovertext[-1].append(text)
 
         # Assign np.nan to self and neighbour distances
-        clean_distance_matrix = remove_self_neighbours(matrix=distance_matrix,
+        clean_distance_matrix = _remove_self_neighbours(matrix=distance_matrix,
                                                        n_neighbours=2)
 
         dmatrix_fig.add_trace(go.Heatmap(z=clean_distance_matrix,
@@ -739,27 +740,27 @@ def create_ss_frequency_figure(
     residue numbers.
 
     Args:
-        ss_frequency:
-            calculated secondary structure assignment frequency matrix DataFrame or path to
+        ss_frequency (pd.DataFrame | str):
+            Calculated secondary structure assignment frequency matrix DataFrame or path to
             calculated matrix in .csv format.
-        topology:
-            path to topology .pdb file.
-        trajectory_id:
-            used on Figure title and prefix for saved ss_frequency filename. Defaults to None.
-        output_path:
-            path to output .html file or output directory where created Figure will be stored.
+        topology (str):
+            Path to topology .pdb file.
+        trajectory_id (str, optional):
+            Used on Figure title and prefix for saved ss_frequency filename. Defaults to None.
+        output_path (str, optional):
+            Path to output .html file or output directory where created Figure will be stored.
             If directory, written file is named 'ss_frequency.html', optionally with
             trajectory_id prefix. Defaults to None.
-        reweighted:
-            boolean stating whether we are creating a reweighted secondary structure frequency
+        reweighted (bool, optional):
+            Boolean stating whether we are creating a reweighted secondary structure frequency
             figure or a default one. Defaults to False.
-        difference:
-            boolean stating whether we are creating a difference secondary structure frequency
+        difference (bool, optional):
+            Boolean stating whether we are creating a difference secondary structure frequency
             figure or a default one. Defaults to False.
 
     Returns:
-        ss_freq_fig:
-            a stacked line plot with the secondary structure frequencies of each secondary
+        go.Figure:
+            Stacked line plot with the secondary structure frequencies of each secondary
             structure type for each residue in the structure.
     """
     assert not(reweighted and difference), ('Secondary Structure Frequency Figure can\'t '
@@ -774,10 +775,10 @@ def create_ss_frequency_figure(
     x_labels,\
     _,\
     chain_dividers,\
-    tickvals = get_figure_layout_elements(topology=topology,
-                                          num_res=len(ss_frequency.columns),
-                                          ssfreq=True,
-                                          ssfreq_diff=difference)
+    tickvals = _get_figure_layout_elements(topology=topology,
+                                           num_res=len(ss_frequency.columns),
+                                           ssfreq=True,
+                                           ssfreq_diff=difference)
 
     # Create Figure
     ss_freq_fig = go.Figure(layout=DEFAULT_LAYOUT)
@@ -899,28 +900,28 @@ def create_metrics_traces(
     a Structural Metrics Figure.
 
     Args:
-        metrics:
+        metrics (pd.DataFrame | str):
             DataFrame where columns are the desired structural metrics and rows are the frames
             of the trajectory or path to that DataFrame in .csv format.
-        trajectory_id:
+        trajectory_id (str):
             prefix identifier for trace names.
-        color:
+        color (str, optional):
             hex code for the color the created traces will be. Defaults to '#636EFA', or light
             blue.
 
     Returns:
-        A tuple (box_traces,hist_traces,scatter_traces) where:
-            box_traces:
-                a list of the boxplot traces, one for each structural metric.
-            hist_traces:
-                a list of the histogram traces, one for each structural metric.
-            scatter_traces:
-                a list of the scatter Kernel Density Estimate (KDE) traces, one
+        tuple[list[go.Box], list[go.Histogram], list[go.Scatter], list[float], list[float]]:
+            box_traces (list[go.Box]):
+                A list of the boxplot traces, one for each structural metric.
+            hist_traces (list[go.Histogram]):
+                A list of the histogram traces, one for each structural metric.
+            scatter_traces (list[go.Scatter]):
+                A list of the scatter Kernel Density Estimate (KDE) traces, one
                 for each structural metric.
-            avg_values:
-                a list of the values of the mean for each metric.
-            avg_stderr:
-                a list of the values of the standard error of the mean for each metric.
+            avg_values (list[float]):
+                A list of the values of the mean for each metric.
+            avg_stderr (list[float]):
+                A list of the values of the standard error of the mean for each metric.
     """
     if isinstance(metrics,str):
         assert metrics.endswith('.csv'), ('Structural metrics matrix '
@@ -993,23 +994,23 @@ def create_metrics_fig(
     """Create a Structural Metrics Figure from previously created Box, Histogram and Scatter traces.
 
     Args:
-        trajectory_ids:
-            list of prefix identifiers that must match the prefix identifiers used for naming the
+        trajectory_ids (list[str]):
+            List of prefix identifiers that must match the prefix identifiers used for naming the
             created traces.
-        total_box_traces:
-            mapping of trajectory_ids to a list of created Box traces.
-        total_hist_traces:
-            mapping of trajectory_ids to a list of created Histogram traces.
-        total_scatter_traces:
-            mapping of trajectory_ids to a list of created Scatter traces.
-        total_avg_values:
-            mapping of trajectory_ids to a list of mean values.
-        output_path:
-            path to output .html file or output directory where the created Figure will be stored.
+        total_box_traces (dict[str,list[go.Box]]):
+            Mapping of trajectory_ids to a list of created Box traces.
+        total_hist_traces (dict[str,list[go.Histogram]]):
+            Mapping of trajectory_ids to a list of created Histogram traces.
+        total_scatter_traces (dict[str,list[go.Scatter]]):
+            Mapping of trajectory_ids to a list of created Scatter traces.
+        total_avg_values (dict[str,list[float]]):
+            Mapping of trajectory_ids to a list of mean values.
+        output_path (str, optional):
+            Path to output .html file or output directory where the created Figure will be stored.
             If directory, written file is named 'structural_metrics.html'. Defaults to None.
 
     Returns:
-        metrics_fig:
+        go.Figure:
             Structural Metrics Figure that allows for comparison between all the created traces.
     """
     # Get dimensions of dashboard
@@ -1300,14 +1301,14 @@ def create_single_metrics_fig_directly(
     id and calculated metrics data.
 
     Args:
-        metrics:
+        metrics (pd.DataFrame | str):
             DataFrame where columns are the desired structural metrics and rows are the frames
             of the trajectory or path to that DataFrame in .csv format.
-        trajectory_id:
-            prefix identifier for trace names.
+        trajectory_id (str, optional):
+            Prefix identifier for trace names.
 
     Returns:
-        metrics_fig:
+        go.Figure:
             Structural Metrics Figure with the provided calculated metrics data.
     """
     if isinstance(metrics,str):
@@ -1355,27 +1356,29 @@ def create_analysis_figures(
       files.
 
     Args:
-        analysis_data:
-            mapping of data identifiers to lists of DataFrames with the calculated analysis data,
+        analysis_data (dict[str,list[pd.DataFrame]], optional):
+            Mapping of data identifiers to lists of DataFrames with the calculated analysis data,
             one element for each given trajectory,topology,trajectory_id trio.
-        topologies:
-            list of paths to .pdb topology files.
-        trajectory_ids:
-            prefix trajectory identifiers to distinguish between calculated data files.
-        output_directory:
-            path to directory where created Figures will be stored. Defaults to current
+        topologies (list[str]):
+            List of paths to .pdb topology files.
+        trajectory_ids (list[str]):
+            Prefix trajectory identifiers to distinguish between calculated data files.
+        output_directory (str, optional):
+            Path to directory where created Figures will be stored. Defaults to current
             working directory.
-        color_palette:
-            list of color hexcodes, to associate one with each trajectory when creating the
+        color_palette (list[str], optional):
+            List of color hexcodes, to associate one with each trajectory when creating the
             Structural Metrics interactive figure.
     Returns:
-        figures:
-            mapping of figure identifiers to lists of the created Figures, one for each trajectory
+        dict[str,list[go.Figure]]:
+            Mapping of figure identifiers to lists of the created Figures, one for each trajectory
             outlined in the given analysis data. For example:
+
             data = {'ContactMaps' : [ContactMap1,ContactMap2,ContactMap3],
-                    'DistanceMatrices' : [DistanceMatrix1,DistanceMatrix2,DistanceMatrix3],
-                    'SecondaryStructureFrequencies' : [SSFrequency1,SSFrequency2,SSFrequency3],
-                    'StructuralMetrics' : [StructuralMetrics1,StructuralMetrics2,StructuralMetrics3] }
+            'DistanceMatrices' : [DistanceMatrix1,DistanceMatrix2,DistanceMatrix3],
+            'SecondaryStructureFrequencies' : [SSFrequency1,SSFrequency2,SSFrequency3],
+            'StructuralMetrics' : [StructuralMetrics1,StructuralMetrics2,StructuralMetrics3]}
+
     """
     # Setup color palette
     if color_palette is None:

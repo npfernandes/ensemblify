@@ -28,19 +28,19 @@ def traj2saxs(
     that are then used for SAXS curve calculation at every frame.
 
     Args:
-        trajectory:
-            path to trajectory file used in Universe object creation.
-        topology:
-            path to topology file used in Universe object creation.
-        trajectory_id:
-            prefix identifier for created files.
-        exp_saxs_file:
-            path to the experimental SAXS data for this protein, used in PEPSI-SAXS
+        trajectory (str):
+            Path to trajectory file used in Universe object creation.
+        topology (str):
+            Path to topology file used in Universe object creation.
+        trajectory_id (str):
+            Prefix identifier for created files.
+        exp_saxs_file (str):
+            Path to the experimental SAXS data for this protein, used in PEPSI-SAXS
             for SAXS curve calculation.
 
     Returns:
-        calc_saxs_file:
-            path to the file containing the set of calculated SAXS curves, one for every frame of
+        str:
+            Path to the file containing the set of calculated SAXS curves, one for every frame of
             the trajectory.
 
     Adapted from:

@@ -7,30 +7,33 @@ Ensemblify - a Python library for generating and analyzing ensembles of protein 
 
 Main Features
 -------------
+
 - Generate protein conformational ensembles by changing flexible regions.
 - Convert generated ensembles to trajectory file format.
 - Calculate theoretical SAXS curves from generated ensembles.
 - Analyze generated ensemble's structural properties through interactive plots.
 - Reweight generated ensembles using experimental data.
-- Re-analyze structural properties of generated ensembles using weights calculated from
-experimental data, compare to non-reweighted structural properties.
+- Re-analyze structural properties of generated ensembles using weights calculated from 
+  experimental data, compare to non-reweighted structural properties.
 
 How to access documentation
 ----------------------------
-Documentation is available in two forms: docstrings provided with the code, and an online
-ReadtheDocs, available from https://ensemblify.readthedocs.io/en/latest/index.html.
+
+Documentation is available in two forms:
+
+- Docstrings provided with the code
+- An online ReadtheDocs, available at https://ensemblify.readthedocs.io/en/latest/index.html.
 
 Use the built-in `help` function to view a function or module's docstring:
 
-```
 >>> import ensemblify as ey
 >>> help(ey)
 >>> help(ey.generation)
 >>> help(ey.generate_ensemble)
-```
 
 Available subpackages
 ---------------------
+
 `generation`
     Generate an ensemble of structures.
 `conversion`
@@ -44,6 +47,7 @@ Available subpackages
 
 Utilities
 ---------
+
 `test()`
     Run Ensemblify unit tests.
 `show_config()`

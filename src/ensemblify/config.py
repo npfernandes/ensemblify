@@ -29,6 +29,7 @@ GLOBAL_CONFIG = {
                                                        'width': None,
                                                        'scale': 1}} # defaults to bift alias
     }
+"""Ensemblify's global configuration dictionary."""
 
 # FUNCTIONS
 def show_config() -> dict:
@@ -36,7 +37,8 @@ def show_config() -> dict:
     Show the current configuration dictionary.
 
     Returns:
-        The Ensemblify global configuration dictionary.
+        dict:
+            The Ensemblify global configuration dictionary.
     
     """
     return GLOBAL_CONFIG
@@ -50,8 +52,8 @@ def update_config(new_config: dict):
     current config are updated.
 
     Args:
-        new_config:
-            dictionary with configuration parameters to update.
+        new_config (dict):
+            Dictionary with configuration parameters to update.
 
     """
     GLOBAL_CONFIG.update(new_config)

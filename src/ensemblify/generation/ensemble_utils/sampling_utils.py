@@ -25,7 +25,7 @@ from ensemblify.generation.ensemble_utils.functions import (
     apply_pae_constraints,
     derive_constraint_targets,
     get_targets_from_plddt,
-    prep_target,
+    _prep_target,
     setup_fold_tree,
     setup_minmover,
     setup_pose,
@@ -37,17 +37,17 @@ def setup_sampling_logging(sampling_log: str) -> tuple[logging.Logger,str,str]:
     """Setup logging handlers and files for PyRosetta sampling and Ray.
     
     Args:
-        sampling_log:
-            path to sampling .log file.
+        sampling_log (str):
+            Path to sampling .log file.
     
     Returns:
-        A tuple (logger, ray_log, pyrosetta_log) where:
-            logger: 
-                the Logger object associated with the sampling .log file
-            ray_log:
-                filepath to .log file with Ray log messages.
-            pyrosetta_log:
-                filepath to .log file with PyRosetta log messages.
+        tuple[logging.Logger,str,str]:
+            logger (logging.Logger): 
+                The Logger object associated with the sampling .log file
+            ray_log (str):
+                Filepath to .log file with Ray log messages.
+            pyrosetta_log (str):
+                Filepath to .log file with PyRosetta log messages.
     """
     ray_log = os.path.join(os.path.split(sampling_log)[0],'ray.log')
     pyrosetta_log = os.path.join(os.path.split(sampling_log)[0],'pyrosetta.log')
@@ -109,17 +109,17 @@ def setup_sampling_logging(sampling_log: str) -> tuple[logging.Logger,str,str]:
     return logger, ray_log, pyrosetta_log
 
 
-def setup_ray_worker_logging():
+def _setup_ray_worker_logging():
     logger = logging.getLogger('ray')
     logger.setLevel(logging.ERROR)
 
 
-def remove_ansi(file: str):
+def _remove_ansi(file: str):
     """Replace a file with a copy of it without ANSI characters.
 
     Args:
-        file:
-            path to text file to change.
+        file (str):
+            Path to text file to change.
     """
     with open(file,'r') as f:
         clean_text = re.sub(r'\033\[[0-9;]*[mGKHF]','', f.read())
@@ -127,20 +127,20 @@ def remove_ansi(file: str):
         t.write(clean_text)
 
 
-def check_contained_in(
+def _check_contained_in(
     container: list[int],
     elements: list[list[int]],
 ) -> list[list[int]]:
     """Check what elements, if any, have all their numbers present in container.
 
     Args:
-        container:
+        container (list[int]):
             List of integer numbers.
-        elements:
+        elements (list[list[int]]):
             List of lists of integer numbers.
 
     Returns:
-        elements_in_container:
+        list[list[int]]:
             What lists of integer numbers from elements have all their numbers present
             inside container.
     """
@@ -161,12 +161,12 @@ def setup_sampling_parameters(parameters_file: str) -> dict:
     Targets, secondary structure biases and contacts are also updated to tuples instead of lists.
 
     Args:
-        parameters_file:
-            path to parameters file following the Ensemblify template.
+        parameters_file (str):
+            Path to parameters file following the Ensemblify template.
 
     Returns:
-        prepared_parameters:
-            the updated params dictionary.
+        dict:
+            The updated params dictionary.
     """
     with open(parameters_file,'r',encoding='utf-8-sig') as document:
         prepared_parameters = yaml.safe_load(document)
@@ -181,7 +181,7 @@ def setup_sampling_parameters(parameters_file: str) -> dict:
             updated_targets = []
             for target in prepared_parameters['targets'][chain]:
                 sampler,region,database,mode = target
-                updated_regions = check_contained_in(container=[x for x in range(region[0],
+                updated_regions = _check_contained_in(container=[x for x in range(region[0],
                                                                                  region[1]+1)],
                                                      elements=chains_targets[chain])
                 for updated_region in updated_regions:
@@ -238,14 +238,14 @@ def setup_sampling_initial_pose(
     directory as the sampling_log file.
 
     Args:
-        params:
-            parameters following the Ensemblify template.
-        sampling_log:
-            path to the sampling .log file.
+        params (dict):
+            Parameters following the Ensemblify template.
+        sampling_log (str):
+            Path to the sampling .log file.
     
     Returns:
-        initial_pose (pyrosetta.rosetta.core.pose.Pose):
-            object to be used as the starting structure for the sampling process.
+        pyrosetta.rosetta.core.pose.Pose:
+            Object to be used as the starting structure for the sampling process.
     """
     logger = logging.getLogger(__name__)
 
@@ -310,19 +310,19 @@ def setup_sampling_initial_pose(
     return initial_pose
 
 
-def get_dbs_mem_size(databases: dict[str,pd.DataFrame]) -> int:
+def _get_dbs_mem_size(databases: dict[str,pd.DataFrame]) -> int:
     """Get a rough estimate of the size of a databases dictionary, in bytes.
 
     Store the size of the databases dictionary and for each database, the database ID,
     the database dictionary, the aminoacid ID and DataFrame.
 
     Args:
-        databases:
-            mapping of database IDs to Ensemblify databases.
+        databases (dict[str,pd.DataFrame]):
+            Mapping of database IDs to Ensemblify databases.
 
     Returns:
         int:
-            total memory size of each elements of the databases, in bytes.
+            Total memory size of each elements of the databases, in bytes.
     """
     total_mem = sys.getsizeof(databases)
     for db_id,db in databases.items():
@@ -359,59 +359,60 @@ def sample_pdb(
 
     Args:
         ppose (pyrosetta.distributed.packed_pose.core.PackedPose):
-            reference to the initial structure.
-        databases:
-            reference to the databases dictionary.
-        targets:
-            dictionary detailing the target regions for sampling in each chain.
-        output_path:
-            path to directory where sampled structures will be written to.
-        job_name:
-            prefix identifier for generated structures.
-        decoy_num:
+            Reference to the initial structure.
+        databases (dict[str,dict[str,pd.DataFrame]]):
+            Reference to the databases dictionary.
+        targets (dict[str,tuple[tuple[str,tuple[int,...],str,str]]]):
+            Dictionary detailing the target regions for sampling in each chain.
+        output_path (str):
+            Path to directory where sampled structures will be written to.
+        job_name (str):
+            Prefix identifier for generated structures.
+        decoy_num (str):
             Identifier to differentiate between different decoys of the same batch in a
             multiprocessing context. Defaults to ''.
-        log_file:
+        log_file (str):
             Path to the PyRosetta .log file. Defaults to 'pyrosetta.log' in current working
             directory.
-        ss_bias:
+        ss_bias (tuple[tuple[tuple[str,tuple[int,int],str],...],int] | None):
             Secondary Structure Bias with the desired percentage of total structures to respect
             this bias. Defaults to None.
-        variance:
-            new dihedral angle values inserted into sampling regions are sampled from a Gaussian
+        variance (float):
+            New dihedral angle values inserted into sampling regions are sampled from a Gaussian
             distribution centred on the value found in database and percentage variance equal to
             this value. Defaults to 0.10 (10%).
-        sampler_params:
+        sampler_params (dict[str,dict[str,int]]):
             Parameters for the used sampler, assumes MonteCarloSampler is used. Defaults to
             {'MC':{'temperature':200,'max_loops':200}}.
-        scorefxn_id:
+        scorefxn_id (str):
             PyRosetta ScoreFunction identifier. Must pertain to a .wst weights file present in
             /.../pyrosetta/database/scoring/weights/ . Defaults to 'score0'.
-        scorefxn_weight:
+        scorefxn_weight (float):
             Weight for the repulsive Van der Waals term in the ScoreFunction. Will only have an
             effect if the ScoreFunction has a repulsive Van der Waals term. Defaults to 1.0.
-        minimizer_id:
+        minimizer_id (str):
             PyRosetta minimization algorithm identifier used in MinMover.
             Defaults to 'dfpmin_armijo_nonmonotone'.
-        minimizer_tolerance:
+        minimizer_tolerance (float):
             Tolerance value for the PyRosetta MinMover object. Defaults to 0.001.
-        minimizer_maxiters:
+        minimizer_maxiters (int):
             Maximum iterations value for the PyRosetta MinMover object. Defaults to 5000.
-        minimizer_finalcycles:
+        minimizer_finalcycles (int):
             Number of times to apply the MinMover to our final structure. Defaults to 5.
-        cst_weight:
+        cst_weight (int):
             Weight of the AtomPairConstraint term in the ScoreFunction. Defaults to 1.
-        cstviolation_threshold:
+        cstviolation_threshold (float):
             Any residue with AtomPairConstraint score term value above this threshold is considered
             in violation of the applied constraints. Defaults to 0.015.
-        cstviolation_maxres:
+        cstviolation_maxres (int):
             Number of residues allowed to be above the constraint violation threshold.
             Defaults to 20.
 
     Returns:
-        output_filename: path to the sampled .pdb structure. Only written and returned if the
-        sampled structure is valid (does not violate the applied constraints).
-        Otherwise, return None.
+        str | None:
+            Path to the sampled .pdb structure. Only written and returned if the
+            sampled structure is valid (does not violate the applied constraints).
+            Otherwise, return None.
     """
     import pyrosetta
     import pyrosetta.distributed
@@ -470,8 +471,8 @@ def sample_pdb(
                 chain_end = working_pose.size()
 
             # So we don't sample fragments with length 2
-            target_prep = prep_target(seq_len=chain_end,
-                                      target=target)
+            target_prep = _prep_target(seq_len=chain_end,
+                                       target=target)
 
             if ss_bias is not None:
                 ssb = ss_bias[0]

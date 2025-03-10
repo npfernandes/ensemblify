@@ -17,21 +17,21 @@ def kde(
     data point to the KDE distribution.
 
     Args:
-        data:
-            dataset to calculate KDE values for.
-        weights:
-            array with weights for each data point. Defaults to uniform weights.
+        data (np.ndarray):
+            Dataset to calculate KDE values for.
+        weights (list, optional):
+            Array with weights for each data point. Defaults to uniform weights.
 
     Returns:
-        A tuple (x_coords,norm_kde,weighted_average,weighted_standard_error) where:
-            x_coords:
-                x axis coordinates corresponding to the calculated kde distribution.
-            norm_kde:
-                normalized kde distribution.
-            weighted_average:
-                weighted average of the given dataset.
-            weighted_standard_error:
-                weighted standard error of the calculated average.
+        tuple[np.ndarray,np.ndarray,float,float]:
+            x_coords (np.ndarray):
+                X axis coordinates corresponding to the calculated kde distribution.
+            norm_kde (np.ndarray):
+                Normalized kde distribution.
+            weighted_average (float):
+                Weighted average of the given dataset.
+            weighted_standard_error (float):
+                Weighted standard error of the calculated average.
 
     Adapted from:
         https://github.com/FrPsc/EnsembleLab/blob/main/EnsembleLab.ipynb
@@ -93,14 +93,14 @@ def get_array_extremum(arrays: list[np.ndarray], get_max: bool | None = True) ->
     """Get maximum or minimum value of the set with all values of all provided arrays.
 
     Args:
-        arrays:
-            list of arrays to analyze.
-        get_max:
+        arrays (list[np.ndarray]):
+            List of arrays to analyze.
+        get_max (bool, optional):
             Whether to get the maximum or minimum (if False) value. Defaults to True.
 
     Returns:
-        ext:
-            maximum or minimum value.
+        float:
+            Maximum or minimum value.
     """
     if get_max:
         ext = max(list(map(np.max,arrays)))
@@ -113,12 +113,12 @@ def round_to_nearest_multiple(n: int, factor: int, up: bool | None = True) -> in
     """Round a number to the nearest (up or down) multiple of a given factor.
 
     Args:
-        n:
-            number to round.
-        factor:
-            n will be rounded to multiple of this number.
-        up: 
-            whether to round up or down (if False). Defaults to True.
+        n (int):
+            Number to round.
+        factor (int):
+            The number n will be rounded to a multiple of factor.
+        up (bool, optional):
+            Whether to round up or down (if False). Defaults to True.
 
     Returns:
         rounded:

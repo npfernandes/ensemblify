@@ -712,11 +712,13 @@ def calculate_analysis_data(
             topology file pair.
         cm_dist (dict[str,tuple[str,str]], optional):
             Mapping of identifiers to tuples with two selection strings for creating MDAnalysis
-            AtomGroups, whose center mass distance will be calculated. If None, no center mass
-            distances are calculated. See https://userguide.mdanalysis.org/stable/selections.html
-            for more information about MDAnalysis selections. For example:
+            AtomGroups, whose center mass distance will be calculated. For example:
 
-            {'inter_domain' : ('resid 1:30', 'resid 110:140')}
+                {'inter_domain' : ('resid 1:30', 'resid 110:140')}
+
+            If None, no center mass distances are calculated.
+            See https://userguide.mdanalysis.org/stable/selections.html for more information about
+            MDAnalysis selections.
 
     Returns:
         dict[str,list[pd.DataFrame]]:

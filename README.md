@@ -310,8 +310,8 @@ To download and compile the GROMACS source code from their [website](https://ftp
     cd gromacs-2024.2
     mkdir build
     cd build
-    cmake .. -DGMX_BUILD_OWN_FFTW=ON -DREGRESSIONTEST_DOWNLOAD=ON -j $(nproc)
-    make
+    cmake .. -DGMX_BUILD_OWN_FFTW=ON -DREGRESSIONTEST_DOWNLOAD=ON
+    make -j $(nproc)
     make check
     sudo make install
     source /usr/local/gromacs/bin/GMXRC

@@ -217,10 +217,6 @@ def main():
                                                            'Ensemblify Python library.'),
                                               formatter_class=CustomHelpFormatter)
 
-    parser_conversion.add_argument('-j', '--jobname',
-                                   required=True, type=str, metavar='',
-                                   help='Name for created trajectory file (.xtc).')
-
     parser_conversion.add_argument('-e', '--ensembledir',
                                    required=True, type=str,  metavar='',
                                    help=('Path to directory where ensemble files (.pdb) are '
@@ -230,6 +226,10 @@ def main():
                                    required=True, type=str,  metavar='',
                                    help=('Path to directory where trajectory file (.xtc) will be '
                                          'created.'))
+
+    parser_conversion.add_argument('-i', '--trajectoryid',
+                                   required=True, type=str, metavar='',
+                                   help='Name for created trajectory file (.xtc).')
 
     parser_conversion.add_argument('-s',
                                    default=10000, type=int,  metavar='',
@@ -410,9 +410,9 @@ def main():
 
     elif full_args.module in ['conversion', 'c', 'con']:
         from ensemblify.conversion import ensemble2traj
-        ensemble2traj(job_name=full_args.jobname,
-                      ensemble_dir=full_args.ensembledir,
+        ensemble2traj(ensemble_dir=full_args.ensembledir,
                       trajectory_dir=full_args.trajectorydir,
+                      trajectory_id=full_args.trajectoryid,
                       trajectory_size=full_args.s,)
 
     elif full_args.module in ['analysis', 'a', 'ana']:

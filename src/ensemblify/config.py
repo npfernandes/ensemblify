@@ -5,7 +5,6 @@
 import os
 
 # CONSTANTS
-# Global configuration dictionary
 GLOBAL_CONFIG = {
     'USED_DATABASE_COLNAMES': {'OMG1': 'OMG1', # values == column names required in input dbs
                                'OMG2': 'OMG2', # case insensitive, becomes capital letter
@@ -27,7 +26,7 @@ GLOBAL_CONFIG = {
                               'toImageButtonOptions': {'format': 'svg', # defaults to svg download
                                                        'height': None,
                                                        'width': None,
-                                                       'scale': 1}} # defaults to bift alias
+                                                       'scale': 1}}
     }
 """Ensemblify's global configuration dictionary."""
 

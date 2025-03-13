@@ -67,9 +67,9 @@ def ensemblify_pipeline(
 
     # Create trajectory
     start = timer()
-    trajectory_path, topology_path = ensemble2traj(job_name=JOB_NAME,
-                                                   ensemble_dir=valid_pdbs_dir,
+    trajectory_path, topology_path = ensemble2traj(ensemble_dir=valid_pdbs_dir,
                                                    trajectory_dir=TRAJECTORY_DIR,
+                                                   trajectory_id=JOB_NAME,
                                                    trajectory_size=ENSEMBLE_SIZE)
     end = timer()
     print(f' ----------------- Trajectory Creation took: {round(end-start,3)} s -----------------' )
@@ -77,9 +77,9 @@ def ensemblify_pipeline(
     # Analyze trajectory
     if analysis:
         start = timer()
-        structural_metrics_data = analyze_trajectory(trajectory_ids=JOB_NAME,
-                                                     trajectories=trajectory_path,
+        structural_metrics_data = analyze_trajectory(trajectories=trajectory_path,
                                                      topologies=topology_path,
+                                                     trajectory_ids=JOB_NAME,
                                                      output_directory=ANALYSIS_DIR)
         end = timer()
         print((f' ----------------- Trajectory Analysis took: {round(end-start,3)} s '
@@ -88,9 +88,9 @@ def ensemblify_pipeline(
         # Reweigh ensemble with exp data
         if exp_data is not None:
             start = timer()
-            reweight_ensemble(trajectory_id=JOB_NAME,
-                              trajectory=trajectory_path,
+            reweight_ensemble(trajectory=trajectory_path,
                               topology=topology_path,
+                              trajectory_id=JOB_NAME,
                               exp_saxs_data=exp_data,
                               output_dir=REWEIGHTING_DIR,
                               calculated_metrics_data=structural_metrics_data)

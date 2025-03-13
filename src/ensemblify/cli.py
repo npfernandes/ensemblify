@@ -8,7 +8,7 @@ import sys
 # CONSTANTS
 NO_ARGS_ERROR_MSG = '''
 Error: Missing required arguments.
-Usage: ensemblify {generation,conversion,analysis,reweighting,clash_checking} [module options]
+Usage: ensemblify {generation,conversion,analysis,reweighting,clash_checking,pipeline} [module options]
 Run \'ensemblify help\' for more information.
 
 '''

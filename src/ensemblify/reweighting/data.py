@@ -46,16 +46,17 @@ def _derive_traj_id_from_file(filename: str) -> str:
             The text before the first underscore of filename, or the whole filename if
             no underscores are present.
     """
-    trajectory_id = filename
-    filename_components = filename.split('_')
-    no_exp = True
-    for i,s in enumerate(filename_components):
-        if s == 'exp':
-            no_exp = False
-            trajectory_id = '_'.join([x for x in filename_components[:i] ])
-    if no_exp:
-        filename_components[-1] = filename_components[-1][:-4]
-        trajectory_id = '_'.join([x for x in filename_components])
+    # Split the filename into components and handle the file extension
+    filename_components, _ = os.path.splitext(filename)
+    filename_components = filename_components.split('_')
+
+    # If 'exp' exists, do not include it in trajectory_id
+    try:
+        exp_index = filename_components.index('exp')
+        trajectory_id = '_'.join(filename_components[:exp_index])
+    except ValueError:
+        trajectory_id = '_'.join(filename_components)
+
     return trajectory_id
 
 

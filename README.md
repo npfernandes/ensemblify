@@ -288,7 +288,7 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
 GROMACS is a molecular dynamics package mainly designed for simulations of proteins, lipids, and nucleic acids [[5]](#ref5).
 It comes with a large selection of flexible tools for trajectory analysis and the output formats are also supported by all major analysis and visualisation packages.
 
-To download and compile the GROMACS source code from their [website](https://ftp.gromacs.org/gromacs/gromacs-2024.2.tar.gz) you can follow these commands:
+To download and compile the GROMACS [source code](https://ftp.gromacs.org/gromacs/gromacs-2024.2.tar.gz) from their [website](https://manual.gromacs.org/documentation/current/download.html) you can follow these commands:
 
 1. Create and navigate into your desired GROMACS installation directory, for example:
 

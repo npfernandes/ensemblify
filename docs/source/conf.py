@@ -79,7 +79,7 @@ napoleon_attr_annotations = True
 
 autoapi_dirs = ['../../src/ensemblify']
 autoapi_type = "python"
-# autoapi_template_dir = "_templates/autoapi"
+autoapi_template_dir = "_templates/autoapi"
 autoapi_options = [
     "members",
     "show-module-summary",

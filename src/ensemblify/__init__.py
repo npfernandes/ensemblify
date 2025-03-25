@@ -22,14 +22,14 @@ How to access documentation
 Documentation is available in two forms:
 
 - Docstrings provided with the code
-- An online ReadtheDocs, available at https://ensemblify.readthedocs.io/en/latest/index.html.
+- An online ReadtheDocs, available at https://ensemblify.readthedocs.io/latest/.
 
 Use the built-in `help` function to view a function or module's docstring:
 
 >>> import ensemblify as ey
 >>> help(ey)
 >>> help(ey.generation)
->>> help(ey.generate_ensemble)
+>>> help(ey.generation.generate_ensemble)
 
 Available subpackages
 ---------------------

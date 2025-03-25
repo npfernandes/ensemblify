@@ -3,7 +3,7 @@
 {{ obj.short_name }}
 {{ "=" * obj.short_name|length }}
 
-.. py:module:: {{ obj.short_name }}
+.. py:module:: {{ obj.name }}
 
       {% if obj.docstring %}
 .. autoapi-nested-parse::
@@ -51,7 +51,7 @@ Attributes
 .. autoapisummary::
 
                   {% for attribute in visible_attributes %}
-   {{ attribute.short_name }}
+   {{ attribute.id }}
                   {% endfor %}
                {% endif %}
 
@@ -75,7 +75,7 @@ Exceptions
 .. autoapisummary::
 
                   {% for exception in visible_exceptions %}
-   {{ exception.short_name }}
+   {{ exception.id }}
                   {% endfor %}
                {% endif %}
 
@@ -99,7 +99,7 @@ Classes
 .. autoapisummary::
 
                   {% for klass in visible_classes %}
-   {{ klass.short_name }}
+   {{ klass.id }}
                   {% endfor %}
                {% endif %}
 
@@ -123,7 +123,7 @@ Functions
 .. autoapisummary::
 
                   {% for function in visible_functions %}
-   {{ function.short_name }}
+   {{ function.id }}
                   {% endfor %}
                {% endif %}
 
@@ -141,7 +141,7 @@ Functions
          {% endif %}
       {% endblock %}
    {% else %}
-.. py:module:: {{ obj.short_name }}
+.. py:module:: {{ obj.name }}
 
       {% if obj.docstring %}
    .. autoapi-nested-parse::

@@ -167,7 +167,7 @@ For UNIX or Linux users:
 2. Navigate to where the FASPR source code is located:
 
     ```bash
-    cd src/ensemblify/third_party/FASPR-master/ # assuming this cloned repository is your current working directory
+    cd src/ensemblify/third_party/FASPR-master/ # assuming the cloned repository is your current working directory
     ```
 
     <!-- ```bash
@@ -202,7 +202,7 @@ For MacOS users:
 2. Navigate to where the FASPR source code is located:
 
     ```bash
-    cd src/ensemblify/third_party/FASPR-master/ # assuming this cloned repository is your current working directory
+    cd src/ensemblify/third_party/FASPR-master/ # assuming the cloned repository is your current working directory
     ```
 
     <!-- ```bash
@@ -252,7 +252,7 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
 2. Navigate to where the PULCHRA source code is located:
 
     ```bash
-    cd src/ensemblify/third_party/pulchra-master/ # assuming this cloned repository is your current working directory
+    cd src/ensemblify/third_party/pulchra-master/ # assuming the cloned repository is your current working directory
     ```
 
     <!-- ```bash
@@ -407,7 +407,7 @@ To compile the provided BIFT source code, you can follow these commands:
 2. Navigate to where the BIFT source code is located:
 
     ```bash
-    cd src/ensemblify/third_party/BIFT/ # assuming this cloned repository is your current working directory
+    cd src/ensemblify/third_party/BIFT/ # assuming the cloned repository is your current working directory
     ```
 
     <!-- ```bash

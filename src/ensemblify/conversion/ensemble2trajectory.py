@@ -23,7 +23,7 @@ def ensemble2traj(
     ensemble_dir: str | None = os.getcwd(),
     trajectory_dir: str | None = os.getcwd(),
     trajectory_id: str | None = '',
-    trajectory_size: int | None = 10000,
+    trajectory_size: int | None = None,
     ) -> tuple[str,str]:
     """Create a trajectory (.xtc) file from an ensemble of .pdb files.
     
@@ -41,6 +41,7 @@ def ensemble2traj(
             Prefix identifier for any created files.
         trajectory_size (int):
             Number of randomly sampled .pdb files to use for trajectory creation.
+            Defaults to all .pdb files in the ensemble directory.
     
     Returns:
         tuple[str,str]:
@@ -83,7 +84,7 @@ def ensemble2traj(
         pbar.set_description(JOIN_PDBS_MSG.format(trajectory_id_msg))
         ensemble_pdb_path = join_pdbs(pdbs_dir=ensemble_dir,
                                       job_name=trajectory_id,
-                                      ensemble_dir=trajectory_dir,
+                                      multimodel_dir=trajectory_dir,
                                       n_models=trajectory_size)
         pbar.update(1)
 

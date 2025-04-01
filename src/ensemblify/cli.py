@@ -232,7 +232,7 @@ def main():
                                    help='Name for created trajectory file (.xtc).')
 
     parser_conversion.add_argument('-s',
-                                   default=10000, type=int,  metavar='',
+                                   default=None, type=int,  metavar='',
                                    help=('(Optional) Number of frames of created trajectory file '
                                          '(.xtc).'))
 

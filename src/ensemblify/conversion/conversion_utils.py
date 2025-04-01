@@ -4,6 +4,7 @@
 ## Standard Library Imports
 import glob
 import os
+import random
 import subprocess
 import warnings
 
@@ -50,42 +51,51 @@ def move_topol_pdb(
 def join_pdbs(
     pdbs_dir: str,
     job_name: str,
-    ensemble_dir: str,
-    n_models: int,
+    multimodel_dir: str,
+    n_models: int | None = None,
     ) -> str:
     """Join a randomly sampled number of .pdb files in a directory into a single multimodel
     .pdb file.
 
     Args:
-        job_name (str):
-            Prefix identifier for created multimodel .pdb file.
-        ensemble_dir (str):
-            Path to directory where ensemble pdb will be created.
         pdbs_dir (str):
             Path to directory where numbered .pdb files are stored.
+        job_name (str):
+            Prefix identifier for created multimodel .pdb file.
+        multimodel_dir (str):
+            Path to directory where ensemble pdb will be created.
         n_models (int):
             Number of .pdb files to randomly sample from the specified directory.
+            If None, all .pdb files in the directory will be used.
     
     Returns:
         str:
             Path to created multimodel ensemble .pdb file.
     """
-    ensemble_path = os.path.join(ensemble_dir,f'{job_name}_ensemble.pdb')
+    # Grab .pdb files to join
+    total_pdbs2join = glob.glob(os.path.join(pdbs_dir,'*.pdb'))
+    if n_models is None:
+        n_models = len(total_pdbs2join)
+    
+    # Sample desired number of .pdb files (without replacement)
+    sampled_pdbs2join = random.sample(total_pdbs2join, n_models)
+
+    # Setup multimodel .pdb filepath
+    ensemble_path = os.path.join(multimodel_dir,f'{job_name}_ensemble.pdb')
+
+    # Write the sampled .pdb files to the multimodel .pdb file
     with open(ensemble_path,'x',encoding='utf-8') as output:
         model = 1
-        for pdb in glob.glob(os.path.join(pdbs_dir,'*.pdb')):
-            if model <= n_models:
-                output.write(f'MODEL {model}\n')
-                output.write(f'REMARK {pdb}\n')
-                with open(pdb, 'r',encoding='utf-8-sig') as pdb_file:
-                    content = pdb_file.readlines()
-                    for line in content:
-                        if line.startswith(('ATOM', 'HETA', 'TER')):
-                            output.write(line)
-                output.write('ENDMDL\n')
-                model += 1
-            else:
-                break
+        for pdb in sampled_pdbs2join:
+            output.write(f'MODEL {model}\n')
+            output.write(f'REMARK {pdb}\n')
+            with open(pdb, 'r',encoding='utf-8-sig') as pdb_file:
+                content = pdb_file.readlines()
+                for line in content:
+                    if line.startswith(('ATOM', 'HETA', 'TER')):
+                        output.write(line)
+            output.write('ENDMDL\n')
+            model += 1
     return ensemble_path
 
 

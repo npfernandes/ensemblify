@@ -49,13 +49,10 @@ HST5_TRAJECTORY, you should run:
 Available Functions
 -------------------
 
-- ``ensemble2traj``
-
-      Create a .xtc trajectory file from an ensemble of .pdb files.
-
-- ``traj2saxs``
-
-      Calculate a theoretical SAXS curve from a trajectory file using Pepsi-SAXS.
+``ensemble2traj``
+    Create a .xtc trajectory file from an ensemble of .pdb files.
+``traj2saxs``
+    Calculate a theoretical SAXS curve from a trajectory file using Pepsi-SAXS.
 
 """
 

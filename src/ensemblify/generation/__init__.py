@@ -32,9 +32,8 @@ HST5_PARAMS, you should run:
 Available Functions
 -------------------
 
-- ``generate_ensemble``
-
-      Generate an ensemble of conformations given a parameters file.
+``generate_ensemble``
+    Generate an ensemble of conformations given a parameters file.
 
 """
 

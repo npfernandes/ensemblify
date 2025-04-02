@@ -32,10 +32,9 @@ respectively, HST5_TRAJECTORY and HST5_SAXS, you should run:
 Available Functions
 -------------------
 
-- ``reweight_ensemble``
-
-      Apply Bayesian Maximum Entropy (BME) reweighting to a conformational ensemble, given
-      experimental SAXS data.
+``reweight_ensemble``
+    Apply Bayesian Maximum Entropy (BME) reweighting to a conformational ensemble, given
+    experimental SAXS data.
 
 """
 

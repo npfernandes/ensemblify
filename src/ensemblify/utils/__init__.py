@@ -63,34 +63,21 @@ run:
 Available Functions
 -------------------
 
-- ``df_from_pdb``
-
-      Convert the information in a .pdb file into a pandas DataFrame using BioPDB.
-
-- ``df_to_pdb``
-
-      Write content of a DataFrame containing PDB file info as a .pdb file using BioPDB.
-
-- ``extract_pdb_info``
-
-      Extract from a .pdb file info about number of chains, chain letters, starting residue
-      numbers and chain size.
-
-- ``cleanup_pdbs``
-
-      Delete all .pdb files in the given list.
-
-- ``kde``
-
-      Calculate a Kernel Density Estimate (KDE) distribution for a given dataset.
-
-- ``get_array_extremum``
-
-      Get maximum or minimum value of all elements of all provided arrays.
-
-- ``round_to_nearest_multiple``
-
-      Round a number to the nearest (up or down) multiple of a given factor.
+``df_from_pdb``
+    Convert the information in a .pdb file into a pandas DataFrame using BioPDB.
+``df_to_pdb``
+    Write content of a DataFrame containing PDB file info as a .pdb file using BioPDB.
+``extract_pdb_info``
+    Extract from a .pdb file info about number of chains, chain letters, starting residue
+    numbers and chain size.
+``cleanup_pdbs``
+    Delete all .pdb files in the given list.
+``kde``
+    Calculate a Kernel Density Estimate (KDE) distribution for a given dataset.
+``get_array_extremum``
+    Get maximum or minimum value of all elements of all provided arrays.
+``round_to_nearest_multiple``
+    Round a number to the nearest (up or down) multiple of a given factor.
 """
 
 from ensemblify.utils.misc import (

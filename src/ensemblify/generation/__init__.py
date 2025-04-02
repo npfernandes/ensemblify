@@ -1,6 +1,6 @@
 """
-Generation - `ensemblify.generation`
-====================================
+Generation - ``ensemblify.generation``
+======================================
 
 :Author(s): Nuno P. Fernandes
 :Year: 2024
@@ -17,7 +17,7 @@ Example applications
 Generate an ensemble
 ~~~~~~~~~~~~~~~~~~~~
 
-The `ensemblify.generation.generate_ensemble` function can be used to generate a conformational
+The ``ensemblify.generation.generate_ensemble`` function can be used to generate a conformational
 ensemble from a .yaml parameters file.
 
 For example, we can generate an ensemble for Histatin5, an intrinsically disordered protein (IDP)
@@ -32,7 +32,7 @@ HST5_PARAMS, you should run:
 Available Functions
 -------------------
 
-- `generate_ensemble`
+- ``generate_ensemble``
 
       Generate an ensemble of conformations given a parameters file.
 

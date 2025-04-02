@@ -45,7 +45,7 @@ A general overview of Ensemblify, descriptions of employed methods and applicati
 
 It is **heavily** recommended to install the `ensemblify` Python package in a dedicated virtual environment.
 
-You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html). We recommend [miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install), a free minimal installer for conda.
+You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html). We recommend [miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install), a free minimal installer for `conda`.
 
 To install the `ensemblify` Python package, you can follow these commands:
 
@@ -62,7 +62,7 @@ To install the `ensemblify` Python package, you can follow these commands:
       cd ensemblify
       ```
 
-2. Create your `ensemblify_env` [Conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) with all of Ensemblify's python dependencies installed by using the provided [environment file](environment.yml) (**recommended**):
+2. Create your `ensemblify_env` [conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) with all of Ensemblify's python dependencies installed by using the provided [environment file](environment.yml) (**recommended**):
 
     ```bash
     conda env create -f environment_Linux.yml # or environment_macOS.yml, for macOS users
@@ -180,7 +180,7 @@ Then, for **Linux** users:
     g++ -O3 --fast-math -o FASPR src/*.cpp
     ```
 
-4. Add an environment variable with the path to your FASPR executable to your `conda` environment:
+4. Add an environment variable with the path to your FASPR executable to your conda environment:
     <!-- ```bash
     echo "export FASPR_PATH='$(realpath FASPR)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
     source ~/.bashrc # Or ~/.zshrc, depending on the shell
@@ -209,7 +209,7 @@ For **macOS** users:
     g++ -03 -o FASPR src/*.cpp
     ```
 
-4. Add an environment variable with the path to your FASPR executable to your `conda` environment:
+4. Add an environment variable with the path to your FASPR executable to your `ensemblify_env` conda environment:
 
     <!-- ```bash
     echo "export FASPR_PATH='$(realpath FASPR)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
@@ -260,7 +260,7 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
     ```
     Do not be alarmed if some warnings show up on your screen; this is normal and they can be ignored.
 
-4. Add an environment variable with the path to your PULCHRA executable to your `conda` environment:
+4. Add an environment variable with the path to your PULCHRA executable to your `ensemblify_env` conda environment:
 
     <!-- ```bash
     echo "export PULCHRA_PATH='$(realpath pulchra)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
@@ -349,7 +349,7 @@ Then, for **Linux** users:
     unzip Pepsi-SAXS-Linux.zip
     ```
 
-3. Add an environment variable with the path to your Pepsi-SAXS executable to your `conda` environment:
+3. Add an environment variable with the path to your Pepsi-SAXS executable to your `ensemblify_env` conda environment:
 
     <!-- ```bash
     echo "export PEPSI_SAXS_PATH='$(realpath Pepsi-SAXS)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
@@ -368,14 +368,14 @@ Then, for **Linux** users:
 
 For **macOS** users:
 
-2. Download and extract the Pepsi-SAXS **macOS** executable:
+2. Download and extract the Pepsi-SAXS macOS executable:
 
     ```bash
     curl -O Pepsi-SAXS-MacOS.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/MacOS/2.6/Pepsi-SAXS.zip
     unzip Pepsi-SAXS-MacOS.zip
     ```
 
-3. Add an environment variable with the path to your Pepsi-SAXS executable to your `conda` environment:
+3. Add an environment variable with the path to your Pepsi-SAXS executable to your `ensemblify_env` conda environment:
 
     <!-- ```bash
     echo "export PEPSI_SAXS_PATH='$(realpath Pepsi-SAXS)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
@@ -429,7 +429,7 @@ To compile the provided BIFT source code, you can follow these commands:
     ```
     the `-march=native` flag may be replaced with `-m64` or `-m32`, and it may be necessary to include the `-static` flag depending on which system you are on.
 
-4. Add an environment variable with the path to your BIFT executable to your `conda` environment:
+4. Add an environment variable with the path to your BIFT executable to your `ensemblify_env` conda environment:
 
     <!-- ```bash
     echo "export BIFT_PATH='$(realpath bift)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell

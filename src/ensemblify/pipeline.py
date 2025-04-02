@@ -1,4 +1,15 @@
-"""All of Ensemblify's functionalities integrated into one function call."""
+"""
+Pipeline - ``ensemblify.pipeline``
+==================================
+
+:Author(s): Nuno P. Fernandes
+:Year: 2024
+:Copyright: GNU Public License v3
+
+.. versionadded:: 1.0.0
+
+All of Ensemblify's functionalities integrated into one function call.
+"""
 
 # IMPORTS
 ## Standard Library Imports

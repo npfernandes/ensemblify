@@ -5,16 +5,16 @@
 
 Ensemblify offers four main modules, all of which can be accessed either through the command line or from inside a Python script/Jupyter Notebook.
 
-The `generation` module
------------------------
+The ``generation`` module
+-------------------------
 
-With the `generation` module, you can generate conformational ensembles for your protein of interest.
+With the ``generation`` module, you can generate conformational ensembles for your protein of interest.
 
 Before generating an ensemble, you must create a parameters file either through the provided `parameters form <https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html>`_ or directly by editing the provided `parameters file template <docs/assets/parameters_template.yaml>`_. Check the :ref:`parameters file setup <Parameters File Setup>` section for more details.
 
 To generate an ensemble, provide Ensemblify with the path to your parameters file.
 
-Using the `ensemblify` command in a terminal:
+Using the ``ensemblify`` command in a terminal:
 
 .. code-block:: bash
 
@@ -49,14 +49,14 @@ An `.html form <https://github.com/npfernandes/ensemblify/releases/download/v0.0
 
 If you prefer to create your own parameters file from scratch, a `template file <docs/assets/parameters_template.yaml>`_ is also provided.
 
-The `conversion` module
------------------------
+The ``conversion`` module
+-------------------------
 
-With the `conversion` module, you can convert your generated .pdb structures into a .xtc trajectory file, enabling you to easily store and analyze your conformational ensemble.
+With the ``conversion`` module, you can convert your generated .pdb structures into a .xtc trajectory file, enabling you to easily store and analyze your conformational ensemble.
 
 To do this, provide the name for your created trajectory, the directory where the ensemble is stored and the directory where the trajectory file should be created.
 
-Using the `ensemblify` command in a terminal:
+Using the ``ensemblify`` command in a terminal:
 
 .. code-block:: bash
 
@@ -71,14 +71,14 @@ Inside a Python script or Jupyter Notebook:
 
 Check the interactive `Conversion Module <examples/03_conversion_module.ipynb>`_ notebook for detailed usage examples.
 
-The `analysis` module
----------------------
+The ``analysis`` module
+-----------------------
 
-With the `analysis` module, you can create an interactive graphical dashboard displaying structural information calculated from the conformational ensemble of your protein of interest.
+With the ``analysis`` module, you can create an interactive graphical dashboard displaying structural information calculated from the conformational ensemble of your protein of interest.
 
 To do this, provide your ensemble in trajectory format, your trajectory's topology file and the name you want to use for your protein in the graphical dashboard.
 
-Using the `ensemblify` command in a terminal:
+Using the ``ensemblify`` command in a terminal:
 
 .. code-block:: bash
 
@@ -93,14 +93,14 @@ Inside a Python script or Jupyter Notebook:
 
 Check the interactive `Analysis Module <examples/04_analysis_module.ipynb>`_ notebook for detailed usage examples.
 
-The `reweighting` module
-------------------------
+The ``reweighting`` module
+--------------------------
 
-With the `reweighting` module, you can use experimental SAXS data to reweigh your conformational ensemble following the Bayesian Maximum Entropy method [12]_.
+With the ``reweighting`` module, you can use experimental SAXS data to reweigh your conformational ensemble following the Bayesian Maximum Entropy method [12]_.
 
 To do this, provide your ensemble in trajectory format, your trajectory's topology file, the name you want to use for your protein in the graphical dashboard and your experimental SAXS data.
 
-Using the `ensemblify` command in a terminal:
+Using the ``ensemblify`` command in a terminal:
 
 .. code-block:: bash
 

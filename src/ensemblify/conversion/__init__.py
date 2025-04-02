@@ -1,6 +1,6 @@
 """
-Conversion - `ensemblify.conversion`
-====================================
+Conversion - ``ensemblify.conversion``
+======================================
 
 :Author(s): Nuno P. Fernandes
 :Year: 2024
@@ -18,7 +18,7 @@ Example applications
 Convert an ensemble to trajectory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `ensemblify.conversion.ensemble2traj` function can be used to create a .xtc trajectory file
+The ``ensemblify.conversion.ensemble2traj`` function can be used to create a .xtc trajectory file
 from an ensemble of .pdb files.
 
 For example, we can create a trajectory from the set of .pdb structures of Histatin5, an
@@ -34,7 +34,7 @@ named, respectively, HST5_ENSEMBLE_DIR and HST5_TRAJECTORY_DIR, you should run:
 Calculate a theoretical SAXS curve from a trajectory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `ensemblify.conversion.traj2saxs` function can be used to back-calculate an average SAXS
+The ``ensemblify.conversion.traj2saxs`` function can be used to back-calculate an average SAXS
 curve from a .xtc trajectory file.
 
 For example, we can calculate a SAXS curve from a .xtc trajectory file of Histatin5, an
@@ -49,13 +49,13 @@ HST5_TRAJECTORY, you should run:
 Available Functions
 -------------------
 
-- `ensemble2traj`
+- ``ensemble2traj``
 
       Create a .xtc trajectory file from an ensemble of .pdb files.
 
-- `traj2saxs`
+- ``traj2saxs``
 
-      Calculate a theoretical SAXS curve from a trajectory file using PEPSI-SAXS.
+      Calculate a theoretical SAXS curve from a trajectory file using Pepsi-SAXS.
 
 """
 

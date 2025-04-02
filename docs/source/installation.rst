@@ -6,18 +6,18 @@
 Ensemblify Python Package
 -------------------------
 
-It is **heavily** recommended to install the `ensemblify` Python package in a dedicated virtual environment.
+It is **heavily** recommended to install the ``ensemblify`` Python package in a dedicated virtual environment.
 
-You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their `website <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_. We recommend `miniconda <https://www.anaconda.com/docs/getting-started/miniconda/install>`_, a free minimal installer for conda.
+You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use ``conda``. If you want to download ``conda`` you can do so through their `website <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_. We recommend `miniconda <https://www.anaconda.com/docs/getting-started/miniconda/install>`_, a free minimal installer for ``conda``.
 
-To install the `ensemblify` Python package, you can follow these commands:
+To install the ``ensemblify`` Python package, you can follow these commands:
 
-1. Get the `ensemblify` source code. To do this you:
+1. Get the ``ensemblify`` source code. To do this you:
 
    a. Install `Git <https://git-scm.com/>`_ if you haven't already:
 
-     - On Linux: ``sudo apt-get install git``
-     - On macOS: Install Xcode Command Line Tools or use Homebrew: ``brew install git``
+      - On Linux: ``sudo apt-get install git``
+      - On macOS: Install Xcode Command Line Tools or use Homebrew: ``brew install git``
 
    b. Clone this repository and ``cd`` into it:
 
@@ -26,7 +26,7 @@ To install the `ensemblify` Python package, you can follow these commands:
       git clone https://github.com/npfernandes/ensemblify.git
       cd ensemblify
 
-2. Create your `ensemblify_env` `Conda environment <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html>`_ with all of Ensemblify's python dependencies installed by using the provided `environment file <environment.yml>`_ (**recommended**):
+2. Create your ``ensemblify_env`` `conda environment <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html>`_ with all of Ensemblify's python dependencies installed by using the provided `environment file <environment.yml>`_ (**recommended**):
 
    .. code-block:: bash
 
@@ -41,7 +41,7 @@ To install the `ensemblify` Python package, you can follow these commands:
       conda activate ensemblify_env
       pip install biopython==1.81 plotly==5.23.0 pyyaml==6.0.1 "ray[default]"==2.33.0
 
-3. Install the `ensemblify` python package into your newly created environment.
+3. Install the ``ensemblify`` python package into your newly created environment.
 
    .. code-block:: bash
 
@@ -59,10 +59,10 @@ Third Party Software
 
 Each of Ensemblify's modules has different dependencies to third party software, so if you only plan on using a certain module you do not have to install software required for others. The requirements are:
 
-- `generation` module: :ref:`PyRosetta <PyRosetta>`, :ref:`FASPR <FASPR>` and :ref:`PULCHRA <PULCHRA>`.
-- `conversion` module: :ref:`GROMACS <GROMACS>`, :ref:`Pepsi-SAXS <Pepsi-SAXS>` and optionally :ref:`BIFT <BIFT>`.
-- `analysis` module: no other software required.
-- `reweighting` module: no other software required.
+- ``generation`` module: :ref:`PyRosetta <PyRosetta>`, :ref:`FASPR <FASPR>` and :ref:`PULCHRA <PULCHRA>`.
+- ``conversion`` module: :ref:`GROMACS <GROMACS>`, :ref:`Pepsi-SAXS <Pepsi-SAXS>` and optionally :ref:`BIFT <BIFT>`.
+- ``analysis`` module: no other software required.
+- ``reweighting`` module: no other software required.
 
 .. _PyRosetta:
 
@@ -71,7 +71,7 @@ PyRosetta
 
 PyRosetta is a Python-based interface to the powerful Rosetta molecular modeling suite [2]_. Its functionalities are used through Ensemblify in order to generate conformational ensembles. You can install it by following these commands:
 
-1. Activate your `ensemblify_env` conda environment:
+1. Activate your ``ensemblify_env`` conda environment:
 
    .. code-block:: bash
 
@@ -79,19 +79,19 @@ PyRosetta is a Python-based interface to the powerful Rosetta molecular modeling
 
    If you have not yet created it, check the `Ensemblify Python Package <#ensemblify-python-package>`_ section.
 
-2. Install the `pyrosetta-installer <https://pypi.org/project/pyrosetta-installer/>`_ Python package, kindly provided by RosettaCommons, to aid in the `pyrosetta` installation:
+2. Install the `pyrosetta-installer <https://pypi.org/project/pyrosetta-installer/>`_ Python package, kindly provided by RosettaCommons, to aid in the ``pyrosetta`` installation:
 
    .. code-block:: bash
 
       pip install pyrosetta-installer 
 
-3. Use `pyrosetta-installer` to download (~ 1.6 GB) and install `pyrosetta` (note the distributed and serialization parameters):
+3. Use ``pyrosetta-installer`` to download (~ 1.6 GB) and install ``pyrosetta`` (note the distributed and serialization parameters):
 
    .. code-block:: bash
 
       python -c 'import pyrosetta_installer; pyrosetta_installer.install_pyrosetta(distributed=True,serialization=True)'
 
-4. To test your `pyrosetta` installation, you can type in a terminal:
+4. To test your ``pyrosetta`` installation, you can type in a terminal:
 
    .. code-block:: bash
 
@@ -99,7 +99,7 @@ PyRosetta is a Python-based interface to the powerful Rosetta molecular modeling
 
    If this step does not produce a complaint or error, your installation has been successful.
 
-   Remember to re-activate the `ensemblify_env` conda environment each time you wish to run code that uses `pyrosetta`.
+   Remember to re-activate the ``ensemblify_env`` environment each time you wish to run code that uses ``pyrosetta``.
 
 .. _FASPR:
 
@@ -108,7 +108,7 @@ FASPR
 
 FASPR is an ultra-fast and accurate program for deterministic protein sidechain packing [3]_. To compile the provided FASPR source-code, you can follow these commands:
 
-1. Activate your `ensemblify_env` conda environment:
+1. Activate your ``ensemblify_env`` conda environment:
 
    .. code-block:: bash
 
@@ -130,7 +130,7 @@ Then, for **Linux** users:
 
       g++ -O3 --fast-math -o FASPR src/*.cpp
 
-4. Add an environment variable with the path to your FASPR executable to your ``conda`` environment:
+4. Add an environment variable with the path to your FASPR executable to your ``ensemblify_env`` conda environment:
 
    .. code-block:: bash
 
@@ -155,7 +155,7 @@ For **macOS** users:
 
       g++ -03 -o FASPR src/*.cpp
 
-4. Add an environment variable with the path to your FASPR executable to your ``conda`` environment:
+4. Add an environment variable with the path to your FASPR executable to your ``ensemblify_env`` conda environment:
 
    .. code-block:: bash
 
@@ -173,7 +173,7 @@ PULCHRA
 
 PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing full-atom protein models from reduced representations [4]_. To compile the provided PULCHRA modified source-code, you can follow these commands:
 
-1. Activate your `ensemblify_env` conda environment:
+1. Activate your ``ensemblify_env`` conda environment:
 
    .. code-block:: bash
 
@@ -195,7 +195,7 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
 
    Do not be alarmed if some warnings show up on your screen; this is normal and they can be ignored.
 
-4. Add an environment variable with the path to your PULCHRA executable to your ``conda`` environment:
+4. Add an environment variable with the path to your PULCHRA executable to your ``ensemblify_env`` conda environment:
 
    .. code-block:: bash
 
@@ -269,7 +269,7 @@ Then, for **Linux** users:
       wget -O Pepsi-SAXS-Linux.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/Linux/3.0/Pepsi-SAXS-Linux.zip
       unzip Pepsi-SAXS-Linux.zip
 
-3. Add an environment variable with the path to your Pepsi-SAXS executable to your ``conda`` environment:
+3. Add an environment variable with the path to your Pepsi-SAXS executable to your ``ensemblify_env`` conda environment:
 
    .. code-block:: bash
       
@@ -283,14 +283,14 @@ Then, for **Linux** users:
 
 For **macOS** users:
 
-2. Download and extract the Pepsi-SAXS MacOS executable:
+2. Download and extract the Pepsi-SAXS macOS executable:
 
    .. code-block:: bash
 
       curl -O Pepsi-SAXS-MacOS.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/MacOS/2.6/Pepsi-SAXS.zip
       unzip Pepsi-SAXS-MacOS.zip
 
-3. Add an environment variable with the path to your Pepsi-SAXS executable to your ``conda`` environment:
+3. Add an environment variable with the path to your Pepsi-SAXS executable to your ``ensemblify_env`` conda environment:
 
    .. code-block:: bash
       
@@ -311,7 +311,7 @@ Bayesian indirect Fourier transformation (BIFT) of small-angle experimental data
 
 To compile the provided BIFT source code, you can follow these commands:
 
-1. Activate your `ensemblify_env` conda environment:
+1. Activate your ``ensemblify_env`` conda environment:
 
    .. code-block:: bash
 
@@ -333,7 +333,7 @@ To compile the provided BIFT source code, you can follow these commands:
 
    the `-march=native` flag may be replaced with `-m64` or `-m32`, and it may be necessary to include the `-static` flag depending on which system you are on.
 
-4. Add an environment variable with the path to your BIFT executable to your ``conda`` environment:
+4. Add an environment variable with the path to your BIFT executable to your ``ensemblify_env`` conda environment:
 
    .. code-block:: bash
 

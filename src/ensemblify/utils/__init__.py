@@ -1,6 +1,6 @@
 """
-Utils - `ensemblify.utils`
-==========================
+Utils - ``ensemblify.utils``
+============================
 
 :Author(s): Nuno P. Fernandes
 :Year: 2024
@@ -14,11 +14,11 @@ in other applications.
 Example applications
 --------------------
 
-Read a .pdb file into a `pandas.DataFrame`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Read a .pdb file into a ``pandas.DataFrame``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `ensemblify.utils.df_from_pdb` function can be used to read a .pdb file and get a
-`pandas.DataFrame` with its contents.
+The ``ensemblify.utils.df_from_pdb`` function can be used to read a .pdb file and get a
+``pandas.DataFrame`` with its contents.
 
 For example, we can get the contents of a .pdb file of Histatin5, an intrinsically
 disordered protein (IDP) with 24 aminoacid residues.
@@ -29,11 +29,11 @@ you should run:
 >>> import ensemblify as ey
 >>> hst5_df = ey.df_from_pdb(HST5_PDB)
 
-Write a .pdb file from a `pandas.DataFrame`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Write a .pdb file from a ``pandas.DataFrame``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `ensemblify.utils.df_to_pdb` function can be used to write a .pdb file from the content
-of a `pandas.DataFrame`.
+The ``ensemblify.utils.df_to_pdb`` function can be used to write a .pdb file from the content
+of a ``pandas.DataFrame``.
 
 For example, we can write the contents of the Hst5 DataFrame we created before back into a
 .pdb file.
@@ -47,7 +47,7 @@ NEW_HST5_PDB, you should run:
 Extract chain information from a .pdb file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `ensemblify.utils.extract_pdb_info` function can be used to extract from a .pdb file
+The ``ensemblify.utils.extract_pdb_info`` function can be used to extract from a .pdb file
 information regarding the number of protein chains present, which chain letters identify them,
 their starting residue numbers and their size.
 
@@ -63,32 +63,32 @@ run:
 Available Functions
 -------------------
 
-- `df_from_pdb`
+- ``df_from_pdb``
 
       Convert the information in a .pdb file into a pandas DataFrame using BioPDB.
 
-- `df_to_pdb`
+- ``df_to_pdb``
 
       Write content of a DataFrame containing PDB file info as a .pdb file using BioPDB.
 
-- `extract_pdb_info`
+- ``extract_pdb_info``
 
       Extract from a .pdb file info about number of chains, chain letters, starting residue
       numbers and chain size.
 
-- `cleanup_pdbs`
+- ``cleanup_pdbs``
 
       Delete all .pdb files in the given list.
 
-- `kde`
+- ``kde``
 
       Calculate a Kernel Density Estimate (KDE) distribution for a given dataset.
 
-- `get_array_extremum`
+- ``get_array_extremum``
 
       Get maximum or minimum value of all elements of all provided arrays.
 
-- `round_to_nearest_multiple`
+- ``round_to_nearest_multiple``
 
       Round a number to the nearest (up or down) multiple of a given factor.
 """

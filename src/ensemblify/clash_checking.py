@@ -1,4 +1,15 @@
-"""Simple module to re-check previously generated ensembles for steric clashes."""
+"""
+Clash Checking - ``ensemblify.clash_checking``
+==============================================
+
+:Author(s): Nuno P. Fernandes
+:Year: 2024
+:Copyright: GNU Public License v3
+
+.. versionadded:: 1.0.0
+
+Simple module to re-check previously generated ensembles for steric clashes.
+"""
 
 # IMPORTS
 ## Standard Library Imports

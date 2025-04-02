@@ -1,9 +1,12 @@
 """
-Ensemblify - a Python library for generating and analyzing ensembles of protein structures.
-===========================================================================================
+Ensemblify - ``ensemblify``
+===========================
+
 :Author(s): Nuno P. Fernandes
 :Year: 2024
 :Copyright: GNU Public License v3
+
+A Python library for generating and analyzing ensembles of protein structures
 
 Main Features
 -------------
@@ -21,10 +24,10 @@ How to access documentation
 
 Documentation is available in two forms:
 
-- Docstrings provided with the code
+- Docstrings provided with the code;
 - An online ReadtheDocs, available at https://ensemblify.readthedocs.io/latest/.
 
-Use the built-in `help` function to view a function or module's docstring:
+Use the built-in ``help`` function to view a function or module's docstring:
 
 >>> import ensemblify as ey
 >>> help(ey)
@@ -34,29 +37,27 @@ Use the built-in `help` function to view a function or module's docstring:
 Available subpackages
 ---------------------
 
-`generation`
+``generation``
     Generate an ensemble of structures.
-`conversion`
+``conversion``
     Convert ensembles to trajectory files and from these calculate SAXS curves.
-`analysis`
+``analysis``
     Calculate and plot data describing your ensemble.
-`reweighting`
+``reweighting``
     Reweight a generated ensemble using experimental data.
-`utils`
+``utils``
     Auxilliary functions used by other modules.
 
 Utilities
 ---------
 
-`test()`
-    Run Ensemblify unit tests.
-`show_config()`
+``show_config()``
     View Ensemblify's current general configuration.
-`update_config()`
+``update_config()``
     Update Ensemblify's current general configuration.
-`clash_checking.check_steric_clashes()`
+``clash_checking.check_steric_clashes()``
     Check an already generated ensemble for steric clashes, reporting any found.
-`pipeline.ensemblify_pipeline()`
+``pipeline.ensemblify_pipeline()``
     Function to use all of Ensemblify's functionalities sequentially.
 
 Citation

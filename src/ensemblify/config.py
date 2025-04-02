@@ -1,5 +1,15 @@
-"""View and update Ensemblify's global configuration."""
+"""
+Configuration - ``ensemblify.config``
+=====================================
 
+:Author(s): Nuno P. Fernandes
+:Year: 2024
+:Copyright: GNU Public License v3
+
+.. versionadded:: 1.0.0
+
+View and update Ensemblify's global configuration.
+"""
 # IMPORTS
 ## Standard Library Imports
 import os

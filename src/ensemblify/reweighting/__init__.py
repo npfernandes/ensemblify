@@ -1,6 +1,6 @@
 """
-Reweighting - `ensemblify.reweighting`
-======================================
+Reweighting - ``ensemblify.reweighting``
+========================================
 
 :Author(s): Nuno P. Fernandes
 :Year: 2024
@@ -9,14 +9,14 @@ Reweighting - `ensemblify.reweighting`
 .. versionadded:: 1.0.0
 
 This module contains functions for reweighting a generated ensemble of protein conformations using
-experimental SAXS data.
+experimental SAXS data, outputting an interactive graphical dashboard.
 
 Example applications
 --------------------
 
 Reweight an ensemble
-~~~~~~~~~~~~~~~~~~~~~
-The `ensemblify.generation.reweight_ensemble` function can be used to reweight a conformational
+~~~~~~~~~~~~~~~~~~~~
+The ``ensemblify.generation.reweight_ensemble`` function can be used to reweight a conformational
 ensemble using an experimental SAXS data file.
 
 For example, we can reweight the ensemble of Histatin5 (Hst5), an intrinsically disordered
@@ -32,7 +32,7 @@ respectively, HST5_TRAJECTORY and HST5_SAXS, you should run:
 Available Functions
 -------------------
 
-- `reweight_ensemble`
+- ``reweight_ensemble``
 
       Apply Bayesian Maximum Entropy (BME) reweighting to a conformational ensemble, given
       experimental SAXS data.

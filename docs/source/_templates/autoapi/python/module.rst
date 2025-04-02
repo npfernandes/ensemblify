@@ -1,7 +1,8 @@
 {% if obj.display %}
    {% if is_own_page %}
-{{ obj.short_name }}
-{{ "=" * obj.short_name|length }}
+
+:code:`{{ obj.short_name }}`
+{{ "=" * (obj.short_name|length + 8)}}
 
 .. py:module:: {{ obj.name }}
 

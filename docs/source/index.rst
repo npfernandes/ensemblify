@@ -1,3 +1,7 @@
+.. raw:: html
+
+    <div id="index-page">
+
 Welcome to `ensemblify`'s documentation!
 ========================================
 
@@ -8,8 +12,8 @@ Contents
    :titlesonly:
    :maxdepth: 2
 
-   overview
-   installation
+   overview.md
+   installation.md
    database
    usage
    documentation
@@ -24,3 +28,7 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+.. raw:: html
+
+    </div>

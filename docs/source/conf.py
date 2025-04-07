@@ -24,7 +24,14 @@ extensions = [
     "sphinx.ext.napoleon", # Allow for the Google and Numpy docstring formats
     "autoapi.extension", # automatically generate API Reference
     "sphinx_copybutton", # add a copy button to code blocks
+    "myst_parser", # support for markdown files
+    "sphinx_tabs.tabs", # support for tabs in markdown
 ]
+
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
 
 templates_path = ['_templates']
 exclude_patterns = []
@@ -32,10 +39,11 @@ exclude_patterns = []
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'furo' # 'sphinx_rtd_theme'
-html_static_path = ['_static']
 html_title = "Ensemblify"
+html_logo = "../assets/logo.png"
+html_theme = 'furo' # 'sphinx_rtd_theme'
 html_theme_options = {
+    "sidebar_hide_name": True,
     "navigation_with_keys": True,
     "footer_icons": [
         {
@@ -53,6 +61,15 @@ html_theme_options = {
     # "source_branch": "main",
     # "source_directory": "docs/source",
 }
+
+# These folders are copied to the documentation's HTML output
+html_static_path = ['_static']
+
+# These paths are either relative to html_static_path
+# or fully qualified paths (eg. https://...)
+html_css_files = [
+    'css/custom.css',
+]
 
 # -- Options for autodoc -----------------------------------------------------
 
@@ -90,3 +107,14 @@ autoapi_add_toctree_entry = False
 autoapi_keep_files = False
 autodoc_typehints = "description"
 suppress_warnings = ['autoapi.python_import_resolution']
+
+# -- Options for myst --------------------------------------------------------
+myst_enable_extensions = [
+    "html_image",
+    "colon_fence",
+]
+myst_heading_anchors = 6
+
+# -- Options for sphinx_tabs ------------------------------------------------
+sphinx_tabs_disable_tab_closing = True
+sphinx_tabs_disable_css_loading = True

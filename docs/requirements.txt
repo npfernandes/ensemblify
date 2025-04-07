@@ -1,3 +1,5 @@
 sphinx-autoapi
 furo
 sphinx_copybutton
+sphinx_tabs
+myst_parser

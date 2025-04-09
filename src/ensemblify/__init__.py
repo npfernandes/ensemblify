@@ -6,7 +6,7 @@ Ensemblify - ``ensemblify``
 :Year: 2024
 :Copyright: GNU Public License v3
 
-A Python library for generating and analyzing ensembles of protein structures
+A Python library for generating and analyzing ensembles of protein structures.
 
 Main Features
 -------------

@@ -14,12 +14,11 @@ Contents
 
    overview.md
    installation.md
-   database
-   usage
-   documentation
-   citation_and_publications
-   acknowledgements
-   authors
+   database.md
+   usage.md
+   citation_and_publications.md
+   acknowledgements.md
+   authors.md
    api_reference
 
 Indices and tables

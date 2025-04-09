@@ -336,7 +336,7 @@ To compile the provided BIFT source code, you can follow these commands:
 
     this will allow Ensemblify to know where your BIFT executable is located.
 
-Do not forget to visit the [Tripeptide Database](#-tripeptide-database) section to learn where you can get the database files that are required for conformational ensemble generation.
+Do not forget to visit the [Tripeptide Database](database.md#-tripeptide-database) section to learn where you can get the database files that are required for conformational ensemble generation.
 
 ## References
 

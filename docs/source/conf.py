@@ -3,12 +3,6 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# # -- Path setup --------------------------------------------------------------
-
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('../src/ensemblify'))
-
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
@@ -41,7 +35,7 @@ exclude_patterns = []
 
 html_title = "Ensemblify"
 html_logo = "../assets/logo.png"
-html_theme = 'furo' # 'sphinx_rtd_theme'
+html_theme = 'furo'
 html_theme_options = {
     "sidebar_hide_name": True,
     "navigation_with_keys": True,
@@ -57,24 +51,20 @@ html_theme_options = {
             "class": "",
         },
     ],
-    # "source_repository": "https://github.com/npfernandes/ensemblify",
-    # "source_branch": "main",
-    # "source_directory": "docs/source",
 }
 
 # These folders are copied to the documentation's HTML output
 html_static_path = ['_static']
 
-# These paths are either relative to html_static_path
-# or fully qualified paths (eg. https://...)
+# These paths are either relative to html_static_path or fully qualified paths (eg. https://...)
 html_css_files = [
     'css/custom.css',
 ]
 
-# -- Options for autodoc -----------------------------------------------------
+# # -- Options for autodoc -----------------------------------------------------
 
-autodoc_mock_imports = ["pyrosetta"] # ,"ensemblify", "MDAnalysis", "mdtraj", "numpy", "pandas", "pyarrow", "scikit-learn", "scipy", "tqdm", "biopython", "plotly", "pyyaml", "ray",
-autodoc_typehints = 'description'
+# autodoc_mock_imports = ["pyrosetta"] # ,"ensemblify", "MDAnalysis", "mdtraj", "numpy", "pandas", "pyarrow", "scikit-learn", "scipy", "tqdm", "biopython", "plotly", "pyyaml", "ray",
+# autodoc_typehints = 'description'
 
 # -- Options for napoleon -----------------------------------------------------
 napoleon_google_docstring = True

@@ -2,7 +2,11 @@
 
 With the `reweighting` module, you can use experimental SAXS data to reweigh your conformational ensemble following the Bayesian/Maximum Entropy method <sup>[[12]](#ref12)</sup>.
 
-To do this, provide your ensemble in trajectory format, your trajectory's topology file, the name you want to use for your protein in the graphical dashboard and your experimental SAXS data.
+To do this, provide:
+- your ensemble in trajectory format;
+- your trajectory's corresponding topology file;
+- the name you want to use for your protein in the graphical dashboard;
+- the experimental SAXS data of your protein.
 
 Using the `ensemblify` command in a terminal:
 
@@ -12,8 +16,6 @@ Inside a Python script or Jupyter Notebook:
 
     from ensemblify.reweighting import reweight_ensemble
     reweight_ensemble('trajectory.xtc','topology.pdb','trajectory_name','exp_SAXS_data.dat')
-
-Check the interactive [Reweighting Module](examples/05_reweighting_module.ipynb) notebook for detailed usage examples.
 
 ## References
 

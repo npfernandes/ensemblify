@@ -32,5 +32,3 @@ Inside a Python script or Jupyter Notebook:
 
     from ensemblify.generation import generate_ensemble
     generate_ensemble('parameters_file.yaml')
-
-Check the interactive [Generation Module](examples/02_generation_module.ipynb) notebook for detailed usage examples. 

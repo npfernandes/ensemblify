@@ -512,7 +512,10 @@ If you prefer to create your own parameters file from scratch, a [template file]
 
 With the `conversion` module, you can convert your generated .pdb structures into a .xtc trajectory file, enabling you to easily store and analyze your conformational ensemble.
 
-To do this, provide the name for your created trajectory, the directory where the ensemble is stored and the directory where the trajectory file should be created.
+To do this, provide:
+- the name for your created trajectory;
+- the directory where the ensemble is stored;
+- the directory where the trajectory file should be created.
 
 Using the `ensemblify` command in a terminal:
 
@@ -535,7 +538,10 @@ Check the `conversion`module [documentation](https://ensemblify.readthedocs.io/l
 
 With the `analysis` module, you can create an interactive graphical dashboard displaying structural information calculated from the conformational ensemble of your protein of interest.
 
-To do this, provide your ensemble in trajectory format, your trajectory's topology file and the name you want to use for your protein in the graphical dashboard.
+To do this, provide:
+- your ensemble in trajectory format;
+- your trajectory's corresponding topology file;
+- the name you want to use for your protein in the graphical dashboard.
 
 Using the `ensemblify` command in a terminal:
 
@@ -558,7 +564,11 @@ Check the `analysis`module [documentation](https://ensemblify.readthedocs.io/lat
 
 With the `reweighting` module, you can use experimental SAXS data to reweigh your conformational ensemble following the Bayesian Maximum Entropy method [[12]](#ref12).
 
-To do this, provide your ensemble in trajectory format, your trajectory's topology file, the name you want to use for your protein in the graphical dashboard and your experimental SAXS data.
+To do this, provide:
+- your ensemble in trajectory format;
+- your trajectory's corresponding topology file;
+- the name you want to use for your protein in the graphical dashboard;
+- the experimental SAXS data of your protein.
 
 Using the `ensemblify` command in a terminal:
 

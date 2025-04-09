@@ -19,6 +19,7 @@ Contents
    citation_and_publications.md
    acknowledgements.md
    authors.md
+   cli.md
    api_reference
 
 Indices and tables

@@ -8,13 +8,12 @@ import sys
 # CONSTANTS
 NO_ARGS_ERROR_MSG = '''
 Error: Missing required arguments.
-Usage: ensemblify {generation, conversion, analysis, reweighting, clash_checking, pipeline} [module options]
+Usage: ensemblify {generation, conversion, analysis, reweighting, pipeline, clash_checking} [module options]
 Run \'ensemblify help\' for more information.
 
 '''
 
-ENSEMBLIFY_HELP_MSG = '''
-usage: ensemblify {generation, conversion, analysis, reweighting, clash_checking, pipeline, help} [module options]
+ENSEMBLIFY_HELP_MSG = '''usage: ensemblify {generation, conversion, analysis, reweighting, pipeline, clash_checking, help} [module options]
 
 Command-line tool to access the modules of the Ensemblify Python library.
 
@@ -25,10 +24,8 @@ positional arguments:
     conversion (c, con)        Access the conversion module.
     analysis (a, ana)          Access the analysis module.
     reweighting (r, rew)       Access the reweighting module.
-    clash_checking (cch)       Access the clash checking module.
     pipeline (ppl)             Access the pipeline module.
-
-'''
+    clash_checking (cch)       Access the clash checking module.'''
 
 # CLASSES
 class CustomHelpFormatter(argparse.HelpFormatter):
@@ -122,8 +119,8 @@ def main():
                                                    'conversion', 'c', 'con',
                                                    'analysis', 'a', 'ana',
                                                    'reweighting', 'r', 'rew',
-                                                   'clash_checking', 'cch',
                                                    'pipeline', 'ppl',
+                                                   'clash_checking', 'cch',
                                                    'h', 'help'])
 
     # Print error message if no arguments are provided

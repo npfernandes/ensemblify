@@ -16,12 +16,12 @@ Step-by-step instructions for installing Ensemblify are available in the [Instal
 After installing Ensemblify, make sure to visit the [Tripeptide Database](database.md#-tripeptide-database) section to learn where you can get the database files required for ensemble generation.
 
 ## 💻 How can I use Ensemblify?
-Ensemblify can be used either as a Command Line Interface (CLI) like so:
+Ensemblify can be used either as a Command Line Interface (CLI):
 
     conda activate ensemblify_env
     ensemblify [options]
 
-or as a library inside a Python script or Jupyter notebook:
+or as a Python library inside a script or Jupyter notebook:
 
     import ensemblify as ey
     ey.do_cool_stuff()

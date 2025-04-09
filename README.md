@@ -8,7 +8,7 @@
 
 **Ensemblify** is a Python package that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (e.g. intrinsically disordered regions (IDRs)).
 
-It supports both user-defined models and AlphaFold [[1]](#ref1) predictions, using predicted Local Distance Difference Test (pLDDT) and Predicted Aligned Error (PAE) confidence metrics to guide conformational sampling. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
+It supports both user-defined models and AlphaFold<sup>[[1]](#ref1)</sup> predictions, using predicted Local Distance Difference Test (pLDDT) and Predicted Aligned Error (PAE) confidence metrics to guide conformational sampling. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
 
 ## 🧰 How do I install Ensemblify?
 Step-by-step instructions for installing Ensemblify are available in the [Installation](#-installation) section.
@@ -16,19 +16,19 @@ Step-by-step instructions for installing Ensemblify are available in the [Instal
 After installing Ensemblify, make sure to visit the [Tripeptide Database](#-tripeptide-database) section to learn where you can get the database files required for ensemble generation.
 
 ## 💻 How can I use Ensemblify?
-Ensemblify can be used either as a Command Line Interface (CLI) like so:
+Ensemblify can be used either as a Command Line Interface (CLI):
 
     conda activate ensemblify_env
     ensemblify [options]
 
-or as a library inside a Python script or Jupyter notebook:
+or as a Python library inside a script or Jupyter notebook:
 
     import ensemblify as ey
     ey.do_cool_stuff()
 
 Check the [Usage](#-usage) section for more details.
 
-You can also check out the interactive [Quick Reference Guide](examples/01_quick_reference_guide.ipynb) notebook.
+You can also check out the interactive [Quick Reference Guide](examples/quick_reference_guide.ipynb) notebook for a basic rundown of Ensemblify's features.
 
 ## 🔎 How does Ensemblify work?
 A general overview of Ensemblify, descriptions of employed methods and applications can be found in the Ensemblify paper:
@@ -51,24 +51,28 @@ To install the `ensemblify` Python package, you can follow these commands:
 
 1. Get the `ensemblify` source code. To do this you:
 
-    a. Install [Git](https://git-scm.com/) if you haven't already:
+    1.1. Install [Git](https://git-scm.com/) if you haven't already:
       - On Linux: `sudo apt-get install git`
-      - On macOS: Install Xcode Command Line Tools or use Homebrew: `brew install git`
+      - On macOS: `brew install git # using Homebrew`
 
-    b. Clone this repository and `cd` into it:
+    1.2. Clone this repository and `cd` into it:
 
       ```bash
       git clone https://github.com/npfernandes/ensemblify.git
       cd ensemblify
       ```
 
-2. Create your `ensemblify_env` [conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) with all of Ensemblify's python dependencies installed by using the provided [environment file](environment.yml) (**recommended**):
+2. Create your `ensemblify_env` [conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) with all of Ensemblify's Python dependencies:
+
+    Using the provided environment file (**recommended**):
 
     ```bash
     conda env create -f environment_Linux.yml # or environment_macOS.yml, for macOS users
     conda activate ensemblify_env
     ```
-    <details><summary>or by creating the environment and installing the necessary python packages manually (<b>not recommended</b>):</summary>
+
+    <details>
+    <summary>Creating the environment and manually installing the Python dependencies (<b>not recommended</b>):</summary>
 
     ```bash
     conda create --channel=conda-forge --name ensemblify_env python=3.10 MDAnalysis=2.6.1 mdtraj=1.9.9 numpy=1.26.4 pandas=2.2.2 pyarrow=13.0.0 scikit-learn=1.4.2 scipy=1.12.0 tqdm=4.66.2
@@ -115,7 +119,7 @@ Each of Ensemblify's modules has different dependencies to third party software,
   
   </summary>
 
-PyRosetta is a Python-based interface to the powerful Rosetta molecular modeling suite [[2]](#ref2). Its functionalities are used through Ensemblify in order to generate conformational ensembles. You can install it by following these commands:
+PyRosetta<sup>[[2]](#ref2)</sup> is a Python-based interface to the powerful Rosetta molecular modeling suite. Its functionalities are used through Ensemblify in order to generate conformational ensembles. You can install it by following these commands:
 
 1. Activate your `ensemblify_env` conda environment:
 
@@ -153,7 +157,7 @@ Remember to re-activate the `ensemblify_env` conda environment each time you wis
   
   </summary>
 
-FASPR is an ultra-fast and accurate program for deterministic protein sidechain packing [[3]](#ref3). To compile the provided FASPR source-code, you can follow these commands:
+FASPR<sup>[[3]](#ref3)</sup> is an ultra-fast and accurate program for deterministic protein sidechain packing. To compile the provided FASPR source-code, you can follow these commands:
 
 1. Activate your `ensemblify_env` conda environment:
 
@@ -172,45 +176,21 @@ FASPR is an ultra-fast and accurate program for deterministic protein sidechain 
     cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/
     ``` -->
 
-Then, for **Linux** users:
-
 3. Compile the FASPR source code:
+
+    For **Linux** users:
 
     ```bash
     g++ -O3 --fast-math -o FASPR src/*.cpp
     ```
-
-4. Add an environment variable with the path to your FASPR executable to your conda environment:
-    <!-- ```bash
-    echo "export FASPR_PATH='$(realpath FASPR)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
-    source ~/.bashrc # Or ~/.zshrc, depending on the shell
-    echo $FASPR_PATH # to check if the variable has been set correctly
-    ``` -->
-    ```bash
-    conda env config vars set FASPR_PATH=$(realpath FASPR)
-    conda deactivate
-    conda activate ensemblify_env
-    echo $FASPR_PATH # to check if the variable has been set correctly
-    ```
-
-    this will allow Ensemblify to know where your FASPR executable is located.
-
-For **macOS** users:
-
-3. Compile the FASPR source code:
+   
+    For **macOS** users:
 
     ```bash
-    g++ -03 -fast-math -o FASPR src/*.cpp
-    ```
-
-    or, if you get an error
-
-    ```bash
-    g++ -03 -o FASPR src/*.cpp
+    g++ -03 -fast-math -o FASPR src/*.cpp # if you get an error, remove -fast-math
     ```
 
 4. Add an environment variable with the path to your FASPR executable to your `ensemblify_env` conda environment:
-
     <!-- ```bash
     echo "export FASPR_PATH='$(realpath FASPR)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
     source ~/.bashrc # Or ~/.zshrc, depending on the shell
@@ -234,7 +214,7 @@ For **macOS** users:
   
   </summary>
 
-PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing full-atom protein models from reduced representations [[4]](#ref4). To compile the provided PULCHRA modified source-code, you can follow these commands:
+PULCHRA<sup>[[4]](#ref4)</sup> (PowerfUL CHain Restoration Algorithm) is a program for reconstructing full-atom protein models from reduced representations. To compile the provided PULCHRA modified source-code, you can follow these commands:
 
 1. Activate your `ensemblify_env` conda environment:
 
@@ -286,7 +266,7 @@ PULCHRA (PowerfUL CHain Restoration Algorithm) is a program for reconstructing f
   
   </summary>
 
-GROMACS is a molecular dynamics package mainly designed for simulations of proteins, lipids, and nucleic acids [[5]](#ref5).
+GROMACS<sup>[[5]](#ref5)</sup> is a molecular dynamics package mainly designed for simulations of proteins, lipids, and nucleic acids.
 It comes with a large selection of flexible tools for trajectory analysis and the output formats are also supported by all major analysis and visualisation packages.
 
 To download and compile the GROMACS [source code](https://ftp.gromacs.org/gromacs/gromacs-2024.2.tar.gz) from their [website](https://manual.gromacs.org/documentation/current/download.html) you can follow these commands:
@@ -329,7 +309,7 @@ To download and compile the GROMACS [source code](https://ftp.gromacs.org/gromac
   
   </summary>
 
-Pepsi-SAXS (Polynomial Expansions of Protein Structures and Interactions - SAXS) is an adaptive method for rapid and accurate computation of small-angle X-ray scattering (SAXS) profiles from atomistic protein models [[6]](#ref6).
+Pepsi-SAXS<sup>[[6]](#ref6)</sup> (Polynomial Expansions of Protein Structures and Interactions - SAXS) is an adaptive method for rapid and accurate computation of small-angle X-ray scattering (SAXS) profiles from atomistic protein models.
 
 To download the Pepsi-SAXS executable from their [website](https://team.inria.fr/nano-d/software/pepsi-saxs/) you can follow these commands:
 
@@ -340,35 +320,16 @@ To download the Pepsi-SAXS executable from their [website](https://team.inria.fr
     cd ~/software/Pepsi-SAXS/
     ```
 
-Then, for **Linux** users:
-
 2. Download and extract the Pepsi-SAXS Linux executable:
+
+    For **Linux** users:
 
     ```bash
     wget -O Pepsi-SAXS-Linux.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/Linux/3.0/Pepsi-SAXS-Linux.zip
     unzip Pepsi-SAXS-Linux.zip
     ```
 
-3. Add an environment variable with the path to your Pepsi-SAXS executable to your `ensemblify_env` conda environment:
-
-    <!-- ```bash
-    echo "export PEPSI_SAXS_PATH='$(realpath Pepsi-SAXS)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
-    source ~/.bashrc # Or ~/.zshrc, depending on the shell
-    echo $PEPSI_SAXS_PATH # to check if the variable has been set correctly
-    ``` -->
-    ```bash
-    conda activate ensemblify_env
-    conda env config vars set PEPSI_SAXS_PATH=$(realpath Pepsi-SAXS)
-    conda deactivate
-    conda activate ensemblify_env
-    echo $PEPSI_SAXS_PATH # to check if the variable has been set correctly
-    ```
-
-    this will allow Ensemblify to know where your Pepsi-SAXS executable is located.
-
-For **macOS** users:
-
-2. Download and extract the Pepsi-SAXS macOS executable:
+    For **macOS** users:
 
     ```bash
     curl -O Pepsi-SAXS-MacOS.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/MacOS/2.6/Pepsi-SAXS.zip
@@ -401,7 +362,7 @@ For **macOS** users:
   
   </summary>
 
-Bayesian indirect Fourier transformation (BIFT) of small-angle experimental data allows for an estimation of parameters that describe the data [[7]](#ref7). Larsen *et al.* show in [[8]](#ref8) that BIFT can identify whether the experimental error in small-angle scattering data is over or underestimated. Here we use their implementation of this method to make this determination and scale the error values accordingly.
+Bayesian indirect Fourier transformation (BIFT) of small-angle experimental data allows for an estimation of parameters that describe the data<sup>[[7]](#ref7)</sup>. Larsen *et al.* show in [[8]](#ref8) that BIFT can identify whether the experimental error in small-angle scattering data is over or underestimated. Here we use their implementation of this method to make this determination and scale the error values accordingly.
 
 To compile the provided BIFT source code, you can follow these commands:
 
@@ -454,7 +415,7 @@ Do not forget to visit the [Tripeptide Database](#-tripeptide-database) section 
 
 Ensemblify provides a three-residue fragment (tripeptide) database from which to sample dihedral angles, found here [link].
 
-This database was originally created and published by González-Delgado *et al.* and, as described in [[9]](#ref9), it was built by extracting dihedral angles from structures taken from the SCOPe [[10]](#ref10) [[11]](#ref11) 2.07 release, a curated database of high-resolution experimentally determined protein structures.
+This database was originally created and published by González-Delgado *et al.* and, as described in [[9]](#ref9), it was built by extracting dihedral angles from structures taken from the SCOPe<sup>[[10]](#ref10) [[11]](#ref11)</sup> 2.07 release, a curated database of high-resolution experimentally determined protein structures.
 In total, 6,740,433 tripeptide dihedral angle values were extracted, making up the *all* dataset. A structurally filtered dataset, *coil*, was generated by removing tripeptides contained in α-helices or β-strands, reducing the number of tripeptide dihedral angle values to 3,141,877.
 
 <details>  
@@ -501,7 +462,12 @@ Ensemblify offers four main modules, all of which can be accessed either through
 
 With the `generation` module, you can generate conformational ensembles for your protein of interest.
 
-Before generating an ensemble, you must create a parameters file either through the provided [parameters form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html) or directly by editing the provided [parameters file template](docs/assets/parameters_template.yaml). Check the [parameters file setup](#-setting-up-your-parameters-file) section for more details.
+Before generating an ensemble, you must create a parameters file either:
+
+- Using the provided [parameters form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html);
+- Directly, by editing the provided [parameters file template](docs/assets/parameters_template.yaml).
+
+Check the [parameters file setup](#-setting-up-your-parameters-file) section for more details.
 
 To generate an ensemble, provide Ensemblify with the path to your parameters file.
 
@@ -514,7 +480,7 @@ Inside a Python script or Jupyter Notebook:
     from ensemblify.generation import generate_ensemble
     generate_ensemble('parameters_file.yaml')
 
-Check the interactive [Generation Module](examples/02_generation_module.ipynb) notebook for detailed usage examples. 
+Check the `generation`module [documentation](https://ensemblify.readthedocs.io/latest/usage_generation.html) for more detailed usage examples. 
 
 <details>  
   <summary>
@@ -557,8 +523,7 @@ Inside a Python script or Jupyter Notebook:
     from ensemblify.conversion import ensemble2traj
     ensemble2traj('trajectory_name','ensemble_dir','trajectory_dir')
 
-Check the interactive [Conversion Module](examples/03_conversion_module.ipynb) notebook for detailed usage examples.
-
+Check the `conversion`module [documentation](https://ensemblify.readthedocs.io/latest/usage_conversion.html) for more detailed usage examples. 
 </details>
 
 <details>  
@@ -581,8 +546,7 @@ Inside a Python script or Jupyter Notebook:
     from ensemblify.analysis import analyze_trajectory
     analyze_trajectory('trajectory.xtc','topology.pdb','trajectory_name')
 
-Check the interactive [Analysis Module](examples/04_analysis_module.ipynb) notebook for detailed usage examples.
-
+Check the `analysis`module [documentation](https://ensemblify.readthedocs.io/latest/usage_analysis.html) for more detailed usage examples. 
 </details>
 
 <details>  
@@ -605,7 +569,7 @@ Inside a Python script or Jupyter Notebook:
     from ensemblify.reweighting import reweight_ensemble
     reweight_ensemble('trajectory.xtc','topology.pdb','trajectory_name','exp_SAXS_data.dat')
 
-Check the interactive [Reweighting Module](examples/05_reweighting_module.ipynb) notebook for detailed usage examples.
+Check the `reweighting`module [documentation](https://ensemblify.readthedocs.io/latest/usage_reweighting.html) for more detailed usage examples. 
 
 </details>
 
@@ -623,6 +587,7 @@ If you use Ensemblify, please cite its original publication:
 # 🤝 Acknowledgements
 
 We would like to thank the DeepMind team for developing AlphaFold.
+
 We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS institute for creating the tripeptide database used in the development of this tool. Check out their work at https://moma.laas.fr/.
 
 # ✍️ Authors

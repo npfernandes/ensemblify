@@ -8,13 +8,13 @@ import sys
 # CONSTANTS
 NO_ARGS_ERROR_MSG = '''
 Error: Missing required arguments.
-Usage: ensemblify {generation,conversion,analysis,reweighting,clash_checking,pipeline} [module options]
+Usage: ensemblify {generation, conversion, analysis, reweighting, clash_checking, pipeline} [module options]
 Run \'ensemblify help\' for more information.
 
 '''
 
 ENSEMBLIFY_HELP_MSG = '''
-usage: ensemblify {generation,conversion,analysis,reweighting,clash_checking,pipeline,help} [module options]
+usage: ensemblify {generation, conversion, analysis, reweighting, clash_checking, pipeline, help} [module options]
 
 Command-line tool to access the modules of the Ensemblify Python library.
 
@@ -113,8 +113,8 @@ def main():
     initial_parser = argparse.ArgumentParser(description=('Command-line tool to access various '
                                                           'modules of the Ensemblify Python '
                                                           'library.'),
-                                             usage=('ensemblify {generation,conversion,analysis,'
-                                                    'reweighting,clash_checking,pipeline}'
+                                             usage=('ensemblify {generation, conversion, analysis, '
+                                                    'reweighting, clash_checking, pipeline}'
                                                     ' [module options]'),
                                              add_help=False) # required
 
@@ -153,7 +153,7 @@ def main():
     parser_pipeline = subparsers.add_parser(name='pipeline',
                                             help='Access the pipeline module',
                                             aliases=['ppl'],
-                                            usage='ensemblify {pipeline,pip} [options]',
+                                            usage='ensemblify {pipeline, ppl} [options]',
                                             description=('The pipeline module of the '
                                                          'Ensemblify Python library.'),
                                             formatter_class=CustomHelpFormatter)
@@ -162,12 +162,12 @@ def main():
                                  type=str, required=True, metavar='',
                                  help='Path to parameters file (.yaml).')
 
-    parser_pipeline.add_argument('-a',
+    parser_pipeline.add_argument('-a', '--analysis',
                                  action='store_true', default=False,
                                  help=('(Optional) Whether to perform the analysis of the '
                                        'ensemble. Defaults to False.'))
 
-    parser_pipeline.add_argument('-e',
+    parser_pipeline.add_argument('-e', '--expdata',
                                  default=None, type=str, metavar='',
                                  help='(Optional) Path to experimental SAXS data file (.dat).')
 
@@ -175,7 +175,7 @@ def main():
     parser_clash_check = subparsers.add_parser(name='clash_checking',
                                                help='Access the clash checking module',
                                                aliases=['cch'],
-                                               usage='ensemblify {clash_checking,cch} [options]',
+                                               usage='ensemblify {clash_checking, cch} [options]',
                                                description=('The clash checking module of the '
                                                             'Ensemblify Python library.'),
                                                formatter_class=CustomHelpFormatter)
@@ -185,12 +185,12 @@ def main():
                                     help=('Path to directory where ensemble .pdb structures '
                                           'are stored.'))
 
-    parser_clash_check.add_argument('-s',
+    parser_clash_check.add_argument('-s', '--samplingtargets',
                                     default=None, type=str, metavar='',
                                     help=('(Optional) Path to file (.yaml) with sampling targets: '
                                           'mapping of chain letters to residue ranges.'))
 
-    parser_clash_check.add_argument('-i',
+    parser_clash_check.add_argument('-i', '--inputstructure',
                                     default=None, type=str, metavar='',
                                     help=('(Optional) Path to input structure (.pdb) used to '
                                           'generate the ensemble.'))
@@ -199,7 +199,7 @@ def main():
     parser_generation = subparsers.add_parser(name='generation',
                                               help='Access the generation module',
                                               aliases=['g', 'gen'],
-                                              usage='ensemblify {generation,gen,g} [options]',
+                                              usage='ensemblify {generation, gen, g} [options]',
                                               description=('The generation module of the '
                                                            'Ensemblify Python library.'),
                                               formatter_class=CustomHelpFormatter)
@@ -212,7 +212,7 @@ def main():
     parser_conversion = subparsers.add_parser(name='conversion',
                                               help='Access the conversion module',
                                               aliases=['c', 'con'],
-                                              usage='ensemblify {conversion,con,c} [options]',
+                                              usage='ensemblify {conversion, con, c} [options]',
                                               description=('The conversion module of the '
                                                            'Ensemblify Python library.'),
                                               formatter_class=CustomHelpFormatter)
@@ -231,7 +231,7 @@ def main():
                                    required=True, type=str, metavar='',
                                    help='Name for created trajectory file (.xtc).')
 
-    parser_conversion.add_argument('-s',
+    parser_conversion.add_argument('-s', '--size',
                                    default=None, type=int,  metavar='',
                                    help=('(Optional) Number of frames of created trajectory file '
                                          '(.xtc).'))
@@ -240,7 +240,7 @@ def main():
     parser_analysis = subparsers.add_parser(name='analysis',
                                             help='Access the analysis module',
                                             aliases=['a', 'ana'],
-                                            usage='ensemblify {analysis,ana,a} [options]',
+                                            usage='ensemblify {analysis, ana, a} [options]',
                                             description=('The analysis module of the Ensemblify '
                                                          'Python library.'),
                                             formatter_class=CustomHelpFormatter)
@@ -257,52 +257,52 @@ def main():
                                  nargs='+', required=True, type=str,  metavar='',
                                  help='Prefix identifier(s) for trajectory file(s).')
 
-    parser_analysis.add_argument('-out',
+    parser_analysis.add_argument('-out', '--outputdir',
                                  type=str,  metavar='',
                                  help='(Optional) Path to output directory.')
 
-    parser_analysis.add_argument('-rma',
+    parser_analysis.add_argument('-rma', '--ramachandran',
                                  action ='store_false',
                                  help=('(Optional) Whether to calculate a dihedral angles '
                                        'matrix. Defaults to True.'))
 
-    parser_analysis.add_argument('-dm',
+    parser_analysis.add_argument('-dm', '--distancematrix',
                                  action ='store_false',
                                  help=('(Optional) Whether to calculate a distance matrix. '
                                        'Defaults to True.'))
 
-    parser_analysis.add_argument('-cm',
+    parser_analysis.add_argument('-cm', '--contactmatrix',
                                  action ='store_false',
                                  help=('(Optional) Whether to calculate a contact matrix. '
                                        'Defaults to True.'))
 
-    parser_analysis.add_argument('-ssf',
+    parser_analysis.add_argument('-ssf', '--ssfrequency',
                                  action ='store_false',
                                  help=('(Optional) Whether to calculate a secondary structure '
                                        'assignment frequency matrix. Defaults to True.'))
 
-    parser_analysis.add_argument('-rg',
+    parser_analysis.add_argument('-rg', '--radiusgyration',
                                  action ='store_false',
                                  help=('(Optional) Whether to calculate a radius of gyration '
                                        'distribution. Defaults to True.'))
     
-    parser_analysis.add_argument('-dmax',
+    parser_analysis.add_argument('-dmax', '--maxdistance',
                                  action ='store_false',
                                  help=('(Optional) Whether to calculate a maximum distance '
                                        'distribution. Defaults to True.'))
 
-    parser_analysis.add_argument('-eed',
+    parser_analysis.add_argument('-eed', '--endtoend',
                                  action ='store_false',
                                  help=('(Optional) Whether to calculate an end-to-end distance '
                                        'distribution. Defaults to True.'))
 
-    parser_analysis.add_argument('-cmdist',
+    parser_analysis.add_argument('-cmdist', '--centremassdistance',
                                  nargs='+', type=str, metavar='',
                                  help=('(Optional) Pair(s) of MDAnalysis selection strings for '
-                                       'which to calculate a center of mass distance '
+                                       'which to calculate a centre of mass distance '
                                        'distribution. Defaults to None.'))
 
-    parser_analysis.add_argument('-colors',
+    parser_analysis.add_argument('-colors', '--colorpalette',
                                  nargs='+', type=str,  metavar='',
                                  help=('(Optional) List of color hexcodes to use, one for each '
                                        'analyzed trajectory.'))
@@ -311,7 +311,7 @@ def main():
     parser_reweighting = subparsers.add_parser(name='reweighting',
                                                aliases=['r', 'rew'],
                                                help='Access the reweighting module',
-                                               usage='ensemblify {reweighting,rew,r} [options]',
+                                               usage='ensemblify {reweighting, rew, r} [options]',
                                                description=('The reweighting module of the '
                                                             'Ensemblify Python library.'),
                                                formatter_class=CustomHelpFormatter)
@@ -332,57 +332,57 @@ def main():
                                     required=True, type=str,
                                     help='Path to experimental SAXS data file (.dat).')
 
-    parser_reweighting.add_argument('-out',
+    parser_reweighting.add_argument('-out', '--outputdir',
                                     type=str,  metavar='',
                                     help=('(Optional) Path to output directory. Defaults '
                                           'to current working directory.'))
 
-    parser_reweighting.add_argument('-tht',
+    parser_reweighting.add_argument('-tht', '--theta',
                                     nargs='+', type=int,  metavar='',
                                     help=('(Optional) List of values to try as the theta '
                                           'parameter in BME.'))
 
-    parser_reweighting.add_argument('-cm',
+    parser_reweighting.add_argument('-cm', '--contactmatrix',
                                     type=str,
                                     help=('(Optional) Path to calculated contact matrix file '
                                           '(.csv).'))
 
-    parser_reweighting.add_argument('-dm',
+    parser_reweighting.add_argument('-dm', '--distancematrix',
                                     type=str,
                                     help=('(Optional) Path to calculated distance matrix file '
                                           '(.csv).'))
 
-    parser_reweighting.add_argument('-ss',
+    parser_reweighting.add_argument('-ss', '--ssfrequency',
                                     type=str,
                                     help=('(Optional) Path to calculated secondary structure '
                                           'frequency matrix file (.csv).'))
 
-    parser_reweighting.add_argument('-m',
+    parser_reweighting.add_argument('-m', '--metrics',
                                     type=str,
                                     help=('(Optional) Path to calculated structural metrics file '
                                           '(.csv).'))
 
-    parser_reweighting.add_argument('-crg',
+    parser_reweighting.add_argument('-crg', '--compare_rg',
                                     action ='store_false',
                                     help=('(Optional) Whether to calculate and compare '
                                           'uniform/reweighted radius of gyration distributions. '
                                           'Defaults to True.'))
 
-    parser_reweighting.add_argument('-cdmax',
+    parser_reweighting.add_argument('-cdmax', '--compare_dmax',
                                     action ='store_false',
                                     help=('(Optional) Whether to calculate and compare uniform/reweighted '
                                           'maximum distance distributions. Defaults to True.'))
 
-    parser_reweighting.add_argument('-ceed',
+    parser_reweighting.add_argument('-ceed', '--compare_eed',
                                     action ='store_false',
                                     help=('(Optional) Whether to calculate and compare uniform/reweighted '
                                           'end-to-end distance distributions. Defaults to True.'))
 
-    parser_reweighting.add_argument('-ccmdist',
+    parser_reweighting.add_argument('-ccmdist', '--compare_cmdist',
                                     nargs='+', type=str, metavar='',
                                     help=('(Optional) Pair(s) of MDAnalysis selection strings for '
                                           'which to calculate and compare uniform/reweighted '
-                                          'center of mass distance distributions. Defaults to '
+                                          'centre of mass distance distributions. Defaults to '
                                           'None.'))
 
     # Now parse the remaining arguments with the full parser
@@ -395,41 +395,41 @@ def main():
     elif full_args.module in ['pipeline','ppl']:
         from ensemblify.pipeline import ensemblify_pipeline
         ensemblify_pipeline(parameters=full_args.parameters,
-                            analysis=full_args.a,
-                            exp_data=full_args.e,)
+                            analysis=full_args.analysis,
+                            exp_data=full_args.expdata)
 
     elif full_args.module in ['clash_checking', 'cch']:
         from ensemblify.clash_checking import check_steric_clashes
         check_steric_clashes(ensemble_dir=full_args.ensembledir,
-                             sampling_targets=full_args.s,
-                             input_structure=full_args.i,)
+                             sampling_targets=full_args.samplingtargets,
+                             input_structure=full_args.inputstructure)
 
     elif full_args.module in ['generation', 'g', 'gen']:
         from ensemblify.generation import generate_ensemble
-        generate_ensemble(parameters_path=full_args.parameters,)
+        generate_ensemble(parameters_path=full_args.parameters)
 
     elif full_args.module in ['conversion', 'c', 'con']:
         from ensemblify.conversion import ensemble2traj
         ensemble2traj(ensemble_dir=full_args.ensembledir,
                       trajectory_dir=full_args.trajectorydir,
                       trajectory_id=full_args.trajectoryid,
-                      trajectory_size=full_args.s,)
+                      trajectory_size=full_args.size)
 
     elif full_args.module in ['analysis', 'a', 'ana']:
         from ensemblify.analysis import analyze_trajectory
         analyze_trajectory(trajectories=full_args.trajectory,
                            topologies=full_args.topology,
                            trajectory_ids=full_args.trajectoryid,
-                           output_directory=full_args.out,
-                           ramachandran_data=full_args.rma,
-                           distancematrices=full_args.dm,
-                           contactmatrices=full_args.cm,
-                           ssfrequencies=full_args.ssf,
-                           rg=full_args.rg,
-                           dmax=full_args.dmax,
-                           eed=full_args.eed,
-                           cm_dist=full_args.cmdist,
-                           color_palette=full_args.colors,)
+                           output_directory=full_args.outputdir,
+                           ramachandran_data=full_args.ramachandran,
+                           distancematrices=full_args.distancematrix,
+                           contactmatrices=full_args.contactmatrix,
+                           ssfrequencies=full_args.ssfrequency,
+                           rg=full_args.radiusgyration,
+                           dmax=full_args.maxdistance,
+                           eed=full_args.endtoend,
+                           cm_dist=full_args.centremassdistance,
+                           color_palette=full_args.colorpalette)
 
     elif full_args.module in ['reweighting', 'r', 'rew']:
         from ensemblify.reweighting import reweight_ensemble
@@ -437,13 +437,13 @@ def main():
                           topology=full_args.topology,
                           trajectory_id=full_args.trajectoryid,
                           exp_saxs_data=full_args.expdata,
-                          output_dir=full_args.out,
-                          thetas=full_args.tht,
-                          calculated_cmatrix=full_args.cm,
-                          calculated_dmatrix=full_args.dm,
-                          calculated_ss_frequency=full_args.ss,
-                          calculated_metrics_data=full_args.m,
-                          compare_rg=full_args.crg,
-                          compare_dmax=full_args.cdmax,
-                          compare_eed=full_args.ceed,
-                          compare_cmdist=full_args.ccmdist,)
+                          output_dir=full_args.outputdir,
+                          thetas=full_args.theta,
+                          calculated_cmatrix=full_args.contactmatrix,
+                          calculated_dmatrix=full_args.distancematrix,
+                          calculated_ss_frequency=full_args.ssfrequency,
+                          calculated_metrics_data=full_args.metrics,
+                          compare_rg=full_args.compare_rg,
+                          compare_dmax=full_args.compare_dmax,
+                          compare_eed=full_args.compare_eed,
+                          compare_cmdist=full_args.compare_cmdist)

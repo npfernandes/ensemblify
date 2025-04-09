@@ -21,7 +21,7 @@ Your database must contain at least 10 columns: 9 containing the Phi, Psi and Om
 | VYV | -3.135116 | -2.503945 | -0.949731 | -3.119968 | 1.407456 | 1.979130 | -3.112883 | -2.592680 | 2.573798 |
 
 #### Single Residue Database
-Your database must contain at least 4 columns: 3 containing the Phi, Psi and Omega angles for each residue (**in radians**)  and 1 with the string identification of the residue. Any additional columns will be ignored. Note the '2' suffix in the column names which help with compatibility between single residue and tripeptide sampling modes.
+Your database must contain at least 4 columns: 3 containing the Phi, Psi and Omega angles for each residue (**in radians**)  and 1 with the string identification of the residue. Any additional columns will be ignored. Note the '2' suffix in the column names which helps with compatibility between single residue and tripeptide sampling modes.
 
 | FRAG | OMG2 | PHI2 | PSI2 |
 | :---: | :---: | :---: | :---: |

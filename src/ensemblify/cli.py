@@ -114,7 +114,7 @@ def main():
                                                           'modules of the Ensemblify Python '
                                                           'library.'),
                                              usage=('ensemblify {generation, conversion, analysis, '
-                                                    'reweighting, clash_checking, pipeline}'
+                                                    'reweighting, clash_checking, pipeline, help}'
                                                     ' [module options]'),
                                              add_help=False) # required
 

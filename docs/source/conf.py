@@ -15,7 +15,7 @@ release = '1.0.0'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    "sphinx.ext.napoleon", # Allow for the Google and Numpy docstring formats
+    # "sphinx.ext.napoleon", # Allow for the Google and Numpy docstring formats
     "autoapi.extension", # automatically generate API Reference
     "sphinx_copybutton", # add a copy button to code blocks
     "myst_parser", # support for markdown files
@@ -61,26 +61,21 @@ html_css_files = [
     'css/custom.css',
 ]
 
-# # -- Options for autodoc -----------------------------------------------------
-
-# autodoc_mock_imports = ["pyrosetta"] # ,"ensemblify", "MDAnalysis", "mdtraj", "numpy", "pandas", "pyarrow", "scikit-learn", "scipy", "tqdm", "biopython", "plotly", "pyyaml", "ray",
-# autodoc_typehints = 'description'
-
-# -- Options for napoleon -----------------------------------------------------
-napoleon_google_docstring = True
-napoleon_numpy_docstring = False
-napoleon_include_init_with_doc = True
-napoleon_include_private_with_doc = False
-napoleon_include_special_with_doc = True
-napoleon_use_admonition_for_examples = True
-napoleon_use_admonition_for_notes = True
-napoleon_use_admonition_for_references = True
-napoleon_use_ivar = False
-napoleon_use_param = True
-napoleon_use_rtype = True
-napoleon_preprocess_types = True
-napoleon_type_aliases = None
-napoleon_attr_annotations = True
+# # -- Options for napoleon -----------------------------------------------------
+# napoleon_google_docstring = True
+# napoleon_numpy_docstring = False
+# napoleon_include_init_with_doc = True
+# napoleon_include_private_with_doc = False
+# napoleon_include_special_with_doc = True
+# napoleon_use_admonition_for_examples = True
+# napoleon_use_admonition_for_notes = True
+# napoleon_use_admonition_for_references = True
+# napoleon_use_ivar = False
+# napoleon_use_param = True
+# napoleon_use_rtype = True
+# napoleon_preprocess_types = True
+# napoleon_type_aliases = None
+# napoleon_attr_annotations = True
 
 # -- Options for autoapi -----------------------------------------------------
 

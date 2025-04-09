@@ -1,16 +1,27 @@
 """
 Color Palettes and Colorscales used in trajectory analysis Figures.
 
-Reference:
-    https://plotly.com/python/v3/matplotlib-colorscales/
+References:
 
-    https://github.com/BIDS/colormap/blob/master/parula.py
+    - Default trace color palette, chosen for visual distinctiveness and colorblind friendliness:
+        Wong, B. (2011), Points of View: Color Blindness. Nature Methods,
+        8(6), 441. https://doi.org/10.1038/nmeth.1618
+
+    - The parula colorscale from MATLAB, used here in plotly Heatmaps:
+        https://github.com/BIDS/colormap/blob/master/parula.py
 
 """
 
-DEFAULT_TRACE_COLOR_PALETTE = ['#1f77b4', '#ff7f0e', '#2ca02c','#d62728', '#9467bd',
-                               '#8c564b', '#e377c2','#7f7f7f', '#bcbd22', '#17becf']
-"""Default color palette for traces in plotly figures."""
+DEFAULT_TRACE_COLOR_PALETTE = [
+    '#E69F00', # orange
+    '#56B4E9', # sky blue
+    '#009E73', # bluish green
+    '#F0E442', # yellow
+    '#0072B2', # blue
+    '#D55E00', # vermillion
+    '#CC79C5', # reddish purple
+]
+"""Default color palette used for traces in plotly figures."""
 
 PARULA_COLORSCALE = [[0.0, 'rgb(53, 42, 134)'],
                      [0.003937007874015748, 'rgb(53, 43, 138)'],

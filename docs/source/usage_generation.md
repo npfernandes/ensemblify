@@ -26,9 +26,13 @@ To generate an ensemble, provide Ensemblify with the path to your parameters fil
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify generation -p parameters_file.yaml
+   ```{code-block} console
+   $ ensemblify generation -p parameters_file.yaml
+   ```
 
 Inside a Python script or Jupyter Notebook:
 
-    from ensemblify.generation import generate_ensemble
-    generate_ensemble('parameters_file.yaml')
+   ```{code-block} python
+   from ensemblify.generation import generate_ensemble
+   generate_ensemble('parameters_file.yaml')
+   ```

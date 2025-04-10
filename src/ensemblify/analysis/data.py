@@ -549,16 +549,16 @@ def calc_cm_dist(
     sel1: str,
     sel2: str,
     ) -> float:
-    """Calculate the distance between the centre of mass of two atom selections in current frame.
+    """Calculate the distance between the center of mass of two atom selections in current frame.
 
     Args:
         u (mda.Universe):
             Universe pointing to the current frame.
         sel1 (str):
-            MDAnalysis selection string for selecting an AtomGroup whose centre of mass will be
+            MDAnalysis selection string for selecting an AtomGroup whose center of mass will be
             calculated.
         sel2 (str):
-            MDAnalysis selection string for selecting an AtomGroup whose centre of mass will be
+            MDAnalysis selection string for selecting an AtomGroup whose center of mass will be
             calculated.
     
     Returns:
@@ -596,11 +596,11 @@ def calculate_metrics_data(
             Whether to calculate the distance from the N to C terminal of the protein.
         cm_dist (dict[str,tuple[str,str]], optional):
             Mapping of identifiers to tuples with two selection strings for creating MDAnalysis
-            AtomGroups, whose centre mass distance will be calculated. For example:
+            AtomGroups, whose center mass distance will be calculated. For example:
 
                 {'inter_domain' : ('resid 1:30', 'resid 110:140')}
 
-            If None, no centre mass distances are calculated.
+            If None, no center mass distances are calculated.
             See https://userguide.mdanalysis.org/stable/selections.html for more information about
             MDAnalysis selections.
         output_path (str, optional):
@@ -712,11 +712,11 @@ def calculate_analysis_data(
             topology file pair.
         cm_dist (dict[str,tuple[str,str]], optional):
             Mapping of identifiers to tuples with two selection strings for creating MDAnalysis
-            AtomGroups, whose centre mass distance will be calculated. For example:
+            AtomGroups, whose center mass distance will be calculated. For example:
 
                 {'inter_domain' : ('resid 1:30', 'resid 110:140')}
 
-            If None, no centre mass distances are calculated.
+            If None, no center mass distances are calculated.
             See https://userguide.mdanalysis.org/stable/selections.html for more information about
             MDAnalysis selections.
 

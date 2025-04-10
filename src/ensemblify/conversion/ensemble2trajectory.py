@@ -9,7 +9,7 @@ import subprocess
 from tqdm import tqdm
 
 ## Local Imports
-from ensemblify.conversion.conversion_utils import join_pdbs, move_topol_pdb
+from ensemblify.conversion.conversion_utils import join_pdbs, move_topology_pdb
 
 # CONSTANTS
 MOVE_PDB_MSG = 'Moving{}topology .pdb... '
@@ -50,12 +50,6 @@ def ensemble2traj(
             topology_path (str):
                 Path to created topology .pdb file.
     """
-    assert not(ensemble_dir == os.getcwd() and
-               trajectory_dir == os.getcwd()), ('You must provide at least one of ensemble or '
-                                                'trajectory directory!')
-    assert ensemble_dir != trajectory_dir, ('Ensemble and trajectory directories '
-                                            'must be different!')
-
     # Create trajectory directory if non existent
     if not os.path.isdir(trajectory_dir):
         os.mkdir(trajectory_dir)
@@ -75,17 +69,18 @@ def ensemble2traj(
 
         # Keep one .pdb to serve as topology file for later analysis
         pbar.set_description(MOVE_PDB_MSG.format(trajectory_id_msg))
-        topology_path = move_topol_pdb(job_name=trajectory_id,
-                                       origin_path=ensemble_dir,
-                                       destination_path=trajectory_dir)
+        topology_path = move_topology_pdb(topology_name=trajectory_id,
+                                          origin_dir=ensemble_dir,
+                                          destination_dir=trajectory_dir)
         pbar.update(1)
 
         # Join pdbs into a single multimodel .pdb file
         pbar.set_description(JOIN_PDBS_MSG.format(trajectory_id_msg))
         ensemble_pdb_path = join_pdbs(pdbs_dir=ensemble_dir,
-                                      job_name=trajectory_id,
+                                      multimodel_name=trajectory_id,
                                       multimodel_dir=trajectory_dir,
-                                      n_models=trajectory_size)
+                                      n_models=trajectory_size,
+                                      topology_path=topology_path)
         pbar.update(1)
 
         # From a multimodel .pdb file, create a .xtc trajectory file

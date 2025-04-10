@@ -92,6 +92,11 @@ autoapi_add_toctree_entry = False
 autoapi_keep_files = False
 autodoc_typehints = "description"
 
+# -- Options for sphinx_copybutton -------------------------------------------------
+copybutton_prompt_text = r"\$ |\(ensemblify_env\) \$ "
+copybutton_prompt_is_regexp = True
+copybutton_copy_empty_lines = False
+
 # -- Options for myst --------------------------------------------------------
 myst_enable_extensions = [
     "html_image",

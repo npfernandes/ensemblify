@@ -14,20 +14,20 @@ To install the `ensemblify` Python package, you can follow these commands:
 
      ````{tabs}
 
-        ```{code-tab} bash Linux
-        sudo apt-get install git
+        ```{code-tab} console Linux
+        $ sudo apt-get install git
         ```
 
-        ```{code-tab} bash macOS
-        brew install git # using Homebrew
+        ```{code-tab} console macOS
+        $ brew install git # using Homebrew
         ```
      ````
 
     1.2. Clone this repository and `cd` into it:
 
-      ```bash
-      git clone https://github.com/npfernandes/ensemblify.git
-      cd ensemblify
+      ```{code-block} console
+      $ git clone https://github.com/npfernandes/ensemblify.git
+      $ cd ensemblify
       ```
 
 2. Create your `ensemblify_env` [conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) with all of Ensemblify's Python dependencies:
@@ -36,31 +36,31 @@ To install the `ensemblify` Python package, you can follow these commands:
 
       ````{tabs}
 
-         ```{code-tab} bash Linux
-         conda env create -f environment_Linux.yml
-         conda activate ensemblify_env
+         ```{code-tab} console Linux
+         $ conda env create -f environment_Linux.yml
+         $ conda activate ensemblify_env
          ```
 
-         ```{code-tab} bash macOS
-         conda env create -f environment_macOS.yml
-         conda activate ensemblify_env
+         ```{code-tab} console macOS
+         $ conda env create -f environment_macOS.yml
+         $ conda activate ensemblify_env
          ```
       ````
 
     <details>
     <summary> Creating the environment and manually installing the Python dependencies (<b>not recommended</b>):</summary>
 
-      ```bash
-      conda create --channel=conda-forge --name ensemblify_env python=3.10 MDAnalysis=2.6.1 mdtraj=1.9.9 numpy=1.26.4 pandas=2.2.2 pyarrow=13.0.0 scikit-learn=1.4.2 scipy=1.12.0 tqdm=4.66.2
-      conda activate ensemblify_env
-      pip install biopython==1.81 plotly==5.23.0 pyyaml==6.0.1 "ray[default]"==2.33.0
+      ```{code-block} console
+      $ conda create --channel=conda-forge --name ensemblify_env python=3.10 MDAnalysis=2.6.1 mdtraj=1.9.9 numpy=1.26.4 pandas=2.2.2 pyarrow=13.0.0 scikit-learn=1.4.2 scipy=1.12.0 tqdm=4.66.2
+      $ conda activate ensemblify_env
+      (ensemblify_env) $ pip install biopython==1.81 plotly==5.23.0 pyyaml==6.0.1 "ray[default]"==2.33.0
       ```
     </details><br>
 
 3. Install the `ensemblify` python package into your newly created environment.
 
-    ```bash
-    pip install .
+    ```{code-block} console
+    (ensemblify_env) $ pip install .
     ```
 
 <!-- Alternatively, Ensemblify is available via the Python Package Index:
@@ -88,27 +88,27 @@ PyRosetta<sup>[[2]](#ref2)</sup> is a Python-based interface to the powerful Ros
 
 1. Activate your `ensemblify_env` conda environment:
 
-    ```bash
-    conda activate ensemblify_env
+    ```{code-block} console
+    $ conda activate ensemblify_env
     ```
     If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
 
 2. Install the [`pyrosetta-installer`](https://pypi.org/project/pyrosetta-installer/) Python package, kindly provided by RosettaCommons, to aid in the `pyrosetta` installation:
 
-    ```bash
-    pip install pyrosetta-installer 
+    ```{code-block} console
+    (ensemblify_env) $ pip install pyrosetta-installer 
     ```
 
 3. Use `pyrosetta-installer` to download (~ 1.6 GB) and install `pyrosetta` (note the distributed and serialization parameters):
     
-    ```bash
-    python -c 'import pyrosetta_installer; pyrosetta_installer.install_pyrosetta(distributed=True,serialization=True)'
+    ```{code-block} console
+    (ensemblify_env) $ python -c 'import pyrosetta_installer; pyrosetta_installer.install_pyrosetta(distributed=True,serialization=True)'
     ```
 
 4. To test your `pyrosetta` installation, you can type in a terminal:
 
-    ```bash
-    python -c 'import pyrosetta.distributed; pyrosetta.distributed.init()'
+    ```{code-block} console
+    (ensemblify_env) $ python -c 'import pyrosetta.distributed; pyrosetta.distributed.init()'
     ```
 
 If this step does not produce a complaint or error, your installation has been successful.
@@ -121,15 +121,15 @@ FASPR<sup>[[3]](#ref3)</sup> is an ultra-fast and accurate program for determini
 
 1. Activate your `ensemblify_env` conda environment:
 
-    ```bash
-    conda activate ensemblify_env
+    ```{code-block} console
+    $ conda activate ensemblify_env
     ```
     If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
 
 2. Navigate to where the FASPR source code is located:
 
-    ```bash
-    cd src/ensemblify/third_party/FASPR-master/ # assuming the cloned repository is your current working directory
+    ```{code-block} console
+    (ensemblify_env) $ cd src/ensemblify/third_party/FASPR-master/ # assuming the cloned repository is your current working directory
     ```
 
     <!-- ```bash
@@ -140,12 +140,12 @@ FASPR<sup>[[3]](#ref3)</sup> is an ultra-fast and accurate program for determini
 
     ````{tabs}
 
-       ```{code-tab} bash Linux
-       g++ -O3 --fast-math -o FASPR src/*.cpp
+       ```{code-tab} console Linux
+       (ensemblify_env) $ g++ -O3 --fast-math -o FASPR src/*.cpp
        ```
 
-       ```{code-tab} bash macOS
-       g++ -03 -fast-math -o FASPR src/*.cpp # if you get an error, remove -fast-math
+       ```{code-tab} console macOS
+       (ensemblify_env) $ g++ -03 -fast-math -o FASPR src/*.cpp # if you get an error, remove -fast-math
        ```
     ````
 
@@ -155,11 +155,11 @@ FASPR<sup>[[3]](#ref3)</sup> is an ultra-fast and accurate program for determini
     source ~/.bashrc # Or ~/.zshrc, depending on the shell
     echo $FASPR_PATH # to check if the variable has been set correctly
     ``` -->
-    ```bash
-    conda env config vars set FASPR_PATH=$(realpath FASPR)
-    conda deactivate
-    conda activate ensemblify_env
-    echo $FASPR_PATH # to check if the variable has been set correctly
+    ```{code-block} console
+    (ensemblify_env) $ conda env config vars set FASPR_PATH=$(realpath FASPR)
+    (ensemblify_env) $ conda deactivate
+    $ conda activate ensemblify_env
+    (ensemblify_env) $ echo $FASPR_PATH # to check if the variable has been set correctly
     ```
 
     this will allow Ensemblify to know where your FASPR executable is located.
@@ -170,15 +170,16 @@ PULCHRA<sup>[[4]](#ref4)</sup> (PowerfUL CHain Restoration Algorithm) is a progr
 
 1. Activate your `ensemblify_env` conda environment:
 
-    ```bash
-    conda activate ensemblify_env
+    ```{code-block} console
+    $ conda activate ensemblify_env
     ```
+
     If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
 
-2. Navigate to where the PULCHRA source code is located:
-
-    ```bash
-    cd src/ensemblify/third_party/pulchra-master/ # assuming the cloned repository is your current working directory
+2. Navigate to where the PULCHRA source code is located.
+    
+    ```{code-block} console
+    (ensemblify_env) $ cd src/ensemblify/third_party/pulchra-master/ # assuming the cloned repository is your current working directory:
     ```
 
     <!-- ```bash
@@ -187,9 +188,10 @@ PULCHRA<sup>[[4]](#ref4)</sup> (PowerfUL CHain Restoration Algorithm) is a progr
 
 3. Compile the PULCHRA source code:
 
-    ```bash
-    cc -O3 -o pulchra pulchra_CHANGED.c pulchra_data.c -lm
+    ```{code-block} console
+    (ensemblify_env) $ cc -O3 -o pulchra pulchra_CHANGED.c pulchra_data.c -lm
     ```
+
     Do not be alarmed if some warnings show up on your screen; this is normal and they can be ignored.
 
 4. Add an environment variable with the path to your PULCHRA executable to your `ensemblify_env` conda environment:
@@ -200,11 +202,11 @@ PULCHRA<sup>[[4]](#ref4)</sup> (PowerfUL CHain Restoration Algorithm) is a progr
     echo $PULCHRA_PATH # to check if the variable has been set correctly
     ``` -->
 
-    ```bash
-    conda env config vars set PULCHRA_PATH=$(realpath pulchra)
-    conda deactivate
-    conda activate ensemblify_env
-    echo $PULCHRA_PATH # to check if the variable has been set correctly
+    ```{code-block} console
+    (ensemblify_env) $ conda env config vars set PULCHRA_PATH=$(realpath pulchra)
+    (ensemblify_env) $ conda deactivate
+    $ conda activate ensemblify_env
+    (ensemblify_env) $ echo $PULCHRA_PATH # to check if the variable has been set correctly
     ```
 
     this will allow Ensemblify to know where your PULCHRA executable is located.
@@ -218,29 +220,29 @@ To download and compile the GROMACS [source code](https://ftp.gromacs.org/gromac
 
 1. Create and navigate into your desired GROMACS installation directory, for example:
 
-    ```bash
-    mkdir -p ~/software/GROMACS
-    cd ~/software/GROMACS
+    ```{code-block} console
+    $ mkdir -p ~/software/GROMACS
+    $ cd ~/software/GROMACS
     ```
 
 2. Download the GROMACS source code from their website:
 
-    ```bash
-    wget -O gromacs-2024.2.tar.gz https://zenodo.org/records/11148655/files/gromacs-2024.2.tar.gz?download=1
+    ```{code-block} console
+    $ wget -O gromacs-2024.2.tar.gz https://zenodo.org/records/11148655/files/gromacs-2024.2.tar.gz?download=1
     ```
 
 3. Follow the [GROMACS installation instructions](https://manual.gromacs.org/documentation/current/install-guide/index.html) to compile the GROMACS source code (this could take a while):
 
-    ```bash
-    tar xfz gromacs-2024.2.tar.gz
-    cd gromacs-2024.2
-    mkdir build
-    cd build
-    cmake .. -DGMX_BUILD_OWN_FFTW=ON -DREGRESSIONTEST_DOWNLOAD=ON
-    make -j $(nproc)
-    make check
-    sudo make install
-    source /usr/local/gromacs/bin/GMXRC
+    ```{code-block} console
+    $ tar xfz gromacs-2024.2.tar.gz
+    $ cd gromacs-2024.2
+    $ mkdir build
+    $ cd build
+    $ cmake .. -DGMX_BUILD_OWN_FFTW=ON -DREGRESSIONTEST_DOWNLOAD=ON
+    $ make -j $(nproc)
+    $ make check
+    $ sudo make install
+    $ source /usr/local/gromacs/bin/GMXRC
     ```
 
     Environment variables that will allow Ensemblify to know where GROMACS is located will have already been added to your shell configuration file.
@@ -253,23 +255,23 @@ To download the Pepsi-SAXS executable from their [website](https://team.inria.fr
 
 1. Create and navigate into your desired Pepsi-SAXS installation directory, for example:
 
-    ```bash
-    mkdir -p ~/software/Pepsi-SAXS/
-    cd ~/software/Pepsi-SAXS/
+    ```{code-block} console
+    $ mkdir -p ~/software/Pepsi-SAXS/
+    $ cd ~/software/Pepsi-SAXS/
     ```
 
 2. Download and extract the Pepsi-SAXS executable:
 
     ````{tabs}
 
-       ```{code-tab} bash Linux
-       wget -O Pepsi-SAXS-Linux.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/Linux/3.0/Pepsi-SAXS-Linux.zip
-       unzip Pepsi-SAXS-Linux.zip
+       ```{code-tab} console Linux
+       $ wget -O Pepsi-SAXS-Linux.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/Linux/3.0/Pepsi-SAXS-Linux.zip
+       $ unzip Pepsi-SAXS-Linux.zip
        ```
 
-       ```{code-tab} bash macOS
-       curl -O Pepsi-SAXS-MacOS.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/MacOS/2.6/Pepsi-SAXS.zip
-       unzip Pepsi-SAXS-MacOS.zip
+       ```{code-tab} console macOS
+       $ curl -O Pepsi-SAXS-MacOS.zip https://files.inria.fr/NanoDFiles/Website/Software/Pepsi-SAXS/MacOS/2.6/Pepsi-SAXS.zip
+       $ unzip Pepsi-SAXS-MacOS.zip
        ```
     ````
 
@@ -280,12 +282,12 @@ To download the Pepsi-SAXS executable from their [website](https://team.inria.fr
     source ~/.bashrc # Or ~/.zshrc, depending on the shell
     echo $PEPSI_SAXS_PATH # to check if the variable has been set correctly
     ``` -->
-    ```bash
-    conda activate ensemblify_env
-    conda env config vars set PEPSI_SAXS_PATH=$(realpath Pepsi-SAXS)
-    conda deactivate
-    conda activate ensemblify_env
-    echo $PEPSI_SAXS_PATH # to check if the variable has been set correctly
+    ```{code-block} console
+    $ conda activate ensemblify_env
+    (ensemblify_env) $ conda env config vars set PEPSI_SAXS_PATH=$(realpath Pepsi-SAXS)
+    (ensemblify_env) $ conda deactivate
+    $ conda activate ensemblify_env
+    (ensemblify_env) $ echo $PEPSI_SAXS_PATH # to check if the variable has been set correctly
     ```
 
     this will allow Ensemblify to know where your Pepsi-SAXS executable is located.
@@ -298,15 +300,15 @@ To compile the provided BIFT source code, you can follow these commands:
 
 1. Activate your `ensemblify_env` conda environment:
 
-    ```bash
-    conda activate ensemblify_env
+    ```{code-block} console
+    $ conda activate ensemblify_env
     ```
     If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
 
 2. Navigate to where the BIFT source code is located:
 
-    ```bash
-    cd src/ensemblify/third_party/BIFT/ # assuming the cloned repository is your current working directory
+    ```{code-block} console
+    (ensemblify_env) $ cd src/ensemblify/third_party/BIFT/ # assuming the cloned repository is your current working directory
     ```
 
     <!-- ```bash
@@ -315,8 +317,8 @@ To compile the provided BIFT source code, you can follow these commands:
 
 3. Compile the BIFT source code:
 
-    ```bash
-    gfortran -march=native -O3 bift.f -o bift
+    ```{code-block} console
+    (ensemblify_env) $ gfortran -march=native -O3 bift.f -o bift
     ```
     the `-march=native` flag may be replaced with `-m64` or `-m32`, and it may be necessary to include the `-static` flag depending on which system you are on.
 
@@ -327,11 +329,11 @@ To compile the provided BIFT source code, you can follow these commands:
     source ~/.bashrc # Or ~/.zshrc, depending on the shell
     echo $BIFT_PATH # to check if the variable has been set correctly
     ``` -->
-    ```bash
-    conda env config vars set BIFT_PATH=$(realpath bift)
-    conda deactivate
-    conda activate ensemblify_env
-    echo $BIFT_PATH # to check if the variable has been set correctly
+    ```{code-block} console
+    (ensemblify_env) $ conda env config vars set BIFT_PATH=$(realpath bift)
+    (ensemblify_env) $ conda deactivate
+    $ conda activate ensemblify_env
+    (ensemblify_env) $ echo $BIFT_PATH # to check if the variable has been set correctly
     ```
 
     this will allow Ensemblify to know where your BIFT executable is located.

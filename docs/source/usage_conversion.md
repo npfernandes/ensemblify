@@ -9,9 +9,13 @@ To do this, provide:
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify conversion -j trajectory_name -e ensemble_dir -t trajectory_dir
+   ```{code-block} console
+   $ ensemblify conversion -j trajectory_name -e ensemble_dir -t trajectory_dir
+   ```
 
 Inside a Python script or Jupyter Notebook:
 
-    from ensemblify.conversion import ensemble2traj
-    ensemble2traj('trajectory_name','ensemble_dir','trajectory_dir')
+   ```{code-block} python
+   from ensemblify.conversion import ensemble2traj
+   ensemble2traj('trajectory_name','ensemble_dir','trajectory_dir')
+   ```

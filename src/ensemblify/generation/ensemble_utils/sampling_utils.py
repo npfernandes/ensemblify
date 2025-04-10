@@ -379,7 +379,7 @@ def sample_pdb(
             this bias. Defaults to None.
         variance (float):
             New dihedral angle values inserted into sampling regions are sampled from a Gaussian
-            distribution centred on the value found in database and percentage variance equal to
+            distribution centered on the value found in database and percentage variance equal to
             this value. Defaults to 0.10 (10%).
         sampler_params (dict[str,dict[str,int]]):
             Parameters for the used sampler, assumes MonteCarloSampler is used. Defaults to

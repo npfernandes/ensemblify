@@ -10,12 +10,16 @@ To do this, provide:
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify reweighting -trj trajectory.xtc -top topology.pdb -tid trajectory_name -exp exp_SAXS_data.dat
+   ```{code-block} console
+   $ ensemblify reweighting -trj trajectory.xtc -top topology.pdb -tid trajectory_name -exp exp_SAXS_data.dat
+   ```
 
 Inside a Python script or Jupyter Notebook:
 
-    from ensemblify.reweighting import reweight_ensemble
-    reweight_ensemble('trajectory.xtc','topology.pdb','trajectory_name','exp_SAXS_data.dat')
+   ```{code-block} python
+   from ensemblify.reweighting import reweight_ensemble
+   reweight_ensemble('trajectory.xtc','topology.pdb','trajectory_name','exp_SAXS_data.dat')
+   ```
 
 ## References
 

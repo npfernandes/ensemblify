@@ -16,7 +16,7 @@ usage_pipeline.md
 - **[`generation`](usage_generation.md#the-generation-module) module:** generate conformational ensembles for your protein of interest.
 - **[`conversion`](usage_conversion.md#the-conversion-module) module:** convert your generated .pdb structures into a single .xtc trajectory file, facilitating ensemble storage and analysis.
 - **[`analysis`](usage_analysis.md#the-analysis-module) module:** create an interactive graphical dashboard displaying structural information calculated from the conformational ensemble of your protein of interest.
-- **[`reweighting`](usage_reweighting.md#the-reweighting-module) module:** use experimental SAXS data to reweigh your conformational ensemble following the Bayesian/Maximum Entropy method.
+- **[`reweighting`](usage_reweighting.md#the-reweighting-module) module:** use experimental SAXS data to reweight your conformational ensemble following the Bayesian/Maximum Entropy method.
 
 Ensemblify also offers two minor modules that can also be accessed through the command line or from inside a Python script/Jupyter Notebook.
 

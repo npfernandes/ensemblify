@@ -16,31 +16,30 @@ import numpy as np
 from ensemblify.config import GLOBAL_CONFIG
 
 # FUNCTIONS
-def move_topol_pdb(
-    job_name: str,
-    origin_path: str,
-    destination_path:str,
+def move_topology_pdb(
+    topology_name: str,
+    origin_dir: str,
+    destination_dir: str,
     ) -> str:
-    """Move a .pdb file from origin to destination directory.
+    """Move a .pdb file from origin to destination directory, to act as a topology file.
     
-    Given a path to a directory containing .pdb files, moves a single .pdb
-    from that directory to a destination directory, to serve as a topology
-    file for future trajectory analysis.
+    Given a path to a directory containing .pdb files, moves a single .pdb from that directory
+    to a destination directory, to serve as a topology file for future trajectory analysis.
 
     Args:
-        job_name (str):
+        topology_name (str):
             Prefix identifier for moved .pdb file.
-        origin_path (str):
-            Directory where topology file of interest is located.
-        destination_path (str):
-            Directory where topology file will be moved to.
+        origin_dir (str):
+            Directory where file of interest is located.
+        destination_dir (str):
+            Directory where file will be moved to.
     
     Returns:
         str:
             Path to the moved topology file.
     """
-    topology_path = os.path.join(destination_path,f'{job_name}_top.pdb')
-    for pdb in glob.glob(os.path.join(origin_path,'*.pdb')):
+    topology_path = os.path.join(destination_dir,f'{topology_name}_top.pdb')
+    for pdb in glob.glob(os.path.join(origin_dir,'*.pdb')):
         with open(pdb,'r',encoding='utf-8-sig') as f, open(topology_path,'w',encoding='utf-8') as t:
             t.write(f.read())
             break
@@ -50,9 +49,10 @@ def move_topol_pdb(
 
 def join_pdbs(
     pdbs_dir: str,
-    job_name: str,
+    multimodel_name: str,
     multimodel_dir: str,
     n_models: int | None = None,
+    topology_path: str | None = None,
     ) -> str:
     """Join a randomly sampled number of .pdb files in a directory into a single multimodel
     .pdb file.
@@ -60,13 +60,16 @@ def join_pdbs(
     Args:
         pdbs_dir (str):
             Path to directory where numbered .pdb files are stored.
-        job_name (str):
+        multimodel_name (str):
             Prefix identifier for created multimodel .pdb file.
         multimodel_dir (str):
             Path to directory where ensemble pdb will be created.
         n_models (int):
             Number of .pdb files to randomly sample from the specified directory.
             If None, all .pdb files in the directory will be used.
+        topology_path (str):
+            Path to a topology .pdb file to be ignored when sampling .pdb files from
+            multimodel_dir. Required if pdbs_dir matches multimodel_dir. Defaults to None.
     
     Returns:
         str:
@@ -74,6 +77,12 @@ def join_pdbs(
     """
     # Grab .pdb files to join
     total_pdbs2join = glob.glob(os.path.join(pdbs_dir,'*.pdb'))
+    
+    # Remove topology_path from the list of .pdb files to join, if applicable
+    if topology_path is not None:
+        total_pdbs2join.remove(topology_path)
+    
+    # Assign number of models to sample if not given
     if n_models is None:
         n_models = len(total_pdbs2join)
     
@@ -81,7 +90,7 @@ def join_pdbs(
     sampled_pdbs2join = random.sample(total_pdbs2join, n_models)
 
     # Setup multimodel .pdb filepath
-    ensemble_path = os.path.join(multimodel_dir,f'{job_name}_ensemble.pdb')
+    ensemble_path = os.path.join(multimodel_dir,f'{multimodel_name}_ensemble.pdb')
 
     # Write the sampled .pdb files to the multimodel .pdb file
     with open(ensemble_path,'x',encoding='utf-8') as output:

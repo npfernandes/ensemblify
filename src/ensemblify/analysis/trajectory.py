@@ -70,11 +70,11 @@ def analyze_trajectory(
             trajectory, topology file pair.
         cm_dist (dict[str,tuple[str,str]]):
             Mapping of identifiers to tuples with two selection strings for creating MDAnalysis
-            AtomGroups, whose centre mass distance will be calculated and plotted. For example:
+            AtomGroups, whose center mass distance will be calculated and plotted. For example:
 
                 {'inter_domain' : ('resid 1:30', 'resid 110:140')}
 
-            If None, no centre mass distances are calculated.
+            If None, no center mass distances are calculated.
             See https://userguide.mdanalysis.org/stable/selections.html for more information about
             MDAnalysis selections.
         color_palette (list[str]):

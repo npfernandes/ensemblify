@@ -60,7 +60,7 @@ class MonteCarloSampler():
                 Parameters for the instantiated sampler.
             variance (float):
                 New dihedral angle values inserted into sampling regions are sampled from a
-                Gaussian distribution centred on the value found in database and percentage
+                Gaussian distribution centered on the value found in database and percentage
                 variance equal to this value.
             log_file (str):
                 Path to .log file for warnings or error messages related to sampling.

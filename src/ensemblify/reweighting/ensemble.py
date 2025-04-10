@@ -62,7 +62,7 @@ def reweight_ensemble(
     Inside the output directory, a directory named trajectory_id will be created and that is where
     all output files will be stored.
     If calculated metrics data is provided, it will not be recalculated.
-    If data for the centre mass distance is to be taken from the given calculated metrics data,
+    If data for the center mass distance is to be taken from the given calculated metrics data,
     the compare_cmdist mapping must be provided. The identifiers of this mapping will be matched
     to column names of the given DataFrame, if present.
  
@@ -110,11 +110,11 @@ def reweight_ensemble(
             to True.
         compare_cmdist (bool, optional):
             Mapping of identifiers to tuples with two selection strings for creating MDAnalysis
-            AtomGroups, whose centre mass distance will be calculated. For example:
+            AtomGroups, whose center mass distance will be calculated. For example:
 
                 {'inter_domain' : ('resid 1:30', 'resid 110:140')}
 
-            If None, no centre mass distances are calculated or compared.
+            If None, no center mass distances are calculated or compared.
             See https://userguide.mdanalysis.org/stable/selections.html for more information about
             MDAnalysis selections.
             Defaults to None.

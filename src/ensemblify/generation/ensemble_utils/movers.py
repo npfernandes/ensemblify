@@ -29,7 +29,7 @@ class SetRandomDihedralsMover(Mover):
             angle values dataframes.
         variance (float):
             New dihedral angle values inserted into sampling regions are sampled from a Gaussian
-            distribution centred on the value found in database and percentage variance equal to
+            distribution centered on the value found in database and percentage variance equal to
             this value.
         log_file (str):
             Path to .log file for warnings or error messages related to sampling.
@@ -44,7 +44,7 @@ class SetRandomDihedralsMover(Mover):
                 to dihedral angle values dataframes.
             variance (float):
                 New dihedral angle values inserted into sampling regions are sampled from a Gaussian
-                distribution centred on the value found in database and percentage variance equal to
+                distribution centered on the value found in database and percentage variance equal to
                 this value.
             log_file (str):
                 Path to .log file for warnings or error messages related to sampling.
@@ -181,7 +181,7 @@ def setup_mover(
             to dihedral angle values dataframes.
         variance (float):
             New dihedral angle values inserted into sampling regions are sampled from a Gaussian
-            distribution centred on the value found in database and percentage variance equal to
+            distribution centered on the value found in database and percentage variance equal to
             this value.
         log_file (str):
             Path to .log file for warnings or error messages related to sampling.

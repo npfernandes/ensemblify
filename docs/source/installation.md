@@ -70,6 +70,8 @@ To install the `ensemblify` Python package, you can follow these commands:
   pip install -U ensemblify
   ``` -->
 
+----
+
 ## 2. Third Party Software
 
 Each of Ensemblify's modules has different dependencies to third party software, so if you only plan on using a certain module you do not have to install software required for others. The requirements are:
@@ -150,11 +152,7 @@ FASPR<sup>[[3]](#ref3)</sup> is an ultra-fast and accurate program for determini
     ````
 
 4. Add an environment variable with the path to your FASPR executable to your `ensemblify_env` conda environment:
-    <!-- ```bash
-    echo "export FASPR_PATH='$(realpath FASPR)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
-    source ~/.bashrc # Or ~/.zshrc, depending on the shell
-    echo $FASPR_PATH # to check if the variable has been set correctly
-    ``` -->
+
     ```{code-block} console
     (ensemblify_env) $ conda env config vars set FASPR_PATH=$(realpath FASPR)
     (ensemblify_env) $ conda deactivate
@@ -195,12 +193,6 @@ PULCHRA<sup>[[4]](#ref4)</sup> (PowerfUL CHain Restoration Algorithm) is a progr
     Do not be alarmed if some warnings show up on your screen; this is normal and they can be ignored.
 
 4. Add an environment variable with the path to your PULCHRA executable to your `ensemblify_env` conda environment:
-
-    <!-- ```bash
-    echo "export PULCHRA_PATH='$(realpath pulchra)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
-    source ~/.bashrc # Or ~/.zshrc, depending on the shell
-    echo $PULCHRA_PATH # to check if the variable has been set correctly
-    ``` -->
 
     ```{code-block} console
     (ensemblify_env) $ conda env config vars set PULCHRA_PATH=$(realpath pulchra)
@@ -277,11 +269,6 @@ To download the Pepsi-SAXS executable from their [website](https://team.inria.fr
 
 3. Add an environment variable with the path to your Pepsi-SAXS executable to your `ensemblify_env` conda environment:
 
-    <!-- ```bash
-    echo "export PEPSI_SAXS_PATH='$(realpath Pepsi-SAXS)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
-    source ~/.bashrc # Or ~/.zshrc, depending on the shell
-    echo $PEPSI_SAXS_PATH # to check if the variable has been set correctly
-    ``` -->
     ```{code-block} console
     $ conda activate ensemblify_env
     (ensemblify_env) $ conda env config vars set PEPSI_SAXS_PATH=$(realpath Pepsi-SAXS)
@@ -324,11 +311,6 @@ To compile the provided BIFT source code, you can follow these commands:
 
 4. Add an environment variable with the path to your BIFT executable to your `ensemblify_env` conda environment:
 
-    <!-- ```bash
-    echo "export BIFT_PATH='$(realpath bift)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
-    source ~/.bashrc # Or ~/.zshrc, depending on the shell
-    echo $BIFT_PATH # to check if the variable has been set correctly
-    ``` -->
     ```{code-block} console
     (ensemblify_env) $ conda env config vars set BIFT_PATH=$(realpath bift)
     (ensemblify_env) $ conda deactivate
@@ -338,7 +320,14 @@ To compile the provided BIFT source code, you can follow these commands:
 
     this will allow Ensemblify to know where your BIFT executable is located.
 
-Do not forget to visit the [Tripeptide Database](database.md#-tripeptide-database) section to learn where you can get the database files that are required for conformational ensemble generation.
+----
+
+## 3. Tripeptide Database
+
+If you plan on generating protein conformational ensembles using Ensemblify's `generation` module, you will need to provide the software with a dihedral angle values database.
+Visit the [Tripeptide Database](database.md#-tripeptide-database) section to learn more about this database and where you can get it.
+
+----
 
 ## References
 

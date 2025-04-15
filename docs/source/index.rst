@@ -22,6 +22,8 @@ Contents
    cli.md
    api_reference
 
+----
+
 Indices and tables
 ------------------
 

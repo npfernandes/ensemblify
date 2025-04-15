@@ -253,6 +253,7 @@ def check_steric_clashes(
                             desc='Checking ensemble for steric clashes... ',
                             total=ensemble_size)) # (pdb2check, steric_clashes)
 
+    # Process results, write reports
     clashed_pdbs = 0
     erred_pdbs = []
     for pdb2check, steric_clashes in results:

@@ -14,7 +14,6 @@ All of Ensemblify's functionalities integrated into one function call.
 # IMPORTS
 ## Standard Library Imports
 import os
-from timeit import default_timer as timer
 
 ## Local Imports
 from ensemblify.analysis import analyze_trajectory
@@ -27,17 +26,17 @@ def ensemblify_pipeline(
     parameters: str,
     analysis: bool = True,
     exp_data: str | None = None):
-    """Function that uses all the functionalities of the ensemblify Python library.
+    """Function that uses all the main features of the Ensemblify Python library in sequence.
     
     Consists of 4 main steps:
     
-    - Ensemble Generation using ensemblify.generation.generate_ensemble
+    - Ensemble Generation using ``ensemblify.generation.generate_ensemble``
     
-    - Trajectory Creation using ensemblify.conversion.ensemble2traj
+    - Trajectory Creation using ``ensemblify.conversion.ensemble2traj``
     
-    - Trajectory Analysis using ensemblify.analysis.analyze_trajectory
+    - Trajectory Analysis using ``ensemblify.analysis.analyze_trajectory``
     
-    - Ensemble Reweighting using ensemblify.reweighting.reweight_ensemble
+    - Ensemble Reweighting using ``ensemblify.reweighting.reweight_ensemble``
 
     Args:
         parameters (str):
@@ -71,42 +70,36 @@ def ensemblify_pipeline(
     REWEIGHTING_DIR = os.path.join(OUTPUT_DIR_JOB,'reweighting')
 
     # Generate ensemble
-    start = timer()
     valid_pdbs_dir = generate_ensemble(parameters_path=parameters)
-    end = timer()
-    print(f' ----------------- Ensemble generation took {round(end-start,3)} s -----------------' )
 
     # Create trajectory
-    start = timer()
     trajectory_path, topology_path = ensemble2traj(ensemble_dir=valid_pdbs_dir,
                                                    trajectory_dir=TRAJECTORY_DIR,
                                                    trajectory_id=JOB_NAME,
                                                    trajectory_size=ENSEMBLE_SIZE)
-    end = timer()
-    print(f' ----------------- Trajectory Creation took: {round(end-start,3)} s -----------------' )
 
     # Analyze trajectory
-    if analysis:
-        start = timer()
-        structural_metrics_data = analyze_trajectory(trajectories=trajectory_path,
-                                                     topologies=topology_path,
-                                                     trajectory_ids=JOB_NAME,
-                                                     output_directory=ANALYSIS_DIR)
-        end = timer()
-        print((f' ----------------- Trajectory Analysis took: {round(end-start,3)} s '
-                '-----------------'))
+    analysis_data = {'DistanceMatrices': [None],
+                     'ContactMatrices': [None],
+                     'SecondaryStructureFrequencies': [None],
+                     'StructuralMetrics': [None]}
 
-        # Reweigh ensemble with exp data
-        if exp_data is not None:
-            start = timer()
-            reweight_ensemble(trajectory=trajectory_path,
-                              topology=topology_path,
-                              trajectory_id=JOB_NAME,
-                              exp_saxs_data=exp_data,
-                              output_dir=REWEIGHTING_DIR,
-                              calculated_metrics_data=structural_metrics_data)
-            end = timer()
-            print((f' ----------------- Ensemble Reweighting took: {round(end-start,3)} s '
-                    '-----------------'))
+    if analysis:
+        analysis_data = analyze_trajectory(trajectories=trajectory_path,
+                                           topologies=topology_path,
+                                           trajectory_ids=JOB_NAME,
+                                           output_directory=ANALYSIS_DIR)
+
+    # Reweigh ensemble with exp data
+    if exp_data is not None:
+        reweight_ensemble(trajectory=trajectory_path,
+                          topology=topology_path,
+                          trajectory_id=JOB_NAME,
+                          exp_saxs_data=exp_data,
+                          output_dir=REWEIGHTING_DIR,
+                          calculated_cmatrix=analysis_data['ContactMatrices'][0],
+                          calculated_dmatrix=analysis_data['DistanceMatrices'][0],
+                          calculated_ss_frequency=analysis_data['SecondaryStructureFrequencies'][0],
+                          calculated_metrics_data=analysis_data['StructuralMetrics'][0])
 
     print("Ensemblify's pipeline has finished, good luck in your analysis!")

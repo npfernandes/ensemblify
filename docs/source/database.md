@@ -29,6 +29,7 @@ Your database must contain at least 4 columns: 3 containing the Phi, Psi and Ome
 | ... | ... | ... | ... |
 | Y | -3.119968 | 1.407456 | 1.979130 |
 
+----
 
 ## References
 

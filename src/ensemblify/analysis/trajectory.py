@@ -19,7 +19,7 @@ def analyze_trajectory(
     trajectories: list[str] | str,
     topologies: list[str] | str,
     trajectory_ids: list[str] | str,
-    output_directory: str | None = os.getcwd(),
+    output_directory: str = None,
     ramachandran_data: bool | None = True,
     distancematrices: bool | None = True,
     contactmatrices: bool | None = True,
@@ -96,8 +96,11 @@ def analyze_trajectory(
         trajectory_ids = [trajectory_ids]
 
     # Setup output directory
-    if not os.path.isdir(output_directory):
-        os.mkdir(output_directory)
+    if output_directory is None:
+        output_directory = os.getcwd()
+    else:
+        if not os.path.isdir(output_directory):
+            os.mkdir(output_directory)
 
     # Setup color palette
     if color_palette is None:

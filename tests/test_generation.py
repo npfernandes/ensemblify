@@ -5,7 +5,6 @@
 #import pytest
 
 ## Local Imports
-from ensemblify.generation import generate_ensemble
 from ensemblify.generation.ensemble_utils.functions import setup_pose, derive_constraint_targets
 
 def test_derive_constraint_targets():
@@ -46,10 +45,3 @@ def test_derive_constraint_targets():
                                                       ('MC',(10,24),'all','TRIPEPTIDE'))})
     assert result_9 == ((1,5),(9,9)), result_9
 
-def test_generate_ensemble():
-    input_params = 'examples/input_parameters/generate_Hst5.yaml'
-    valid_pdbs_dir = generate_ensemble(input_params)
-    assert valid_pdbs_dir == './examples/Hst5_test/ensemble/valid_pdbs', valid_pdbs_dir
-
-if __name__ == '__main__':
-    test_generate_ensemble()

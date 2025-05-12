@@ -13,13 +13,13 @@ References:
 """
 
 DEFAULT_TRACE_COLOR_PALETTE = [
-    '#E69F00', # orange
+    '#E69F00', # dark yellow
     '#56B4E9', # sky blue
     '#009E73', # bluish green
-    '#F0E442', # yellow
+    '#F0E442', # light yellow
     '#0072B2', # blue
     '#D55E00', # vermillion
-    '#CC79C5', # reddish purple
+    '#CC79C5', # lilac
 ]
 """Default color palette used for traces in plotly figures."""
 

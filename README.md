@@ -6,9 +6,9 @@
 
 ## 💡 What is Ensemblify?
 
-**Ensemblify** is a Python package that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (e.g. intrinsically disordered regions (IDRs)).
+**Ensemblify** is a Python package that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (*e.g.* intrinsically disordered regions (IDRs)).
 
-It supports both user-defined models and AlphaFold<sup>[[1]](#ref1)</sup> predictions, using predicted Local Distance Difference Test (pLDDT) and Predicted Aligned Error (PAE) confidence metrics to guide conformational sampling. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
+It supports both user-defined models and AlphaFold<sup>[[1]](#ref1)</sup> predictions, using the predicted Local Distance Difference Test (pLDDT) and Predicted Aligned Error (PAE) confidence metrics to guide conformational sampling. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
 
 ## 🧰 How do I install Ensemblify?
 Step-by-step instructions for installing Ensemblify are available in the [Installation](#-installation) section.
@@ -28,7 +28,7 @@ or as a Python library inside a script or Jupyter notebook:
 
 Check the [Usage](#-usage) section for more details.
 
-You can also check out the interactive [Quick Reference Guide](examples/quick_reference_guide.ipynb) notebook for a basic rundown of Ensemblify's features.
+You can also check out the [Quick Reference Guide](examples/quick_reference_guide.ipynb) notebook for a basic rundown of Ensemblify's features.
 
 ## 🔎 How does Ensemblify work?
 A general overview of Ensemblify, descriptions of employed methods and applications can be found in the Ensemblify paper:
@@ -585,7 +585,7 @@ Check the `reweighting`module [documentation](https://ensemblify.readthedocs.io/
 
 # 📚 Accessing Documentation
 
-Ensemblify's documentation is available together with an API reference at https://ensemblify.readthedocs.io/latest/.
+Ensemblify's documentation is available together with an API reference at https://ensemblify.readthedocs.io.
 Alternatively, the source-code contains docstrings with relevant information. 
 
 # 🗨️ Citation and Publications

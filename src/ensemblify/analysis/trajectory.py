@@ -19,7 +19,7 @@ def analyze_trajectory(
     trajectories: list[str] | str,
     topologies: list[str] | str,
     trajectory_ids: list[str] | str,
-    output_directory: str = None,
+    output_directory: str | None = None,
     ramachandran_data: bool | None = True,
     distancematrices: bool | None = True,
     contactmatrices: bool | None = True,
@@ -57,29 +57,32 @@ def analyze_trajectory(
             file pair and create the corresponding contact map interactive figure.
         ssfrequencies (bool):
             Whether to calculate a secondary structure assignment frequency matrix for each
-            trajectory, topology file pair and create the corresponding secondary structure
+            trajectory,topology file pair and create the corresponding secondary structure
             frequency interactive figure.
         rg (bool):
-            Whether to calculate and plot the radius of gyration for each trajectory,topology
-            file pair.
-        dmax (bool):
-            Whether to calculate and plot the maximum distance between any two alpha carbons
+            Whether to calculate and plot a probability distribution for the radius of gyration
             for each trajectory,topology file pair.
+        dmax (bool):
+            Whether to calculate and plot a probability distribution for the maximum distance
+            between any two alpha carbons for each trajectory,topology file pair.
         eed (bool):
-            Whether to calculate and plot the distance between the N and C terminal for each
-            trajectory, topology file pair.
+            Whether to calculate and plot a probability distribution for the distance between
+            the N- and C-terminal for each trajectory,topology file pair.
         cm_dist (dict[str,tuple[str,str]]):
-            Mapping of identifiers to tuples with two selection strings for creating MDAnalysis
-            AtomGroups, whose center mass distance will be calculated and plotted. For example:
+            Mapping of arbitrary string identifiers to tuples containing two selection strings
+            for creating MDAnalysis AtomGroups. A probability distribution for the center mass
+            distance between the two AtomGroups will be calculated and plotted. For example, to
+            calculate the distance between the centers of mass of two domains, one comprising
+            residues 1-30 and the other comprising residues 110-140:
 
                 {'inter_domain' : ('resid 1:30', 'resid 110:140')}
 
             If None, no center mass distances are calculated.
             See https://userguide.mdanalysis.org/stable/selections.html for more information about
-            MDAnalysis selections.
+            MDAnalysis selection strings.
         color_palette (list[str]):
-            List of color hexcodes, to associate one with each trajectory in the created Structural
-            Metrics interactive dashboard.
+            List of color hexcodes, to associate one with each trajectory,topology pair in the
+            created figures. If None, the default color palette is used.
 
     Returns:
         dict[str,pd.DataFrame]:

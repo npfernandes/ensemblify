@@ -236,9 +236,9 @@ def calculate_distance_matrix_frame(
         frame_idx (int):
             Number of the frame to be analyzed.
         frame_weight (float):
-            Distances calculated for this frame will be multiplied by this value
-            in the resulting frame matrix. In a uniformly weighted matrix, calculated
-            distances will be multiplied by 1 / number of trajectory frames.
+            Distances calculated for this frame will be multiplied by this value in the resulting
+            frame matrix. In a uniformly weighted matrix, calculated distances will be multiplied
+            by 1 divided by the number of trajectory frames.
 
     Returns:
         np.ndarray:
@@ -359,8 +359,8 @@ def calculate_ss_assignment(
     ) -> pd.DataFrame:
     """Calculate a secondary structure assignment matrix from a trajectory and topology files.
     
-    For each residue in each frame of the trajectory, calculate it's secondary structure
-    assignment using DSSP. The simplified DSSP codes used here are:
+    For each residue in each frame of the trajectory, calculate its secondary structure assignment
+    using DSSP. The simplified DSSP codes used here are:
 
         'H' : Helix. Either of the 'H', 'G', or 'I' codes.
 
@@ -435,8 +435,8 @@ def calculate_ss_frequency(
         topology (str):
             Path to .pdb topology file.
         weights (np.ndarray, optional):
-            Optional array of weight values to be used in secondary structure
-            assignment reweighting. If None, uniform weights are used.
+            Optional array of weight values to be used in secondary structure assignment
+            reweighting. If None, uniform weights are used.
         output_path (str, optional):
             Path to output .csv file or output directory. If directory, written file is named
             'ss_frequency.csv'. Defaults to current working directory.
@@ -506,7 +506,7 @@ def calc_rg(u: mda.Universe) -> float:
 
 
 def calc_eed(u: mda.Universe) -> float:
-    """Calculate the distance from the N to the C terminal in the current frame.
+    """Calculate the distance from the N- to the C-terminal in the current frame.
     
     Args:
         u (mda.Universe):
@@ -589,20 +589,26 @@ def calculate_metrics_data(
         topology (str):
             Path to .pdb topology file.
         rg (bool, optional):
-            Whether to calculate the radius of gyration of the protein.
+            Whether to calculate, for each frame in the trajectory, the radius of gyration of the
+            protein.
         dmax (bool, optional):
-            Whether to calculate the maximum distance between any two alpha carbons in the protein.
+            Whether to calculate, for each frame in the trajectory, the maximum distance between
+            any two alpha carbons in the protein.
         eed (bool, optional):
-            Whether to calculate the distance from the N to C terminal of the protein.
+            Whether to calculate, for each frame in the trajectory, the distance from the N- to
+            C-terminal of the protein.
         cm_dist (dict[str,tuple[str,str]], optional):
-            Mapping of identifiers to tuples with two selection strings for creating MDAnalysis
-            AtomGroups, whose center mass distance will be calculated. For example:
+            Mapping of arbitrary string identifiers to tuples containing two selection strings
+            for creating MDAnalysis AtomGroups. For each frame in the trajectory, the center mass
+            distance between the two AtomGroups will be calculated. For example, to calculate the
+            distance between the centers of mass of two domains, one comprising residues 1-30 and
+            the other comprising residues 110-140:
 
                 {'inter_domain' : ('resid 1:30', 'resid 110:140')}
 
             If None, no center mass distances are calculated.
             See https://userguide.mdanalysis.org/stable/selections.html for more information about
-            MDAnalysis selections.
+            MDAnalysis selection strings.
         output_path (str, optional):
             Path to output .csv file or output directory. If directory, written file is named
             'structural_metrics.csv'. Defaults to current working directory.
@@ -678,7 +684,7 @@ def calculate_analysis_data(
     eed: bool = True,
     cm_dist: dict[str,tuple[str,str]] | None = None,
     ) -> dict[str,list[pd.DataFrame]]:
-    """Calculate  structural data for each given pair of trajectory,topology files.
+    """Calculate structural data for each given pair of trajectory,topology files.
 
     Args:
         trajectories (list[str]):
@@ -701,29 +707,34 @@ def calculate_analysis_data(
             file pair.
         ssfrequencies (bool):
             Whether to calculate a secondary structure assignment frequency matrix for each
-            trajectory, topology file pair.
-        rg (bool):
-            Whether to calculate the radius of gyration for each trajectory,topology file pair.
-        dmax (bool):
-            Whether to calculate the maximum distance between any two alpha carbons for each
             trajectory,topology file pair.
+        rg (bool):
+            Whether to calculate and plot a probability distribution for the radius of gyration
+            for each trajectory,topology file pair.
+        dmax (bool):
+            Whether to calculate and plot a probability distribution for the maximum distance
+            between any two alpha carbons for each trajectory,topology file pair.
         eed (bool):
-            Whether to calculate the distance between the N and C terminal for each trajectory,
-            topology file pair.
-        cm_dist (dict[str,tuple[str,str]], optional):
-            Mapping of identifiers to tuples with two selection strings for creating MDAnalysis
-            AtomGroups, whose center mass distance will be calculated. For example:
+            Whether to calculate and plot a probability distribution for the distance between
+            the N- and C-terminal for each trajectory,topology file pair.
+        cm_dist (dict[str,tuple[str,str]]):
+            Mapping of arbitrary string identifiers to tuples containing two selection strings
+            for creating MDAnalysis AtomGroups. A probability distribution for the center mass
+            distance between the two AtomGroups will be calculated and plotted. For example, to
+            calculate the distance between the centers of mass of two domains, one comprising
+            residues 1-30 and the other comprising residues 110-140:
 
                 {'inter_domain' : ('resid 1:30', 'resid 110:140')}
 
             If None, no center mass distances are calculated.
             See https://userguide.mdanalysis.org/stable/selections.html for more information about
-            MDAnalysis selections.
+            MDAnalysis selection strings.
 
     Returns:
         dict[str,list[pd.DataFrame]]:
             Mapping of data identifiers to lists of DataFrames with the calculated analysis data,
-            one element for each given trajectory,topology,trajectory_id trio. For example:
+            one element for each given trajectory,topology,trajectory_id trio. For example, if we
+            calculated analysis data for three trajectory,topology pairs:
 
             data = {
             'DistanceMatrices' : [DistanceMatrix1,DistanceMatrix2,DistanceMatrix3],

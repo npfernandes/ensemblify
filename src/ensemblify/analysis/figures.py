@@ -736,8 +736,8 @@ def create_ss_frequency_figure(
     """Create a secondary structure frequency Figure from a secondary structure assignment
     frequency matrix.
 
-    The topology provides information about number of chains, their chain letters and
-    residue numbers.
+    The topology provides information about number of chains, their chain letters and residue
+    numbers.
 
     Args:
         ss_frequency (pd.DataFrame | str):
@@ -906,8 +906,7 @@ def create_metrics_traces(
         trajectory_id (str):
             prefix identifier for trace names.
         color (str, optional):
-            hex code for the color the created traces will be. Defaults to '#636EFA', or light
-            blue.
+            hex code for the color the created traces will be. Defaults to light blue.
 
     Returns:
         tuple[list[go.Box], list[go.Histogram], list[go.Scatter], list[float], list[float]]:

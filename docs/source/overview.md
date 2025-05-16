@@ -1,10 +1,6 @@
 # 🌐 Overview
 
-## Ensemblify: A Python package for generating ensembles of intrinsically disordered regions of AlphaFold or user defined models
-
 <img src="../assets/ensemblify_presentation.svg" width="100%"/>
-
-----
 
 ## 💡 What is Ensemblify?
 
@@ -34,7 +30,7 @@ or as a Python library inside a script or Jupyter notebook:
 
 Check the [Usage](usage.md#-usage) section for more details.
 
-You can also check out the interactive [Quick Reference Guide](../../examples/quick_reference_guide.ipynb) notebook for a basic rundown of Ensemblify's features.
+You can also check out the [Quick Reference Guide](../../examples/quick_reference_guide.ipynb) notebook for a basic rundown of Ensemblify's features.
 
 ----
 

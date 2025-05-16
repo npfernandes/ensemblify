@@ -1,3 +1,5 @@
+:hide-toc:
+
 .. raw:: html
 
     <div id="index-page">

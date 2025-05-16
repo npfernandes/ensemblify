@@ -15,7 +15,7 @@ release = '1.0.0'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    "sphinx.ext.napoleon", # Allow for the Google and Numpy docstring formats
+    "sphinx.ext.napoleon", # allow for the Google and Numpy docstring formats
     "autoapi.extension", # automatically generate API Reference
     "sphinx_copybutton", # add a copy button to code blocks
     "myst_parser", # support for markdown files
@@ -79,7 +79,6 @@ napoleon_type_aliases = None
 napoleon_attr_annotations = True
 
 # -- Options for autoapi -----------------------------------------------------
-
 autoapi_dirs = ['../../src/ensemblify']
 autoapi_type = "python"
 autoapi_template_dir = "_templates/autoapi"

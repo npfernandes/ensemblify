@@ -1,25 +1,31 @@
 Third-Party Software Notice
+---------------------------
 
 The ./BME_main directory contains all files from the BME software distribution.
 Source: https://github.com/KULL-Centre/BME
 
 License:
----------
-This software is distributed under the GNU Public License, detailed in the 
+--------
+
+This software is distributed under the GNU General Public License, as detailed in the
 ./BME_main/LICENSE.md file.
 
 Modifications:
 --------------
+
 The simple_BME.py and simple_BME_tools.py files are a modified version of the original source code
 files ./BME_main/BME.py and ./BME_main/BME_tools.py, and contain a modified version of the original
-Reweight class, SimpleReweight, and its auxiliary functions. The main changes made consisted in
-removing functionalities that were not used through Ensemblify and documenting and styling the code
-to be consistent with the rest of Ensemblify's source code. The functionality of the code remained
-essentially the same, so any novel or interesting code implementations spotted can be fully
-attributed to BME's original authors.
+Reweight class, SimpleReweight, and its auxiliary functions.
+The main changes made consisted in:
+    - removing functionalities that were not used through Ensemblify;
+    - documenting and styling the code to be consistent with the rest of Ensemblify's source code.
+
+The functionality of the code remained essentially the same, so any novel or interesting code
+implementations spotted can be fully attributed to BME's original authors.
 
 Reference:
 ----------
+
     S. Bottaro , T. Bengsten and K. Lindorff-Larsen, "Integrating Molecular Simulation and
     Experimental Data: A Bayesian/Maximum Entropy Reweighting Approach," pp. 219-240, Feb.
     2020. In: Z. Gáspári, (eds) *Structural Bioinformatics*, *Methods in Molecular Biology*,

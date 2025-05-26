@@ -1,12 +1,15 @@
 Third-Party Software Notice
+---------------------------
 
 The ./FASPR-master directory contains all files from the FASPR software distribution.
 Source: https://github.com/tommyhuangthu/FASPR
 
 License:
 ---------
+
 This software is distributed under the MIT License, detailed in the ./FASPR-master/LICENSE file.
 
 Modifications:
 --------------
+
 All the files taken from the original distribution were not modified in any way.

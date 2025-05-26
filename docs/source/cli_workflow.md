@@ -14,7 +14,7 @@ To generate a conformational ensemble for your protein of interest, you simply n
 
 For this example, we will use a parameters file created to sample the conformational space of Histatin5, a small IDP that can normally be found in saliva, where it acts as a defense against fungal infections.
 
-1. Build you parameters file using the provided [template](../assets/parameters_template.yaml), optionally with the aid of the more user-friendly HTML [form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html).
+1. Build your parameters file using the provided [template](../assets/parameters_template.yaml), optionally with the aid of the more user-friendly HTML [form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html).
 
       In this example, we are using a parameters file `params.yaml` with the following information:
 

@@ -4,18 +4,18 @@
 
 <div align="justify">
 
-## 💡 What is Ensemblify?
+### 💡 What is Ensemblify?
 
 **Ensemblify** is a Python package that can generate protein conformational ensembles by sampling dihedral angle values from a three-residue fragment database and inserting them into flexible regions of a protein of interest (*e.g.* intrinsically disordered regions (IDRs)).
 
 It supports both user-defined models and AlphaFold<sup>[[1]](#ref1)</sup> predictions, using the predicted Local Distance Difference Test (pLDDT) and Predicted Aligned Error (PAE) confidence metrics to guide conformational sampling. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
 
-## 🧰 How do I install Ensemblify?
+### 🧰 How do I install Ensemblify?
 Step-by-step instructions for installing Ensemblify are available in the [Installation](#-installation) section.
 
 After installing Ensemblify, make sure to visit the [Tripeptide Database](#-tripeptide-database) section to learn where you can get the database files required for ensemble generation.
 
-## 💻 How can I use Ensemblify?
+### 💻 How can I use Ensemblify?
 Ensemblify can be used either as a Command Line Interface (CLI):
 
     conda activate ensemblify_env
@@ -30,16 +30,16 @@ Check the [Usage](#-usage) section for more details.
 
 You can also check out the [Quick Reference Guide](examples/quick_reference_guide.ipynb) notebook for a basic rundown of Ensemblify's features.
 
-## 🔎 How does Ensemblify work?
+### 🔎 How does Ensemblify work?
 A general overview of Ensemblify, descriptions of employed methods and applications can be found in the Ensemblify paper:
 
     PAPER
 
-# 🧰 Installation
+## 🧰 Installation
 
 <details><summary>
 
-## 1. Ensemblify Python Package
+### 1. Ensemblify Python Package
 
 </summary>    
 
@@ -98,7 +98,7 @@ To install the `ensemblify` Python package, you can follow these commands:
 
 <details><summary>
 
-## 2. Third Party Software
+### 2. Third Party Software
 
 </summary>  
 
@@ -115,7 +115,7 @@ Each of Ensemblify's modules has different dependencies to third party software,
 <details>  
   <summary>
   
-### PyRosetta
+#### PyRosetta
   
   </summary>
 
@@ -153,7 +153,7 @@ Remember to re-activate the `ensemblify_env` conda environment each time you wis
 <details>  
   <summary>
   
-### FASPR
+#### FASPR
   
   </summary>
 
@@ -210,7 +210,7 @@ FASPR<sup>[[3]](#ref3)</sup> is an ultra-fast and accurate program for determini
 <details>  
   <summary>
   
-### PULCHRA
+#### PULCHRA
   
   </summary>
 
@@ -262,7 +262,7 @@ PULCHRA<sup>[[4]](#ref4)</sup> (PowerfUL CHain Restoration Algorithm) is a progr
 <details>  
   <summary>
   
-### GROMACS
+#### GROMACS
   
   </summary>
 
@@ -305,7 +305,7 @@ To download and compile the GROMACS [source code](https://ftp.gromacs.org/gromac
 <details>  
   <summary>
   
-### PEPSI-SAXS
+#### PEPSI-SAXS
   
   </summary>
 
@@ -358,7 +358,7 @@ To download the Pepsi-SAXS executable from their [website](https://team.inria.fr
 <details>  
   <summary>
   
-### BIFT
+#### BIFT
   
   </summary>
 
@@ -411,7 +411,7 @@ To compile the provided BIFT source code, you can follow these commands:
 
 Do not forget to visit the [Tripeptide Database](#-tripeptide-database) section to learn where you can get the database files that are required for conformational ensemble generation.
 
-# 🗃 Tripeptide Database
+## 🗃 Tripeptide Database
 
 Ensemblify provides a three-residue fragment (tripeptide) database from which to sample dihedral angles, found here [link].
 
@@ -421,15 +421,15 @@ In total, 6,740,433 tripeptide dihedral angle values were extracted, making up t
 <details>  
   <summary>
   
-## Using your own database
+### Using your own database
   
   </summary>
 
 Ensemblify can sample dihedral angles from any file in a supported format (currently .parquet, .pkl or .csv), structured according to [Database Structure](#database-structure). Tripeptide sampling mode will only work if a tripeptide database is provided. However, single residue sampling mode will work even when you provide a tripeptide database.
 
-### Database Structure
+#### Database Structure
 
-#### Tripeptide Database
+##### Tripeptide Database
 Your database must contain at least 10 columns: 9 containing the Phi, Psi and Omega angles for each residue of the triplet (**in radians**) and 1 with the string identification of the fragment they make up. Any additional columns will be ignored.
 
 | FRAG | OMG1 | PHI1 | PSI1 | OMG2 | PHI2 | PSI2 | OMG3 | PHI3 | PSI3 |
@@ -438,7 +438,7 @@ Your database must contain at least 10 columns: 9 containing the Phi, Psi and Om
 | ... | ... | ... | ... | ... | ... | ... | ... | ... | ... |
 | VYV | -3.135116 | -2.503945 | -0.949731 | -3.119968 | 1.407456 | 1.979130 | -3.112883 | -2.592680 | 2.573798 |
 
-#### Single Residue Database
+##### Single Residue Database
 Your database must contain at least 4 columns: 3 containing the Phi, Psi and Omega angles for each residue (**in radians**)  and 1 with the string identification of the residue. Any additional columns will be ignored. Note the '2' suffix in the column names which helps with compatibility between single residue and tripeptide sampling modes.
 
 | FRAG | OMG2 | PHI2 | PSI2 |
@@ -449,14 +449,14 @@ Your database must contain at least 4 columns: 3 containing the Phi, Psi and Ome
 
 </details>  
 
-# 💻 Usage
+## 💻 Usage
 
 Ensemblify offers four main modules, all of which can be accessed either through the command line or from inside a Python script/Jupyter Notebook.
 
 <details>  
   <summary>
   
-## The `generation` module
+### The `generation` module
   
   </summary>
 
@@ -485,7 +485,7 @@ Check the `generation`module [documentation](https://ensemblify.readthedocs.io/l
 <details>  
   <summary>
   
-###  📝 Setting up your parameters file
+####  📝 Setting up your parameters file
   
   </summary>
 
@@ -506,7 +506,7 @@ If you prefer to create your own parameters file from scratch, a [template file]
 <details>  
   <summary>
 
-## The `conversion` module
+### The `conversion` module
   
   </summary>
 
@@ -532,7 +532,7 @@ Check the `conversion`module [documentation](https://ensemblify.readthedocs.io/l
 <details>  
   <summary>
   
-## The `analysis` module
+### The `analysis` module
   
   </summary>
 
@@ -558,7 +558,7 @@ Check the `analysis`module [documentation](https://ensemblify.readthedocs.io/lat
 <details>  
   <summary>
   
-## The `reweighting` module
+### The `reweighting` module
   
   </summary>
 
@@ -583,24 +583,24 @@ Check the `reweighting`module [documentation](https://ensemblify.readthedocs.io/
 
 </details>
 
-# 📚 Accessing Documentation
+## 📚 Accessing Documentation
 
 Ensemblify's documentation is available together with an API reference at https://ensemblify.readthedocs.io.
 Alternatively, the source-code contains docstrings with relevant information. 
 
-# 🗨️ Citation and Publications
+## 🗨️ Citation and Publications
 
 If you use Ensemblify, please cite its original publication:
 
     PUB
 
-# 🤝 Acknowledgements
+## 🤝 Acknowledgements
 
 We would like to thank the DeepMind team for developing AlphaFold.
 
 We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS institute for creating the tripeptide database used in the development of this tool. Check out their work at https://moma.laas.fr/.
 
-# ✍️ Authors
+## ✍️ Authors
 
 **Nuno P. Fernandes** (Main Developer) [[GitHub]](https://github.com/npfernandes?tab=repositories)
 
@@ -608,7 +608,7 @@ We would also like to thank the team at the Juan Cortés lab in the LAAS-CNRS in
 
 **Tiago N. Cordeiro** (Supervisor) [[GitHub]](https://github.com/CordeiroLab?tab=repositories)
 
-# 📖 References
+## 📖 References
 
 <a id="ref1">[1]</a> J. Jumper, R. Evans, A. Pritzel et al., "Highly accurate protein structure prediction with AlphaFold," *Nature*, vol. 596, pp. 583–589, 2021. [[Link](https://doi.org/10.1038/s41586-021-03819-2)]
 

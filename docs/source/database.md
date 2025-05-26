@@ -7,11 +7,9 @@ In total, 6,740,433 tripeptide dihedral angle values were extracted, making up t
   
 ## Using your own database
   
-Ensemblify can sample dihedral angles from any file in a supported format (currently .parquet, .pkl or .csv), structured according to [Database Structure](#database-structure). Tripeptide sampling mode will only work if a tripeptide database is provided. However, single residue sampling mode will work even when you provide a tripeptide database.
+Ensemblify can sample dihedral angles from any file in a supported format (currently .parquet, .pkl or .csv), structured according to the tables below. Tripeptide sampling mode will only work if a tripeptide database is provided. However, single residue sampling mode will work even when you provide a tripeptide database.
 
-### Database Structure
-
-#### Tripeptide Database
+### Tripeptide Database
 Your database must contain at least 10 columns: 9 containing the Phi, Psi and Omega angles for each residue of the triplet (**in radians**) and 1 with the string identification of the fragment they make up. Any additional columns will be ignored.
 
 | FRAG | OMG1 | PHI1 | PSI1 | OMG2 | PHI2 | PSI2 | OMG3 | PHI3 | PSI3 |
@@ -20,7 +18,7 @@ Your database must contain at least 10 columns: 9 containing the Phi, Psi and Om
 | ... | ... | ... | ... | ... | ... | ... | ... | ... | ... |
 | VYV | -3.135116 | -2.503945 | -0.949731 | -3.119968 | 1.407456 | 1.979130 | -3.112883 | -2.592680 | 2.573798 |
 
-#### Single Residue Database
+### Single Residue Database
 Your database must contain at least 4 columns: 3 containing the Phi, Psi and Omega angles for each residue (**in radians**)  and 1 with the string identification of the residue. Any additional columns will be ignored. Note the '2' suffix in the column names which helps with compatibility between single residue and tripeptide sampling modes.
 
 | FRAG | OMG2 | PHI2 | PSI2 |

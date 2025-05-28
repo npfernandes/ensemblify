@@ -49,9 +49,11 @@ def run_sampling(
     sampling_log: str):
     """Perform conformational sampling according to input parameters.
 
-    The Pulchra clashes file for the input structure must be provided, along with the path to
-    the directory where sampled structures will be stored and a sampling log file.
-    Additional log files will be created in the same directory as the provided log file.
+    The path to the directory where sampled structures will be stored must be provided, along
+    with a sampling log file.
+    The PULCHRA output for the input structure can also be provided, and the reported steric
+    clashes in sampled regions will be ignored.
+    Additional log files will be created in the same directory as the provided sampling log file.
 
     Args:
         input_parameters (str):

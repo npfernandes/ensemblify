@@ -8,14 +8,13 @@ import math
 import numpy as np
 import pandas as pd
 import pyrosetta
-from pyrosetta.rosetta.protocols.moves import Mover
 
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.generation.ensemble_utils.movers_utils import get_ss_bounds
 
 # CLASSES
-class SetRandomDihedralsMover(Mover):
+class SetRandomDihedralsMover(pyrosetta.rosetta.protocols.moves.Mover):
     """
     Custom PyRosetta Mover object that sets random dihedral angles in target residues, taken from
     a given database.
@@ -49,7 +48,7 @@ class SetRandomDihedralsMover(Mover):
             log_file (str):
                 Path to .log file for warnings or error messages related to sampling.
         """
-        Mover.__init__(self)
+        pyrosetta.rosetta.protocols.moves.Mover.__init__(self)
         self.databases = databases
         self.variance = variance
         self.log_file = log_file

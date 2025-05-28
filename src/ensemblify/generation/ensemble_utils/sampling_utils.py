@@ -16,7 +16,6 @@ import pyrosetta
 import pyrosetta.distributed
 import ray
 import yaml
-from pyrosetta.rosetta.core.scoring.constraints import ConstraintIO
 from tqdm import tqdm
 
 ## Local Imports
@@ -257,7 +256,8 @@ def setup_sampling_initial_pose(
 
     # Create pose
     logger.info('Creating Pose from input structure/sequence...')
-    initial_pose = setup_pose(input_structure=params['sequence'])
+    initial_pose = setup_pose(input_structure=params['sequence'],
+                              make_centroid=True)
 
     if params['pae'] != 'None':
         logger.info('Applying pae constraints...')
@@ -296,10 +296,11 @@ def setup_sampling_initial_pose(
     cs = initial_pose.constraint_set()
     if cs.has_constraints():
         logger.info('Saving applied constraints to file...')
-        ConstraintIO.write_constraints(os.path.join(os.path.split(sampling_log)[0],
-                                                    'constraints.cst'),
-                                       cs,
-                                       initial_pose)
+        pyrosetta.rosetta.core.scoring.constraints.ConstraintIO.write_constraints(
+            os.path.join(os.path.split(sampling_log)[0],'constraints.cst'),
+            cs,
+            initial_pose
+            )
 
     # Save initial pose information to log file
     logger.info(f'Initial Pose:\n{initial_pose}')
@@ -341,7 +342,7 @@ def sample_pdb(
     output_path: str,
     job_name: str,
     decoy_num: str = '',
-    log_file: str = os.path.join(os.getcwd(),'pyrosetta.log'),
+    log_file: str = None,
     ss_bias: tuple[tuple[tuple[str,tuple[int,int],str],...],int] | None = None,
     variance: float | None = 0.10,
     sampler_params: dict[str,dict[str,int]] = {'MC':{'temperature':200,'max_loops':200}},
@@ -419,6 +420,10 @@ def sample_pdb(
     import pyrosetta.distributed.io as io
 
     pyrosetta.distributed.maybe_init()
+
+    # Setup log file
+    if log_file is None:
+        log_file = os.path.join(os.getcwd(),'pyrosetta.log')
 
     # Setup score function
     scorefxn = pyrosetta.rosetta.core.scoring.ScoreFunctionFactory.create_score_function(scorefxn_id)

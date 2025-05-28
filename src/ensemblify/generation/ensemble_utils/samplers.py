@@ -8,7 +8,6 @@ import random
 import numpy as np
 import pandas as pd
 import pyrosetta
-from pyrosetta.rosetta.core.pose import Pose
 
 ## Local Imports
 from ensemblify.generation.ensemble_utils.movers import setup_mover
@@ -104,7 +103,7 @@ class MonteCarloSampler():
         current_score = self.scorefxn(pose)
 
         # Setup working Pose
-        working_pose = Pose()
+        working_pose = pyrosetta.rosetta.core.pose.Pose()
         working_pose.assign(pose)
 
         # Sample each residue

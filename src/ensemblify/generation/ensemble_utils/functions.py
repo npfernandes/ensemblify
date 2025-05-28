@@ -9,13 +9,6 @@ from copy import deepcopy
 import numpy as np
 import pyrosetta
 import pyrosetta.distributed.io as io
-from pyrosetta.rosetta.core.id import AtomID
-from pyrosetta.rosetta.core.kinematics import MoveMap
-from pyrosetta.rosetta.core.pose import Pose, get_chain_from_chain_id, pdb_to_pose
-from pyrosetta.rosetta.core.scoring import constraints, func
-from pyrosetta.rosetta.protocols.constraint_movers import ConstraintSetMover
-from pyrosetta.rosetta.protocols.minimization_packing import MinMover
-from pyrosetta.rosetta.protocols.simple_moves import SwitchResidueTypeSetMover
 
 ## Local Imports
 from ensemblify.utils import df_from_pdb
@@ -25,54 +18,61 @@ def add_intrachain_constraints(
     pose: pyrosetta.rosetta.core.pose.Pose,
     constraint_targets: tuple[tuple[int,int],...],
     constraint_set: pyrosetta.rosetta.core.scoring.constraints.ConstraintSet,
-    constraint_function: pyrosetta.rosetta.core.scoring.func.HarmonicFunc | pyrosetta.rosetta.core.scoring.func.FlatHarmonicFunc,
-    stdev: float,
+    stdev: float | None = 10.0,
     tolerance: float | None = None,
 ) -> pyrosetta.rosetta.core.scoring.constraints.ConstraintSet:
     """
-    Add constraints between non-sampled residues in a chain to a constraint set.
+    Add constraints between desired residues of the same domain to a constraint set.
     
-    Create all AtomPairConstraints between residues of a Pose object
-    present in constraint_targets and add them to a ConstraintSet.
-
     Args:
         pose (pyrosetta.rosetta.core.pose.Pose):
-            Target Pose object for constraints.
+            Target Pose object for constraints. Only used to extract residue ID and coordinates.
         constraint_targets (tuple[tuple[int,int],...]):
-            Residues between which AtomPairConstraints will be applied.
+            Residues between which AtomPairConstraints will be added.
         constraint_set (pyrosetta.rosetta.core.scoring.constraints.ConstraintSet):
             Set of constraints to later be applied to Pose.
-        constraint_function (pyrosetta.rosetta.core.scoring.func.HarmonicFunc | pyrosetta.rosetta.core.scoring.func.FlatHarmonicFunc):
-            Function to use for each added constraint.
-        stdev (float):
-            Standard deviation value to use in constraints.
+        stdev (float, optional):
+            Standard deviation value to use in constraints. Defaults to 10.0.
         tolerance (float, optional):
-            Tolerance value to use in constraints (if applicable). Defaults to None.
+            Tolerance value to use in constraints. Defaults to None.
     
     Returns:
         pyrosetta.rosetta.core.scoring.constraints.ConstraintSet:
-            Updated constraint set, with intrachain constraints.
+            Updated ConstraintSet object, with added intrachain constraints.
     """
-    AtomPairConstraint = constraints.AtomPairConstraint
-    working_cs = constraints.ConstraintSet()
+    # Initialize working ConstraintSet object
+    working_cs = pyrosetta.rosetta.core.scoring.constraints.ConstraintSet()
     working_cs.detached_copy(constraint_set)
+
+    # Iterate over target residue ranges and add constraints
     for target in constraint_targets:
         target_range = list(range(target[0],target[1]+1))
         for i,res_id_1 in enumerate(target_range):
             for res_id_2 in target_range[i+1:]:
-                a1 = AtomID(pose.residue(res_id_1).atom_index('CA'), res_id_1)
-                a2 = AtomID(pose.residue(res_id_2).atom_index('CA'), res_id_2)
+                a1 = pyrosetta.rosetta.core.id.AtomID(pose.residue(res_id_1).atom_index('CA'),
+                                                      res_id_1)
+                a2 = pyrosetta.rosetta.core.id.AtomID(pose.residue(res_id_2).atom_index('CA'),
+                                                      res_id_2)
                 a1_xyz = pose.residue(a1.rsd()).xyz(a1.atomno())
                 a2_xyz = pose.residue(a2.rsd()).xyz(a2.atomno())
                 d = (a1_xyz - a2_xyz).norm()
 
                 if tolerance:
-                    apc = AtomPairConstraint(a1,a2, constraint_function(x0_in=d,
-                                                                        sd_in=stdev,
-                                                                        tol_in=tolerance))
+                    apc = pyrosetta.rosetta.core.scoring.constraints.AtomPairConstraint(
+                        a1,
+                        a2,
+                        pyrosetta.rosetta.core.scoring.func.FlatHarmonicFunc(x0_in=d,
+                                                                             sd_in=stdev,
+                                                                             tol_in=tolerance)
+                    )
+
                 else:
-                    apc = AtomPairConstraint(a1,a2, constraint_function(x0_in=d,
-                                                                        sd_in=stdev))
+                    apc = pyrosetta.rosetta.core.scoring.constraints.AtomPairConstraint(
+                        a1,
+                        a2,
+                        pyrosetta.rosetta.core.scoring.func.HarmonicFunc(x0_in=d,
+                                                                         sd_in=stdev)
+                    )
 
                 working_cs.add_constraint(apc)
 
@@ -83,81 +83,91 @@ def add_contacts_constraints(
     pose: pyrosetta.rosetta.core.pose.Pose,
     contacts: tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...] | None,
     constraint_set: pyrosetta.rosetta.core.scoring.constraints.ConstraintSet,
-    constraint_function: pyrosetta.rosetta.core.scoring.func.HarmonicFunc | pyrosetta.rosetta.core.scoring.func.FlatHarmonicFunc,
-    stdev: float,
+    stdev: float | None = 10.0,
     tolerance: float | None = None,
     ) -> pyrosetta.rosetta.core.scoring.constraints.ConstraintSet:
     """
-    Add constraints between residues of different chains/domains that must remain in contact.
+    Add constraints between residue regions whose relative position must be conserved to a
+    constraint set.
 
-    Create all contact constraints (dimerization sites, intrachain folding) targeting residues
-    of a Pose object and add them to a ConstraintSet.
+    This would include, for example, dimerization sites or long range intrachain folding.
+    The word 'contacts' is used here for convenience, these could be any two regions whose
+    relative position should be conserved, even if they are far apart in the Pose.
 
     Args:
         pose (pyrosetta.rosetta.core.pose.Pose):
             Target Pose object for constraints.
         contacts (tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...]):
-            Residue ranges where two regions are interacting.
+            Residue ranges of regions whose relative position should be conserved.
         constraint_set (pyrosetta.rosetta.core.scoring.constraints.ConstraintSet):
             Set of constraints to later be applied to Pose.
-        constraint_function (pyrosetta.rosetta.core.scoring.func.HarmonicFunc | pyrosetta.rosetta.core.scoring.func.FlatHarmonicFunc):
-            Function to use for each added constraint.
-        stdev (float):
-            Standard deviation value to use in constraints.
+        stdev (float, optional):
+            Standard deviation value to use in constraints. Defaults to 10.0.
         tolerance (float, optional):
             Tolerance value to use in constraints (if applicable). Defaults to None.
     
     Returns:
         pyrosetta.rosetta.core.scoring.constraints.ConstraintSet:
-            Updated constraint set, with contact constraints.
+            Updated ConstraintSet, with added relative position constraints.
     """
-    AtomPairConstraint = constraints.AtomPairConstraint # for interactions
-
-    working_cs = constraints.ConstraintSet()
+    # Initialize working ConstraintSet object
+    working_cs = pyrosetta.rosetta.core.scoring.constraints.ConstraintSet()
     working_cs.detached_copy(constraint_set)
 
-    if contacts is not None:
-        for contact in contacts:
-            # contact: ( ('X', (x1,x2) ) , ( 'Y', (y1,y2) ) )
+    if contacts is None:
+        return working_cs
 
-            # Chain X
-            chain_x = contact[0][0]
+    # Iterate over residue ranges and add constraints
+    for contact in contacts:
+        # contact: ( ('X', (x1,x2) ) , ( 'Y', (y1,y2) ) )
 
-            # Contact residue range for X
-            x_start = contact[0][1][0]
-            x_end = contact[0][1][1]
-            inter_range_x = [ pdb_to_pose(pose, res_id, chain_x)
-                              for res_id in range(x_start, x_end+1) ]
+        # Chain X
+        chain_x = contact[0][0]
 
-            # Chain Y
-            chain_y = contact[1][0]
+        # Contact residue range for X
+        x_start = contact[0][1][0]
+        x_end = contact[0][1][1]
+        inter_range_x = [ pyrosetta.rosetta.core.pose.pdb_to_pose(pose, res_id, chain_x)
+                            for res_id in range(x_start, x_end+1) ]
 
-            # Contact residue range for Y
-            y_start = contact[1][1][0]
-            y_end = contact[1][1][1]
-            inter_range_y = [ pdb_to_pose(pose, res_id, chain_y)
-                              for res_id in range(y_start,y_end+1) ]
+        # Chain Y
+        chain_y = contact[1][0]
 
-            # Apply inter-region constraints between X and Y
-            for res_id_x in inter_range_x:
-                for res_id_y in inter_range_y:
-                    a1 = AtomID(pose.residue(res_id_x).atom_index('CA'), res_id_x)
-                    a2 = AtomID(pose.residue(res_id_y).atom_index('CA'), res_id_y)
-                    a1_xyz = pose.residue(a1.rsd()).xyz(a1.atomno())
-                    a2_xyz = pose.residue(a2.rsd()).xyz(a2.atomno())
-                    d = (a1_xyz - a2_xyz).norm()
+        # Contact residue range for Y
+        y_start = contact[1][1][0]
+        y_end = contact[1][1][1]
+        inter_range_y = [ pyrosetta.rosetta.core.pose.pdb_to_pose(pose, res_id, chain_y)
+                            for res_id in range(y_start,y_end+1) ]
 
-                    if tolerance:
-                        apc = AtomPairConstraint(a1,a2, constraint_function(x0_in=d,
+        # Apply inter-region constraints between region (x1,x2) and (y1,y2)
+        for res_id_x in inter_range_x:
+            for res_id_y in inter_range_y:
+                a1 = pyrosetta.rosetta.core.id.AtomID(pose.residue(res_id_x).atom_index('CA'),
+                                                      res_id_x)
+                a2 = pyrosetta.rosetta.core.id.AtomID(pose.residue(res_id_y).atom_index('CA'),
+                                                      res_id_y)
+                a1_xyz = pose.residue(a1.rsd()).xyz(a1.atomno())
+                a2_xyz = pose.residue(a2.rsd()).xyz(a2.atomno())
+                d = (a1_xyz - a2_xyz).norm()
+
+                if tolerance:
+                    apc = pyrosetta.rosetta.core.scoring.constraints.AtomPairConstraint(
+                        a1,
+                        a2,
+                        pyrosetta.rosetta.core.scoring.func.FlatHarmonicFunc(x0_in=d,
                                                                             sd_in=stdev,
-                                                                            tol_in=tolerance))
-                    else:
-                        apc = AtomPairConstraint(a1,a2, constraint_function(x0_in=d,
-                                                                            sd_in=stdev))
+                                                                            tol_in=tolerance)
+                    )
 
-                    working_cs.add_constraint(apc)
+                else:
+                    apc = pyrosetta.rosetta.core.scoring.constraints.AtomPairConstraint(
+                        a1,
+                        a2,
+                        pyrosetta.rosetta.core.scoring.func.HarmonicFunc(x0_in=d,
+                                                                        sd_in=stdev)
+                    )
 
-    #setup constraints for other experimental info here similarly
+                working_cs.add_constraint(apc)
 
     return working_cs
 
@@ -238,80 +248,91 @@ def get_targets_from_plddt(parameters: dict) -> dict[str,list[int]]:
     return bfact_sampling_targets
 
 
-def setup_pose(input_structure: str) -> pyrosetta.rosetta.core.pose.Pose:
+def setup_pose(
+    input_structure: str,
+    make_centroid: bool = False,
+    ) -> pyrosetta.rosetta.core.pose.Pose:
     """Initialize a Pose object from a sequence, a .txt file containing the sequence or a PDB file.
      
-    The created Pose object is then changed to 'centroid' configuration.
+    If desired, the created Pose object is then changed to 'centroid' configuration.
 
     Args:
         input_structure (str):
             Filepath to the input .pdb structure, .txt with sequence or the actual sequence string.
+        make_centroid (str, optional):
+            Whether to convert the Pose side-chains to centroid configuration. Defaults to False.
 
     Returns:
         pyrosetta.rosetta.core.pose.Pose:
-            Our initial Pose for sampling.
+            A PyRosetta Pose object initialized from the input structure/sequence.
     """
-    initial_pose = None
+    pose = None
     if input_structure.endswith('.pdb'):
         # Returns PackedPose so we need to convert to Pose
-        initial_pose = io.to_pose(io.pose_from_file(input_structure))
+        pose = io.to_pose(io.pose_from_file(input_structure))
 
     elif input_structure.endswith('.txt'):
         with open(input_structure,'r',encoding='utf-8') as input_sequence:
             # Returns PackedPose so we need to convert to Pose
-            initial_pose = io.to_pose(io.pose_from_sequence(input_sequence.read().strip()))
+            pose = io.to_pose(io.pose_from_sequence(input_sequence.read().strip()))
 
     else:
         # Returns PackedPose so we need to convert to Pose
-        initial_pose = io.to_pose(io.pose_from_sequence(input_structure))
+        pose = io.to_pose(io.pose_from_sequence(input_structure))
 
-    assert initial_pose is not None, 'Invalid input structure!'
+    assert pose is not None, 'Invalid input structure/sequence!'
 
-    # Swap to centroid conformation
-    SwitchResidueTypeSetMover('centroid').apply(initial_pose)
+    # Swap to centroid configuration if requested
+    if make_centroid:
+        pyrosetta.rosetta.protocols.simple_moves.SwitchResidueTypeSetMover('centroid').apply(pose)
 
-    return initial_pose
+    return pose
 
 
 def setup_minmover(
     scorefxn: pyrosetta.rosetta.core.scoring.ScoreFunction,
     min_id: str,
     tolerance: float,
-    max_iters: int,
+    max_iters: int | None = None,
     dofs: tuple[str,str] = ('bb','chi'),
     ) -> pyrosetta.rosetta.protocols.minimization_packing.MinMover:
-    """Setup the MoveMap and MinMover for last minimization steps in the sampling process.
+    """Setup a PyRosetta MinMover object given the necessary parameters.
 
     Args:
         scorefxn (pyrosetta.rosetta.core.scoring.ScoreFunction):
-            Score function used during sampling to evaluate our Pose conformations.
+            Score function that will be used during Pose minimization.
         min_id (str):
-            Identifier for the PyRosetta minimization algorithm.
+            Identifier for the used PyRosetta minimization algorithm.
         tolerance (float):
             Value for the MinMover tolerance.
         max_iters (int):
-            Maximum iterations of the MinMover.
+            Maximum iterations of the MinMover. Defaults to None, meaning
+            the MinMover object's default value.
         dofs (tuple[str,str], optional):
             Defines what angles to set as flexible during minimization.
             Defaults to backbone and sidechain, i.e. ('bb','chi').
 
     Returns:
         pyrosetta.rosetta.protocols.minimization_packing.MinMover:
-            PyRosetta MinMover for last minimization steps in the sampling process.
+            A PyRosetta MinMover object setup with desired parameters.
     """
-    # Setup the MoveMap and MinMover for last minimization step
-    mmap = MoveMap()
-    for dof in dofs:
-        if dof == 'bb':
-            mmap.set_bb(True) # we want to modify backbone torsion angles (phi psi)
-        elif dof == 'chi':
-            mmap.set_chi(True) # and chi torsion angles (side chains)
-
-    min_mover = MinMover(mmap,scorefxn,min_id,tolerance,True)
-    min_mover.max_iter(max_iters)
+    # Setup the MoveMap object with desired degrees of freedom
+    mmap = pyrosetta.rosetta.core.kinematics.MoveMap()
+    if 'bb' in dofs:
+        mmap.set_bb(True) # we want to modify backbone torsion angles (phi psi)
+    if 'chi' in dofs:
+        mmap.set_chi(True) # and chi torsion angles (side chains)
+    
+    # Setup the MinMover object with required paremeters
+    min_mover = pyrosetta.rosetta.protocols.minimization_packing.MinMover(mmap,
+                                                                          scorefxn,
+                                                                          min_id,
+                                                                          tolerance,
+                                                                          True) # whether to use neighbour list
+    if max_iters is not None:
+        min_mover.max_iter(max_iters)
 
     return min_mover
-
 
 def derive_constraint_targets(
     pose: pyrosetta.rosetta.core.pose.Pose,
@@ -337,7 +358,7 @@ def derive_constraint_targets(
 
     # Map chain letters (str) to chain ids (int)
     if pose.num_chains() == 1:
-        chain_letter = get_chain_from_chain_id(1,pose)
+        chain_letter = pyrosetta.rosetta.core.pose.get_chain_from_chain_id(1,pose)
         if chain_letter == ' ':
             # In single-chain PDBs chain letter can be empty so we force it to be 'A' here
             chain_letter_ids = { 'A': 1}
@@ -348,7 +369,7 @@ def derive_constraint_targets(
         chain_letter_ids = {}
         i = 1
         while i < pose.num_chains() + 1:
-            chain_letter_ids[get_chain_from_chain_id(i,pose)] = i
+            chain_letter_ids[pyrosetta.rosetta.core.pose.get_chain_from_chain_id(i,pose)] = i
             i += 1
 
     constraint_targets = []
@@ -375,8 +396,8 @@ def derive_constraint_targets(
         end_residues = []
         for target in chain_targets: # e.g. target = ('MC' , (X1,Y1), 'all', 'TRIPEPTIDE')
             # Get start and end residue numbers for target region
-            start_res = pdb_to_pose(pose, target[1][0], chain)
-            end_res = pdb_to_pose(pose, target[1][-1], chain)
+            start_res = pyrosetta.rosetta.core.pose.pdb_to_pose(pose, target[1][0], chain)
+            end_res = pyrosetta.rosetta.core.pose.pdb_to_pose(pose, target[1][-1], chain)
             start_res_sampled = False
             end_res_sampled = False
 
@@ -412,9 +433,7 @@ def derive_constraint_targets(
             # We want to constrain the non-sampled regions so we grab end_res first
             constraint_targets.append((end_res,start_res))
 
-    cst_targets = tuple(constraint_targets)
-
-    return cst_targets
+    return tuple(constraint_targets)
 
 
 def apply_pae_constraints(
@@ -494,11 +513,11 @@ def apply_pae_constraints(
             for res in res_range:
                 low_plddt_res.append(pose.pdb_info().pdb2pose(chain_id,res))
 
-    cst_pose = Pose()
-    cst_pose.detached_copy(pose)
+    tmp_pose = pyrosetta.rosetta.core.pose.Pose()
+    tmp_pose.detached_copy(pose)
 
     # Create constraint set
-    working_cs = constraints.ConstraintSet(pose.constraint_set())
+    working_cs = pyrosetta.rosetta.core.scoring.constraints.ConstraintSet(pose.constraint_set())
 
     # Apply constraints based on pae
     for r1_idx, r2_idx in np.argwhere(pae_matrix < cutoff):
@@ -522,26 +541,28 @@ def apply_pae_constraints(
             if error < flatten_cutoff:
                 error = flatten_value
 
-            FlatHarmonicFunc = func.FlatHarmonicFunc
-            HarmonicFunc = func.HarmonicFunc
-            AtomPairConstraint = constraints.AtomPairConstraint
-
-            ca1 = AtomID(pose.residue(r1_idx + 1).atom_index('CA'), r1_idx + 1)
-            ca2 = AtomID(pose.residue(r2_idx + 1).atom_index('CA'), r2_idx + 1)
+            ca1 = pyrosetta.rosetta.core.id.AtomID(pose.residue(r1_idx + 1).atom_index('CA'),
+                                                   r1_idx + 1)
+            ca2 = pyrosetta.rosetta.core.id.AtomID(pose.residue(r2_idx + 1).atom_index('CA'),
+                                                   r2_idx + 1)
             ca1_xyz = pose.residue(ca1.rsd()).xyz(ca1.atomno())
             ca2_xyz = pose.residue(ca2.rsd()).xyz(ca2.atomno())
             d = (ca1_xyz - ca2_xyz).norm()
 
             if tolerance is not None:
                 # Higher sd_in -> Lower apc value -> Lower Pose score => Weaker cst
-                fun = FlatHarmonicFunc(x0_in=d,
-                                       sd_in=error*weight*plddt_scaling_factor,
-                                       tol_in=tolerance)
+                fun = pyrosetta.rosetta.core.scoring.func.FlatHarmonicFunc(
+                    x0_in=d,
+                    sd_in=error*weight*plddt_scaling_factor,
+                    tol_in=tolerance
+                    )
             else:
-                fun = HarmonicFunc(x0_in=d,
-                                   sd_in=error*weight*plddt_scaling_factor)
+                fun = pyrosetta.rosetta.core.scoring.func.HarmonicFunc(
+                    x0_in=d,
+                    sd_in=error*weight*plddt_scaling_factor
+                    )
 
-            apc = AtomPairConstraint(ca1,ca2,fun)
+            apc = pyrosetta.rosetta.core.scoring.constraints.AtomPairConstraint(ca1,ca2,fun)
             working_cs.add_constraint(apc)
 
         elif r1_idx+1 not in low_plddt_res and r2_idx+1 not in low_plddt_res:
@@ -551,99 +572,94 @@ def apply_pae_constraints(
             if error < flatten_cutoff:
                 error = flatten_value
 
-            FlatHarmonicFunc = func.FlatHarmonicFunc
-            HarmonicFunc = func.HarmonicFunc
-            AtomPairConstraint = constraints.AtomPairConstraint
-
-            ca1 = AtomID(pose.residue(r1_idx + 1).atom_index('CA'), r1_idx + 1)
-            ca2 = AtomID(pose.residue(r2_idx + 1).atom_index('CA'), r2_idx + 1)
+            ca1 = pyrosetta.rosetta.core.id.AtomID(pose.residue(r1_idx + 1).atom_index('CA'),
+                                                   r1_idx + 1)
+            ca2 = pyrosetta.rosetta.core.id.AtomID(pose.residue(r2_idx + 1).atom_index('CA'),
+                                                   r2_idx + 1)
             ca1_xyz = pose.residue(ca1.rsd()).xyz(ca1.atomno())
             ca2_xyz = pose.residue(ca2.rsd()).xyz(ca2.atomno())
             d = (ca1_xyz - ca2_xyz).norm()
 
             if tolerance is not None:
                 # Lower sd_in -> Higher apc value -> Higher Pose score => Stronger cst
-                fun = FlatHarmonicFunc(x0_in=d,
-                                       sd_in=error*weight,
-                                       tol_in=tolerance)
+                fun = pyrosetta.rosetta.core.scoring.func.FlatHarmonicFunc(x0_in=d,
+                                                                           sd_in=error*weight,
+                                                                           tol_in=tolerance)
             else:
-                fun = HarmonicFunc(x0_in=d,
-                                   sd_in=error*weight)
+                fun = pyrosetta.rosetta.core.scoring.func.HarmonicFunc(x0_in=d,
+                                                                       sd_in=error*weight)
 
-            apc = AtomPairConstraint(ca1,ca2,fun)
+            apc = pyrosetta.rosetta.core.scoring.constraints.AtomPairConstraint(ca1,ca2,fun)
             working_cs.add_constraint(apc)
 
     # Apply constraint set to pose
-    setup = ConstraintSetMover()
+    setup = pyrosetta.rosetta.protocols.constraint_movers.ConstraintSetMover()
     setup.constraint_set(working_cs)
-    setup.apply(cst_pose)
+    setup.apply(tmp_pose)
 
     # Update working pose
-    pose.assign(cst_pose)
+    pose.assign(tmp_pose)
 
 
 def apply_constraints(
     pose: pyrosetta.rosetta.core.pose.Pose,
     cst_targets: tuple[tuple[int,int],...],
-    contacts: tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...] | None,
-    stdev: float = 10.0,
+    contacts: tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...] | None = None,
+    stdev: float | None = 10.0,
     tolerance: float | None = 0.001):
-    """Apply constraints to non-sampled regions of a Pose object.
+    """Apply energy constraints to desired regions of a Pose object.
 
-    Apply all appropriate intra-region constraints based on cst_targets and all interregion
-    constraints based on given restraints.
-    not be sampled.
     This function is incompatible with the apply_pae_constraints function, and they should not be
-    used in tandem.
+    used on the same Pose.
+    The word 'contacts' is used here for convenience, these could be any two regions whose
+    relative position should be conserved, even if they are far apart in the Pose.
+    
 
     Args:
         pose (pyrosetta.rosetta.core.pose.Pose):
-            Target Pose object for constraints.
+            Target Pose object for constraints. It is modified in place.
         cst_targets (tuple[tuple[int,int],...]):
-            Residues between which AtomPairConstraints will be applied.
+            Residue ranges defining regions that make up folded protein domains.
+            AtomPairConstraints will be applied between constituting residues.
         contacts (tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...]):
-            Residue ranges where two chains are interacting.
-        stdev (float):
-            Standard deviation value to use in constraints.
+            Pairs of residue ranges defining regions whose relative position should be conserved.
+            AtomPairConstraints will be applied between residues belonging to different regions.
+            Defaults to None.
+        stdev (float, optional):
+            Standard deviation value to use in constraints. Defaults to 10.0.
         tolerance (float, optional):
-            Tolerance value to use in constraints (if applicable). Defaults to None.
+            Tolerance value to use in constraints. Defaults to 0.001.
     """
-    cst_pose = Pose()
-    cst_pose.detached_copy(pose)
+    # Initialize temporary Pose object
+    tmp_pose = pyrosetta.rosetta.core.pose.Pose()
+    tmp_pose.detached_copy(pose)
 
-    # Setup constraint function
-    if tolerance is not None:
-        cst_func = func.FlatHarmonicFunc
-    else:
-        cst_func = func.HarmonicFunc
+    # Initialize working ConstraintSet object
+    cs = pyrosetta.rosetta.core.scoring.constraints.ConstraintSet(pose.constraint_set())
 
-    # Create constraint set
-    cs = constraints.ConstraintSet(pose.constraint_set())
-
-    # Add to constraint set
-    ## Constraints for non sampled regions (conserve secondary structure)
-    cs_intra = add_intrachain_constraints(pose=cst_pose,
+    # Add to ConstraintSet
+    ## Conserve the structure of folded domains made up of contiguous residues
+    cs_intra = add_intrachain_constraints(pose=tmp_pose,
                                           constraint_targets=cst_targets,
                                           constraint_set=cs,
-                                          constraint_function=cst_func,
                                           stdev=stdev,
                                           tolerance=tolerance)
 
-    ## Additional constraints to direct sampling (conserve tertiary and quaternary structure)
-    cs_intra_contacts = add_contacts_constraints(pose=cst_pose,
+    ## Additional constraints between regions that are not contiguous in the Pose,
+    # but whose relative position should be conserved
+    cs_intra_contacts = add_contacts_constraints(pose=tmp_pose,
                                                  contacts=contacts,
                                                  constraint_set=cs_intra,
-                                                 constraint_function=cst_func,
                                                  stdev=stdev,
                                                  tolerance=tolerance)
 
-    # Apply constraint set to pose
-    setup = ConstraintSetMover()
+    # Update ConstraintSet of temporary Pose
+    setup = pyrosetta.rosetta.protocols.constraint_movers.ConstraintSetMover()
     setup.constraint_set(cs_intra_contacts)
-    setup.apply(cst_pose)
+    setup.apply(tmp_pose)
 
-    # Update working pose
-    pose.assign(cst_pose)
+    # Overwrite Pose with final ConstraintSet
+    pose.assign(tmp_pose)
 
 
 def setup_fold_tree(
@@ -685,7 +701,7 @@ def setup_fold_tree(
         for more information about the Rosetta FoldTree.
     """
     # Prepare working pose
-    ft_pose = Pose()
+    ft_pose = pyrosetta.rosetta.core.pose.Pose()
     ft_pose.detached_copy(pose)
 
     #central_residues = [227,483,739] # N246TRIMER (sets the fold tree manually)
@@ -732,7 +748,10 @@ def setup_fold_tree(
             # Contact residue range for X
             x_start = contact[0][1][0]
             x_end = contact[0][1][1]
-            inter_range_x = set([pdb_to_pose(ft_pose, res_id, chain_x)
+            inter_range_x = set([pyrosetta.rosetta.core.pose.pdb_to_pose(
+                                    ft_pose,
+                                    res_id,
+                                    chain_x)
                                 for res_id in range(x_start, x_end+1) ])
             try:
                 if inter_range_x not in chains_contact_regions[chain_x]:
@@ -746,8 +765,11 @@ def setup_fold_tree(
             # Contact residue range for Y
             y_start = contact[1][1][0]
             y_end = contact[1][1][1]
-            inter_range_y = [pdb_to_pose(ft_pose, res_id, chain_y)
-                                for res_id in range(y_start,y_end+1) ]
+            inter_range_y = [pyrosetta.rosetta.core.pose.pdb_to_pose(
+                                ft_pose,
+                                res_id,
+                                chain_y)
+                            for res_id in range(y_start,y_end+1) ]
             try:
                 if inter_range_y not in chains_contact_regions[chain_y]:
                     chains_contact_regions[chain_y].append(inter_range_y)

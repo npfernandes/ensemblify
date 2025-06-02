@@ -14,9 +14,9 @@ To generate a conformational ensemble for your protein of interest, you simply n
 
 For this example, we will use a parameters file created to sample the conformational space of Histatin5, a small IDP that can normally be found in saliva, where it acts as a defense against fungal infections.
 
-1. Build your parameters file using the provided [template](../assets/parameters_template.yaml), optionally with the aid of the more user-friendly HTML [form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html).
+1. Build your parameters file using the provided [template](../assets/parameters_template.yml), optionally with the aid of the more user-friendly HTML [form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html).
 
-      In this example, we are using a parameters file `params.yaml` with the following information:
+      In this example, we are using a YAML parameters file `params.yml` with the following information:
 
       ```{code-block} console
       {'job_name': 'Hst5',
@@ -29,17 +29,17 @@ For this example, we will use a parameters file created to sample the conformati
 
 2. Generate an ensemble via the Ensemblify CLI:
     
-      Assuming you have an Ensemblify parameters file `params.yaml` in the current working directory, you can run:
+      Assuming you have an Ensemblify parameters file `params.yml` in the current working directory, you can run:
 
       ```{code-block} console
-      (ensemblify_env) $ ensemblify gen -p params.yaml
+      (ensemblify_env) $ ensemblify gen -p params.yml
       Generating ensemble of 10 valid pdbs using 31 processor cores... 
       Ensemblified!: 100%|██████████| 10/10 [00:07<00:00,  1.43valid_pdb/s]   
       There are 10 valid pdbs, 14 were discarded ( 14 clashed | 0 violated constraints).
       Ensemble Generation Finished!
       ```
 
-      This command will create a directory in the current working directory named after the `job_name` parameter in `params.yaml`.
+      This command will create a directory in the current working directory named after the `job_name` parameter in `params.yml`.
       Assuming `job_name` is 'Hst5', a directory named 'Hst5' will be created and the ensemble will be located in `./Hst5/ensemble/valid_pdbs`.
 
 ----

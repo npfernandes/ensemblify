@@ -463,7 +463,7 @@ With the `generation` module, you can generate conformational ensembles for your
 Before generating an ensemble, you must create a parameters file either:
 
 - Using the provided [parameters form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html);
-- Directly, by editing the provided [parameters file template](docs/assets/parameters_template.yaml).
+- Directly, by editing the provided [parameters file template](docs/assets/parameters_template.yml).
 
 Check the [parameters file setup](#-setting-up-your-parameters-file) section for more details.
 
@@ -471,12 +471,12 @@ To generate an ensemble, provide Ensemblify with the path to your parameters fil
 
 Using the `ensemblify` command in a terminal:
 
-    ensemblify generation -p parameters_file.yaml
+    ensemblify generation -p parameters_file.yml
 
 Inside a Python script or Jupyter Notebook:
 
     from ensemblify.generation import generate_ensemble
-    generate_ensemble('parameters_file.yaml')
+    generate_ensemble('parameters_file.yml')
 
 Check the `generation`module [documentation](https://ensemblify.readthedocs.io/latest/usage_generation.html) for more detailed usage examples. 
 
@@ -496,7 +496,7 @@ An [.html form](https://github.com/npfernandes/ensemblify/releases/download/v0.0
 
 </details>
 
-If you prefer to create your own parameters file from scratch, a [template file](docs/assets/parameters_template.yaml) is also provided.
+If you prefer to create your own parameters file from scratch, a [template file](docs/assets/parameters_template.yml) is also provided.
 
 </details>
 </details>

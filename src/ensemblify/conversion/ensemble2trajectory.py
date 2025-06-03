@@ -20,8 +20,8 @@ FINAL_MSG = '{}Trajectory creation complete! '
 
 # FUNCTIONS
 def ensemble2traj(
-    ensemble_dir: str | None = os.getcwd(),
-    trajectory_dir: str | None = os.getcwd(),
+    ensemble_dir: str | None = None,
+    trajectory_dir: str | None = None,
     trajectory_id: str | None = '',
     trajectory_size: int | None = None,
     ) -> tuple[str,str]:
@@ -50,8 +50,12 @@ def ensemble2traj(
             topology_path (str):
                 Path to created topology .pdb file.
     """
-    # Create trajectory directory if non existent
-    if not os.path.isdir(trajectory_dir):
+    # Setup ensemble and trajectory directories
+    if ensemble_dir is None:
+        ensemble_dir = os.getcwd()
+    if trajectory_dir is None:
+        trajectory_dir = os.getcwd()
+    elif not os.path.isdir(trajectory_dir):
         os.mkdir(trajectory_dir)
 
     # Setup trajectory name

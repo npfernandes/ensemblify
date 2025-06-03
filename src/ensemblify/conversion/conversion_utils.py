@@ -80,7 +80,10 @@ def join_pdbs(
     
     # Remove topology_path from the list of .pdb files to join, if applicable
     if topology_path is not None:
-        total_pdbs2join.remove(topology_path)
+        try:
+            total_pdbs2join.remove(topology_path)
+        except ValueError:
+            pass
     
     # Assign number of models to sample if not given
     if n_models is None:

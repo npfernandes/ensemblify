@@ -8,7 +8,7 @@ Pipeline - ``ensemblify.pipeline``
 
 .. versionadded:: 1.0.0
 
-All of Ensemblify's functionalities integrated into one function call.
+All of Ensemblify's main functionalities integrated into one function call.
 """
 
 # IMPORTS

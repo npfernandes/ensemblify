@@ -106,7 +106,7 @@ Each of Ensemblify's modules has different dependencies to third party software,
 
 - `generation` module: [PyRosetta](#pyrosetta), [FASPR](#faspr) and [PULCHRA](#pulchra).
 
-- `conversion` module: [GROMACS](#gromacs), [Pepsi-SAXS](#pepsi-saxs) and optionally [BIFT](#bift).
+- `conversion` module: [GROMACS](#gromacs) (optional), [Pepsi-SAXS](#pepsi-saxs) and [BIFT](#bift) (optional).
 
 - `analysis` module: no other software required.
 
@@ -191,11 +191,7 @@ FASPR<sup>[[3]](#ref3)</sup> is an ultra-fast and accurate program for determini
     ```
 
 4. Add an environment variable with the path to your FASPR executable to your `ensemblify_env` conda environment:
-    <!-- ```bash
-    echo "export FASPR_PATH='$(realpath FASPR)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
-    source ~/.bashrc # Or ~/.zshrc, depending on the shell
-    echo $FASPR_PATH # to check if the variable has been set correctly
-    ``` -->
+
     ```bash
     conda env config vars set FASPR_PATH=$(realpath FASPR)
     conda deactivate
@@ -242,12 +238,6 @@ PULCHRA<sup>[[4]](#ref4)</sup> (PowerfUL CHain Restoration Algorithm) is a progr
 
 4. Add an environment variable with the path to your PULCHRA executable to your `ensemblify_env` conda environment:
 
-    <!-- ```bash
-    echo "export PULCHRA_PATH='$(realpath pulchra)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
-    source ~/.bashrc # Or ~/.zshrc, depending on the shell
-    echo $PULCHRA_PATH # to check if the variable has been set correctly
-    ``` -->
-
     ```bash
     conda env config vars set PULCHRA_PATH=$(realpath pulchra)
     conda deactivate
@@ -268,6 +258,7 @@ PULCHRA<sup>[[4]](#ref4)</sup> (PowerfUL CHain Restoration Algorithm) is a progr
 
 GROMACS<sup>[[5]](#ref5)</sup> is a molecular dynamics package mainly designed for simulations of proteins, lipids, and nucleic acids.
 It comes with a large selection of flexible tools for trajectory analysis and the output formats are also supported by all major analysis and visualisation packages.
+If you decide not to install GROMACS in your system, the Ensemblify `conversion` module will still work as intended, but will be much slower.
 
 To download and compile the GROMACS [source code](https://ftp.gromacs.org/gromacs/gromacs-2024.2.tar.gz) from their [website](https://manual.gromacs.org/documentation/current/download.html) you can follow these commands:
 
@@ -338,11 +329,6 @@ To download the Pepsi-SAXS executable from their [website](https://team.inria.fr
 
 3. Add an environment variable with the path to your Pepsi-SAXS executable to your `ensemblify_env` conda environment:
 
-    <!-- ```bash
-    echo "export PEPSI_SAXS_PATH='$(realpath Pepsi-SAXS)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
-    source ~/.bashrc # Or ~/.zshrc, depending on the shell
-    echo $PEPSI_SAXS_PATH # to check if the variable has been set correctly
-    ``` -->
     ```bash
     conda activate ensemblify_env
     conda env config vars set PEPSI_SAXS_PATH=$(realpath Pepsi-SAXS)
@@ -392,11 +378,6 @@ To compile the provided BIFT source code, you can follow these commands:
 
 4. Add an environment variable with the path to your BIFT executable to your `ensemblify_env` conda environment:
 
-    <!-- ```bash
-    echo "export BIFT_PATH='$(realpath bift)'" >> ~/.bashrc # Or ~/.zshrc, depending on the shell
-    source ~/.bashrc # Or ~/.zshrc, depending on the shell
-    echo $BIFT_PATH # to check if the variable has been set correctly
-    ``` -->
     ```bash
     conda env config vars set BIFT_PATH=$(realpath bift)
     conda deactivate

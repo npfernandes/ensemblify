@@ -78,7 +78,7 @@ Each of Ensemblify's modules has different dependencies to third party software,
 
 - `generation` module: [PyRosetta](#pyrosetta), [FASPR](#faspr) and [PULCHRA](#pulchra).
 
-- `conversion` module: [GROMACS](#gromacs), [Pepsi-SAXS](#pepsi-saxs) and optionally [BIFT](#bift).
+- `conversion` module: [GROMACS](#gromacs) (optional), [Pepsi-SAXS](#pepsi-saxs) and [BIFT](#bift) (optional).
 
 - `analysis` module: no other software required.
 
@@ -207,6 +207,7 @@ PULCHRA<sup>[[4]](#ref4)</sup> (PowerfUL CHain Restoration Algorithm) is a progr
 
 GROMACS<sup>[[5]](#ref5)</sup> is a molecular dynamics package mainly designed for simulations of proteins, lipids, and nucleic acids.
 It comes with a large selection of flexible tools for trajectory analysis and the output formats are also supported by all major analysis and visualisation packages.
+If you decide not to install GROMACS in your system, the Ensemblify `conversion` module will still work as intended, but will be much slower.
 
 To download and compile the GROMACS [source code](https://ftp.gromacs.org/gromacs/gromacs-2024.2.tar.gz) from their [website](https://manual.gromacs.org/documentation/current/download.html) you can follow these commands:
 

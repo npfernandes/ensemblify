@@ -47,6 +47,47 @@ def move_topology_pdb(
     return topology_path
 
 
+def _sample_without_topology(
+    pdbs_dir: str,
+    topology_path: str | None = None,
+    n_models: int | None = None,
+    ) -> list[str]:
+    """Sample .pdb files from a directory, excluding a topology file.
+    
+    Args:
+        pdbs_dir (str):
+            Path to directory where .pdb files are stored.
+        topology_path (str):
+            Path to a topology .pdb file to be ignored when sampling .pdb files from
+            pdbs_dir. Defaults to None.
+        n_models (int):
+            Number of .pdb files to randomly sample from the provided directory.
+            Defaults to all .pdb files in the directory.
+
+    Returns:
+        list[str]:
+            List of paths to sampled .pdb files."""
+    
+    # Grab total .pdb files
+    total_pdbs = glob.glob(os.path.join(pdbs_dir,'*.pdb'))
+    
+    # Remove topology_path from the list of .pdb files, if applicable
+    if topology_path is not None:
+        try:
+            total_pdbs.remove(topology_path)
+        except ValueError:
+            pass
+    
+    # Assign number of models to sample if not given
+    if n_models is None:
+        n_models = len(total_pdbs)
+    
+    # Sample desired number of .pdb files (without replacement)
+    sampled_pdbs = random.sample(total_pdbs, n_models)
+    
+    return sampled_pdbs
+
+
 def join_pdbs(
     pdbs_dir: str,
     multimodel_name: str,
@@ -74,23 +115,11 @@ def join_pdbs(
     Returns:
         str:
             Path to created multimodel ensemble .pdb file.
-    """
-    # Grab .pdb files to join
-    total_pdbs2join = glob.glob(os.path.join(pdbs_dir,'*.pdb'))
-    
-    # Remove topology_path from the list of .pdb files to join, if applicable
-    if topology_path is not None:
-        try:
-            total_pdbs2join.remove(topology_path)
-        except ValueError:
-            pass
-    
-    # Assign number of models to sample if not given
-    if n_models is None:
-        n_models = len(total_pdbs2join)
-    
+    """  
     # Sample desired number of .pdb files (without replacement)
-    sampled_pdbs2join = random.sample(total_pdbs2join, n_models)
+    sampled_pdbs2join = _sample_without_topology(pdbs_dir=pdbs_dir,
+                                                 topology_path=topology_path,
+                                                 n_models=n_models)
 
     # Setup multimodel .pdb filepath
     ensemble_path = os.path.join(multimodel_dir,f'{multimodel_name}_ensemble.pdb')
@@ -155,8 +184,8 @@ def calc_saxs_data(
     with warnings.catch_warnings():
         # Suppress UserWarnings related to Unit cell dimensions and 'formalcharges'
         warnings.filterwarnings('ignore', category=UserWarning)
-        with mda.Writer(frame_file, universe.atoms.n_atoms) as W:
-            W.write(universe.atoms)
+        with mda.Writer(frame_file, universe.atoms.n_atoms) as w:
+            w.write(universe.atoms)
 
     # Calculate SAXS data for this frame
     pepsi_saxs_path = GLOBAL_CONFIG['PEPSI_SAXS_PATH']

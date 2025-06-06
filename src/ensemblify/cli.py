@@ -217,19 +217,20 @@ def main():
                                               formatter_class=CustomHelpFormatter)
 
     parser_conversion.add_argument('-e', '--ensembledir',
-                                   required=True, type=str,  metavar='',
-                                   help=('Path to directory where ensemble files (.pdb) are '
-                                         'located. Defaults to current working directory.'))
+                                   default=None, type=str,  metavar='',
+                                   help=('(Optional) Path to directory where ensemble files (.pdb)'
+                                         'are located. Defaults to current working directory.'))
 
     parser_conversion.add_argument('-t', '--trajectorydir',
-                                   required=True, type=str,  metavar='',
-                                   help=('Path to directory where trajectory file (.xtc) will be '
-                                         'created. Defaults to current working directory.'))
+                                   default=None, type=str,  metavar='',
+                                   help=('(Optional) Path to directory where trajectory file '
+                                         '(.xtc) will be created. Defaults to current working '
+                                         'directory.'))
 
     parser_conversion.add_argument('-i', '--trajectoryid',
-                                   required=True, type=str, metavar='',
-                                   help=('Prefix for created trajectory file (.xtc). Defaults to '
-                                        'None.'))
+                                   default=None, type=str, metavar='',
+                                   help=('(Optional) Name for created trajectory file (.xtc). '
+                                         'Defaults to None.'))
 
     parser_conversion.add_argument('-s', '--size',
                                    default=None, type=int,  metavar='',
@@ -256,10 +257,11 @@ def main():
 
     parser_analysis.add_argument('-tid', '--trajectoryid',
                                  nargs='+', required=True, type=str,  metavar='',
-                                 help='Prefix identifier(s) for trajectory file(s).')
+                                 help=('Name to give analyzed trajectory file(s) in created '
+                                       'analysis figures.'))
 
     parser_analysis.add_argument('-out', '--outputdir',
-                                 type=str,  metavar='',
+                                 default=None, type=str,  metavar='',
                                  help=('(Optional) Path to output directory. Defaults to current '
                                       'working directory.'))
 
@@ -329,14 +331,15 @@ def main():
 
     parser_reweighting.add_argument('-tid', '--trajectoryid',
                                     required=True, type=str,  metavar='',
-                                    help='Prefix identifier for trajectory file.')
+                                    help=('Name to give reweighted trajectory file(s) in created '
+                                          'reweighting figures.'))
 
     parser_reweighting.add_argument('-exp', '--expdata',
                                     required=True, type=str,
                                     help='Path to experimental SAXS data file (.dat).')
 
     parser_reweighting.add_argument('-out', '--outputdir',
-                                    type=str,  metavar='',
+                                    default=None, type=str,  metavar='',
                                     help=('(Optional) Path to output directory. Defaults '
                                           'to current working directory.'))
 

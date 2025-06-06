@@ -45,7 +45,7 @@ def reweight_ensemble(
     topology: str,
     trajectory_id: str,
     exp_saxs_data: str,
-    output_dir: str | None = os.getcwd(),
+    output_dir: str | None = None,
     thetas: list[int] | None = None,
     calculated_cmatrix: pd.DataFrame | str | None = None,
     calculated_dmatrix: pd.DataFrame | str | None = None,
@@ -124,7 +124,9 @@ def reweight_ensemble(
         thetas = [1, 10, 20, 50, 75, 100, 200, 400, 750, 1000, 5000, 10000]
 
     # Setup output directory
-    if not os.path.isdir(output_dir):
+    if output_dir is None:
+        output_dir = os.getcwd()
+    elif not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 
     # Setup directory for reweighting files

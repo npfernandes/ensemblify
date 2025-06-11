@@ -207,6 +207,7 @@ PULCHRA<sup>[[4]](#ref4)</sup> (PowerfUL CHain Restoration Algorithm) is a progr
 
 GROMACS<sup>[[5]](#ref5)</sup> is a molecular dynamics package mainly designed for simulations of proteins, lipids, and nucleic acids.
 It comes with a large selection of flexible tools for trajectory analysis and the output formats are also supported by all major analysis and visualisation packages.
+
 If you decide not to install GROMACS in your system, the Ensemblify `conversion` module will still work as intended, but will be much slower.
 
 To download and compile the GROMACS [source code](https://ftp.gromacs.org/gromacs/gromacs-2024.2.tar.gz) from their [website](https://manual.gromacs.org/documentation/current/download.html) you can follow these commands:
@@ -283,6 +284,8 @@ To download the Pepsi-SAXS executable from their [website](https://team.inria.fr
 ### BIFT
 
 Bayesian indirect Fourier transformation (BIFT) of small-angle experimental data allows for an estimation of parameters that describe the data<sup>[[7]](#ref7)</sup>. Larsen *et al.* show in [[8]](#ref8) that BIFT can identify whether the experimental error in small-angle scattering data is over or underestimated. Here we use their implementation of this method to make this determination and scale the error values accordingly.
+
+If you decide not to install BIFT, the Ensemblify `conversion` module will still work, but provided experimental errors will not be adjusted.
 
 To compile the provided BIFT source code, you can follow these commands:
 

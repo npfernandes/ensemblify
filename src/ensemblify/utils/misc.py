@@ -65,26 +65,15 @@ def kde(
     # Get the weighted average of our data
     weighted_average = np.average(data,weights=weights) # np.sum(weights * data) / np.sum(weights)
 
-    #####################################
-    ####### Readable code version #######
-    #####################################
+    # Calculate effective N and correction factor
+    effective_sample_size = np.sum(weights)**2 / np.sum(weights**2)
+    correction = effective_sample_size/(effective_sample_size - 1)
 
-    # # Calculate effective N and correction factor
-    # effective_sample_size = np.sum(weights)**2 / np.sum(weights**2)
-    # correction = effective_sample_size/(effective_sample_size - 1)
+    # Get the weighted variance of our data
+    weighted_variance = np.sum(weights * (data - weighted_average) ** 2) / np.sum(weights)
 
-    # # Get the weighted variance of our data
-    # weighted_variance = np.sum(weights * (data - weighted_average) ** 2) / np.sum(weights)
-
-    # # Get the weighted standard error of our average
-    # weighted_standard_error = np.sqrt((correction * weighted_variance) / effective_sample_size)
-
-    #############################################################
-    ###### All in one operation to reduce information loss ######
-    #############################################################
-
-    # Calculate the standard error of the weighted average
-    weighted_standard_error = np.sqrt((((np.sum(weights)**2/np.sum(weights**2))/((np.sum(weights)**2/np.sum(weights**2))-1))*(np.sum(weights*(data-weighted_average)**2)/np.sum(weights)))/(np.sum(weights)**2/np.sum(weights**2)))
+    # Get the weighted standard error of our average
+    weighted_standard_error = np.sqrt((correction * weighted_variance) / effective_sample_size)
 
     return x_coords,norm_kde,weighted_average,weighted_standard_error
 

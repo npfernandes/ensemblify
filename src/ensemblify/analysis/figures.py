@@ -1494,7 +1494,7 @@ def create_analysis_figures(
 
     if total_box_traces:
         metrics_fig_out = os.path.join(output_directory,
-                                       'structural_metrics.html')
+                                       f"{'_'.join(trajectory_ids)}structural_metrics.html")
 
         metrics_fig = create_metrics_fig(trajectory_ids=trajectory_ids,
                                          total_box_traces=total_box_traces,

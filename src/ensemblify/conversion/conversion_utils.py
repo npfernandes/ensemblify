@@ -40,7 +40,7 @@ def move_topology_pdb(
     """
     topology_path = os.path.join(destination_dir,f'{topology_name}_top.pdb')
     for pdb in glob.glob(os.path.join(origin_dir,'*.pdb')):
-        with open(pdb,'r',encoding='utf-8-sig') as f, open(topology_path,'w',encoding='utf-8') as t:
+        with open(pdb,'r',encoding='utf-8-sig') as f,open(topology_path,'w',encoding='utf-8') as t:
             t.write(f.read())
             break
 
@@ -95,8 +95,8 @@ def join_pdbs(
     n_models: int | None = None,
     topology_path: str | None = None,
     ) -> str:
-    """Join a randomly sampled number of .pdb files in a directory into a single multimodel
-    .pdb file.
+    """Join a randomly sampled number of .pdb files in a directory into a single multimodel .pdb
+    file.
 
     Args:
         pdbs_dir (str):
@@ -104,7 +104,7 @@ def join_pdbs(
         multimodel_name (str):
             Prefix identifier for created multimodel .pdb file.
         multimodel_dir (str):
-            Path to directory where ensemble pdb will be created.
+            Path to directory where ensemble .pdb file will be created.
         n_models (int):
             Number of .pdb files to randomly sample from the specified directory.
             If None, all .pdb files in the directory will be used.
@@ -147,11 +147,11 @@ def calc_saxs_data(
     exp_saxs_file: str,
     calc_saxs_log: str,
     ) -> np.ndarray:
-    """Calculate a theoretical SAXS curve for a frame of a MDAnalysis
-    Universe object using PEPSI-SAXS.
+    """Calculate a theoretical SAXS curve for a frame of a MDAnalysis Universe object using
+    Pepsi-SAXS.
 
-    Calculation is done for a single temporary .pdb file created  from
-    the current frame of the Universe object.
+    Calculation is done for a single temporary .pdb file created  from the current frame of
+    the Universe object.
 
     Args:
         trajectory_id (str):
@@ -161,15 +161,15 @@ def calc_saxs_data(
         frame_index (int):
             Current frame being calculated.
         exp_saxs_file (str):
-            Path to .dat file with experimental SAXS data for the current
-            protein to be used by PEPSI-SAXS.
+            Path to .dat file with experimental SAXS data for the current protein to be used by
+            Pepsi-SAXS.
         calc_saxs_log (str):
             Path to .log file for the SAXS curve calculation of each frame.
 
     Returns:
         np.ndarray:
-            Numpy ndarray with the values for the SAXS curve calculated from this
-            frame of the trajectory in the Universe object.
+            Numpy ndarray with the values for the SAXS curve calculated from this frame of the
+            trajectory in the Universe object.
     """
     # Setup tmp files
     frame_file = os.path.join(os.path.split(exp_saxs_file)[0],

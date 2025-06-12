@@ -704,13 +704,6 @@ def setup_fold_tree(
     ft_pose = pyrosetta.rosetta.core.pose.Pose()
     ft_pose.detached_copy(pose)
 
-    #central_residues = [227,483,739] # N246TRIMER (sets the fold tree manually)
-    #central_residues = [227,483] # N246DIMER (sets the fold tree manually)
-    #central_residues = [227] # N246MONOMER
-    #central_residues = [52,133,214] # NLINKERTRIMER
-    #central_residues = [227,656,1085,1514] # NFullLengthTetramer (sets the fold tree manually)
-    # Uncomment what is below (so that the FoldTree is set automatically)
-
     # Calculate the optimal central residues
     central_residues = []
     for i in range(1,ft_pose.num_chains()+1):

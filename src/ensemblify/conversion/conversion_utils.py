@@ -191,7 +191,7 @@ def calc_saxs_data(
     pepsi_saxs_path = GLOBAL_CONFIG['PEPSI_SAXS_PATH']
     assert pepsi_saxs_path is not None, 'Pepsi-SAXS installation not found!'
 
-    pepsi_comm = f'{pepsi_saxs_path} {frame_file} {exp_saxs_file} -o {output_file} -cst -x'
+    pepsi_comm = f'{pepsi_saxs_path} {frame_file} {exp_saxs_file} -o {output_file} -cst'
     subprocess.run(pepsi_comm.split(),
                    stdout=open(calc_saxs_log,'a',encoding='utf-8'),
                    stderr=subprocess.STDOUT,
@@ -204,3 +204,36 @@ def calc_saxs_data(
     os.remove(output_file)
 
     return calc_saxs
+
+
+def calc_chi2_residuals(exp: np.ndarray, calc: np.ndarray, sample_weights: np.ndarray) -> float:
+    """Apply a chi-square goodness-of-fit test between experimental and calculated data profiles.
+    
+    Args:
+        exp (np.ndarray):
+            Experimental data in the format {value, error}.
+        calc (np.ndarray):
+            Calculated averages for each data point in the sample, in the format {value}.
+        sample_weights (np.ndarray):
+            Weights for each sample in the calculated data.
+
+    Returns:
+        float:
+            Reduced chi2 value of fit.
+        np.ndarray:
+            Residuals of the fit.
+    """
+    # Calculate the average value for each calculated data point in the sample,
+    # weighted by sample weights
+    calc_avg = np.sum(calc*sample_weights[:,np.newaxis],
+                      axis=0)
+
+    # Calculate the difference between calculated averages and experimental values
+    diff = calc_avg-exp[:,0]
+
+    # Calculate the reduced chi2 value using experimental errors
+    chi2 = np.average((diff/exp[:,1])**2)
+
+    (i_exp-i_prior)/err
+
+    return chi2

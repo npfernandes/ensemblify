@@ -23,18 +23,18 @@ from ensemblify.analysis import (
     create_ss_frequency_figure,
 )
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.conversion import traj2saxs
+from ensemblify.conversion import traj2saxs, calc_chi2_fit
 from ensemblify.reweighting.data import (
     attempt_read_calculated_data,
     attempt_read_reweighting_data,
     average_saxs_profiles,
     bme_ensemble_reweighting,
-    correct_exp_error,
-    process_exp_data,
+    correct_exp_saxs_error,
+    process_exp_saxs_data,
 )
 from ensemblify.reweighting.figures import (
     create_effective_frames_fit_fig,
-    create_reweighting_fits_fig,
+    create_rw_saxs_fits_fig,
     create_reweighting_metrics_fig,
 )
 from ensemblify.utils import get_array_extremum, round_to_nearest_multiple
@@ -44,7 +44,8 @@ def reweight_ensemble(
     trajectory: str,
     topology: str,
     trajectory_id: str,
-    exp_saxs_data: str,
+    exp_data: str | list[str],
+    exp_type: str | list[str] | None = None,
     output_dir: str | None = None,
     thetas: list[int] | None = None,
     calculated_cmatrix: pd.DataFrame | str | None = None,
@@ -56,11 +57,13 @@ def reweight_ensemble(
     compare_eed: bool | None = True,
     compare_cmdist: bool | None = None,
     ):
-    """Apply Bayesian Maximum Entropy (BME) reweighting to a conformational ensemble, given
-    experimental SAXS data.
+    """Apply Bayesian Maximum Entropy (BME) reweighting to a conformational ensemble.
 
-    Inside the output directory, a directory named trajectory_id will be created and that is where
-    all output files will be stored.
+    If exp_type if not provided, it must be specified in the first line of the exp_data file, in
+    the form of 'DATA=<type>', where <type> is one of the following: ['CS','JCOUPLINGS','RDC',
+    'SAXS'].
+    Inside the output directory, a directory named trajectory_id will be created where all output
+    files will be stored.
     If calculated metrics data is provided, it will not be recalculated.
     If data for the center mass distance is to be taken from the given calculated metrics data,
     the compare_cmdist mapping must be provided. The identifiers of this mapping will be matched
@@ -73,13 +76,16 @@ def reweight_ensemble(
             Path to .pdb topology file corresponding to any one frame of the ensemble.
         trajectory_id (str):
             Prefix trajectory identifier to be added to plotted traces and output files.
-        exp_saxs_data (str):
-            Path to .dat file with experimental SAXS data.
-        output_dir (str):
+        exp_data (str | list[str]):
+            Path(s) to .dat file(s) with experimental data with 3 columns {Label, Value, Error}.
+        exp_type (str, optional):
+            Type(s) of experimental data provided in the same order as exp_data. If None, the
+            type(s) are taken from the first line of each exp_data file.
+        output_dir (str, optional):
             Path to output directory. Is created if it does not exist. Defaults to current working
             directory. After output_dir is setup, a directory named trajectory_id is created inside
             it, where the interactive .html plots and reweighting output files will be stored.
-        thetas (list[int]):
+        thetas (list[int], optional):
             List of values to try as the theta parameter in BME. The ensemble will be reweighted
             each time using a different theta value. The effect of different theta values can be
             analyzed in the created effective frames figure.
@@ -119,15 +125,45 @@ def reweight_ensemble(
             MDAnalysis selections.
             Defaults to None.
     """
-    # Setup theta values
-    if thetas is None:
-        thetas = [1, 10, 20, 50, 75, 100, 200, 400, 750, 1000, 5000, 10000]
+    # Setup experimental data inputs
+    if isinstance(exp_data, str):
+        exp_data_input = [exp_data]
+    elif isinstance(exp_data, list):
+        exp_data_input = [x for x in exp_data]
+    else:
+        raise TypeError('exp_data must be a string or a list of strings.')
 
     # Setup output directory
     if output_dir is None:
         output_dir = os.getcwd()
     elif not os.path.isdir(output_dir):
         os.mkdir(output_dir)
+       
+    # Setup experimental data type(s) if not provided
+    if exp_type is None:
+        exp_type = []
+        for data_file in exp_data_input:
+            # Read first line of experimental data file to get type
+            with open(data_file, 'r', encoding='utf-8') as f:
+                first_line = f.readline().strip()
+                if 'DATA=' in first_line:
+                    for equality in first_line.split(' '):
+                        if 'DATA=' in equality:
+                            exp_type.append(equality.split('=')[1].upper())
+                            break
+                else:
+                    raise ValueError('Experimental data type not specified in the first line of '
+                                     'the experimental data file. Please add it or specify it '
+                                     'using the exp_type argument.')
+
+    # Copy experimental data file(s) into output dir before working on it
+    exp_data = []
+    for data_file, data_type in zip(exp_data_input,exp_type):
+        exp_data_copy = os.path.join(output_dir,
+                                     f'{trajectory_id}_{data_type}_exp_input.dat')
+        shutil.copy(src=data_file,
+                    dst=exp_data_copy)
+        exp_data.append(exp_data_copy)
 
     # Setup directory for reweighting files
     reweighting_dir = os.path.join(output_dir,
@@ -135,43 +171,71 @@ def reweight_ensemble(
     if not os.path.isdir(reweighting_dir):
         os.mkdir(reweighting_dir)
 
+    # Setup theta values
+    if thetas is None:
+        thetas = [1, 10, 20, 50, 75, 100, 200, 400, 750, 1000, 5000, 10000]
+
     # Check if we can skip some steps by reading previously computed data from output directory
-    exp_saxs_file,\
-    calc_saxs_file,\
-    thetas_array,\
-    stats,\
-    weights = attempt_read_reweighting_data(reweighting_output_directory=output_dir,
-                                            trajectory_id=trajectory_id)
+    exp_data_BME, \
+    calc_data_BME, \
+    thetas_array, \
+    stats, \
+    weights = None, None, None, None, None
+    # exp_data_file,\
+    # exp_type,
+    # calc_file,\
+    # thetas_array,\
+    # stats,\
+    # weights = attempt_read_reweighting_data(reweighting_output_directory=output_dir,
+    #                                         trajectory_id=trajectory_id)
 
-    if exp_saxs_file is None:
-        # Copy experimental data file into output dir before working on it
-        exp_saxs_data_copy = os.path.join(output_dir,
-                                        f'{trajectory_id}_exp_saxs_input.dat')
-        shutil.copy(src=exp_saxs_data,
-                    dst=exp_saxs_data_copy)
+    if exp_data_BME is None:
+        # Setup list of processed experimental data files for BME
+        exp_data_BME = []
 
-        # Process input experimental data
-        print(f'Processing {trajectory_id} experimental data file...')
+        for data_file, data_type in zip(exp_data,exp_type):
 
-        ## Check units
-        processed_exp_data = process_exp_data(experimental_data_path=exp_saxs_data_copy)
+            # Process input experimental data
+            print(f'Processing {trajectory_id} experimental {data_type} file...')
 
-        ## Correct error
-        try:
-            exp_saxs_file = correct_exp_error(experimental_data_path=processed_exp_data)
-        except subprocess.CalledProcessError: # if BIFT is not available
-            exp_saxs_file = os.path.join(os.path.split(processed_exp_data)[0],
-                                        f'{trajectory_id}_exp_saxs.dat')
-            np.savetxt(exp_saxs_file,
-                       np.loadtxt(processed_exp_data),
-                       header=' DATA=SAXS')
+            # If SAXS, additional processing
+            if data_type == 'SAXS':
 
-    if calc_saxs_file is None:
-        # Calculate SAXS data from ensemble
-        calc_saxs_file = traj2saxs(trajectory=trajectory,
-                                   topology=topology,
-                                   trajectory_id=trajectory_id,
-                                   exp_saxs_file=exp_saxs_file)
+                # Check units
+                exp_saxs_file_processed = process_exp_saxs_data(experimental_data_path=data_file)
+
+                # Correct errors
+                try:
+                    exp_file_BME = correct_exp_saxs_error(experimental_data_path=exp_saxs_file_processed)
+                except subprocess.CalledProcessError: # if BIFT is not available
+                    exp_file_BME = os.path.join(os.path.dirname(exp_saxs_file_processed),
+                                                f'{trajectory_id}_SAXS_exp.dat')
+                    np.savetxt(exp_file_BME,
+                               np.loadtxt(exp_saxs_file_processed),
+                               header=' DATA=SAXS')
+
+                # Clean up intermediate files
+                os.remove(data_file)
+                os.remove(exp_saxs_file_processed)
+
+            # Add processed experimental data file to list
+            exp_data_BME.append(exp_file_BME)
+
+    if calc_data_BME is None:
+        # Setup list of calculated data files for BME
+        calc_data_BME = []
+
+        for data_file, data_type in zip(exp_data_BME,exp_type):
+            if data_type == 'SAXS':
+
+                # Calculate SAXS data from ensemble
+                all_calc_file, avg_calc_file, fit_file = traj2saxs(trajectory=trajectory,
+                                                                   topology=topology,
+                                                                   trajectory_id=trajectory_id,
+                                                                   exp_saxs_file=data_file)
+                
+            # Add calculated data file to list
+            calc_data_BME.append(all_calc_file)
 
     if thetas_array is None or stats is None or weights is None:
         # Reweigh ensemble using different theta values
@@ -179,8 +243,9 @@ def reweight_ensemble(
 
         print((f'Applying BME reweighting to {trajectory_id} ensemble '
                f'with theta values {thetas} ...'))
-        stats, weights = bme_ensemble_reweighting(exp_saxs_file=exp_saxs_file,
-                                                  calc_saxs_file=calc_saxs_file,
+        stats, weights = bme_ensemble_reweighting(exp_data=exp_data_BME,
+                                                  exp_type=exp_type,
+                                                  calc_data=calc_data_BME,
                                                   thetas=thetas_array,
                                                   output_dir=reweighting_dir)
 
@@ -215,24 +280,58 @@ def reweight_ensemble(
     ##############################################################################################
     ############################# CALCULATE REWEIGHTING FIGURES DATA #############################
     ##############################################################################################
+    
+    # Calculate Experimental Fittings
+    for exp_data_file, calc_data_file, data_type in zip(exp_data_BME, calc_data_BME, exp_type):
+        print(f'Calculating reweighting figures data for {trajectory_id} experimental {data_type} '
+              f'data...')
+        
+        if data_type == 'SAXS':
 
-    # Calculate prior and posterior average SAXS intensities
-    common_i_prior = None
-    i_posts = []
+            # Calculate prior and posterior average SAXS intensities
+            common_i_prior = None
+            i_posts = []
 
-    for chosen_theta,chosen_weight_set in zip(chosen_thetas,chosen_weight_sets):
-        # Grab reweighted SAXS data using choice theta
-        rw_calc_saxs_file = glob.glob(os.path.join(reweighting_dir,
-                                                   f'ibme_t{chosen_theta}_*.calc.dat'))[0]
+            for chosen_theta,chosen_weight_set in zip(chosen_thetas,chosen_weight_sets):
 
-        # Calculate uniform (prior) and  reweighted (posterior) average SAXS profiles
-        i_prior, i_post = average_saxs_profiles(exp_saxs_file=exp_saxs_file,
-                                                calc_saxs_file=calc_saxs_file,
-                                                rw_calc_saxs_file=rw_calc_saxs_file,
-                                                weights=chosen_weight_set)
+                # Grab reweighted SAXS data using choice theta
+                rw_calc_saxs_file = glob.glob(os.path.join(reweighting_dir,
+                                                           f'ibme_t{chosen_theta}_*.calc.dat'))[0]
 
-        common_i_prior = i_prior
-        i_posts.append(i_post)
+                # Calculate uniform (prior) and reweighted (posterior) average SAXS profiles
+                i_prior, i_post = average_saxs_profiles(exp_saxs_file=exp_data_file,
+                                                        calc_saxs_file=calc_data_file,
+                                                        rw_calc_saxs_file=rw_calc_saxs_file,
+                                                        weights=chosen_weight_set)
+
+                common_i_prior = i_prior
+                i_posts.append(i_post)
+
+                # Fit reweighted SAXS data to experimental SAXS data, save chisquare and residuals
+                ## Get experimental intensities and errors
+                q, i_exp, err = np.loadtxt(data_file,
+                                           unpack=True)
+
+                chi2, residuals = calc_chi2_fit(exp=np.hstack((i_exp.reshape(-1,1),
+                                                               err.reshape(-1,1))),
+                                                calc=np.loadtxt(rw_calc_saxs_file)[...,1:],
+                                                sample_weights=chosen_weight_set)
+                ## Save fitting data
+                fitting_saxs_file = os.path.join(os.path.dirname(data_file),
+                                     f'{trajectory_id}_SAXS_fitting_t{chosen_theta}.dat')
+                chi2_header = f'Chi^2 = {chi2}\n'
+                col_names = ['Momentum Vector', 'Experimental SAXS Intensity', 'Experimental Error',
+                             'Calculated SAXS Intensity', 'Residuals of Fit']
+                file_header = chi2_header + '\t'.join(col_names)
+                
+                np.savetxt(fitting_saxs_file,
+                           np.hstack((q.reshape(-1,1),
+                                      i_exp.reshape(-1,1),
+                                      err.reshape(-1,1),
+                                      i_post.reshape(-1,1),
+                                      residuals.reshape(-1,1))),
+                           header=file_header,
+                           encoding='utf-8')
 
     # Calculate Contact Matrices
     ## Uniform
@@ -327,21 +426,30 @@ def reweight_ensemble(
     ##############################################################################################
     ################################# CREATE REWEIGHTING FIGURES #################################
     ##############################################################################################
-
     # Create interactive figures
     print(f'Creating {trajectory_id} reweighted interactive figures...')
 
-    # Experimental Fittings
-    ## Read experimental data
-    q, i_exp, err = np.loadtxt(exp_saxs_file,
-                               unpack=True)
-    ## Create Figure
-    rw_fits_fig = create_reweighting_fits_fig(q=q,
-                                              i_exp=i_exp,
-                                              err=err,
-                                              i_prior=common_i_prior,
-                                              i_posts=i_posts,
-                                              title_text=f'{trajectory_id} Reweighted Fittings')
+    # Experimental fitting figures
+    rw_fits_figs = []
+    for data_file, data_type in zip(exp_data_BME, exp_type):
+        print(f'Creating {trajectory_id} reweighted interactive figures for experimental '
+              f'{data_type} data...')
+        
+        if data_type == 'SAXS':
+            # Read experimental data
+            q, i_exp, err = np.loadtxt(data_file,
+                                       unpack=True)
+
+            # Create fittings Figure
+            rw_saxs_fits_fig = create_rw_saxs_fits_fig(q=q,
+                                                       i_exp=i_exp,
+                                                       err=err,
+                                                       i_prior=common_i_prior,
+                                                       i_posts=i_posts,
+                                                       title_text=(f'{trajectory_id} '
+                                                                   'Reweighted SAXS '
+                                                                   'Fittings'))
+            rw_fits_figs.append(rw_saxs_fits_fig)
 
     # Create nested dictionary to split up reweighted figures according to theta values
     theta_2_reweighted_figures = {}
@@ -480,10 +588,15 @@ def reweight_ensemble(
                                                  div_id='chosen_thetas')
 
     # Experimental Fittings
-    rw_fits_div = rw_fits_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
-                                      full_html=False,
-                                      include_plotlyjs=False,
-                                      div_id='rw_fits')
+    rw_fits_divs = []
+    for rw_fits_fig, data_type in zip(rw_fits_figs, exp_type):      
+        if data_type == 'SAXS':
+            rw_saxs_fits_div = rw_fits_fig.to_html(config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'],
+                                                   full_html=False,
+                                                   include_plotlyjs=False,
+                                                   div_id=f'rw_fits_{data_type}')
+            rw_fits_divs.append(rw_saxs_fits_div)
+    rw_fits_div_total = ''.join(rw_fits_divs)
 
     # Build Reweighted Figures Divs
     theta_2_reweighted_divs = {}
@@ -700,7 +813,7 @@ def reweight_ensemble(
             <div class="flex-container">
             {chosen_theta_div}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            {rw_fits_div}
+            {rw_fits_div_total}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             {rw_metrics_div}
             </div>

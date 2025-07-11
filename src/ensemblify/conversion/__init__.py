@@ -49,6 +49,8 @@ HST5_TRAJECTORY, you should run:
 Available Functions
 -------------------
 
+``calc_chi2_fit``
+    Calculate the chi-square value and residuals of a fit between experimental and calculated data.
 ``ensemble2traj``
     Create a .xtc trajectory file from an ensemble of .pdb files.
 ``traj2saxs``
@@ -56,7 +58,11 @@ Available Functions
 
 """
 
+from ensemblify.conversion.conversion_utils import calc_chi2_fit
 from ensemblify.conversion.ensemble2trajectory import ensemble2traj
 from ensemblify.conversion.trajectory2saxs import traj2saxs
 
-__all__ = ['ensemble2traj','traj2saxs']
+__all__ = [
+    'calc_chi2_fit',
+    'ensemble2traj',
+    'traj2saxs']

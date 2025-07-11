@@ -13,6 +13,7 @@ Reference:
 ## Standard Library Imports
 import sys
 import time
+from collections.abc import Callable
 
 ## Third Party Imports
 import numpy as np
@@ -29,13 +30,19 @@ TMAX = np.log((sys.float_info.max) / 5.)
 """Maximum safe argument for exponential functions. Used to prevent overflow when computing 
 exp(arg) by ensuring the result stays below sys.float_info.max with a safety factor of 5."""
 
+EXP2FIT = {'SAXS': 'scale+offset',
+           'RDC': 'scale',
+           'CS': None,
+           'JCOUPLINGS': None}
+"""Mapping of experimental data types to data scaling methods."""
+
 # CLASS
 class SimpleReweight:
     """The SimpleReweight class for performing Bayesian/Maximum Entropy reweighting.
 
     It supports plain averaged experimental data like Chemical Shifts (CS) and 3J couplings
     (JCOUPLINGS).
-    It supports data that must be rescaled or rescaled+shifted, like Residual Dipolar Couplings
+    It supports data that must be scaled or scaled+offset, like Residual Dipolar Couplings
     (RDCs) and Small Angle X-Ray Scattering (SAXS) respectively.
     It does NOT support non linearly averaged data or data that comes in the form of lower and
     upper bounds like nuclear Overhauser effects (NOEs).
@@ -59,6 +66,14 @@ class SimpleReweight:
             Back-calculated experimental data values.
         normalized (bool):
             Indicates if the data has been normalized.
+        exp_types (dict):
+            Mapping of data point indices to their experimental data type. For example, for a set
+            of 10 data points:
+
+                { 'SAXS': (0,4), 'RDC': (5,10) }
+                
+            indicates that the first five data points correspond to SAXS data and the final five
+            data points correspond to RDC data.
     """
     def __init__(self, name: str, w0: np.ndarray | None = None):
         """Initialize SimpleReweight instance.
@@ -81,6 +96,7 @@ class SimpleReweight:
         self.experiment =  None
         self.calculated =  None
         self.normalized = False
+        self.exp_types = {}
 
     def get_lambdas(self) -> np.ndarray | None:
         return self.lambdas
@@ -112,6 +128,19 @@ class SimpleReweight:
     def get_w0(self) -> np.ndarray | None:
         return np.copy(self.w0)
 
+    def add_exp_type_idxs(self, exp_type: str, idxs: tuple[int, int]):
+        """Add a new experimental data type to the exp_types dictionary.
+
+        Args:
+            exp_type (str):
+                Type of experimental data to add.
+            idxs (tuple[int, int]):
+                Indices of the experimental data points corresponding to this type.
+        """
+        assert exp_type in bt.EXP_TYPES , (f'Error. Experimental type must be one of the '
+                                           f'following: {bt.EXP_TYPES} ')
+        self.exp_types[exp_type] = idxs
+
     def set_lambdas(self, lambda0: np.ndarray):
         if self.lambdas is None:
             self.lambdas = lambda0
@@ -119,20 +148,35 @@ class SimpleReweight:
             print('# Overriding lambdas is not possible')
             sys.exit(1)
 
+    def log_message(self, message: str) -> None:
+        """Helper method to write and flush log messages."""
+        self.log_fd.write(message)
+        self.log_fd.flush()
+
+    def __del__(self):
+        """Close log file when object is destroyed."""
+        if hasattr(self, 'log_fd') and not self.log_fd.closed:
+            self.log_fd.close()
+
     def read_file(
         self,
         exp_file: str,
         calc_file: str,
+        exp_type: str,
         use_samples: list[int] | None = None,
         use_data: list[int] | None = None,
         ) -> tuple[np.ndarray,np.ndarray,np.ndarray]:
-        """Read experimental and calculated data files.
+        """Extract experimental and calculated data from files.
+
+        Calculated data is fit to experimental data, then scaled and offset if applicable.
 
         Args:
             exp_file (str):
                 Path to file with experimental data.
             calc_file (str):
                 Path to file with back-calculated experimental data.
+            exp_type (str):
+                Type of experimental data, used to determine how to fit the calculated data.
             use_samples (list[int] | None):
                 Use only this subset of calculated data indices. Defaults to None, and all
                 samples are used.
@@ -152,59 +196,88 @@ class SimpleReweight:
         # Read file
         labels, exp, calc, log = bt.parse(exp_file=exp_file,
                                           calc_file=calc_file)
-        self.log_fd.write(log)
+        self.log_message(log)
 
         # Use only a subset of datapoints if use_samples or use_data is specified
-        labels, exp, calc, log = bt.subsample(label=labels,
+        labels, exp, calc, log = bt.subsample(labels=labels,
                                               exp=exp,
                                               calc=calc,
                                               use_samples=use_samples,
                                               use_data=use_data)
-        self.log_fd.write(log)
+        self.log_message(log)
 
         # Initialize weights, by default uniform
         if self.w0 is None:
             self.w0 = np.ones(calc.shape[0]) / calc.shape[0]
-            self.log_fd.write(f'Initialized uniform weights {calc.shape[0]}\n')
+            self.log_message(f'Initialized uniform weights {calc.shape[0]}\n')
         else:
-            self.log_fd.write('Warm start\n')
+            self.log_message('Using provided starting weights\n')
+
+        # Fit calculated data to experimental data, scale appropriately
+        assert exp_type in bt.EXP_TYPES , (f'Error. DATA in {exp_file} must be one of the '
+                                           f'following: {bt.EXP_TYPES} ')
+        fit_type = EXP2FIT[exp_type]
+        scaled_calc, log = bt.fit_and_scale(exp=exp,
+                                            calc=calc,
+                                            calc_weights=self.w0,
+                                            fit_type=fit_type)
+        self.log_message(log)
 
         # Do sanity checks and comparisons between experimental and calculated data
         log = bt.check_data(labels=labels,
                             exp=exp,
                             calc=calc,
                             sample_weights=self.w0)
-        self.log_fd.write(log)
+        self.log_message(log)
 
-        return labels,exp,calc
+        return labels, exp, calc
 
     def load(
         self,
         exp_file: str,
         calc_file: str,
+        exp_type: str | None = None,
         use_samples: list[int] | None = None,
         use_data: list[int] | None = None,
-        weight: int = 1,
         ) -> None:
         """Load data from files into class attributes.
 
         Args:
             exp_file (str):
-                path to file with experimental data.
+                Path to file with experimental data.
             calc_file (str):
-                path to file with calculated data.
+                Path to file with calculated data.
+            exp_type (str):
+                Type of experimental data, used to determine how to fit the calculated data.
             use_samples (list[int] | None):
                 Use only this subset of calculated data indices. Defaults to None, and all
                 samples are used.
             use_data (list[int] | None):
                 Use only this subset of experimental data indices. Defaults to None, and all
                 samples are used.
-            weight (int):
-                value to multiply all weights by. Defaults to 1.
         """
+        # Check if experimental data type is provided
+        if exp_type is None:
+            # Read first line of experimental data file to get type
+            with open(exp_file, 'r', encoding='utf-8') as f:
+                first_line = f.readline().strip()
+                if 'DATA=' in first_line:
+                    for equality in first_line.split(' '):
+                        if 'DATA=' in equality:
+                            exp_type = equality.split('=')[1].upper()
+                            break
+                else:
+                    raise ValueError('Experimental data type not specified in the first line of '
+                                    'the experimental data file. Please add it or specify it '
+                                    'using the exp_type argument.')
+
+        assert exp_type in bt.EXP_TYPES , (f'Error. DATA in {exp_file} must be one of the '
+                                           f'following: {bt.EXP_TYPES} ')
+        
         # Read files and parse data
         labels, exp, calc = self.read_file(exp_file=exp_file,
                                            calc_file=calc_file,
+                                           exp_type=exp_type,
                                            use_samples=use_samples,
                                            use_data=use_data)
 
@@ -213,21 +286,22 @@ class SimpleReweight:
             self.experiment = exp
             self.calculated = calc
             self.labels = labels
-            self.weights = np.ones(exp.shape[0]) * weight
+            self.add_exp_type_idxs(exp_type, (0, exp.shape[0] - 1))
         else:
             # If data is already loaded, append new data to existing arrays
             self.experiment = np.vstack([self.experiment,exp])
             self.calculated = np.hstack([self.calculated,calc])
             self.labels = np.hstack([self.labels,labels])
-            self.weights = np.hstack([self.weights,np.ones(exp.shape[0]) * weight])
+            self.add_exp_type_idxs(exp_type, (self.experiment.shape[0] - exp.shape[0],
+                                              self.experiment.shape[0] - 1)
+                                    )
 
     def load_array(
         self,
         labels: np.ndarray,
         exp: np.ndarray,
-        calc: np.ndarray,
-        weight: int = 1):
-        """Load data from external array into class attributes.
+        calc: np.ndarray):
+        """Load data from external array directly into class attributes.
 
         Args:
             labels (np.ndarray):
@@ -236,8 +310,6 @@ class SimpleReweight:
                 array of experimental data values.
             calc (np.ndarray):
                 array of calculated data values.
-            weight (int):
-                value to multiply all weights by. Defaults to 1.
         """
         # If its the first time loading data, initialize class attributes
         if self.experiment is None:
@@ -246,16 +318,15 @@ class SimpleReweight:
             self.labels = labels
             if self.w0 is None:
                 self.w0 = np.ones(calc.shape[0]) / calc.shape[0]
-            self.weights = np.ones(exp.shape[0]) * weight
         else:
             # If data is already loaded, append new data to existing arrays
             self.experiment = np.vstack([self.experiment,exp])
             self.calculated = np.hstack([self.calculated,calc])
             self.labels = np.hstack([self.labels,labels])
-            self.weights = np.hstack([self.weights,np.ones(exp.shape[0]) * weight])
+
 
     def define_maxent(self,
-                      theta: int) -> function:
+                      theta: int) -> Callable:
         """Define the maximum entropy function for optimization.
         Args:
             theta (int):
@@ -298,12 +369,12 @@ class SimpleReweight:
                          axis=0)
 
             # Scale experimental uncertainties using theta
-            theta_sigma2 = theta * self.weights * self.experiment[:,1]**2
+            theta_sigma2 = theta * self.experiment[:,1]**2
             
             # Compute gaussian integral
             eps2 = 0.5 * np.sum((lambdas * lambdas) * theta_sigma2)
 
-            # experimental value
+            # Experimental value
             sum1 = np.dot(lambdas,self.experiment[:,0])
 
             # Corresponds to function described in Eq. 6 in the reference paper
@@ -345,16 +416,16 @@ class SimpleReweight:
                                    calc=self.calculated,
                                    sample_weights=self.w0)
         # Log initial values
-        self.log_fd.write((f'Optimizing {self.experiment.shape[0]} data and '
+        self.log_message((f'Optimizing {self.experiment.shape[0]} data and '
                            f'{self.calculated.shape[0]} samples. Theta={theta} \n'))
-        self.log_fd.write(f'CHI2 before optimization: {chi2_before:8.4f} \n')
+        self.log_message(f'CHI2 before optimization: {chi2_before:8.4f} \n')
         self.log_fd.flush()
 
         # Setup optimization parameters
         ## Initialize Lagrange multipliers
         lambdas = np.zeros(self.experiment.shape[0],
                            dtype=np.longdouble)
-        self.log_fd.write('Lagrange multipliers initialized from zero\n')
+        self.log_message('Lagrange multipliers initialized from zero\n')
 
         ## Define the maximum entropy function using chosen theta
         maxent_func = self.define_maxent(theta=theta)
@@ -371,12 +442,12 @@ class SimpleReweight:
                           options=opt,
                           method=mini_method,
                           jac=True)
-        self.log_fd.write(f'Execution time: {(time.time() - start_time):.2f} seconds\n')
+        self.log_message(f'Execution time: {(time.time() - start_time):.2f} seconds\n')
 
         # Check if the optimization was successful
         if result.success:
-            self.log_fd.write((f'Minimization using {mini_method} successful '
-                             f'(iterations:{result.nit})\n'))
+            self.log_message((f'Minimization using {mini_method} successful '
+                               f'(iterations:{result.nit})\n'))
 
             # Calculate optimized set of weights
             arg = -np.sum(result.x[np.newaxis,:] * self.calculated,axis=1) - TMAX
@@ -395,17 +466,15 @@ class SimpleReweight:
             phi = np.exp(-bt.srel(self.w0,
                                   w_opt))
 
-            self.log_fd.write(f'CHI2 after optimization: {chi2_after:8.4f} \n')
-            self.log_fd.write(f'Fraction of effective frames: {phi:8.4f} \n')
-            self.log_fd.flush()
+            self.log_message(f'CHI2 after optimization: {chi2_after:8.4f} \n')
+            self.log_message(f'Fraction of effective frames: {phi:8.4f} \n')
             return chi2_before, chi2_after, phi
 
         else:
             # Abort
-            self.log_fd.write(f'Minimization using {mini_method} failed\n')
-            self.log_fd.write(f'Message: {result.message}\n')
+            self.log_message(f'Minimization using {mini_method} failed\n')
+            self.log_message(f'Message: {result.message}\n')
             self.niter = -1
-            self.log_fd.flush()
             return np.NaN, np.NaN, np.NaN
 
     def ibme(
@@ -413,8 +482,7 @@ class SimpleReweight:
         theta: int,
         ftol: float = 0.01,
         iterations: int = 50,
-        offset: bool = True,
-        ) -> tuple[float | float | float | np.ndarray | np.ndarray]:
+        ) -> tuple[float, float, float, np.ndarray, np.ndarray]:
         """Iterative BME.
 
         Args:
@@ -429,9 +497,17 @@ class SimpleReweight:
                 data. Defaults to True.
 
         Returns:
-            chi2_0,rr[1],phi,calc_0,calc:
-                Initial chisquare value, final chisquare value, fraction of effective frames,
-                initial calculated data, final calculated data.
+            tuple[float, float, float, np.ndarray, np.ndarray]:
+                float:
+                    Initial chi-square value before optimization.
+                float:
+                    Final chi-square value after optimization.
+                float:
+                    Fraction of effective frames after optimization.
+                np.ndarray:
+                    Initial calculated data before optimization.
+                np.ndarray:
+                    Rescaled calculated data after optimization.
         """
         # Here we assume that the data and weights are already loaded
         current_weights = self.get_w0()
@@ -445,12 +521,6 @@ class SimpleReweight:
         self.ibme_weights = []
         self.ibme_stats = []
 
-        # Since the magnitude of experimental noise is not constant, the experimental data
-        # are heteroskedastic. To improve our maximum likelihood estimation in the LinearRegression
-        # process below, we use the inverse of the variance of experimental noise at each point as
-        # the experimental sample weights. Here, we store that array of values to use later.
-        inv_var = 1. / exp[:,1]**2
-
         # Setup log msg
         log = ''
 
@@ -458,22 +528,24 @@ class SimpleReweight:
         fit_stats_old = np.NaN
 
         for it in range(iterations):
-            
-            # Calculate the average value for each calculated data point in the sample,
-            # using the current set of weights
-            calc_avg = np.sum(calc * current_weights[:,np.newaxis],
-                              axis=0)
+            # Split calculated and experimental data by experimental data type
+            groups_calc = bt.split_array_by_groups(array=calc,
+                                                   groups_dict=self.exp_types,
+                                                   type='column')
+            groups_exp = bt.split_array_by_groups(array=exp,
+                                                  groups_dict=self.exp_types,
+                                                  type='row')
 
-            # Scale and offset calculated data towards experimental data
-            # Experimental error is taken into account by using the inverse of the variance
-            # of experimental noise as sample weights in the LinearRegression fit.
-            model = LinearRegression(fit_intercept=offset)
-            model.fit(X=calc_avg.reshape(-1,1),
-                      y=exp[:,0],
-                      sample_weight=inv_var)
-            alpha = model.coef_[0]
-            beta = model.intercept_
-            calc = alpha * calc + beta # update calculated data
+            rescaled_calcs = []
+            for exp_type in self.exp_types.keys():
+                rescaled_calc, _ = bt.fit_and_scale(exp=groups_exp[exp_type],
+                                                    calc=groups_calc[exp_type],
+                                                    calc_weights=current_weights,
+                                                    fit_type=EXP2FIT[exp_type])
+                rescaled_calcs.append(rescaled_calc)
+
+            # Concatenate rescaled calculated data for each experimental data type
+            calc = np.hstack(rescaled_calcs)
 
             # Create SimpleReweight instance, load exp and calc data and fit calc data to exp
             r1 = SimpleReweight(name=f'{name}_ibme_{it}',
@@ -493,8 +565,7 @@ class SimpleReweight:
 
             # Calculate and log difference in fit statistics
             diff = abs(fit_stats_old - fit_stats[1])
-            log += (f'Iteration:{it:3d} scale: {alpha:7.4f} offset: {beta:7.4f} '
-                    f'chi2: {fit_stats[1]:7.4f} diff: {diff:7.4e}\n')
+            log += (f'Iteration:{it:3d} chi2: {fit_stats[1]:7.4f} diff: {diff:7.4e}\n')
             
             # Store old fit statistics and update tracking lists
             fit_stats_old = fit_stats[1]
@@ -534,7 +605,7 @@ class SimpleReweight:
         print(outfiles_msg)
         log += outfiles_msg + '\n'
 
-        self.log_fd.write(log+'\n')
+        self.log_message(log+'\n')
 
         # Extract final fraction of effective frames and set of optimized weights
         phi = np.exp(-bt.srel(w0,
@@ -542,7 +613,7 @@ class SimpleReweight:
         self.w_opt = current_weights
 
         # Return initial chi2, final chi2, fraction eff frames, initial calc data, final calc data
-        return chi2_0,fit_stats[1],phi,calc_0,calc
+        return chi2_0, fit_stats[1], phi, calc_0, calc
 
     def get_ibme_weights(self) -> list[np.ndarray]:
 

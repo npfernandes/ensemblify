@@ -191,7 +191,7 @@ def calc_saxs_data(
     pepsi_saxs_path = GLOBAL_CONFIG['PEPSI_SAXS_PATH']
     assert pepsi_saxs_path is not None, 'Pepsi-SAXS installation not found!'
 
-    pepsi_comm = f'{pepsi_saxs_path} {frame_file} {exp_saxs_file} -o {output_file} -cst'
+    pepsi_comm = f'{pepsi_saxs_path} {frame_file} {exp_saxs_file} -o {output_file} -cst -x'
     subprocess.run(pepsi_comm.split(),
                    stdout=open(calc_saxs_log,'a',encoding='utf-8'),
                    stderr=subprocess.STDOUT,
@@ -206,23 +206,34 @@ def calc_saxs_data(
     return calc_saxs
 
 
-def calc_chi2_residuals(exp: np.ndarray, calc: np.ndarray, sample_weights: np.ndarray) -> float:
+def calc_chi2_fit(
+    exp: np.ndarray,
+    calc: np.ndarray,
+    sample_weights: np.ndarray | None = None,
+    ) -> tuple[float,np.ndarray]:
     """Apply a chi-square goodness-of-fit test between experimental and calculated data profiles.
     
     Args:
         exp (np.ndarray):
             Experimental data in the format {value, error}.
         calc (np.ndarray):
-            Calculated averages for each data point in the sample, in the format {value}.
-        sample_weights (np.ndarray):
-            Weights for each sample in the calculated data.
+            Calculated samples for each data point, in the format {value}. Will be averaged
+            across samples before fitting.
+        sample_weights (np.ndarray, optional):
+            Weights for each sample in the calculated data. If None, all samples are assumed to
+            have equal weight. Defaults to None.
 
     Returns:
-        float:
-            Reduced chi2 value of fit.
-        np.ndarray:
-            Residuals of the fit.
+        tuple[float, np.ndarray]:
+            float:
+                Reduced chi2 value of fit.
+            np.ndarray:
+                Residuals of the fit.
     """
+    # Setup sample weights if not provided
+    if sample_weights is None:
+        sample_weights = np.ones(calc.shape[0])/calc.shape[0]
+
     # Calculate the average value for each calculated data point in the sample,
     # weighted by sample weights
     calc_avg = np.sum(calc*sample_weights[:,np.newaxis],
@@ -231,9 +242,10 @@ def calc_chi2_residuals(exp: np.ndarray, calc: np.ndarray, sample_weights: np.nd
     # Calculate the difference between calculated averages and experimental values
     diff = calc_avg-exp[:,0]
 
-    # Calculate the reduced chi2 value using experimental errors
-    chi2 = np.average((diff/exp[:,1])**2)
+    # Calculate the standardized residuals of the fit
+    residuals = diff/exp[:,1]
 
-    (i_exp-i_prior)/err
+    # Calculate the reduced chi2 value using standardized and squared residuals
+    chi2 = np.average(residuals**2)
 
-    return chi2
+    return chi2, residuals

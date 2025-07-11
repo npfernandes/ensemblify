@@ -335,8 +335,12 @@ def main():
                                           'reweighting figures.'))
 
     parser_reweighting.add_argument('-exp', '--expdata',
-                                    required=True, type=str,
-                                    help='Path to experimental SAXS data file (.dat).')
+                                    required=True, nargs='+', type=str,
+                                    help='Path to experimental data file (.dat).')
+
+    parser_reweighting.add_argument('-expt', '--exptype',
+                                    default=None, nargs='+', type=str,
+                                    help='Type of provided experimental data.')
 
     parser_reweighting.add_argument('-out', '--outputdir',
                                     default=None, type=str,  metavar='',
@@ -443,7 +447,8 @@ def main():
         reweight_ensemble(trajectory=full_args.trajectory,
                           topology=full_args.topology,
                           trajectory_id=full_args.trajectoryid,
-                          exp_saxs_data=full_args.expdata,
+                          exp_data=full_args.expdata,
+                          exp_type=full_args.exptype,
                           output_dir=full_args.outputdir,
                           thetas=full_args.theta,
                           calculated_cmatrix=full_args.contactmatrix,

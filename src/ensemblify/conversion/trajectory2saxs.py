@@ -11,7 +11,7 @@ import numpy as np
 from tqdm import tqdm
 
 ## Local Imports
-from ensemblify.conversion.conversion_utils import calc_saxs_data
+from ensemblify.conversion.conversion_utils import calc_saxs_data, calc_chi2_fit
 
 # FUNCTIONS
 def traj2saxs(
@@ -19,7 +19,7 @@ def traj2saxs(
     topology: str,
     trajectory_id: str,
     exp_saxs_file: str,
-    ) -> str:
+    ) -> tuple[str, str]:
     """Calculate a set of theoretical SAXS curves from a trajectory file using PEPSI-SAXS.
     
     Calculation is done in chunks distributed across available processor cores.
@@ -39,11 +39,15 @@ def traj2saxs(
             for SAXS curve calculation.
 
     Returns:
-        str:
-            Path to the file containing the set of calculated SAXS curves, one for every frame of
-            the trajectory.
-        str:
-            Path to the file containing the average SAXS curve of the trajectory.
+        tuple[str, str, str]:
+            str:
+                Path to the file containing the set of calculated SAXS curves, one for every frame
+                of the trajectory.
+            str:
+                Path to the file containing the average SAXS curve of the trajectory.
+            str:
+                Path to the file containing the fitting of the average SAXS curve to the
+                experimental SAXS data, including the chi-square value and residuals.
 
     Adapted from:
         https://github.com/FrPsc/EnsembleLab/blob/main/EnsembleLab.ipynb
@@ -58,7 +62,7 @@ def traj2saxs(
     universes = [u] * u.trajectory.n_frames
     exp_saxs_files = [exp_saxs_file] * u.trajectory.n_frames
     calc_saxs_log = os.path.join(os.path.split(exp_saxs_file)[0],
-                                 f'{trajectory_id}_calc_saxs.log')
+                                 f'{trajectory_id}_SAXS_calc.log')
     calc_saxs_logs = [calc_saxs_log] * u.trajectory.n_frames
 
     # Calculate SAXS data in chunks
@@ -73,26 +77,54 @@ def traj2saxs(
                                      desc=f'Calculating {trajectory_id} SAXS data... '))
 
     # Build the full calculated SAXS data file
+    ## Extract experimental data information
+    q, i_exp, err_exp = np.loadtxt(exp_saxs_file, unpack=True)
+
     ## Join the calculated chunks
-    all_calc_saxs = np.vstack(calc_saxs_chunks)
+    all_calc_saxs_intensities = np.vstack(calc_saxs_chunks)
     ## Make a column with the frame indices
-    col0 = np.arange(1,len(all_calc_saxs) + 1).reshape(len(all_calc_saxs), 1)
+    col0 = np.arange(1,len(all_calc_saxs_intensities) + 1).reshape(len(all_calc_saxs_intensities), 1)
     ## Join indices with data
-    all_calc_saxs = np.hstack((col0,all_calc_saxs))
+    all_calc_saxs = np.hstack((col0,all_calc_saxs_intensities))
 
     # Save calculated SAXS data
-    all_calc_saxs_file = os.path.join(os.path.split(exp_saxs_file)[0],
-                                  f'{trajectory_id}_all_calc_saxs.dat')
+    all_calc_saxs_file = os.path.join(os.path.dirname(exp_saxs_file),
+                                      f'{trajectory_id}_SAXS_all_calc.dat')
     np.savetxt(all_calc_saxs_file,
                all_calc_saxs,
                encoding='utf-8')
 
     # Save the averaged calculated SAXS data
-    avg_calc_saxs = np.average(all_calc_saxs,axis=0)
-    avg_calc_saxs_file = os.path.join(os.path.split(exp_saxs_file)[0],
-                                  f'{trajectory_id}_avg_calc_saxs.dat')
+    avg_calc_saxs_intensities = np.average(all_calc_saxs_intensities,axis=0).reshape(-1, 1)
+    avg_calc_saxs = np.hstack((q.reshape(-1,1),
+                               avg_calc_saxs_intensities))
+    avg_calc_saxs_file = os.path.join(os.path.dirname(exp_saxs_file),
+                                      f'{trajectory_id}_SAXS_avg_calc.dat')
     np.savetxt(avg_calc_saxs_file,
                avg_calc_saxs,
                encoding='utf-8')
 
-    return all_calc_saxs_file, avg_calc_saxs_file
+    # Fit averaged calculated SAXS data to experimental SAXS data,
+    # save chisquare value and fitting residuals
+    chi2, residuals = calc_chi2_fit(exp=np.hstack((i_exp.reshape(-1,1),
+                                                   err_exp.reshape(-1,1))),
+                                    calc=all_calc_saxs_intensities)
+    
+    fitting_saxs_file = os.path.join(os.path.dirname(exp_saxs_file),
+                                     f'{trajectory_id}_SAXS_fitting.dat')
+    
+    chi2_header = f'Chi^2 = {chi2}\n'
+    col_names = ['Momentum Vector', 'Experimental SAXS Intensity', 'Experimental Error',
+                 'Calculated SAXS Intensity', 'Residuals of Fit']
+    file_header = chi2_header + '\t'.join(col_names)
+
+    np.savetxt(fitting_saxs_file,
+               np.hstack((q.reshape(-1,1),
+                          i_exp.reshape(-1,1),
+                          err_exp.reshape(-1,1),
+                          avg_calc_saxs_intensities.reshape(-1,1),
+                          residuals.reshape(-1,1))),
+               header=file_header,
+               encoding='utf-8')
+
+    return all_calc_saxs_file, avg_calc_saxs_file, fitting_saxs_file

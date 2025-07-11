@@ -12,8 +12,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 ## Third Party Imports
 import numpy as np
 import pandas as pd
-import sklearn
 from tqdm import tqdm
+from sklearn.linear_model import LinearRegression
 
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
@@ -32,6 +32,11 @@ DATA_NAMES = {'cmatrix': 'contact matrix',
 FOUND_EXP_SAXS_MSG = 'Found processed experimental SAXS data.'
 FOUND_EXP_CALC_SAXS_MSG = 'Found processed experimental SAXS data and calculated SAXS data.'
 FOUND_RW_DATA_MSG = 'Found calculated BME reweighting data with theta values: {}'
+EXP2FIT = {'SAXS': 'scale+offset',
+           'RDC': 'scale',
+           'CS': None,
+           'JCOUPLINGS': None}
+FIT_TYPES = ['scale','scale+offset']
 
 # FUNCTIONS
 def _derive_traj_id_from_file(filename: str) -> str:
@@ -42,26 +47,33 @@ def _derive_traj_id_from_file(filename: str) -> str:
             Name of file to extract trajectory identifier from.
 
     Returns:
-        trajectory_id (str):
-            The text before the first underscore of filename, or the whole filename if
-            no underscores are present.
+        str:
+            The text before the first experimental type identifier, or the whole filename if
+            no experimental types are present.
     """
     # Split the filename into components and handle the file extension
     filename_components, _ = os.path.splitext(filename)
     filename_components = filename_components.split('_')
 
-    # If 'exp' exists, do not include it in trajectory_id
-    try:
-        exp_index = filename_components.index('exp')
-        trajectory_id = '_'.join(filename_components[:exp_index])
-    except ValueError:
-        trajectory_id = '_'.join(filename_components)
-
+    # Find the earliest occurrence of any experimental type
+    earliest_exp_index = len(filename_components)  # Default to end of list
+    
+    for exp_type in EXP2FIT.keys():
+        try:
+            exp_index = filename_components.index(exp_type)
+            earliest_exp_index = min(earliest_exp_index, exp_index)
+        except ValueError:
+            # exp_type not found in filename_components
+            continue
+    
+    # Use components before the earliest experimental type
+    trajectory_id = '_'.join(filename_components[:earliest_exp_index])
+    
     return trajectory_id
 
 
-def process_exp_data(experimental_data_path: str) -> str:
-    """Check formatting and units in input experimental data file.
+def process_exp_saxs_data(experimental_data_path: str) -> str:
+    """Check formatting and units in input experimental SAXS data file.
 
     If values for q are in Ångstrom, they are converted to nanometer.
     Any q-values above 5nm^(-1) are removed, as SAXS calculations are not reliable in that
@@ -96,15 +108,17 @@ def process_exp_data(experimental_data_path: str) -> str:
         exp_saxs_input = exp_saxs_input[(exp_saxs_input[...,0] < 5)]
 
     # Save processed data
-    trajectory_id = _derive_traj_id_from_file(filename=os.path.split(experimental_data_path)[1])
-    processed_exp_saxs = os.path.join(os.path.split(experimental_data_path)[0],
-                                      f'{trajectory_id}_exp_saxs_input_processed.dat')
-    np.savetxt(processed_exp_saxs,exp_saxs_input)
-
+    trajectory_id = _derive_traj_id_from_file(filename=os.path.basename(experimental_data_path))
+    processed_exp_saxs = os.path.join(os.path.dirname(experimental_data_path),
+                                      f'{trajectory_id}_SAXS_exp_input_processed.dat')
+    np.savetxt(processed_exp_saxs,
+               exp_saxs_input,
+               header=' DATA=SAXS')
+    
     return processed_exp_saxs
 
 
-def correct_exp_error(experimental_data_path: str) -> str:
+def correct_exp_saxs_error(experimental_data_path: str) -> str:
     """Correct experimental error of input experimental data file using BIFT.
 
     Bayesian Indirect Fourier Transformation (BIFT) can identify whether the
@@ -126,17 +140,17 @@ def correct_exp_error(experimental_data_path: str) -> str:
     Adapted from:
         https://github.com/FrPsc/EnsembleLab/blob/main/EnsembleLab.ipynb
     """
-    # Deduce working directory
+    # Assign working directory
     working_dir, experimental_data_file = os.path.split(experimental_data_path)
 
     # Prepare input file for BIFT
     input_file = os.path.join(working_dir,'inputfile.dat')
     with open(input_file,'w',encoding='utf-8') as f:
-        f.write(f'{experimental_data_file}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
+        f.write(f'{experimental_data_file}' + ('\n' * 18))
 
     # Run BIFT
     try:
-        subprocess.run(f'{GLOBAL_CONFIG["BIFT_PATH"]} < {os.path.split(input_file)[1]}',
+        subprocess.run(f'{GLOBAL_CONFIG["BIFT_PATH"]} < {os.path.basename(input_file)}',
                        shell=True,
                        cwd=working_dir,
                        stdout=open(os.path.join(working_dir,'bift.log'),'w',encoding='utf-8'),
@@ -145,10 +159,10 @@ def correct_exp_error(experimental_data_path: str) -> str:
     except subprocess.CalledProcessError as e:
         raise e
 
-    # Save rescaled experimental data
+    # Save experimental data with corrected errors
     trajectory_id = _derive_traj_id_from_file(filename=experimental_data_file)
     corrected_exp_saxs = os.path.join(working_dir,
-                                      f'{trajectory_id}_exp_saxs.dat')
+                                      f'{trajectory_id}_SAXS_exp.dat')
     np.savetxt(corrected_exp_saxs,
                np.loadtxt(os.path.join(working_dir,'rescale.dat')),
                header=' DATA=SAXS')
@@ -167,23 +181,23 @@ def correct_exp_error(experimental_data_path: str) -> str:
                      'parameters.dat','pr.dat','rescale.dat','scale_factor.dat','st_pr.dat']:
         os.remove(os.path.join(working_dir,tmp_file))
 
-    print( 'Experimental errors on SAXS intensities have been corrected with BIFT using scale '
+    print('Experimental errors on SAXS intensities have been corrected with BIFT using scale '
           f'factor {scale_factor}.')
 
     return corrected_exp_saxs
 
 
-def ibme(
+def bme(
     theta: int,
-    exp_file: str,
-    calc_file: str,
+    exp_files: str | list[str],
+    calc_files: str | list[str],
     output_dir: str,
+    exp_types: str | None | list[str|None],
     ) -> tuple[int,tuple[float,float,float],np.ndarray]:
-    """Apply the Iterative Bayesian Maximum Entropy (BME) algorithm on calculated SAXS data,
-    given a value for the theta parameter.
-
-    The used algorithm is explained in:
-        https://github.com/KULL-Centre/BME/blob/main/notebook/example_04.ipynb
+    """Apply the Bayesian Maximum Entropy (BME) algorithm.
+     
+    Uses the provided value for the theta parameter, and possibly applies iterative BME
+    according to the type of experimental data used.
 
     Reference:
         Bottaro S, Bengtsen T, Lindorff-Larsen K. Integrating Molecular Simulation and Experimental
@@ -193,28 +207,31 @@ def ibme(
     Args:
         theta (int):
             Value for the theta parameter to be used in BME algorithm.
-        exp_file (str):
+        exp_files (str | list[str]):
             Path to .dat file with experimental SAXS curve.
-        calc_file (str):
-            Path to .dat file with SAXS curve calculated from an ensemble.
+        calc_file (str | list[str]):
+            Path to .dat file with SAXS curves calculated for each conformer of an ensemble.
         output_dir (str):
             Path to directory where all the files resulting from the reweighting procedure will be
             stored.
+        exp_types (str | None | list[str|None]):
+            Type(s) of experimental data provided.
+            If a list is provided, it must follow the same order as the exp_files list.
 
     Returns:
-        tuple[int,tuple[float,float,float],np.ndarray]:
-            theta (int):
+        tuple[int, tuple[float, float, float], np.ndarray]:
+            int:
                 Value for the theta parameter used in BME algorithm (same as input).
-            stats (tuple[float,float,float]):
-                chi2_before (float):
+            tuple[float, float, float]:
+                float:
                     The value for the chisquare of fitting the ensemble with uniform
                     weights to the experimental data.
-                chi2_after (float):
+                float:
                     The value for the chisquare of fitting the reweighted ensemble to
                     the experimental data.
-                phi (float):
+                float:
                     The fraction of effective frames being used in the reweighted ensemble.
-            weights (np.ndarray):
+            np.ndarray:
                 An array containing the new weights of the ensemble, one for each frame.
 
     Adapted from:
@@ -224,12 +241,30 @@ def ibme(
     old_cd = os.getcwd()
     os.chdir(output_dir)
 
+    # Setup paths for experimental and calculated data files
+    if isinstance(exp_files, str):
+        exps = [exp_files]
+    elif isinstance(exp_files, list):
+        exps = [x for x in exp_files]
+
+    if isinstance(calc_files, str):
+        calcs = [calc_files]
+    elif isinstance(calc_files, list):
+        calcs = [x for x in calc_files]
+
+    if isinstance(exp_types, str):
+        types = [exp_types]
+    elif isinstance(exp_types, list):
+        types = [x for x in exp_types]
+
     # Create reweight object
     rew = simple_BME.SimpleReweight(f'ibme_t{theta}')
 
-    # Load files
-    rew.load(exp_file=exp_file,
-             calc_file=calc_file)
+    # Load experimental and calculated data files, scale and offset if necessary
+    for exp, calc, exp_type in zip(exps,calcs,types):
+        rew.load(exp_file=exp,
+                 calc_file=calc,
+                 exp_type=exp_type)
 
     # Do reweighting
     with contextlib.redirect_stdout(open(os.devnull, 'w',encoding='utf-8')):
@@ -243,20 +278,17 @@ def ibme(
     weights = rew.get_ibme_weights()[-1] # get the final weights
     stats = rew.get_ibme_stats()[-1] # get the final stats
 
-    return theta,stats,weights
+    return theta, stats, weights
 
 
 def bme_ensemble_reweighting(
-    exp_saxs_file: str,
-    calc_saxs_file: str,
+    exp_data: str | list[str],
+    exp_type: str | list[str],
+    calc_data: str | list[str],
     thetas: list[int],
     output_dir: str,
     ) -> tuple[np.ndarray,np.ndarray]:
-    """Perform Bayesian Maximum Entropy (BME) reweighting on calculated SAXS data based on
-    experimental SAXS data of the same protein.
-
-    Applies the iterative BME algorithm, explained in:
-        https://github.com/KULL-Centre/BME/blob/main/notebook/example_04.ipynb
+    """Apply Bayesian/Maximum Entropy (BME) reweighting on calculated+experimental data.
 
     The algorithm is applied using different theta values and the results for each value are stored.
 
@@ -266,12 +298,15 @@ def bme_ensemble_reweighting(
         doi: 10.1007/978-1-0716-0270-6_15. PMID: 32006288.
 
     Args:
-        exp_saxs_file (str):
-            Path to .dat file with experimental SAXS data.
+        exp_data (str | list[str]):
+            Path to .dat file(s) with experimental data.
+        exp_type (str | list[str]):
+            Type(s) of experimental data. If a list is provided, it must follow the same order as
+            the exp_data list.
         calc_saxs_file (str):
-            Path to .dat file with SAXS data calculated from a conformational ensemble.
+            Path to .dat file(s) with experimental data calculated from a conformational ensemble.
         thetas (list[int]):
-            Values of theta to try when applying iBME.
+            Values of theta to try when applying BME.
         output_dir (str):
             Path to directory where output files from reweighting protocol will be stored.
 
@@ -292,25 +327,51 @@ def bme_ensemble_reweighting(
                 An array where each row corresponds to a different theta value with columns
                 containing the set of weights of the ensemble, one for each frame.
     """
-    # Setup variables for parallel computing
-    exp_file = os.path.abspath(exp_saxs_file)
-    calc_file = os.path.abspath(calc_saxs_file)
+    # Check inputs
+    if isinstance(exp_data, str):
+        exp_data_input = [exp_data]
+    elif isinstance(exp_data, list):
+        exp_data_input = [x for x in exp_data]
+
+    if isinstance(exp_type, str):
+        exp_type_input = [exp_type]
+    elif isinstance(exp_type, list):
+        exp_type_input = [x for x in exp_type]
+
+    if isinstance(calc_data, str):
+        calc_data_input = [calc_data]
+    elif isinstance(calc_data, list):
+        calc_data_input = [x for x in calc_data]
+
+    # Setup necessary BME inputs
+    exp_files_BME = [os.path.abspath(x) for x in exp_data_input]
+    exp_types_BME = [ x for x in exp_type_input]
+    calc_files_BME = [os.path.abspath(x) for x in calc_data_input]
 
     # Parallelize the computation across the theta values
     results = []
     with ProcessPoolExecutor() as ppe:
-        futures = [ppe.submit(ibme, theta, exp_file, calc_file, output_dir) for theta in thetas]
-        for future in tqdm(as_completed(futures),total=len(thetas),desc='Reweighting ensemble... '):
+        futures = [ppe.submit(bme,
+                              theta,
+                              exp_files_BME,
+                              calc_files_BME,
+                              output_dir,
+                              exp_types_BME) for theta in thetas]
+    
+        for future in tqdm(as_completed(futures),
+                           desc='Reweighting ensemble... ',
+                           total=len(thetas)):
+            
             results.append(future.result())
 
     # Extract the results
-    results.sort()  # sort by theta (first element)
+    results.sort()  # sort by theta (first element in tuples)
     thetas, stats, weights = zip(*results)
 
     # Convert to numpy arrays for easier indexing
     stats = np.array(stats)
 
-    return stats,weights
+    return stats, weights
 
 
 def average_saxs_profiles(
@@ -355,7 +416,7 @@ def average_saxs_profiles(
 
     # Perform ordinary least squares Linear Regression, fitting the calculated SAXS data to the
     # experimental SAXS data, taking into account the experimental error of each data point
-    model = sklearn.linear_model.LinearRegression()
+    model = LinearRegression()
     model.fit(X=i_prior.reshape(-1,1),
               y=i_exp,
               sample_weight=1/(err**2))
@@ -420,8 +481,9 @@ def attempt_read_calculated_data(
 def attempt_read_reweighting_data(
     reweighting_output_directory: str,
     trajectory_id: str,
-    ) -> tuple[str|None, str|None, np.ndarray|None,
-               np.ndarray|None, np.ndarray|None]:
+    exp_type: str,
+    ) -> tuple[str | None, str | None, np.ndarray | None,
+               np.ndarray | None, np.ndarray | None]:
     """Attempt to read reweighting data from output directory, returning None if not found.
 
     Args:
@@ -430,18 +492,19 @@ def attempt_read_reweighting_data(
         trajectory_id (str):
             Prefix for filenames to look for in directory.
     Returns:
-        tuple[str|None, str|None, np.ndarray|None, np.ndarray|None, np.ndarray|None]:
-            exp_saxs_file (str | None):
-                The corresponding data (if found) or None (if not found).
-            calc_saxs_file (str | None):
-                The corresponding data (if found) or None (if not found).
-            thetas_array (np.ndarray | None):
-                The corresponding data (if found) or None (if not found).
-            stats (np.ndarray | None):
-                The corresponding data (if found) or None (if not found).
-            weights (np.ndarray | None):
-                The corresponding data (if found) or None (if not found).
+        tuple[str | None, str | None, np.ndarray | None, np.ndarray | None, np.ndarray | None]:
+            str | None:
+                The experimental data (if found) or None (if not found).
+            str | None:
+                The calculated data (if found) or None (if not found).
+            np.ndarray | None:
+                The array of theta values (if found) or None (if not found).
+            np.ndarray | None:
+                The fitting statistics (if found) or None (if not found).
+            np.ndarray | None:
+                The set of weights (if found) or None (if not found).
     """
+    # TODO Add logic for other exp data
     # Check for experimental SAXS data file
     exp_saxs_file = os.path.join(reweighting_output_directory,f'{trajectory_id}_exp_saxs.dat')
     if not os.path.isfile(exp_saxs_file):
@@ -475,8 +538,8 @@ def attempt_read_reweighting_data(
         return exp_saxs_file, calc_saxs_file, None, None, None
 
     ## Check which weights/stats are present (if any)
-    ## weights = 'ibme_t{THETA_VALUE}.weights.dat'
-    ## stats = 'ibme_t{THETA_VALUE}_ibme_{ITERATION_NUMBER}.log' with the highest ITERATION_NUMBER
+    ## weights : f'ibme_t{THETA_VALUE}.weights.dat'
+    ## stats : f'ibme_t{THETA_VALUE}_ibme_{ITERATION_NUMBER}.log' with the highest ITERATION_NUMBER
 
     all_weights = []
     all_stats = []

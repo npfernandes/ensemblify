@@ -151,7 +151,7 @@ def create_effective_frames_fit_fig(
     return fig
 
 
-def create_reweighting_fits_fig(
+def create_rw_saxs_fits_fig(
     q: np.ndarray,
     i_exp: np.ndarray,
     err: np.ndarray,
@@ -267,7 +267,7 @@ def create_reweighting_fits_fig(
 
     ## Residuals
     fig.add_trace(go.Scatter(x=q,
-                             y=(i_exp-i_prior)/err,
+                             y=(i_prior-i_exp)/err,
                              line=dict(width=3,
                                        color='black'),
                              name='Uniform',
@@ -314,7 +314,7 @@ def create_reweighting_fits_fig(
 
         # Residuals
         fig.add_trace(go.Scatter(x=q,
-                                 y=(i_exp-i_post)/err,
+                                 y=(i_post-i_exp)/err,
                                  line=dict(width=3,
                                            color=color),
                                  opacity=0.8,
@@ -351,7 +351,7 @@ def create_reweighting_fits_fig(
     ## Residuals
     fig.update_yaxes(row=2,
                      col=2,
-                     title_text='(I<sup>EXP</sup>-I<sup>CALC</sup>)/&#963;')
+                     title_text='(I<sup>CALC</sup>-I<sup>EXP</sup>)/&#963;')
 
     fig.add_shape(row=2,
                   col=2,

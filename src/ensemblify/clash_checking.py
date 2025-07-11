@@ -39,7 +39,7 @@ def process_pulchra_output(
     ) -> list[str]:
     """Check if there are recorded steric clashes in given PULCHRA output.
 
-    Clashes present in input structure (if provided) are not ignored.
+    Clashes present in input structure (if provided) are ignored.
     Clashes are only considered when at least one residue belongs to a sampled region (if those
     regions are provided).
 

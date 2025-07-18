@@ -11,7 +11,7 @@
 It supports both user-defined models and AlphaFold<sup>[[1]](https://doi.org/10.1038/s41586-021-03819-2)</sup> predictions, using the predicted Local Distance Difference Test (pLDDT) and Predicted Aligned Error (PAE) confidence metrics to guide conformational sampling. Designed to enhance the study of IDRs, it allows flexible customization of sampling parameters and works with single or multi-chain proteins, offering a powerful tool for protein structure research. Ensemble analysis and reweighting with experimental data is also available through interactive graphical dashboards.
 
 ### 🧰 How do I install Ensemblify?
-Step-by-step instructions for installing Ensemblify are available in the [Documentation](#https://ensemblify.readthedocs.io/latest/installation.html).
+Step-by-step instructions for installing Ensemblify are available in the [Documentation](https://ensemblify.readthedocs.io/latest/installation.html).
 
 ### 💻 How can I use Ensemblify?
 Ensemblify can be used either as a Command Line Interface (CLI):

@@ -1,6 +1,10 @@
 # The `reweighting` module
 
-With the `reweighting` module, you can use experimental SAXS data to reweight your conformational ensemble following the Bayesian/Maximum Entropy (BME) method <sup>[[12]](#ref12)</sup>.
+With the `reweighting` module, you can use experimental data to reweight your conformational ensemble following the Bayesian/Maximum Entropy (BME) method <sup>[[12]](#ref12)</sup>.
+
+Fitting to experimental data and calculated ensemble structural properties are presented in a user-friendly interactive graphical dashboard.
+
+Calculations are done for the ensemble before and after reweighting, facilitating comparisons.
 
 ## Reweight your conformational ensemble using experimental SAXS data
 
@@ -14,7 +18,7 @@ To use experimental SAXS data to reweight your conformational ensemble following
 ````{tabs}
 
    ```{code-tab} console CLI
-   (ensemblify_env) $ ensemblify reweighting -trj trajectory.xtc -top topology.pdb -tid trajectory_name -exp exp_SAXS_data.dat
+   (ensemblify_env) $ ensemblify reweighting -trj trajectory.xtc -top topology.pdb -tid protein_name -exp exp_SAXS_data.dat
    ```
 
    ```{code-tab} python Python

@@ -13,7 +13,7 @@ It supports both user-defined models and AlphaFold<sup>[[1]](#ref1)</sup> predic
 ## 🧰 How do I install Ensemblify?
 Step-by-step instructions for installing Ensemblify are available in the [Installation](installation.md#-installation) section.
 
-After installing Ensemblify, make sure to visit the [Tripeptide Database](database.md#-tripeptide-database) section to learn where you can get the database files required for ensemble generation.
+After installing Ensemblify, if you wish to generate conformational ensembles, make sure to visit the [Tripeptide Database](database.md#-tripeptide-database) section to learn where you can get the required database.
 
 ----
 
@@ -29,8 +29,6 @@ or as a Python library inside a script or Jupyter notebook:
     ey.do_cool_stuff()
 
 Check the [Usage](usage.md#-usage) section for more details.
-
-You can also check out the [Quick Reference Guide](../../examples/quick_reference_guide.ipynb) notebook for a basic rundown of Ensemblify's features.
 
 ----
 

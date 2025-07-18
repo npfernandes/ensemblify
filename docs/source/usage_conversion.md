@@ -1,13 +1,15 @@
 # The `conversion` module
   
-With the `conversion` module, you can convert your generated .pdb structures into a .xtc trajectory file, enabling you to easily store and analyze your conformational ensemble.
+With the `conversion` module, you can convert your generated .pdb structures into a .xtc trajectory file.
+
+This enables much easier storage and analysis of generated ensembles.
 
 ## Convert a conformational ensemble to trajectory format
 
-To convert your generated .pdb structures into a .xtc trajectory file, provide Ensemblify with:
+To convert your generated .pdb structures into a single .xtc trajectory file, provide Ensemblify with:
 
-- the name for your created trajectory;
-- the directory where the ensemble is stored;
+- the name for the trajectory file that will be created;
+- the directory where the generated ensemble is stored;
 - the directory where the trajectory file should be created.
 
 ````{tabs}

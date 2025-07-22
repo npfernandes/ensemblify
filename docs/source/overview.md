@@ -35,7 +35,7 @@ Check the [Usage](usage.md#-usage) section for more details.
 ## 🔎 How does Ensemblify work?
 A general overview of Ensemblify, descriptions of employed methods and applications can be found in the Ensemblify paper:
 
-    PAPER
+    IN SUBMISSION
 
 ----
 

@@ -8,7 +8,7 @@ Before generating an ensemble, you must create a parameters file either:
 
 - Using the provided [.html form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html);
 
-- Directly, by editing the provided [parameters file template](../assets/parameters_template.yaml).
+- Directly, by editing the provided [parameters file template](../../examples/input_parameters/parameters_template.yml).
 
 ## Generate a conformational ensemble
 

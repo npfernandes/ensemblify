@@ -57,8 +57,6 @@ Utilities
     Update Ensemblify's current general configuration.
 ``clash_checking.check_steric_clashes()``
     Check an already generated ensemble for steric clashes, reporting any found.
-``pipeline.ensemblify_pipeline()``
-    Function to use all of Ensemblify's functionalities sequentially.
 
 Citation
 --------

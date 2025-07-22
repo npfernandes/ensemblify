@@ -31,7 +31,7 @@ You can also check out the [Quick Reference Guide](examples/quick_reference_guid
 ### 🔎 How does Ensemblify work?
 A general overview of Ensemblify, descriptions of employed methods and applications can be found in the Ensemblify paper:
 
-    PAPER
+    IN SUBMISSION
 
 ## 🗃 Tripeptide Database
 

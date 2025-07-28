@@ -43,32 +43,32 @@ def analyze_trajectory(
         trajectory_ids (list[str] | str):
             List of prefix trajectory identifiers to distinguish between calculated data
             files or string with a single prefix trajectory identifier.
-        output_directory (str):
+        output_directory (str, optional):
             Path to directory where calculated data and created figures will be stored.
             If it does not exist, it is created. Defaults to current working directory.
-        ramachandran_data (bool):
-            Whether to calculate a dihedral angles matrix for each trajectory,topology 
+        ramachandran_data (bool, optional):
+            Whether to calculate a dihedral angles matrix for each trajectory,topology
             file pair.
-        distancematrices (bool):
+        distancematrices (bool, optional):
             Whether to calculate an alpha carbon distance matrix for each trajectory,topology
             file pair and create the corresponding distance matrix interactive figure.
-        contactmatrices (bool):
+        contactmatrices (bool, optional):
             Whether to calculate a contact frequency matrix for each trajectory,topology
             file pair and create the corresponding contact map interactive figure.
-        ssfrequencies (bool):
+        ssfrequencies (bool, optional):
             Whether to calculate a secondary structure assignment frequency matrix for each
             trajectory,topology file pair and create the corresponding secondary structure
             frequency interactive figure.
-        rg (bool):
+        rg (bool, optional):
             Whether to calculate and plot a probability distribution for the radius of gyration
             for each trajectory,topology file pair.
-        dmax (bool):
+        dmax (bool, optional):
             Whether to calculate and plot a probability distribution for the maximum distance
             between any two alpha carbons for each trajectory,topology file pair.
-        eed (bool):
+        eed (bool, optional):
             Whether to calculate and plot a probability distribution for the distance between
             the N- and C-terminal for each trajectory,topology file pair.
-        cm_dist (dict[str,tuple[str,str]]):
+        cm_dist (dict[str,tuple[str,str]], optional):
             Mapping of arbitrary string identifiers to tuples containing two selection strings
             for creating MDAnalysis AtomGroups. A probability distribution for the center mass
             distance between the two AtomGroups will be calculated and plotted. For example, to
@@ -80,7 +80,7 @@ def analyze_trajectory(
             If None, no center mass distances are calculated.
             See https://userguide.mdanalysis.org/stable/selections.html for more information about
             MDAnalysis selection strings.
-        color_palette (list[str]):
+        color_palette (list[str], optional):
             List of color hexcodes, to associate one with each trajectory,topology pair in the
             created figures. If None, the default color palette is used.
 

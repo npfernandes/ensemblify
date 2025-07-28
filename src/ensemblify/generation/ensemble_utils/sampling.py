@@ -58,7 +58,7 @@ def run_sampling(
     Args:
         input_parameters (str):
             Path to parameters file following the Ensemblify template.
-        input_clashes_file (str):
+        input_clashes_file (str, optional):
             Path to Pulchra log file for the input structure.
         valid_pdbs_dir (str):
             Path to the directory where sampled structures will be stored.
@@ -237,7 +237,7 @@ def run_sampling(
     # If we wanted 100% with secondary structure bias, exit
     if len(os.listdir(VALID_PDBS_DIR)) == SS_BIAS_CUTPOINT == GOAL_ENSEMBLE_SIZE:
         logger.info('Desired number of structurally biased structures has been reached.')
-        logger.info('Cancelling any remainings tasks and shutting down ray client...')
+        logger.info('Cancelling any remainings tasks and shutting down Ray client...')
         ray.shutdown()
 
         # Close progress bar (required)
@@ -335,7 +335,7 @@ def run_sampling(
 
     logger.info('Desired number of structurally non biased structures has been reached.')
 
-    logger.info('Cancelling any remainings tasks and shutting down ray client...')
+    logger.info('Cancelling any remainings tasks and shutting down Ray client...')
     ray.shutdown()
 
     # Close progress bar (required)

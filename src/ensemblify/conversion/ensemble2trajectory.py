@@ -36,15 +36,15 @@ def ensemble2traj(
     Uses GROMACS for trajectory conversion if installed, else uses MDAnalysis. 
     
     Args:
-        ensemble_dir (str):
+        ensemble_dir (str, optional):
             Path to directory where all the .pdb files are stored. Defaults to current working
             directory.
-        trajectory_dir (str):
+        trajectory_dir (str, optional):
             Path to directory where trajectory .xtc file will be created. Will be created if it
             does not exist. Defaults to current working directory.
-        trajectory_id (str):
+        trajectory_id (str, optional):
             Prefix identifier for any created files.
-        trajectory_size (int):
+        trajectory_size (int, optional):
             Number of randomly sampled .pdb files to use for trajectory creation.
             Defaults to all .pdb files in the ensemble directory.
     

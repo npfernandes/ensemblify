@@ -1,4 +1,4 @@
-"""Auxiliary functions and classes with miscellaneous use."""
+"""Auxiliary functions with miscellaneous use."""
 
 # IMPORTS
 ## Third Party Imports

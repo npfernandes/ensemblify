@@ -23,7 +23,14 @@ RAISE_EXCEPTIONS = False
 def parallel_launcher(
     rdr: mda.Universe,
     w_id: int):
-    """ Helper function for the parallel execution of registered functions."""
+    """Helper function for the parallel execution of registered functions.
+    
+    Args:
+        rdr (mda.Universe):
+            Instance of SimpleMDreader.
+        w_id (int):
+            Worker ID for parallel execution.
+            """
     rdr.p_id = w_id
     return rdr._reader()
 
@@ -42,6 +49,7 @@ class Pool():
         self.nprocs = processes
 
     def map(self, f, argtuple):
+        """Applies f to every element in argtuple, in parallel."""
         procs = []
         nargs = len(argtuple)
         result = [None]*nargs
@@ -141,17 +149,17 @@ class SimpleMDreader(mda.Universe):
         """Initializes the SimpleMDReader instance based on the given parameters.
         
         Args:
-            trajectory:
-                path to trajectory file (.xtc).
-            topology:
-                path to topology file (.pdb).
-            nworkers:
-                number of processor cores to use during parallel calculations. If None, all
+            trajectory (str):
+                Path to trajectory file (.xtc).
+            topology (str):
+                Path to topology file (.pdb).
+            nworkers (int, optional):
+                Number of processor cores to use during parallel calculations. If None, all
                 cores in the machine are used.
-            outstats:
-                controls how often to report performance statistics.
-            statavg:
-                controls over how many frames to accumulate performance statistics.
+            outstats (int, optional):
+                Controls how often to report performance statistics. Defaults to 1.
+            statavg (int, optional):
+                Controls over how many frames to accumulate performance statistics. Defaults to 100.
         """
         self.verbose = True
         self.nworkers = nworkers
@@ -161,7 +169,7 @@ class SimpleMDreader(mda.Universe):
         self._endframe = self.nframes-1
         self.totalframes = int(np.rint(math.ceil(float(self._endframe - self._startframe+1))))
 
-        # Stuff pertaining to progress output/parallelization
+        # Parameters pertaining to progress output/parallelization
         self.outstats = outstats
         self.statavg = statavg
         self.loop_dtimes = np.empty(self.statavg, dtype=datetime.timedelta)
@@ -281,6 +289,7 @@ class SimpleMDreader(mda.Universe):
         for _ in self.iterate():
             result = self.p_fn(*self.p_args, **self.p_kwargs)
             reslist.append(result)
+
         return reslist
 
     def do_in_parallel(self,
@@ -288,12 +297,20 @@ class SimpleMDreader(mda.Universe):
         *args,
         **kwargs,
         ) -> list[float] | None:
-        """ Applies fn to every frame, taking care of parallelization details.
+        """ Applies a function to every frame, taking care of parallelization details.
         
-        Returns a list with the returned elements, in order.
-        args and kwargs should be an iterable, resp. a dictionary, of arguments
-            that will be passed (with the star, resp. double-star, operator) to
-            fn. Default to the empty tuple and empty dict.
+        Args:
+            fn (Callable):
+                Function to be applied to every frame of the trajectory.
+                It should accept the current frame as its first argument.
+            args (Iterable, optional):
+                Additional positional arguments to be passed to fn. Defaults to an empty tuple.
+            kwargs (dict, optional):
+                Additional keyword arguments to be passed to fn. Defaults to an empty dict.
+
+        Returns:
+            list[float] | None:
+                The returned elements from applying fn to each frame, in order.
         """
         # Set function to call
         self.p_fn = fn

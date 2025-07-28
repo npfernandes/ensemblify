@@ -33,7 +33,7 @@ def check_clashes(
             Stdout from applying PULCHRA to the sampled .pdb structure.
         sampling_targets (dict[str,tuple[tuple[str,tuple[int,...],str,str]]]):
             Mapping of chain identifiers to sampled residue numbers.
-        input_clashes (list[tuple[str,str]] | None):
+        input_clashes (list[tuple[str,str]], optional):
             Clashes present in the sampling input structure, that will be ignored if
             present in the given PULCHRA output.
     Returns:
@@ -137,7 +137,7 @@ def setup_logger(pdb: str, log_file: str) -> logging.Logger:
     return logger
 
 
-def apply_faspr_single(faspr_path: str,pdb: str) -> str | None:
+def apply_faspr_single(faspr_path: str, pdb: str) -> str | None:
     """Apply FASPR to a .pdb file. Log outcome.
 
     Args:
@@ -220,7 +220,7 @@ def apply_rewrite_single(pdb: str) -> str:
     return rewrite_filename
 
 
-def apply_pulchra_single(pulchra_path: str,pdb: str) -> tuple[str,str] | tuple[None,None]:
+def apply_pulchra_single(pulchra_path: str, pdb: str) -> tuple[str,str] | tuple[None,None]:
     """Apply PULCHRA to a .pdb file. Log outcome.
 
     Args:
@@ -263,7 +263,7 @@ def apply_pulchra_single(pulchra_path: str,pdb: str) -> tuple[str,str] | tuple[N
         raise e
 
 
-def apply_restore_single(pdb: str,reference_pdb: str) -> str:
+def apply_restore_single(pdb: str, reference_pdb: str) -> str:
     """Restore chain, residue number and B-Factor info to pdb from reference pdb.
         
     Restore chain, residue numbering and B-Factor information to a post-Pulchra .pdb
@@ -363,8 +363,8 @@ def process_pdb(
     information restored to its original status.
 
     Args:
-        sampled_pdb (str, optional): 
-            Sampled .pdb structure, unprocessed.
+        sampled_pdb (str | None):
+            Sampled .pdb structure, unprocessed. If None, processing is cancelled.
         faspr_path (str):
             Path to FASPR executable or its alias.
         pulchra_path (str):

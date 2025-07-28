@@ -13,7 +13,7 @@ References:
 """
 
 DEFAULT_TRACE_COLOR_PALETTE = [
-    '#E69F00', # dark yellow
+    '#E69F00', # orange
     '#56B4E9', # sky blue
     '#009E73', # bluish green
     '#F0E442', # light yellow

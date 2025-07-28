@@ -81,7 +81,7 @@ class SimpleReweight:
         Args:
             name (str):
                 Identifier for the instance, used in created file names.
-            w0 (np.ndarray | None):
+            w0 (np.ndarray, optional):
                 Initial weights. If None, uniform weights are initialized.
         """
         # Setup input attributes
@@ -177,10 +177,10 @@ class SimpleReweight:
                 Path to file with back-calculated experimental data.
             exp_type (str):
                 Type of experimental data, used to determine how to fit the calculated data.
-            use_samples (list[int] | None):
+            use_samples (list[int], optional):
                 Use only this subset of calculated data indices. Defaults to None, and all
                 samples are used.
-            use_data (list[int] | None):
+            use_data (list[int], optional):
                 Use only this subset of experimental data indices. Defaults to None, and all
                 samples are used.
 
@@ -247,12 +247,12 @@ class SimpleReweight:
                 Path to file with experimental data.
             calc_file (str):
                 Path to file with calculated data.
-            exp_type (str):
+            exp_type (str, optional):
                 Type of experimental data, used to determine how to fit the calculated data.
-            use_samples (list[int] | None):
+            use_samples (list[int], optional):
                 Use only this subset of calculated data indices. Defaults to None, and all
                 samples are used.
-            use_data (list[int] | None):
+            use_data (list[int], optional):
                 Use only this subset of experimental data indices. Defaults to None, and all
                 samples are used.
         """

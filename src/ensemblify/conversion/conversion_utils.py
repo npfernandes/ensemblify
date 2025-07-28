@@ -57,10 +57,10 @@ def _sample_without_topology(
     Args:
         pdbs_dir (str):
             Path to directory where .pdb files are stored.
-        topology_path (str):
+        topology_path (str, optional):
             Path to a topology .pdb file to be ignored when sampling .pdb files from
             pdbs_dir. Defaults to None.
-        n_models (int):
+        n_models (int, optional):
             Number of .pdb files to randomly sample from the provided directory.
             Defaults to all .pdb files in the directory.
 
@@ -105,10 +105,10 @@ def join_pdbs(
             Prefix identifier for created multimodel .pdb file.
         multimodel_dir (str):
             Path to directory where ensemble .pdb file will be created.
-        n_models (int):
+        n_models (int, optional):
             Number of .pdb files to randomly sample from the specified directory.
             If None, all .pdb files in the directory will be used.
-        topology_path (str):
+        topology_path (str, optional):
             Path to a topology .pdb file to be ignored when sampling .pdb files from
             multimodel_dir. Required if pdbs_dir matches multimodel_dir. Defaults to None.
     

@@ -117,9 +117,9 @@ def subsample(
             Experimental data in the format {I, sigma, bound}.
         calc (np.ndarray):
             Calculated data in the format {I, sigma, bound}.
-        use_samples (list | None):
+        use_samples (list, optional):
             List of indices of the samples to use from the calculated data.
-        use_data (list | None):
+        use_data (list, optional):
             List of indices of the experimental data to use.
     
     Returns:
@@ -295,20 +295,33 @@ def normalize(
     return log, calc_avg, calc_std
     
 
-def split_array_by_groups(array, groups_dict, type=None):
+def split_array_by_groups(
+    array: np.ndarray,
+    groups_dict: dict,
+    type: str | None = None,
+    ) -> dict[str, np.ndarray]:
     """
-    Splits a NumPy array into multiple arrays based on named groups of indices.
+    Splits an array into multiple arrays based on named groups of indices.
 
     Type of splitting can be specified as either 'row' or 'column'.
     If 'row', the array is split into groups of rows.
     If 'column', the array is split into groups of columns.
     
     Args:
-        array: NumPy array to split.
-        groups_dict: Dictionary with group names as keys and column indices as values
+        array (np.ndarray):
+            Array to split.
+        groups_dict (dict):
+            Mapping of group names to row/column indices.
+        type (str | None):
+            Type of splitting to perform. Can be 'row' or 'column'.
 
     Returns:
-        Dictionary with group names as keys and split arrays as values
+        dict[str, np.ndarray]:
+            Mapping of group names to arrays.
+
+    Raises:
+        ValueError:
+            If type is not 'row' or 'column'.
     """
     if type == 'column':
         return {name: array[:, indices[0]:indices[1]+1] for name, indices in groups_dict.items()}
@@ -322,7 +335,7 @@ def fit_and_scale(
     exp: np.ndarray,
     calc: np.ndarray,
     calc_weights: np.ndarray | None = None,
-    fit_type: str = None,
+    fit_type: str | None = None,
     ) -> tuple[np.ndarray,str]:
     """Fit a linear regression model between calculated and experimental data and scale calculated
     data accordingly.
@@ -332,10 +345,10 @@ def fit_and_scale(
             Experimental data in the format {value, error}.
         calc (np.ndarray):
             Calculated data. Will be averaged and possibly scaled.
-        calc_weights (np.ndarray | None):
+        calc_weights (np.ndarray, optional):
             Weights for each row in the calculated data, used in averaging.
             If None, uniform weights are assumed.
-        fit_type (str):
+        fit_type (str, optional):
             Type of data scaling to be applied after fitting. Can be 'scale', 'scale+offset'
             or None. If None, no data scaling is applied and input data is not changed.
 

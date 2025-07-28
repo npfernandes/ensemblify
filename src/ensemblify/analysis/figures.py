@@ -45,7 +45,10 @@ DEFAULT_LAYOUT = {
 }
 
 # FUNCTIONS
-def _remove_self_neighbours(matrix: pd.DataFrame, n_neighbours: int | None = None) -> pd.DataFrame:
+def _remove_self_neighbours(
+    matrix: pd.DataFrame,
+    n_neighbours: int | None = None,
+    ) -> pd.DataFrame:
     """Take a matrix and assign Numpy NaN values to the main and secondary diagonals according to
     the number of neighbours.
 
@@ -1357,7 +1360,8 @@ def create_analysis_figures(
     Args:
         analysis_data (dict[str,list[pd.DataFrame]], optional):
             Mapping of data identifiers to lists of DataFrames with the calculated analysis data,
-            one element for each given trajectory,topology,trajectory_id trio.
+            one element for each given trajectory,topology,trajectory_id trio. If None, the
+            function will try to read the data from the output_directory.
         topologies (list[str]):
             List of paths to .pdb topology files.
         trajectory_ids (list[str]):

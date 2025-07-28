@@ -97,8 +97,9 @@ def add_contacts_constraints(
     Args:
         pose (pyrosetta.rosetta.core.pose.Pose):
             Target Pose object for constraints.
-        contacts (tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...]):
-            Residue ranges of regions whose relative position should be conserved.
+        contacts (tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...], optional):
+            Residue ranges of regions whose relative position should be conserved. If None, no
+            constraints are added.
         constraint_set (pyrosetta.rosetta.core.scoring.constraints.ConstraintSet):
             Set of constraints to later be applied to Pose.
         stdev (float, optional):
@@ -305,7 +306,7 @@ def setup_minmover(
             Identifier for the used PyRosetta minimization algorithm.
         tolerance (float):
             Value for the MinMover tolerance.
-        max_iters (int):
+        max_iters (int, optional):
             Maximum iterations of the MinMover. Defaults to None, meaning
             the MinMover object's default value.
         dofs (tuple[str,str], optional):
@@ -468,21 +469,21 @@ def apply_pae_constraints(
         plddt_targets (dict):
             Mapping of each chain to the residue numbers that
             will be sampled (pdb numbering), all with plddt below a threshold.
-        cutoff (float):
+        cutoff (float, optional):
             Only consider PAE values below this number (low error).
-        flatten_cutoff (float):
+        flatten_cutoff (float, optional):
             Any PAE values below this value will be changed to match flatten value.
-        flatten_value (float):
+        flatten_value (float, optional):
             Any PAE values below flatten cutoff will be changed to match this value.
-        weight (float):
+        weight (float, optional):
             Along with the error value, determines the strength of the applied AtomPairConstraints
         tolerance (float, optional):
             Defines the tolerance of the FlatHarmonicFunction of AtomPairConstraints
             created from the PAE matrix. Defaults to None.
-        adjacency_threshold (int):
+        adjacency_threshold (int, optional):
             How far away two residues need to be to consider their PAE value. Neighbours are skipped
             as PAE is best used for determining between domain or between chain confidence.
-        plddt_scaling_factor (float):
+        plddt_scaling_factor (float, optional):
             Any constraints setup between residues where one of them has a low pLDDT and another a
             high pLDDT will be scaled by multiplying its weight by this factor. The higher this
             value the weaker those constraints will be.
@@ -621,7 +622,7 @@ def apply_constraints(
         cst_targets (tuple[tuple[int,int],...]):
             Residue ranges defining regions that make up folded protein domains.
             AtomPairConstraints will be applied between constituting residues.
-        contacts (tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...]):
+        contacts (tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...], optional):
             Pairs of residue ranges defining regions whose relative position should be conserved.
             AtomPairConstraints will be applied between residues belonging to different regions.
             Defaults to None.
@@ -693,7 +694,7 @@ def setup_fold_tree(
             Pose object whose FoldTree will be updated.
         constraint_targets (tuple[tuple[int,int],...]):
             Residues between which AtomPairConstraints will be applied.
-        contacts (tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...]):
+        contacts (tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...], optional):
             Residue ranges where two chains are interacting.
     
     Reference:

@@ -88,7 +88,7 @@ class MonteCarloSampler():
                 Letter identifier for the current chain being sampled.
             database_id (str):
                 Identifier for which database to sample from.
-            ss_bias (tuple[tuple[str,tuple[int,int],str],...] | None):
+            ss_bias (tuple[tuple[str,tuple[int,int],str],...], optional):
                 Information about types of secondary structure biases, including which chain and
                 residue numbers they should be applied on.
             sampling_mode (str):

@@ -369,43 +369,43 @@ def sample_pdb(
             Path to directory where sampled structures will be written to.
         job_name (str):
             Prefix identifier for generated structures.
-        decoy_num (str):
+        decoy_num (str, optional):
             Identifier to differentiate between different decoys of the same batch in a
             multiprocessing context. Defaults to ''.
-        log_file (str):
+        log_file (str, optional):
             Path to the PyRosetta .log file. Defaults to 'pyrosetta.log' in current working
             directory.
-        ss_bias (tuple[tuple[tuple[str,tuple[int,int],str],...],int] | None):
+        ss_bias (tuple[tuple[tuple[str,tuple[int,int],str],...],int], optional):
             Secondary Structure Bias with the desired percentage of total structures to respect
             this bias. Defaults to None.
-        variance (float):
+        variance (float, optional):
             New dihedral angle values inserted into sampling regions are sampled from a Gaussian
             distribution centered on the value found in database and percentage variance equal to
             this value. Defaults to 0.10 (10%).
-        sampler_params (dict[str,dict[str,int]]):
+        sampler_params (dict[str,dict[str,int]], optional):
             Parameters for the used sampler, assumes MonteCarloSampler is used. Defaults to
             {'MC':{'temperature':200,'max_loops':200}}.
-        scorefxn_id (str):
+        scorefxn_id (str, optional):
             PyRosetta ScoreFunction identifier. Must pertain to a .wst weights file present in
             /.../pyrosetta/database/scoring/weights/ . Defaults to 'score0'.
-        scorefxn_weight (float):
+        scorefxn_weight (float, optional):
             Weight for the repulsive Van der Waals term in the ScoreFunction. Will only have an
             effect if the ScoreFunction has a repulsive Van der Waals term. Defaults to 1.0.
-        minimizer_id (str):
+        minimizer_id (str, optional):
             PyRosetta minimization algorithm identifier used in MinMover.
             Defaults to 'dfpmin_armijo_nonmonotone'.
-        minimizer_tolerance (float):
+        minimizer_tolerance (float, optional):
             Tolerance value for the PyRosetta MinMover object. Defaults to 0.001.
-        minimizer_maxiters (int):
+        minimizer_maxiters (int, optional):
             Maximum iterations value for the PyRosetta MinMover object. Defaults to 5000.
-        minimizer_finalcycles (int):
+        minimizer_finalcycles (int, optional):
             Number of times to apply the MinMover to our final structure. Defaults to 5.
-        cst_weight (int):
+        cst_weight (int, optional):
             Weight of the AtomPairConstraint term in the ScoreFunction. Defaults to 1.
-        cstviolation_threshold (float):
+        cstviolation_threshold (float, optional):
             Any residue with AtomPairConstraint score term value above this threshold is considered
             in violation of the applied constraints. Defaults to 0.015.
-        cstviolation_maxres (int):
+        cstviolation_maxres (int, optional):
             Number of residues allowed to be above the constraint violation threshold.
             Defaults to 20.
 

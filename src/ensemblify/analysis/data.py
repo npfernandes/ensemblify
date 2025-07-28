@@ -696,28 +696,28 @@ def calculate_analysis_data(
         output_directory (str, optional):
             Path to directory where calculated data will be stored. Defaults to current
             working directory.
-        ramachandran_data (bool):
+        ramachandran_data (bool, optional):
             Whether to calculate a dihedral angles matrix for each trajectory,topology 
             file pair.
-        distancematrices (bool):
+        distancematrices (bool, optional):
             Whether to calculate an alpha carbon distance matrix for each trajectory,topology
             file pair.
-        contactmatrices (bool):
+        contactmatrices (bool, optional):
             Whether to calculate a contact frequency matrix for each trajectory,topology
             file pair.
-        ssfrequencies (bool):
+        ssfrequencies (bool, optional):
             Whether to calculate a secondary structure assignment frequency matrix for each
             trajectory,topology file pair.
-        rg (bool):
+        rg (bool, optional):
             Whether to calculate and plot a probability distribution for the radius of gyration
             for each trajectory,topology file pair.
-        dmax (bool):
+        dmax (bool, optional):
             Whether to calculate and plot a probability distribution for the maximum distance
             between any two alpha carbons for each trajectory,topology file pair.
         eed (bool):
             Whether to calculate and plot a probability distribution for the distance between
             the N- and C-terminal for each trajectory,topology file pair.
-        cm_dist (dict[str,tuple[str,str]]):
+        cm_dist (dict[str,tuple[str,str]], optional):
             Mapping of arbitrary string identifiers to tuples containing two selection strings
             for creating MDAnalysis AtomGroups. A probability distribution for the center mass
             distance between the two AtomGroups will be calculated and plotted. For example, to

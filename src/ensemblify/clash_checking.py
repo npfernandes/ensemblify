@@ -48,9 +48,9 @@ def process_pulchra_output(
             Path to .pdb file output from conformational sampling.
         pulchra_output_buffer (str):
             Stdout from applying PULCHRA to the sampled .pdb structure.
-        sampling_targets (dict[str,tuple[tuple[str,tuple[int,...],str,str]]] | None):
+        sampling_targets (dict[str,tuple[tuple[str,tuple[int,...],str,str]]], optional):
             Mapping of chain identifiers to sampled residue numbers.
-        input_clashes (list[tuple[str,str]] | None):
+        input_clashes (list[tuple[str,str]], optional):
             Clashes present in the sampling input structure, that will be ignored if
             present in the given PULCHRA output.
     Returns:
@@ -134,10 +134,10 @@ def check_report_pdb_clashes(
     Args:
         pdb2check (str):
             Path to .pdb file to check for steric clashes.
-        sampling_targets (dict[str,tuple[tuple[str,tuple[int,...],str,str]]] | None):
+        sampling_targets (dict[str,tuple[tuple[str,tuple[int,...],str,str]]], optional):
             Mapping of chains to sampled regions following Ensemblify parameters style. If
             provided, clashes are only checked for in these regions. Defaults to None.
-        input_clashes (list[tuple[str,str]] | None): 
+        input_clashes (list[tuple[str,str]], optional): 
             List of clashes detected in the ensemble generation input structure. If provided,
             clashes detailed here will be ignored if found in the .pdb to check (only in sampled
             regions, if sampling targets is provided). Defaults to None.
@@ -186,12 +186,12 @@ def check_steric_clashes(
     Args:
         ensemble_dir (str):
             Path to directory where ensemble .pdb structures are stored.
-        sampling_targets (str | dict[str,tuple[tuple[str,tuple[int,...],str,str]]] | None):
+        sampling_targets (str | dict[str,tuple[tuple[str,tuple[int,...],str,str]]], optional):
             Mapping of chains to sampled regions following Ensemblify parameters style or path to
             this mapping in .yaml format. If a path is provided, it can either be solely the
             mapping or a full Ensemblify parameters file. If provided, clashes are only checked
             for in these regions. Defaults to None.
-        input_structure (str | None):
+        input_structure (str, optional):
             Path to input structure used to generate the ensemble. If provided, steric clashes
             present in this structure (only in sampled regions, if sampling targets is provided)
             are ignored if they are detected in any of the sampled structures. Defaults to None.

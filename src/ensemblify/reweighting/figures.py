@@ -11,8 +11,16 @@ from plotly.subplots import make_subplots
 from ensemblify.utils import kde
 
 # CONSTANTS
-DEFAULT_REWEIGHTING_TRACE_COLOR_PALETTE = ['#E69F00','#56B4E9','#009E73','#F0E442',
-                                           '#0072B2','#D55E00','#CC79A7']
+DEFAULT_REWEIGHTING_TRACE_COLOR_PALETTE = [
+    '#E69F00', # orange
+    '#56B4E9', # sky blue
+    '#009E73', # bluish green
+    '#F0E442', # light yellow
+    '#0072B2', # blue
+    '#D55E00', # vermillion
+    '#CC79A7'  # lilac
+]
+
 DEFAULT_AXIS = {
     'showgrid': False,
     'color': 'black',
@@ -44,7 +52,7 @@ def create_effective_frames_fit_fig(
     thetas: np.ndarray,
     choices: int | list[int] | None = None,
     title_text: str | None = None,
-    colors: list[str] = None,
+    colors: list[str] | None = None,
     ) -> go.Figure:
     """Create a Figure plotting the fraction of effective frames vs the chisquare value, resulting
     from applying BME using different theta values.
@@ -69,12 +77,12 @@ def create_effective_frames_fit_fig(
                     The fraction of effective frames being used in the reweighted ensemble.
         thetas (np.ndarray):
             Array of values for the theta parameter used when applying BME algorithm.
-        choices (int | list[int] | None):
+        choices (int | list[int], optional):
             Theta value(s) chosen for reweighting ensemble, corresponding data points will be
             highlighted in the created Figure. Defaults to None.
-        title_text (str | None):
+        title_text (str, optional):
             Title for the created Figure. Defaults to None.
-        colors (list[str]):
+        colors (list[str], optional):
             Hexcodes for the colors to use for highlighting theta values. Defaults to ['#E69F00',
             '#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7'].
 
@@ -158,7 +166,7 @@ def create_rw_saxs_fits_fig(
     i_prior: np.ndarray,
     i_posts: np.ndarray | list[np.ndarray],
     title_text: str | None = None,
-    colors: list[str] = None,
+    colors: list[str] | None = None,
     ) -> go.Figure:
     """Create a multiplot Figure showcasing the differences between uniform and reweighted
     calculated SAXS data, when fit to experimental data.
@@ -403,7 +411,7 @@ def create_reweighting_metrics_fig(
     metrics: pd.DataFrame,
     weight_sets: np.ndarray | list[np.ndarray],
     title_text: str | None = None,
-    colors: list[str] = None,
+    colors: list[str] | None = None,
     ) -> go.Figure:
     """Create a Figure with probability distribution plots for calculated structural metrics, using
     uniform or unequal weights.
@@ -415,9 +423,9 @@ def create_reweighting_metrics_fig(
         weight_sets (np.ndarray | list[np.ndarray]):
             An array or list of arrays containing the weights for calculating the probability
             distributions of each structural metric, for each set of weights.
-        title_text (str | None):
+        title_text (str, optional):
             Title for the created Figure. Defaults to None.
-        colors (list[str]):
+        colors (list[str], optional):
             Hexcodes for colors to use for the traces relative to each i_post, in order of input.
             Defaults to ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7'].
 

@@ -118,25 +118,32 @@ class SetRandomDihedralsMover(pyrosetta.rosetta.protocols.moves.Mover):
 
             # Check if the previous filtering step resulted in at least one valid row to sample from
             if dihedrals.shape[0] == 0:
-                if secondary_structure == 'alpha_helix':
-                    # Set canonical alpha helix values with omega 180
-                    phi, psi = GLOBAL_CONFIG['ALPHA_HELIX_CANON']
-                    omg = 180
-                elif secondary_structure == 'beta_strand':
-                    # Set canonical beta strand values with omega 180
-                    phi, psi = GLOBAL_CONFIG['BETA_STRAND_CANON']
-                    omg = 180
+                if secondary_structure is not None:
+                    if secondary_structure == 'alpha_helix':
+                        # Set canonical alpha helix values with omega 180
+                        phi, psi = GLOBAL_CONFIG['ALPHA_HELIX_CANON']
+                        omg = 180
+                    elif secondary_structure == 'beta_strand':
+                        # Set canonical beta strand values with omega 180
+                        phi, psi = GLOBAL_CONFIG['BETA_STRAND_CANON']
+                        omg = 180
 
-                pose.set_phi(target_resnum,phi)
-                pose.set_psi(target_resnum,psi)
-                pose.set_omega(target_resnum,omg)
+                    pose.set_phi(target_resnum,phi)
+                    pose.set_psi(target_resnum,psi)
+                    pose.set_omega(target_resnum,omg)
 
-                no_rows_found_msg = ('No rows respecting filters found in database, canonical '
-                                     f'values for {secondary_structure} set on residue '
-                                     f'{target_resnum}!\n')
-                print(no_rows_found_msg, end='')
-                with open(self.log_file,'a',encoding='utf-8') as f:
-                    f.write(no_rows_found_msg)
+                    no_rows_found_msg = ('No rows respecting filters found in database, canonical '
+                                        f'values for {secondary_structure} set on residue '
+                                        f'{target_resnum}!\n')
+                    print(no_rows_found_msg, end='')
+                    with open(self.log_file,'a',encoding='utf-8') as f:
+                        f.write(no_rows_found_msg)
+                else:
+                    no_rows_found_msg = ('No rows respecting filters found in database, '
+                                         f'no dihedral angles set on residue {target_resnum}!\n')
+                    print(no_rows_found_msg, end='')
+                    with open(self.log_file,'a',encoding='utf-8') as f:
+                        f.write(no_rows_found_msg)
 
             else:
                 # Choose row from which to take dihedral values

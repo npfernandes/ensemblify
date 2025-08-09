@@ -18,9 +18,9 @@ Generate an ensemble
 ~~~~~~~~~~~~~~~~~~~~
 
 The ``ensemblify.generation.generate_ensemble`` function can be used to generate a conformational
-ensemble from a .yaml parameters file.
+ensemble from a .yml parameters file.
 
-For example, we can generate an ensemble for Histatin5, an intrinsically disordered protein (IDP)
+For example, we can generate an ensemble for Histatin5 (Hst5), an intrinsically disordered peptide
 with 24 aminoacid residues.
 
 Assuming the path to the required input parameters file is assigned to a variable named

@@ -736,8 +736,7 @@ def create_ss_frequency_figure(
     reweighted: bool = False,
     difference: bool = False,
     ) -> go.Figure:
-    """Create a secondary structure frequency Figure from a secondary structure assignment
-    frequency matrix.
+    """Create a SS frequency Figure from a SS assignment frequency matrix.
 
     The topology provides information about number of chains, their chain letters and residue
     numbers.
@@ -899,8 +898,7 @@ def create_metrics_traces(
     trajectory_id: str,
     color: str = '#1f77b4',
     ) -> tuple[list[go.Box], list[go.Histogram], list[go.Scatter], list[float], list[float]]:
-    """Create Ploty Box, Histogram and Scatter (KDE) traces to be used in the creation of
-    a Structural Metrics Figure.
+    """Create Plotly traces to be used in the creation of a Structural Metrics Figure.
 
     Args:
         metrics (pd.DataFrame | str):
@@ -993,7 +991,7 @@ def create_metrics_fig(
     total_avg_stderr_values: dict[str,list[float]],
     output_path: str | None = None,
     ) -> go.Figure:
-    """Create a Structural Metrics Figure from previously created Box, Histogram and Scatter traces.
+    """Create a Structural Metrics Figure from previously created traces.
 
     Args:
         trajectory_ids (list[str]):
@@ -1299,8 +1297,7 @@ def create_single_metrics_fig_directly(
     metrics: pd.DataFrame | str,
     trajectory_id: str | None = None,
     ) -> go.Figure:
-    """Create a Structural Metrics Figure for a single trajectory directly from its trajectory
-    id and calculated metrics data.
+    """Create a Figure directly from calculated metrics data.
 
     Args:
         metrics (pd.DataFrame | str):
@@ -1354,8 +1351,7 @@ def create_analysis_figures(
     output_directory: str | None = os.getcwd(),
     color_palette: list[str] | None = None,
     ) -> dict[str,list[go.Figure]]:
-    """Create interactive figures given analysis data for one or more pairs of trajectory,topology
-      files.
+    """Create Figures given analysis data for pairs of trajectory,topology files.
 
     Args:
         analysis_data (dict[str,list[pd.DataFrame]], optional):

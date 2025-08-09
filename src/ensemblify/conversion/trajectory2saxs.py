@@ -20,7 +20,7 @@ def traj2saxs(
     trajectory_id: str,
     exp_saxs_file: str,
     ) -> tuple[str, str]:
-    """Calculate a set of theoretical SAXS curves from a trajectory file using PEPSI-SAXS.
+    """Calculate a set of theoretical SAXS curves from a trajectory file using Pepsi-SAXS.
     
     Calculation is done in chunks distributed across available processor cores.
     A Universe object is created with the given trajectory and topology, which
@@ -35,8 +35,9 @@ def traj2saxs(
         trajectory_id (str):
             Prefix identifier for created files.
         exp_saxs_file (str):
-            Path to the experimental SAXS data for this protein, used in PEPSI-SAXS
-            for SAXS curve calculation.
+            Path to the experimental SAXS data for this protein. Used in Pepsi-SAXS
+            for SAXS curve calculation, as an indication of the number of experimental data points
+            that should be calculated for each frame of the trajectory.
 
     Returns:
         tuple[str, str, str]:

@@ -450,6 +450,7 @@ def calculate_ss_frequency(
                                             topology=topology)
 
     if weights is None:
+        print('Calculating secondary structure assignment frequency matrix...')
         # Count the frequency of each secondary structure element
         frequency = ss_assignment.apply(lambda x: pd.Series(x).value_counts())
         frequency = frequency.fillna(0)

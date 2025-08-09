@@ -125,8 +125,9 @@ def check_report_pdb_clashes(
     sampling_targets: dict[str,tuple[tuple[str,tuple[int,...],str,str]]] | None = None,
     input_clashes: list[tuple[str,str]] | None = None,
     ) -> tuple[str,list[str] | None]:
-    """Check for steric clashes in a .pdb file, optionally considering sampling targets and clashes
-    in the input structure.
+    """Check for steric clashes in .pdb file, outputting report.
+    
+    Optionally, sampling targets and clashes in the input structure can be considered.
 
     A steric clash is reported when the distance between any two non bonded atoms is less than two
     angstrom.

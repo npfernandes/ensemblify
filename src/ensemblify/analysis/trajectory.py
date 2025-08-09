@@ -30,8 +30,7 @@ def analyze_trajectory(
     cm_dist: dict[str,tuple[str,str]] | None = None,
     color_palette: list[str] | None = None,
     ) -> dict[str,pd.DataFrame]:
-    """Calculate structural data and create interactive figures for given trajectory and
-    topology files.
+    """Calculate structural data and create figures for trajectory,topology file pairs.
 
     Args:
         trajectories (list[str] | str):

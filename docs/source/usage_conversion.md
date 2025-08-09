@@ -8,9 +8,9 @@ This enables much easier storage and analysis of generated ensembles.
 
 To convert your generated .pdb structures into a single .xtc trajectory file, provide Ensemblify with:
 
-- the name for the trajectory file that will be created;
 - the directory where the generated ensemble is stored;
 - the directory where the trajectory file should be created.
+- the name for the trajectory file that will be created;
 
 ````{tabs}
 

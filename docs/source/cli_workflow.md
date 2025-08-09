@@ -60,7 +60,7 @@ Along with the created trajectory, one of the structures of the generated ensemb
    Hst5 Trajectory creation complete! : 100%|██████████| 4/4 [00:00<00:00, 475.09step/s]
    ```
 
-   The created **trajectory** and **topology** files will be in `./trajectory/Hst5_trajectory.xtc` and `./trajectory/Hst5_top.xtc`, respectively.
+   The created **trajectory** and **topology** files will be in `./trajectory/Hst5_trajectory.xtc` and `./trajectory/Hst5_top.pdb`, respectively.
 
 ----
 
@@ -72,7 +72,7 @@ To do this, specify the location of your **trajectory** and **topology** files a
 1. Assuming the current working directory is the previously created 'Hst5' directory:
 
    ```{code-block} console
-   (ensemblify_env) $ ensemblify ana -trj ./trajectory/Hst5_trajectory.xtc -top ./trajectory/Hst5_top.xtc -tid Hst5 -out ./analysis
+   (ensemblify_env) $ ensemblify ana -trj ./trajectory/Hst5_trajectory.xtc -top ./trajectory/Hst5_top.pdb -tid Hst5 -out ./analysis
    Analyzing Hst5 trajectory...
    Calculating ramachandran data for Hst5...
    Calculating contact matrix for Hst5...
@@ -103,7 +103,7 @@ To do this, specify the location of your **trajectory**, **topology** and experi
 1. Assuming the current working directory is the previously created 'Hst5' directory, and the `Hst5_SAXS.dat` file is one directory up:
 
    ```{code-block} console
-   (ensemblify_env) $ ensemblify rew -trj ./trajectory/Hst5_trajectory.xtc -top ./trajectory/Hst5_top.xtc -tid Hst5 -exp ../Hst5_SAXS.dat -out ./reweighting
+   (ensemblify_env) $ ensemblify rew -trj ./trajectory/Hst5_trajectory.xtc -top ./trajectory/Hst5_top.pdb -tid Hst5 -exp ../Hst5_SAXS.dat -out ./reweighting
    Processing Hst5 experimental data file...
    Experimental errors on SAXS intensities have been corrected with BIFT using scale factor 1.0.
    Calculating Hst5 SAXS data... : 100%|██████████| 10/10 [00:00<00:00, 260.36it/s]

@@ -20,8 +20,8 @@ Read a .pdb file into a ``pandas.DataFrame``
 The ``ensemblify.utils.df_from_pdb`` function can be used to read a .pdb file and get a
 ``pandas.DataFrame`` with its contents.
 
-For example, we can get the contents of a .pdb file of Histatin5, an intrinsically
-disordered protein (IDP) with 24 aminoacid residues.
+For example, we can get the contents of a .pdb file of Histatin5 (Hst5), an intrinsically
+disordered peptide with 24 aminoacid residues.
 
 Assuming the path to the required input .pdb file is assigned to a variable named HST5_PDB,
 you should run:
@@ -51,8 +51,8 @@ The ``ensemblify.utils.extract_pdb_info`` function can be used to extract from a
 information regarding the number of protein chains present, which chain letters identify them,
 their starting residue numbers and their size.
 
-For example, we can extract information from a .pdb file of Histatin5, an intrinsically
-disordered protein (IDP) with 24 aminoacid residues.
+For example, we can extract information from a .pdb file of Histatin5 (Hst5), an intrinsically
+disordered peptide with 24 aminoacid residues.
 
 Assuming the path to the required .pdb file is assigned to a variable named HST5_PDB, you should
 run:
@@ -75,7 +75,7 @@ Available Functions
 ``kde``
     Calculate a Kernel Density Estimate (KDE) distribution for a given dataset.
 ``get_array_extremum``
-    Get maximum or minimum value of all elements of all provided arrays.
+    Get maximum or minimum value out of all elements of all provided arrays.
 ``round_to_nearest_multiple``
     Round a number to the nearest (up or down) multiple of a given factor.
 """

@@ -19,14 +19,15 @@ Analyze an ensemble in trajectory format
 The ``ensemblify.analysis.analyze_trajectory`` function can be used to create an interactive
 analysis graphical dashboard from a conformational ensemble in .xtc trajectory format.
 
-For example, we can analyze an ensemble of Histatin5, an intrinsically disordered protein
-(IDP) with 24 aminoacid residues.
+For example, we can analyze an ensemble of Histatin5 (Hst5), an intrinsically disordered peptide
+with 24 aminoacid residues.
 
-Assuming that the path to the required Hst5 .xtc trajectory
-file is assigned to a variable named HST5_TRAJECTORY_PATH, you should run:
+Assuming that the path to the required trajectory and topology files are assigned to the variables
+HST5_TRAJ_PATH and HST5_TOP_PATH, respectively, and that your desired trajectory ID is 'Hst5', you
+can run:
 
 >>> import ensemblify.analysis as ea
->>> ea.analyze_trajectory(HST5_TRAJECTORY_PATH)
+>>> ea.analyze_trajectory(HST5_TRAJ_PATH, HST5_TOP_PATH, 'Hst5')
 
 
 Available Functions
@@ -62,7 +63,7 @@ Available Functions
     Create a secondary structure frequency Figure from a secondary structure assignment frequency
     matrix.
 ``create_metrics_traces``
-    Create Ploty Box, Histogram and Scatter (KDE) traces from calculated structural metrics data
+    Create Plotly Box, Histogram and Scatter (KDE) traces from calculated structural metrics data
     to be used in the creation of a Structural Metrics Figure.
 ``create_metrics_fig``
     Create a Structural Metrics Figure from previously created Box, Histogram and Scatter traces.

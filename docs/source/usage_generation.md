@@ -10,6 +10,8 @@ Before generating an ensemble, you must create a parameters file either:
 
 - Directly, by editing the provided [parameters file template](../../examples/input_parameters/parameters_template.yml).
 
+Below you can find a description of all available parameters. Required parameters are marked with an asterisk (*).
+
 ## Generate a conformational ensemble
 
 To generate an ensemble, simply provide Ensemblify with the path to your parameters file.

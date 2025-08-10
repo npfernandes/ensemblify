@@ -17,16 +17,14 @@ Step-by-step instructions for installing Ensemblify are available in the [Docume
 Ensemblify can be used either as a Command Line Interface (CLI):
 
     conda activate ensemblify_env
-    ensemblify [options]
+    (ensemblify_env) $ ensemblify [options]
 
 or as a Python library inside a script or Jupyter notebook:
 
     import ensemblify as ey
-    ey.do_cool_stuff()
+    ey.show_config()
 
 Check the [Documentation](https://ensemblify.readthedocs.io/latest/usage.html) for more details.
-
-You can also check out the [Quick Reference Guide](examples/quick_reference_guide.ipynb) notebook for a basic rundown of Ensemblify's features. 
 
 ### 🔎 How does Ensemblify work?
 A general overview of Ensemblify, descriptions of employed methods and applications can be found in the Ensemblify paper:
@@ -50,7 +48,7 @@ Alternatively, the source-code contains docstrings with relevant information.
 
 If you use Ensemblify, please cite its original publication:
 
-    PUB
+    IN SUBMISSION
 
 ## 🤝 Acknowledgements
 

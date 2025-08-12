@@ -1,7 +1,7 @@
 # CLI Workflow
 In this short example, we will:
 
-- [Generate](#1-generate-a-protein-conformational-ensemble) an ensemble of 10 conformations for Histatin 5, an intrinsically disordered protein (IDP) with 24 residues;
+- [Generate](#1-generate-a-protein-conformational-ensemble) an ensemble of 10 conformations for Histatin 5 (Hst5), an intrinsically disordered peptide with 24 residues;
 - [Convert](#2-convert-the-generated-ensemble-to-trajectory-format) the generated ensemble to trajectory format;
 - [Analyze](#3-analyze-your-generated-ensemble) the generated ensemble by calculating structural properties;
 - [Reweight](#4-reweight-your-generated-ensemble-using-experimental-saxs-data) the generated ensemble using experimental SAXS data, and re-calculate structural properties using the optimal set of conformer weights.
@@ -12,11 +12,11 @@ In this short example, we will:
 
 To generate a conformational ensemble for your protein of interest, you simply need to provide Ensemblify with your parameters file.
 
-For this example, we will use a parameters file created to sample the conformational space of Histatin5, a small IDP that can normally be found in saliva, where it acts as a defense against fungal infections.
+For this example, we will use a parameters file created for Histatin5, a small intrinsically disordered peptide that can normally be found in saliva, where it acts as a defense against fungal infections.
 
-1. Build your parameters file using the provided [template](../assets/parameters_template.yml), optionally with the aid of the more user-friendly HTML [form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html).
+1. Build your parameters file using the provided [template](../../examples/parameters_template.yml), or with the aid of the more user-friendly HTML [form](../../examples/parameters_form.html).
 
-      In this example, we are using a YAML parameters file `params.yml` with the following information:
+      In this example, we are using a YAML parameters file with the following information:
 
       ```{code-block} console
       {'job_name': 'Hst5',
@@ -27,9 +27,11 @@ For this example, we will use a parameters file created to sample the conformati
        'output_path': '.'}
       ```
 
+      If you are following along with the example, please remember to update the <path_to_database> with the location on your machine of the database you want to sample from.
+
 2. Generate an ensemble via the Ensemblify CLI:
     
-      Assuming you have an Ensemblify parameters file `params.yml` in the current working directory, you can run:
+      Assuming you have an Ensemblify parameters file `Hst5_params.yml` in the current working directory, you can run:
 
       ```{code-block} console
       (ensemblify_env) $ ensemblify gen -p params.yml
@@ -39,7 +41,7 @@ For this example, we will use a parameters file created to sample the conformati
       Ensemble Generation Finished!
       ```
 
-      This command will create a directory in the current working directory named after the `job_name` parameter in `params.yml`.
+      This command will create a directory in the current working directory named after the `job_name` parameter in `Hst5_params.yml`.
       Assuming `job_name` is 'Hst5', a directory named 'Hst5' will be created and the ensemble will be located in `./Hst5/ensemble/valid_pdbs`.
 
 ----
@@ -67,7 +69,7 @@ Along with the created trajectory, one of the structures of the generated ensemb
 ## 3. Analyze your generated ensemble
 
 After creating your trajectory, you can use it to create an interactive analysis dashboard with different plots and figures which will aid you in the structural analysis of your protein using your created ensemble.
-To do this, specify the location of your **trajectory** and **topology** files and the output directory where you want to store your interactive dashboard and the figures and data used in its creation.
+To do this, specify the location of your **trajectory** and **topology** files and the output directory where you want to store your interactive dashboard, the individual figures, and the data used in its creation.
 
 1. Assuming the current working directory is the previously created 'Hst5' directory:
 
@@ -98,7 +100,7 @@ To do this, specify the location of your **trajectory** and **topology** files a
 After generating an ensemble, you can use experimental SAXS data to reweight it.
 This will create an interactive reweighting dashboard with comparisons between your uniformly weighted and reweighted ensembles, both in regards to fitting to experimental data and the calculation of structural properties of your protein.
 
-To do this, specify the location of your **trajectory**, **topology** and experimental SAXS data files and the output directory where you want to store your interactive dashboard, along with the figures and data used in its creation.
+To do this, specify the location of your **trajectory**, **topology** and experimental SAXS data files and the output directory where you want to store your interactive dashboard, along with the individual figures and data used in its creation.
 
 1. Assuming the current working directory is the previously created 'Hst5' directory, and the `Hst5_SAXS.dat` file is one directory up:
 
@@ -119,6 +121,7 @@ To do this, specify the location of your **trajectory**, **topology** and experi
    Calculating distance matrix... : 100%|██████████| 10/10 [00:00<00:00, 1757.51it/s]
    Calculating reweighted distance matrix... : 100%|██████████| 10/10 [00:00<00:00, 1744.50it/s]
    No secondary structure assignment frequency matrix data was provided.
+   Calculating secondary structure assignment frequency matrix...
    Calculating reweighted secondary structure assignment frequency matrix...
    No structural metrics distributions data was provided.
    Calculating rg...

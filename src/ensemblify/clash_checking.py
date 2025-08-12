@@ -26,9 +26,9 @@ from tqdm import tqdm
 
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.generation.ensemble_utils.inputs_processing import process_input_pdb, register_input_clashes
-from ensemblify.generation.ensemble_utils.pdb_processing import apply_pulchra_single, apply_rewrite_single, cleanup_pdbs
-from ensemblify.utils import extract_pdb_info
+from ensemblify.generation.ensemble_utils.processing_inputs import process_input_pdb, register_input_clashes
+from ensemblify.modelling.pdb_processing import apply_pulchra_single, apply_rewrite_single
+from ensemblify.utils import cleanup_pdbs, extract_pdb_info
 
 # FUNCTIONS
 def process_pulchra_output(

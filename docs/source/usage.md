@@ -6,12 +6,14 @@ Ensemblify offers four main modules, all of which can be accessed either through
 :titlesonly:
 :maxdepth: 1
 :hidden:
+usage_modelling.md
 usage_generation.md
 usage_conversion.md
 usage_analysis.md
 usage_reweighting.md
 usage_clash_checking.md
 ```
+- **[`modelling`](usage_modelling.md#the-modelling-module) module:** create full-length protein structures by fusing PDB structures of folded protein domains with disordered regions.
 - **[`generation`](usage_generation.md#the-generation-module) module:** generate a conformational ensemble for your protein of interest.
 - **[`conversion`](usage_conversion.md#the-conversion-module) module:** convert your generated .pdb structures into a single .xtc trajectory file, facilitating ensemble storage and analysis.
 - **[`analysis`](usage_analysis.md#the-analysis-module) module:** create an interactive graphical dashboard displaying structural information calculated from the conformational ensemble of your protein of interest.

@@ -8,18 +8,19 @@ import sys
 # CONSTANTS
 NO_ARGS_ERROR_MSG = '''
 Error: Missing required arguments.
-Usage: ensemblify {generation, conversion, analysis, reweighting, clash_checking} [module options]
+Usage: ensemblify {modelling, generation, conversion, analysis, reweighting, clash_checking} [module options]
 Run \'ensemblify help\' for more information.
 
 '''
 
-ENSEMBLIFY_HELP_MSG = '''usage: ensemblify {generation, conversion, analysis, reweighting, clash_checking, help} [module options]
+ENSEMBLIFY_HELP_MSG = '''usage: ensemblify {modelling, generation, conversion, analysis, reweighting, clash_checking, help} [module options]
 
 Command-line tool to access the modules of the Ensemblify Python library.
 
 positional arguments:
 
     help (h)                   Show this message and exit.
+    modelling (m, mod)         Access the modelling module.  
     generation (g, gen)        Access the generation module.
     conversion (c, con)        Access the conversion module.
     analysis (a, ana)          Access the analysis module.
@@ -109,12 +110,14 @@ def main():
     initial_parser = argparse.ArgumentParser(description=('Command-line tool to access various '
                                                           'modules of the Ensemblify Python '
                                                           'library.'),
-                                             usage=('ensemblify {generation, conversion, analysis, '
-                                                    'reweighting, clash_checking, help}'
-                                                    ' [module options]'),
+                                             usage=('ensemblify {modelling, generation, '
+                                                    'conversion, analysis, reweighting, '
+                                                    'clash_checking, help} '
+                                                    '[module options]'),
                                              add_help=False) # required
 
-    initial_parser.add_argument('module', choices=['generation', 'g', 'gen',
+    initial_parser.add_argument('module', choices=['modelling', 'm', 'mod',
+                                                   'generation', 'g', 'gen',
                                                    'conversion', 'c', 'con',
                                                    'analysis', 'a', 'ana',
                                                    'reweighting', 'r', 'rew',
@@ -144,30 +147,35 @@ def main():
     subparsers.add_parser(name='help',
                           aliases=['h'])
 
-    # Subparser for the 'clash_checking' module with aliases
-    parser_clash_check = subparsers.add_parser(name='clash_checking',
-                                               help='Access the clash checking module',
-                                               aliases=['cch'],
-                                               usage='ensemblify {clash_checking, cch} [options]',
-                                               description=('The clash checking module of the '
-                                                            'Ensemblify Python library.'),
-                                               formatter_class=CustomHelpFormatter)
+    # Subparser for the 'modelling' module with aliases
+    parser_modelling = subparsers.add_parser(name='modelling',
+                                             help='Access the modelling module',
+                                             aliases=['m','mod'],
+                                             usage='ensemblify {modelling, mod, m} [options]',
+                                             description=('The modelling module of the '
+                                                          'Ensemblify Python library.'),
+                                             formatter_class=CustomHelpFormatter)
 
-    parser_clash_check.add_argument('-e', '--ensembledir',
-                                    type=str, required=True, metavar='',
-                                    help=('Path to directory where ensemble .pdb structures '
-                                          'are stored. Defaults to current working directory.'))
+    parser_modelling.add_argument('-f', '--fasta',
+                                  type=str, required=True, metavar='',
+                                  help=('Path(s) to FASTA file(s) containing the sequences of '
+                                        'all protein domains (folded + disordered) to be fused, '
+                                        'in order from N- to C-terminal.'))
 
-    parser_clash_check.add_argument('-s', '--samplingtargets',
-                                    default=None, type=str, metavar='',
-                                    help=('(Optional) Path to file (.yaml) with sampling targets: '
-                                          'mapping of chain letters to residue ranges. Defaults '
-                                          'to None.'))
+    parser_modelling.add_argument('-p', '--pdb',
+                                  default=None, type=str, metavar='',
+                                  help=('Path(s) to PDB file(s) containing the structures of '
+                                        'folded protein domains to be fused, in order from '
+                                        'N- to C-terminal.'))
 
-    parser_clash_check.add_argument('-i', '--inputstructure',
-                                    default=None, type=str, metavar='',
-                                    help=('(Optional) Path to input structure (.pdb) used to '
-                                          'generate the ensemble. Defaults to None.'))
+    parser_modelling.add_argument('-i', '--id',
+                                  default=None, type=str, metavar='',
+                                  help='Name for the output fused PDB file (without extension).')
+
+    parser_modelling.add_argument('-o', '--output_dir',
+                                  default=None, type=str, metavar='',
+                                  help=('(Optional) Directory where the output fused PDB file '
+                                        'will be saved. Defaults to current working directory.'))
 
     # Subparser for the 'generation' module with aliases
     parser_generation = subparsers.add_parser(name='generation',
@@ -180,7 +188,7 @@ def main():
 
     parser_generation.add_argument('-p', '--parameters',
                                    type=str, required=True, metavar='',
-                                   help='Path to parameters file (.yaml).')
+                                   help='Path to parameters file (.yml).')
 
     # Subparser for the 'conversion' module with aliases
     parser_conversion = subparsers.add_parser(name='conversion',
@@ -371,6 +379,31 @@ def main():
                                           'center of mass distance distributions. Defaults to '
                                           'None.'))
 
+    # Subparser for the 'clash_checking' module with aliases
+    parser_clash_check = subparsers.add_parser(name='clash_checking',
+                                               help='Access the clash checking module',
+                                               aliases=['cch'],
+                                               usage='ensemblify {clash_checking, cch} [options]',
+                                               description=('The clash checking module of the '
+                                                            'Ensemblify Python library.'),
+                                               formatter_class=CustomHelpFormatter)
+
+    parser_clash_check.add_argument('-e', '--ensembledir',
+                                    type=str, required=True, metavar='',
+                                    help=('Path to directory where ensemble .pdb structures '
+                                          'are stored. Defaults to current working directory.'))
+
+    parser_clash_check.add_argument('-s', '--samplingtargets',
+                                    default=None, type=str, metavar='',
+                                    help=('(Optional) Path to file (.yml) with sampling targets: '
+                                          'mapping of chain letters to residue ranges. Defaults '
+                                          'to None.'))
+
+    parser_clash_check.add_argument('-i', '--inputstructure',
+                                    default=None, type=str, metavar='',
+                                    help=('(Optional) Path to input structure (.pdb) used to '
+                                          'generate the ensemble. Defaults to None.'))
+
     # Now parse the remaining arguments with the full parser
     full_args = parser.parse_args([args.module] + remaining_args)
 
@@ -378,12 +411,13 @@ def main():
     if full_args.module in ['help','h']:
         print(ENSEMBLIFY_HELP_MSG)
 
-    elif full_args.module in ['clash_checking', 'cch']:
-        from ensemblify.clash_checking import check_steric_clashes
-        check_steric_clashes(ensemble_dir=full_args.ensembledir,
-                             sampling_targets=full_args.samplingtargets,
-                             input_structure=full_args.inputstructure)
-
+    elif full_args.module in ['modelling', 'mod', 'm']:
+        from ensemblify.modelling import fuse_structures
+        fuse_structures(input_fastas=full_args.fasta,
+                        input_pdbs=full_args.pdb,
+                        output_name=full_args.id,
+                        output_dir=full_args.output_dir)
+        
     elif full_args.module in ['generation', 'g', 'gen']:
         from ensemblify.generation import generate_ensemble
         generate_ensemble(parameters_path=full_args.parameters)
@@ -428,3 +462,9 @@ def main():
                           compare_dmax=full_args.compare_dmax,
                           compare_eed=full_args.compare_eed,
                           compare_cmdist=full_args.compare_cmdist)
+
+    elif full_args.module in ['clash_checking', 'cch']:
+        from ensemblify.clash_checking import check_steric_clashes
+        check_steric_clashes(ensemble_dir=full_args.ensembledir,
+                             sampling_targets=full_args.samplingtargets,
+                             input_structure=full_args.inputstructure)

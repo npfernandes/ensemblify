@@ -12,9 +12,9 @@ from tqdm import tqdm
 
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.generation.ensemble_utils.inputs_processing import register_input_clashes
 from ensemblify.generation.ensemble_utils.movers_utils import setup_databases
-from ensemblify.generation.ensemble_utils.pdb_processing import process_pdb
+from ensemblify.generation.ensemble_utils.processing_inputs import register_input_clashes
+from ensemblify.generation.ensemble_utils.processing_outputs import process_pdb
 from ensemblify.generation.ensemble_utils.sampling_utils import (
     _get_dbs_mem_size,
     _remove_ansi,

@@ -1,4 +1,4 @@
-"""Auxiliary functions to process input parameters file and the input structure."""
+"""Auxiliary functions to process input parameters file and input structure."""
 
 # IMPORTS
 ## Standard Library Imports
@@ -13,8 +13,10 @@ import yaml
 
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.generation.ensemble_utils.pdb_processing import (
-    apply_faspr_single, apply_pulchra_single, apply_rewrite_single,
+from ensemblify.modelling.pdb_processing import (
+    apply_faspr_single,
+    apply_pulchra_single,
+    apply_rewrite_single,
     apply_restore_single
 )
 from ensemblify.utils import df_from_pdb, df_to_pdb

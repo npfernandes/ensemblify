@@ -21,19 +21,38 @@ Access information about the available Ensemblify modules.
 
    ```{code-block} console
    (ensemblify_env) $ ensemblify help
-   usage: ensemblify {generation, conversion, analysis, reweighting, pipeline, clash_checking, help} [module options]
+   usage: ensemblify {modelling, generation, conversion, analysis, reweighting, clash_checking, help} [module options]
 
    Command-line tool to access the modules of the Ensemblify Python library.
 
    positional arguments:
 
        help (h)                   Show this message and exit.
+       modelling (m, mod)         Access the modelling module.
        generation (g, gen)        Access the generation module.
        conversion (c, con)        Access the conversion module.
        analysis (a, ana)          Access the analysis module.
        reweighting (r, rew)       Access the reweighting module.
-       pipeline (ppl)             Access the pipeline module.
        clash_checking (cch)       Access the clash checking module.
+   ```
+
+----
+
+## `ensemblify modelling --help`
+Access information about the Ensemblify `modelling` module.
+
+   ```{code-block} console
+   (ensemblify_env) $ ensemblify modelling --help
+   usage: ensemblify {modelling, mod, m} [options]
+
+   The modelling module of the Ensemblify Python library.
+   
+   options:
+        -h, --help        show this help message and exit
+        -f, --fasta       Path(s) to FASTA file(s) containing the sequences of all protein domains (folded + disordered) to be fused, in order from N- to C-terminal.
+        -p, --pdb         Path(s) to PDB file(s) containing the structures of folded protein domains to be fused, in order from N- to C-terminal.
+        -i, --id          Name for the output fused PDB file (without extension).
+        -o, --output_dir  (Optional) Directory where the output fused PDB file will be saved. Defaults to current working directory.
    ```
 
 ----
@@ -49,7 +68,7 @@ Access information about the Ensemblify `generation` module.
    
    options:
        -h, --help        show this help message and exit
-       -p, --parameters  Path to parameters file (.yaml).
+       -p, --parameters  Path to parameters file (.yml).
    ```
 
 ----
@@ -130,24 +149,6 @@ Access information about the Ensemblify `reweighting` module.
 
 ----
 
-## `ensemblify pipeline --help`
-Access information about the Ensemblify `pipeline` module.
-
-   ```{code-block} console
-   (ensemblify_env) $ ensemblify pipeline --help
-   usage: ensemblify {pipeline, ppl} [options]
-
-   The pipeline module of the Ensemblify Python library.
-   
-   options:
-       -h, --help        show this help message and exit
-       -p, --parameters  Path to parameters file (.yaml).
-       -a, --analysis    (Optional) Whether to perform the analysis of the ensemble. Defaults to False.
-       -e, --expdata     (Optional) Path to experimental SAXS data file (.dat). Defaults to None.
-   ```
-
-----
-
 ## `ensemblify clash_checking --help`
 Access information about the Ensemblify `clash_checking` module.
 
@@ -160,6 +161,6 @@ Access information about the Ensemblify `clash_checking` module.
    options:
        -h, --help             show this help message and exit
        -e, --ensembledir      Path to directory where ensemble .pdb structures are stored. Defaults to current working directory.
-       -s, --samplingtargets  (Optional) Path to file (.yaml) with sampling targets: mapping of chain letters to residue ranges. Defaults to None.
+       -s, --samplingtargets  (Optional) Path to file (.yml) with sampling targets: mapping of chain letters to residue ranges. Defaults to None.
        -i, --inputstructure   (Optional) Path to input structure (.pdb) used to generate the ensemble. Defaults to None.
    ```

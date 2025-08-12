@@ -1,12 +1,17 @@
 job_name: # Name to give the files/folders resulting from this script
   myprotein
-sequence: # Path to the input sequence, in .pdb or .txt format, or just the sequence string
-  /home/username/myprotein.pdb
+sequence: # Path to the input sequence/structure, in .pdb or .txt format, or just the sequence string
+  /home/user/myprotein.pdb
+  # or build your full-length input structure
+  # fastas: # sequences of all domains (folded + disordered) from N- to C-terminal
+  #   - /home/user/myprotein.fa # multi-sequence FASTA file, can also be separate
+  # pdbs: # PDB structures of all folded domains from N- to C-terminal
+  #   - /home/user/myprotein.pdb # multi model PDB file, can also be separate
 size: # Size of ensemble to generate (1-100000)
   1
 databases: # Path to database(s) to use during sampling
-  all: /home/username/databases/all.parquet
-  coil: /home/username/databases/coil.parquet
+  all: /home/user/databases/all.parquet
+  coil: /home/user/databases/coil.parquet
   # add more databases here
 targets: # Dictionary of chain:List of lists, indicating sampling targets
   A : [ [ MC, [1,49], all , TRIPEPTIDE] ]
@@ -26,12 +31,12 @@ restraints: # Force secondary structure or conserve contacts present in starting
     - [ [A, [50,100]] , [B,  [1,49]] ]
     # add more contacts here
 output_path: # Path to output directory
-  /home/username/
+  /home/user/
 ######################################################################## Advanced Parameters ########################################################################
 faspr_path: # Path to FASPR
-  /home/username/software/FASPR-master/FASPR
+  # /home/user/software/FASPR-master/FASPR
 pulchra_path: # Path to (changed!) Pulchra
-  /home/username/software/pulchra-master/pulchra
+  # /home/user/software/pulchra-master/pulchra
 core_amount: # Number of processor cores to use for parallel sampling
   32
 scorefxn: # PyRosetta Score Function .wts weights file, default or custom, must be defined in /.../pyrosetta/database/scoring/weights/ .

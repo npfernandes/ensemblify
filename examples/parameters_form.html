@@ -9,12 +9,12 @@
     @import url('https://fonts.googleapis.com/css2?family=Jersey+25&display=swap');
        
     header {
-      padding-right:36px;
-      padding-left:36px;
+      padding-right:38px;
+      padding-left:38px;
       padding-top:5px;
       padding-bottom: 5px;
       font-family: "Jersey 25", sans-serif;
-      font-size: 140px;
+      font-size: 148px;
       text-align: center;
       background: radial-gradient(circle, rgba(0,38,66,1) 25%, rgba(48,77,109,1) 100%);
       color: white;
@@ -32,11 +32,13 @@
       justify-content: center;
       align-items: center;
       margin: 0;
+      width: 100%;
     }
 
     #content {
       max-width: max-content;
       padding-top: 20px;
+      padding-left: 20px;
       padding-right: 20px;
       font-family: Helvetica, Arial, sans-serif;
     }
@@ -192,12 +194,25 @@
       left: 150%;
       top: -40%;
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity 0.3s ease;
     }
 
     .tooltip-icon:hover .tooltip-text {
       visibility: visible;
       opacity: 1;
+    }
+
+    /* Instruction box styling */
+    .instruction-box {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      color: #4b5258;
+      font-size: 14px;
+      line-height: 1.4;
+      text-align:center;
     }
 
   </style>
@@ -212,31 +227,77 @@
   <div class="container">
     <div id="content">
       <form id="yamlForm" onsubmit="return false;">
-    
+        <div class="instruction-box">
+          Required entries are marked with an asterisk (*).
+          Hover over the tooltip icons (&#9432;) for more information.
+        </div>
         <h2>Job Name*</h2>
-        <input type="text" id="jobName" placeholder="Name for generated files and folders" required><br>
+        <div class="tooltip-icon">&#9432;
+          <span class="tooltip-text">
+            Name for generated files and folders.
+          </span>
+        </div>
+        <input type="text" id="jobName" placeholder="myprotein" required><br>
         
         <h2>Input Structure/Sequence*</h2>
-        <input type="text" id="sequence" placeholder="Path to structure/sequence in .pdb or .txt format" required><br>
-    
+        <fieldset id="InputStructureSequence" style="padding-top: 3px; padding-bottom: 10px;">
+          <input type="text" id="sequence" placeholder="/home/user/myprotein.pdb" required>
+          <span id="SequenceNbsp">&nbsp;</span>
+          <div class="tooltip-icon" id="SequenceTooltip">&#9432;
+            <span class="tooltip-text">
+              Path to structure/sequence in .pdb or .txt format.
+            </span>
+          </div>
+          <br id="SequenceBr">
+          <label>Do you want to build your full-length structure by joining IDRs with folded domains?</label>&nbsp;
+          <input type="checkbox" id="BuildSequenceCheckbox"style="display:inline-block">&nbsp;<br>
+          <div class="tooltip-icon" id="FASTAPathTooltip"style="display: none;">&#9432;
+            <span class="tooltip-text">
+              Path to FASTA file(s) containing the sequences<br>
+              of all (folded + disordered) protein domains,<br>
+              from N- to C-terminal. Can be provided either in<br>
+              FASTA or Multi-FASTA format.
+            </span>
+          </div>
+          <span id="FASTAPathNbsp" style="display:none;">&nbsp;</span>
+          <input type="text" id="FASTAPath" placeholder="['/home/user/Ndomain.fa', '/home/user/IDR.fa', '/home/user/Cdomain.fa']" style="display:none;">
+          <br id="FASTAPathBr" style="display:none;">
+          <div class="tooltip-icon" id="PDBPathTooltip"style="display: none;">&#9432;
+            <span class="tooltip-text">
+              Path to PDB file(s) containing the structures of all<br>
+              <b>folded</b> protein domains, from N- to C-terminal.<br>
+              Can be provided as a single PDB file with multiple<br>
+              MODEL entries.
+            </span>
+          </div>
+          <span id="PDBPathNbsp" style="display:none;">&nbsp;</span>
+          <input type="text" id="PDBPath" placeholder="['/home/user/Ndomain.pdb', '/home/user/Cdomain.pdb']" style="display:none;">
+          <br id="PDBPathBr" style="display:none;">
+        </fieldset>
+
         <h2>Size of Ensemble*</h2>
-        <input type="number" id="size" min="1" max="100000" placeholder="Size of ensemble to generate (1-100000)" required><br>
+        <div class="tooltip-icon">&#9432;
+          <span class="tooltip-text">
+            Size of ensemble to generate (1-100000).
+          </span>
+        </div>
+        <input type="number" id="size" min="1" max="100000" placeholder="10000" required><br>
     
         <h2>Database(s)*</h2>
         <div class="tooltip-icon">&#9432;
           <span class="tooltip-text">
-            To better utilize your computer's resources, please add<br>
-            only databases that will be sampled from in the<br>
-            Sampling Targets section.
+            To better utilize your computer's resources,<br>
+            please add only databases that will be sampled<br>
+            from in the Sampling Targets section.
           </span>
         </div>
         <fieldset id ="databases">
           <div id="dynamicDatabasesContainer">
             <div class="dynamicDatabase">
               <label>ID:</label>
-              <input type="text" placeholder="Database ID" required >
+              <input type="text" placeholder="coil" required >
               <label>Path:</label>
-              <input type="text" placeholder="Path to database file" required >
+              <input type="text" placeholder="/home/user/databases/coil.parquet" required >
             </div>
           </div>
           <button type="button" onclick="addDynamicDatabase()">+ Add Database</button>
@@ -256,11 +317,11 @@
           <div id="dynamicTargetsContainer">
             <div class="dynamicTarget">
               <label>Chain:</label>
-                <input type="text" class="inputChain" placeholder="A " required >
+                <input type="text" class="inputChain" placeholder="A" required >
               <label>Residue Range:</label>
                 <input type="text" class="inputResidueRange" placeholder="[10,20]" required >
               <label>Database:</label>
-                <input type="text" class="inputDatabaseID" placeholder="Database ID" required >
+                <input type="text" class="inputDatabaseID" placeholder="coil" required >
               <label>Mode:</label>
                 <select class="inputSamplingMode" required >
                   <option value="TRIPEPTIDE" selected>Tripeptide</option>
@@ -274,10 +335,11 @@
         <h2>Output Path*</h2>
         <div class="tooltip-icon">&#9432;
           <span class="tooltip-text">
-            A directory named Job Name will be created here.
+            Path to output directory. A directory<br>
+            named Job Name will be created here.
           </span>
         </div>
-        <input type="text" id="outputPath" placeholder="Path to output directory" required><br>
+        <input type="text" id="outputPath" placeholder="/home/user/" required><br>
     
         <h2>AlphaFold</h2>&nbsp;
         <div class="tooltip-icon">&#9432;
@@ -351,14 +413,31 @@
         
         <div id="advancedParametersContainer" style="display: none;">  
           <br>
-          <h2>FASPR Path</h2>
-          <input type="text" id="fasprPath" placeholder="Path to FASPR executable"><br>
+          <h2>FASPR Path</h2>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Path to FASPR executable. Defaults to location<br>
+              defined during Ensemblify installation.
+            </span>
+          </div>
+          <input type="text" id="fasprPath" placeholder="/home/user/software/FASPR-master/FASPR"><br>
       
-          <h2>PULCHRA Path</h2>
-          <input type="text" id="pulchraPath" placeholder="Path to PULCHRA executable"><br>
+          <h2>PULCHRA Path</h2>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Path to PULCHRA executable. Defaults to location<br>
+              defined during Ensemblify installation.
+            </span>
+          </div>
+          <input type="text" id="pulchraPath" placeholder="/home/user/software/pulchra-master/pulchra"><br>
 
-          <h2>Core amount</h2>
-          <input type="number" id="cores" min="1" max="32" placeholder="Number of processor cores to use. Defaults to all cores in machine minus 1"><br>
+          <h2>Core amount</h2>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Number of processor cores to use. Defaults to all cores in machine minus 1.
+            </span>
+          </div>
+          <input type="number" id="cores" min="1" max="32" placeholder="16"><br>
           
           <h2>ScoreFunction</h2>&nbsp;
           <div class="tooltip-icon">&#9432;
@@ -602,7 +681,12 @@
     function setWidthToPlaceholder(inputElement) {
       if (inputElement.type != "checkbox") {
         var placeholderText = inputElement.placeholder;
-        inputElement.style.width = (placeholderText.length * 8) + 'px';
+        // Character width calculation
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        context.font = window.getComputedStyle(inputElement).font;
+        var textWidth = context.measureText(placeholderText).width;
+        inputElement.style.width = (textWidth + 10) + 'px';
       }
     }
 
@@ -622,6 +706,59 @@
     // Initial call to set the width for all inputs
     setWidthToAllInputs();
 
+    // Show FASTA and PDB path input fields when BuildSequence checkbox is checked
+    document.getElementById('BuildSequenceCheckbox').addEventListener('change', function() {
+      var SequencePath = document.getElementById('sequence');
+      var SequenceTooltip = document.getElementById('SequenceTooltip');
+      var SequenceBr = document.getElementById('SequenceBr');
+      var SequencePathNbsp = document.getElementById('SequenceNbsp');
+      var FASTAPath = document.getElementById('FASTAPath');
+      var FASTATooltip = document.getElementById('FASTAPathTooltip');
+      var FASTAPathBr = document.getElementById('FASTAPathBr');
+      var FASTAPathNbsp = document.getElementById('FASTAPathNbsp');
+      var PDBPath = document.getElementById('PDBPath');
+      var PDBTooltip = document.getElementById('PDBPathTooltip');
+      var PDBPathBr = document.getElementById('PDBPathBr');
+      var PDBPathNbsp = document.getElementById('PDBPathNbsp');
+
+      if (this.checked) {
+        SequencePath.style.display = 'none';
+        SequencePath.required = false;
+        SequenceTooltip.style.display = 'none';
+        SequenceBr.style.display = 'none';
+        SequencePathNbsp.style.display = 'none';
+        FASTAPath.style.display = 'inline-block';
+        FASTAPath.required = true;
+        FASTATooltip.style.display = 'inline-block';
+        FASTAPathBr.style.display = 'block';
+        FASTAPathNbsp.style.display = 'inline';
+        PDBPath.style.display = 'inline-block';
+        PDBPath.required = true;
+        PDBTooltip.style.display = 'inline-block';
+        PDBPathBr.style.display = 'block';
+        PDBPathNbsp.style.display = 'inline';
+      } else {
+        SequencePath.style.display = 'inline-block';
+        SequencePath.required = true;
+        SequenceTooltip.style.display = 'inline-block';
+        SequenceBr.style.display = 'block';
+        SequencePathNbsp.style.display = 'inline';
+        FASTAPath.style.display = 'none';
+        FASTAPath.required = false;
+        FASTATooltip.style.display = 'none';
+        FASTAPathBr.style.display = 'none';
+        FASTAPathNbsp.style.display = 'none';
+        PDBPath.style.display = 'none';
+        PDBPath.required = false;
+        PDBTooltip.style.display = 'none';
+        PDBPathBr.style.display = 'none';
+        PDBPathNbsp.style.display = 'none';
+      }
+      
+      // Call setWidthToAllInputs to set the width for the newly added inputs
+      setWidthToAllInputs();
+    });
+
     // Add a Database
     function addDynamicDatabase() {
       var container = document.getElementById('dynamicDatabasesContainer');
@@ -630,9 +767,9 @@
 
       var htmlContent = `
       <label>ID:</label>
-      <input type="text" placeholder="Database ID">
+      <input type="text" placeholder="coil">
       <label>Path:</label>
-      <input type="text" placeholder="Path to database file">
+      <input type="text" placeholder="/home/user/databases/coil.parquet">
       
       <button type="button" onclick="removeDynamicDatabase(this)">&nbsp;&nbsp;-&nbsp;&nbsp;</button>
       `;
@@ -657,11 +794,11 @@
 
       var htmlContent = `
         <label>Chain:</label>
-        <input type="text" class="inputChain" placeholder=" A">
+        <input type="text" class="inputChain" placeholder="A">
         <label>Residue Range:</label>
         <input type="text" class="inputResidueRange" placeholder="[10,20]">
         <label>Database:</label>
-        <input type="text" class="inputDatabaseID" placeholder="Database ID">
+        <input type="text" class="inputDatabaseID" placeholder="coil">
         <label>Mode:</label>
         <select class="inputSamplingMode" required >
           <option value="TRIPEPTIDE" selected>Tripeptide</option>
@@ -704,7 +841,7 @@
 
       var htmlContent = `&nbsp;
       <label>Chain:</label>
-      <input type="text" class="inputChain" placeholder=" A">
+      <input type="text" class="inputChain" placeholder="A">
       
       <label>Residue Range:</label>
       <input type="text" class="inputResidueRange" placeholder="[10,20]">
@@ -745,7 +882,7 @@
 
       var htmlContent = `&nbsp;
       <label>Chain:</label>
-      <input type="text" class="inputChain1" placeholder=" A">
+      <input type="text" class="inputChain1" placeholder="A">
       
       <label>Residue Range:</label>
       <input type="text" class="inputResidueRange1" placeholder="[50,100]">
@@ -753,7 +890,7 @@
       &nbsp;>|<&nbsp;
       
       <label>Chain:</label>
-      <input type="text" class="inputChain2" placeholder=" B">
+      <input type="text" class="inputChain2" placeholder="B">
       
       <label>Residue Range:</label>
       <input type="text" class="inputResidueRange2" placeholder="[1,49]">
@@ -797,7 +934,58 @@
     }
     
     function generateYAML() {
-
+      
+      // Collect sequence data
+      var inputSequence;
+      var buildSequenceChecked = document.getElementById('BuildSequenceCheckbox').checked;
+      
+      if (buildSequenceChecked) {
+        // BuildSequence checkbox is checked - create YAML dictionary format
+        var fastaPath = document.getElementById('FASTAPath').value;
+        var pdbPath = document.getElementById('PDBPath').value;
+        
+        // Parse the input strings as arrays (assuming they're in format like "['file1.fa', 'file2.fa']")
+        var fastaFiles, pdbFiles;
+        
+        try {
+          // Try to parse as JSON array first
+          fastaFiles = JSON.parse(fastaPath.replace(/'/g, '"'));
+        } catch (e) {
+          // If parsing fails, treat as comma-separated string
+          fastaFiles = fastaPath.split(',').map(function(file) {
+            return file.trim().replace(/[\[\]']/g, '');
+          }).filter(function(file) {
+            return file.length > 0;
+          });
+        }
+        
+        try {
+          // Try to parse as JSON array first
+          pdbFiles = JSON.parse(pdbPath.replace(/'/g, '"'));
+        } catch (e) {
+          // If parsing fails, treat as comma-separated string
+          pdbFiles = pdbPath.split(',').map(function(file) {
+            return file.trim().replace(/[\[\]']/g, '');
+          }).filter(function(file) {
+            return file.length > 0;
+          });
+        }
+        
+        // Format as YAML dictionary string
+        var fastaList = fastaFiles.map(function(file) {
+          return '    - ' + file;
+        }).join('\n');
+        
+        var pdbList = pdbFiles.map(function(file) {
+          return '    - ' + file;
+        }).join('\n');
+        
+        inputSequence = 'fastas:\n' + fastaList + '\n  pdbs:\n' + pdbList;
+      } else {
+        // BuildSequence checkbox is not checked - use single sequence string
+        inputSequence = document.getElementById('sequence').value;
+      }
+      
       // Collect databases data
       var databases = Array.from(document.getElementById('dynamicDatabasesContainer').querySelectorAll('.dynamicDatabase')).map(function (database) {
         var dbId = database.querySelector('input').value;
@@ -867,7 +1055,7 @@
 `job_name:
   ${document.getElementById('jobName').value}
 sequence:
-  ${document.getElementById('sequence').value}
+  ${inputSequence}
 size:
   ${document.getElementById('size').value}
 databases:
@@ -926,14 +1114,14 @@ pae_params:
 `;
 
       // Prompt the user for a filename, with a default name suggested
-      var filename = prompt("Enter a filename for the YAML file:", `${document.getElementById('jobName').value}_params.yaml`);
+      var filename = prompt("Enter a filename for the YAML file:", `${document.getElementById('jobName').value}_params.yml`);
       if (!filename) {
           return; // If the user cancels or enters nothing, don't proceed with download
       }
 
-      // Ensure the filename ends with .yaml
-      if (!filename.endsWith(".yaml")) {
-          filename += ".yaml";
+      // Ensure the filename ends with .yml
+      if (!filename.endsWith(".yml")) {
+          filename += ".yml";
       }
       
       // Create and download YAML file

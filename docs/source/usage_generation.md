@@ -73,11 +73,11 @@ To generate an ensemble, simply provide Ensemblify with the path to your paramet
 ````{tabs}
 
    ```{code-tab} console CLI
-   (ensemblify_env) $ ensemblify generation -p parameters_file.yaml
+   (ensemblify_env) $ ensemblify generation -p parameters_file.yml
    ```
 
    ```{code-tab} python Python
    from ensemblify.generation import generate_ensemble
-   generate_ensemble('parameters_file.yaml')
+   generate_ensemble('parameters_file.yml')
    ```
 ````

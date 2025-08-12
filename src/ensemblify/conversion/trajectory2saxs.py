@@ -19,6 +19,7 @@ def traj2saxs(
     topology: str,
     trajectory_id: str,
     exp_saxs_file: str,
+    pepsi_saxs_opt: str,
     ) -> tuple[str, str]:
     """Calculate a set of theoretical SAXS curves from a trajectory file using Pepsi-SAXS.
     
@@ -38,6 +39,9 @@ def traj2saxs(
             Path to the experimental SAXS data for this protein. Used in Pepsi-SAXS
             for SAXS curve calculation, as an indication of the number of experimental data points
             that should be calculated for each frame of the trajectory.
+        pepsi_saxs_opt (str):
+            This string will be passed onto Pepsi-SAXS as additional command line options.
+            If None, default Pepsi-SAXS options are used instead.
 
     Returns:
         tuple[str, str, str]:
@@ -65,6 +69,7 @@ def traj2saxs(
     calc_saxs_log = os.path.join(os.path.split(exp_saxs_file)[0],
                                  f'{trajectory_id}_SAXS_calc.log')
     calc_saxs_logs = [calc_saxs_log] * u.trajectory.n_frames
+    pepsi_saxs_opts = [pepsi_saxs_opt] * u.trajectory.n_frames
 
     # Calculate SAXS data in chunks
     with ProcessPoolExecutor() as ppe:
@@ -73,7 +78,8 @@ def traj2saxs(
                                              universes,
                                              frame_indices,
                                              exp_saxs_files,
-                                             calc_saxs_logs),
+                                             calc_saxs_logs,
+                                             pepsi_saxs_opts),
                                      total=u.trajectory.n_frames,
                                      desc=f'Calculating {trajectory_id} SAXS data... '))
 

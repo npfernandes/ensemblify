@@ -146,12 +146,12 @@ def calc_saxs_data(
     frame_index: int,
     exp_saxs_file: str,
     calc_saxs_log: str,
+    pepsi_saxs_opt: str | None = None,
     ) -> np.ndarray:
-    """Calculate a theoretical SAXS curve for a frame of a MDAnalysis Universe object using
-    Pepsi-SAXS.
+    """Back-calculate a SAXS profile for a frame of a Universe object using Pepsi-SAXS.
 
     Calculation is done for a single temporary .pdb file created  from the current frame of
-    the Universe object.
+    the MDAnalysis Universe object.
 
     Args:
         trajectory_id (str):
@@ -164,11 +164,14 @@ def calc_saxs_data(
             Path to .dat file with experimental SAXS data for the current protein to be used by
             Pepsi-SAXS.
         calc_saxs_log (str):
-            Path to .log file for the SAXS curve calculation of each frame.
+            Path to .log file for the SAXS profile calculation of each frame.
+        pepsi_saxs_opt (str, optional):
+            This string will be passed onto Pepsi-SAXS as additional command line options.
+            If None, default Pepsi-SAXS options are used instead.
 
     Returns:
         np.ndarray:
-            Numpy ndarray with the values for the SAXS curve calculated from this frame of the
+            Array with the values for the SAXS profile calculated from this frame of the
             trajectory in the Universe object.
     """
     # Setup tmp files
@@ -191,7 +194,12 @@ def calc_saxs_data(
     pepsi_saxs_path = GLOBAL_CONFIG['PEPSI_SAXS_PATH']
     assert pepsi_saxs_path is not None, 'Pepsi-SAXS installation not found!'
 
-    pepsi_comm = f'{pepsi_saxs_path} {frame_file} {exp_saxs_file} -o {output_file} -cst -x'
+    if pepsi_saxs_opt:
+        opt_string = pepsi_saxs_opt
+    else:
+        opt_string = ''
+
+    pepsi_comm = f'{pepsi_saxs_path} {frame_file} {exp_saxs_file} -o {output_file} -cst -x {opt_string}'
     subprocess.run(pepsi_comm.split(),
                    stdout=open(calc_saxs_log,'a',encoding='utf-8'),
                    stderr=subprocess.STDOUT,

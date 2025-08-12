@@ -6,6 +6,7 @@ import glob
 import os
 import shutil
 import subprocess
+import sys
 
 ## Third Party Imports
 import numpy as np
@@ -48,6 +49,7 @@ def reweight_ensemble(
     exp_type: str | list[str] | None = None,
     output_dir: str | None = None,
     thetas: list[int] | None = None,
+    calculated_SAXS_data: np.ndarray | str | None = None,
     calculated_cmatrix: pd.DataFrame | str | None = None,
     calculated_dmatrix: pd.DataFrame | str | None = None,
     calculated_ss_frequency: pd.DataFrame | str | None = None,
@@ -56,6 +58,7 @@ def reweight_ensemble(
     compare_dmax: bool | None = True,
     compare_eed: bool | None = True,
     compare_cmdist: bool | None = None,
+    pepsi_saxs_opt: str | None = None,
     ):
     """Apply Bayesian Maximum Entropy (BME) reweighting to a conformational ensemble.
 
@@ -89,6 +92,12 @@ def reweight_ensemble(
             List of values to try as the theta parameter in BME. The ensemble will be reweighted
             each time using a different theta value. The effect of different theta values can be
             analyzed in the created effective frames figure.
+        calculated_SAXS_data (np.ndarray | str , optional): 
+            Array with calculated SAXS profiles for each conformer in the ensemble or path to 
+            this file in .dat format. Number of rows must match number of different conformers
+            in the ensemble. Number of calculated data points (columns) must match the number
+            of experimental data points provided in exp_data. If provided, this data is used
+            instead of back-calculating it from the ensemble. Defaults to None.
         calculated_cmatrix (pd.DataFrame | str, optional):
             DataFrame with the calculated average contact matrix for the current trajectory or
             path to this file in .csv format. Defaults to None, and this data is calculated anew.
@@ -124,6 +133,10 @@ def reweight_ensemble(
             See https://userguide.mdanalysis.org/stable/selections.html for more information about
             MDAnalysis selections.
             Defaults to None.
+        pepsi_saxs_opt (str, optional):
+            If back-calculation of SAXS data from the ensemble will be attempted, this string
+            will be passed onto Pepsi-SAXS as additional command line options. If None, default
+            Pepsi-SAXS options are used instead.
     """
     # Setup experimental data inputs
     if isinstance(exp_data, str):
@@ -180,20 +193,13 @@ def reweight_ensemble(
     calc_data_BME, \
     thetas_array, \
     stats, \
-    weights = None, None, None, None, None
-    # exp_data_file,\
-    # exp_type,
-    # calc_file,\
-    # thetas_array,\
-    # stats,\
-    # weights = attempt_read_reweighting_data(reweighting_output_directory=output_dir,
-    #                                         trajectory_id=trajectory_id)
+    weights = attempt_read_reweighting_data(reweighting_output_directory=output_dir,
+                                            trajectory_id=trajectory_id,
+                                            exp_type=exp_type)
 
-    if exp_data_BME is None:
-        # Setup list of processed experimental data files for BME
-        exp_data_BME = []
-
-        for data_file, data_type in zip(exp_data,exp_type):
+    # Check read exp_data_BME
+    for i, (data_file,data_type) in enumerate(zip(exp_data,exp_type)):
+        if exp_data_BME[i] is None:
 
             # Process input experimental data
             print(f'Processing {trajectory_id} experimental {data_type} file...')
@@ -218,24 +224,37 @@ def reweight_ensemble(
                 os.remove(data_file)
                 os.remove(exp_saxs_file_processed)
 
+            else:
+                print(f'{data_type} data is currently not supported.')
+                sys.exit(1)
+
             # Add processed experimental data file to list
-            exp_data_BME.append(exp_file_BME)
+            exp_data_BME[i] = exp_file_BME
 
-    if calc_data_BME is None:
-        # Setup list of calculated data files for BME
-        calc_data_BME = []
-
-        for data_file, data_type in zip(exp_data_BME,exp_type):
+    # Check read calc_data_BME
+    for i, (data_file,data_type) in enumerate(zip(exp_data_BME,exp_type)):
+        if calc_data_BME[i] is None:
+            
             if data_type == 'SAXS':
-
-                # Calculate SAXS data from ensemble
-                all_calc_file, avg_calc_file, fit_file = traj2saxs(trajectory=trajectory,
-                                                                   topology=topology,
-                                                                   trajectory_id=trajectory_id,
-                                                                   exp_saxs_file=data_file)
                 
+                if calculated_SAXS_data:
+                    all_calc_file = calculated_SAXS_data
+                else:
+                    # Calculate SAXS data from ensemble
+                    all_calc_file, _, _ = traj2saxs(trajectory=trajectory,
+                                                    topology=topology,
+                                                    trajectory_id=trajectory_id,
+                                                    exp_saxs_file=data_file,
+                                                    pepsi_saxs_opt=pepsi_saxs_opt)
+
+            else:
+                print((f'No method to automatically back-calculate {data_type} data is currently '
+                       'available. Please provide the file(s) with your calculated experimental '
+                       f'data using the calculated_{data_type}_data parameter.'))
+                sys.exit(1)
+
             # Add calculated data file to list
-            calc_data_BME.append(all_calc_file)
+            calc_data_BME[i] = all_calc_file
 
     if thetas_array is None or stats is None or weights is None:
         # Reweigh ensemble using different theta values
@@ -280,7 +299,7 @@ def reweight_ensemble(
     ##############################################################################################
     ############################# CALCULATE REWEIGHTING FIGURES DATA #############################
     ##############################################################################################
-    
+
     # Calculate Experimental Fittings
     for exp_data_file, calc_data_file, data_type in zip(exp_data_BME, calc_data_BME, exp_type):
         print(f'Calculating reweighting figures data for {trajectory_id} experimental {data_type} '
@@ -289,7 +308,6 @@ def reweight_ensemble(
         if data_type == 'SAXS':
 
             # Calculate prior and posterior average SAXS intensities
-            common_i_prior = None
             i_posts = []
 
             for chosen_theta,chosen_weight_set in zip(chosen_thetas,chosen_weight_sets):
@@ -299,12 +317,11 @@ def reweight_ensemble(
                                                            f'ibme_t{chosen_theta}_*.calc.dat'))[0]
 
                 # Calculate uniform (prior) and reweighted (posterior) average SAXS profiles
-                i_prior, i_post = average_saxs_profiles(exp_saxs_file=exp_data_file,
-                                                        calc_saxs_file=calc_data_file,
-                                                        rw_calc_saxs_file=rw_calc_saxs_file,
-                                                        weights=chosen_weight_set)
+                common_i_prior, i_post = average_saxs_profiles(exp_saxs_file=exp_data_file,
+                                                               calc_saxs_file=calc_data_file,
+                                                               rw_calc_saxs_file=rw_calc_saxs_file,
+                                                               weights=chosen_weight_set)
 
-                common_i_prior = i_prior
                 i_posts.append(i_post)
 
                 # Fit reweighted SAXS data to experimental SAXS data, save chisquare and residuals

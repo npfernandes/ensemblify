@@ -29,8 +29,8 @@ DATA_NAMES = {'cmatrix': 'contact matrix',
               'dmatrix': 'distance matrix',
               'ss_freq': 'secondary structure assignment frequency matrix',
               'structural_metrics': 'structural metrics distributions'}
-FOUND_EXP_SAXS_MSG = 'Found processed experimental SAXS data.'
-FOUND_EXP_CALC_SAXS_MSG = 'Found processed experimental SAXS data and calculated SAXS data.'
+FOUND_EXP_MSG = 'Found processed experimental {} data.'
+FOUND_CALC_MSG = 'Found calculated {} data.'
 FOUND_RW_DATA_MSG = 'Found calculated BME reweighting data with theta values: {}'
 EXP2FIT = {'SAXS': 'scale+offset',
            'RDC': 'scale',
@@ -481,7 +481,7 @@ def attempt_read_calculated_data(
 def attempt_read_reweighting_data(
     reweighting_output_directory: str,
     trajectory_id: str,
-    exp_type: str,
+    exp_type: list[str],
     ) -> tuple[str | None, str | None, np.ndarray | None,
                np.ndarray | None, np.ndarray | None]:
     """Attempt to read reweighting data from output directory, returning None if not found.
@@ -491,38 +491,45 @@ def attempt_read_reweighting_data(
             Directory where data should be searched.
         trajectory_id (str):
             Prefix for filenames to look for in directory.
+        exp_type (list[str]):
+            Type(s) of experimental data used in reweighting, provided in the same order as
+            the experimental data files provided in reweighting.
     Returns:
-        tuple[str | None, str | None, np.ndarray | None, np.ndarray | None, np.ndarray | None]:
-            str | None:
-                The experimental data (if found) or None (if not found).
-            str | None:
-                The calculated data (if found) or None (if not found).
+        tuple[list[str | None] | None, list[str | None] | None, np.ndarray | None, np.ndarray | None, np.ndarray | None]:
+            list[str | None] | None:
+                The path(s) to experimental data file(s) (if found) or None (if not found).
+            list[str | None] | None:
+                The path(s) to calculated data file(s) (if found) or None (if not found).
             np.ndarray | None:
-                The array of theta values (if found) or None (if not found).
+                The array of BME theta values (if found) or None (if not found).
             np.ndarray | None:
-                The fitting statistics (if found) or None (if not found).
+                The BME fitting statistics (if found) or None (if not found).
             np.ndarray | None:
-                The set of weights (if found) or None (if not found).
+                The set of BME weights (if found) or None (if not found).
     """
-    # TODO Add logic for other exp data
-    # Check for experimental SAXS data file
-    exp_saxs_file = os.path.join(reweighting_output_directory,f'{trajectory_id}_exp_saxs.dat')
-    if not os.path.isfile(exp_saxs_file):
-        exp_saxs_file = None
-        return None, None, None, None, None
+    exp_files = [None] * len(exp_type)
+    calc_files = [None] * len(exp_type)
+    for i, data_type in enumerate(exp_type):
+        # Check for experimental data file
+        exp_file = os.path.join(reweighting_output_directory,f'{trajectory_id}_{data_type}_exp.dat')
+        if not os.path.isfile(exp_file):
+            return exp_files, calc_files, None, None, None
+        else:
+            print(FOUND_EXP_MSG.format(data_type))
+            exp_files[i] = exp_file
 
-    # Check for calculated SAXS data file
-    calc_saxs_file = os.path.join(reweighting_output_directory,f'{trajectory_id}_calc_saxs.dat')
-    if not os.path.isfile(calc_saxs_file):
-        calc_saxs_file = None
-        print(FOUND_EXP_SAXS_MSG)
-        return exp_saxs_file, None, None, None, None
+        # Check for calculated data file
+        calc_file = os.path.join(reweighting_output_directory,f'{trajectory_id}_{data_type}_all_calc.dat')
+        if not os.path.isfile(calc_file):
+            return exp_files, calc_files, None, None, None
+        else:
+            print(FOUND_CALC_MSG.format(data_type))
+            calc_files[i] = calc_file
 
     # Check for BME reweighting results
     bme_results_dir = os.path.join(reweighting_output_directory,'bme_reweighting_results')
     if not os.path.isdir(bme_results_dir):
-        print(FOUND_EXP_CALC_SAXS_MSG)
-        return exp_saxs_file, calc_saxs_file, None, None, None
+        return exp_files, calc_files, None, None, None
 
     ## Check which theta values are present (if any)
     theta_values = []
@@ -534,8 +541,7 @@ def attempt_read_reweighting_data(
                 theta_values.append(theta_value)
 
     if not theta_values:
-        print(FOUND_EXP_CALC_SAXS_MSG)
-        return exp_saxs_file, calc_saxs_file, None, None, None
+        return exp_files, calc_files, None, None, None
 
     ## Check which weights/stats are present (if any)
     ## weights : f'ibme_t{THETA_VALUE}.weights.dat'
@@ -552,8 +558,7 @@ def attempt_read_reweighting_data(
                                  usecols=1)
             all_weights.append(weights)
         except (IndexError, FileNotFoundError):
-            print(FOUND_EXP_CALC_SAXS_MSG)
-            return exp_saxs_file, calc_saxs_file, None, None, None
+            return exp_files, calc_files, None, None, None
 
         # Get stats
         stats_files_sorted = sorted(glob.glob(os.path.join(bme_results_dir,
@@ -562,18 +567,16 @@ def attempt_read_reweighting_data(
         try:
             with open(stats_files_sorted[-1],'r',encoding='utf-8-sig') as stats_file:
                 lines = stats_file.readlines()
-            chi2_before = float(lines[2].strip().split(' ')[-1])
+            chi2_before = float(lines[1].strip().split(' ')[-1])
             chi2_after = float(lines[5].strip().split(' ')[-1])
             phi = float(lines[-1].strip().split(' ')[-1])
             stats = (chi2_before,chi2_after,phi)
             all_stats.append(stats)
         except (IndexError, FileNotFoundError):
-            print(FOUND_EXP_CALC_SAXS_MSG)
-            return exp_saxs_file, calc_saxs_file, None, None, None
+            return exp_files, calc_files, None, None, None
 
     if len(all_weights) != len(theta_values) or len(all_stats) != len(theta_values):
-        print(FOUND_EXP_CALC_SAXS_MSG)
-        return exp_saxs_file, calc_saxs_file, None, None, None
+        return exp_files, calc_files, None, None, None
 
     weights = np.array(all_weights)
     stats = np.array(all_stats)
@@ -581,4 +584,4 @@ def attempt_read_reweighting_data(
 
     print(FOUND_RW_DATA_MSG.format(sorted(theta_values)))
 
-    return exp_saxs_file, calc_saxs_file, thetas_array, stats, weights
+    return exp_files, calc_files, thetas_array, stats, weights

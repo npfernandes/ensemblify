@@ -378,7 +378,8 @@
         <h2>Restraint(s)</h2>&nbsp;
         <div class="tooltip-icon">&#9432;
           <span class="tooltip-text">
-            Ways to bias sampling towards desired structural properties.
+            Ways to bias sampling towards<br>
+            desired structural properties.
           </span>
         </div>
         <fieldset id="restraints">
@@ -434,7 +435,8 @@
           <h2>Core amount</h2>&nbsp;
           <div class="tooltip-icon">&#9432;
             <span class="tooltip-text">
-              Number of processor cores to use. Defaults to all cores in machine minus 1.
+              Number of processor cores to use. Defaults<br>
+              to all cores in machine minus 1.
             </span>
           </div>
           <input type="number" id="cores" min="1" max="32" placeholder="16"><br>
@@ -442,8 +444,9 @@
           <h2>ScoreFunction</h2>&nbsp;
           <div class="tooltip-icon">&#9432;
             <span class="tooltip-text">
-              PyRosetta Score Function .wts weights file, default or custom,<br>
-              must be defined in /.../pyrosetta/database/scoring/weights/ .
+              PyRosetta Score Function .wts weights file,<br>
+              default or custom, must be defined in<br>
+              /.../pyrosetta/database/scoring/weights/ .
             </span>
           </div>
           <fieldset id="scorefxnParameters">
@@ -452,15 +455,17 @@
             <div class="tooltip-icon">&#9432;
               <span class="tooltip-text">
                 Default ScoreFunction used is <br>
-                score0, with only a repulsive VdW score term.
+                score0, with only a repulsive<br>
+                VdW score term.
               </span>
             </div><br>
             <label>VdW score term weight:</label>
             <input type="number" id="scorefxweight" value="1.0" placeholder="1.0">
             <div class="tooltip-icon">&#9432;
               <span class="tooltip-text">
-                Will only have an effect if the ScoreFunction<br>
-                has a repulsive Van der Waals term.
+                Will only have an effect if the<br>
+                ScoreFunction has a repulsive<br>
+                Van der Waals term.
               </span>
             </div><br>
           </fieldset>
@@ -553,8 +558,9 @@
           <h2>Constraints Violation</h2>&nbsp;
           <div class="tooltip-icon">&#9432;
             <span class="tooltip-text">
-              Number of residues whose AtomPairConstraint's<br>
-              values are allowed to be above a certain threshold.
+              Number of residues whose<br>
+              AtomPairConstraint's values are<br>
+              allowed to be above a certain threshold.
             </span>
           </div>
           <fieldset id="constraintsviolationParameters">

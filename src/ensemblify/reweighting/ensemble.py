@@ -224,12 +224,17 @@ def reweight_ensemble(
                 os.remove(data_file)
                 os.remove(exp_saxs_file_processed)
 
+                # Add processed experimental data file to list
+                exp_data_BME[i] = exp_file_BME
+
+            elif data_type in ['CS','JCOUPLINGS','RDC']:
+
+                # Add experimental data file to list
+                exp_data_BME[i] = exp_file_BME
+
             else:
                 print(f'{data_type} data is currently not supported.')
                 sys.exit(1)
-
-            # Add processed experimental data file to list
-            exp_data_BME[i] = exp_file_BME
 
     # Check read calc_data_BME
     for i, (data_file,data_type) in enumerate(zip(exp_data_BME,exp_type)):

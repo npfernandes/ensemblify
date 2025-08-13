@@ -336,6 +336,12 @@ def main():
                                           'parameter in BME. Defaults to [1, 10, 20, 50, 75, '
                                           '100, 200, 400, 750, 1000, 5000, 10000].'))
 
+    parser_reweighting.add_argument('-csaxs', '--calcsaxs',
+                                    type=str,
+                                    help=('(Optional) Path to file (.dat) with calculated SAXS '
+                                          'profiles for each conformer in the ensemble. '
+                                          'Defaults to None.'))
+
     parser_reweighting.add_argument('-cmx', '--contactmatrix',
                                     type=str,
                                     help=('(Optional) Path to calculated contact matrix file '
@@ -364,19 +370,27 @@ def main():
 
     parser_reweighting.add_argument('-mxd', '--compare_dmax',
                                     action ='store_false',
-                                    help=('(Optional) Whether to calculate and compare uniform/reweighted '
-                                          'maximum distance distributions. Defaults to True.'))
+                                    help=('(Optional) Whether to calculate and compare '
+                                          'uniform/reweighted maximum distance distributions. '
+                                          'Defaults to True.'))
 
     parser_reweighting.add_argument('-eed', '--compare_eed',
                                     action ='store_false',
-                                    help=('(Optional) Whether to calculate and compare uniform/reweighted '
-                                          'end-to-end distance distributions. Defaults to True.'))
+                                    help=('(Optional) Whether to calculate and compare '
+                                          'uniform/reweighted end-to-end distance distributions. '
+                                          'Defaults to True.'))
 
     parser_reweighting.add_argument('-cmd', '--compare_cmdist',
                                     nargs='+', type=str, metavar='',
                                     help=('(Optional) Pair(s) of MDAnalysis selection strings for '
                                           'which to calculate and compare uniform/reweighted '
                                           'center of mass distance distributions. Defaults to '
+                                          'None.'))
+
+    parser_reweighting.add_argument('-pso', '--pepsi_saxs_opt',
+                                    type=str,
+                                    help=('(Optional) Additional command line options that will '
+                                          'be passed onto Pepsi-SAXS invocation. Defaults to '
                                           'None.'))
 
     # Subparser for the 'clash_checking' module with aliases
@@ -454,6 +468,7 @@ def main():
                           exp_type=full_args.exptype,
                           output_dir=full_args.outputdir,
                           thetas=full_args.theta,
+                          calculated_SAXS_data=full_args.calcsaxs,
                           calculated_cmatrix=full_args.contactmatrix,
                           calculated_dmatrix=full_args.distancematrix,
                           calculated_ss_frequency=full_args.ssfrequency,
@@ -461,7 +476,8 @@ def main():
                           compare_rg=full_args.compare_rg,
                           compare_dmax=full_args.compare_dmax,
                           compare_eed=full_args.compare_eed,
-                          compare_cmdist=full_args.compare_cmdist)
+                          compare_cmdist=full_args.compare_cmdist,
+                          pepsi_saxs_opt=full_args.pepsi_saxs_opt)
 
     elif full_args.module in ['clash_checking', 'cch']:
         from ensemblify.clash_checking import check_steric_clashes

@@ -1,11 +1,85 @@
 /* Fix text alignment */
-section {
+  section {
     text-align: justify;
-}
+  }
 
-#index-page section {
+  #index-page section {
     text-align: left;
-}
+  }
+
+/* Generation module parameter table */
+  .tg  {
+    border-collapse:collapse;
+    border-spacing:0;
+  }
+
+  .tg th{
+    background-color:#2f4171;
+    border-color:black;
+    border-style:solid;
+    border-width:1px;
+    color:#ffffff;
+    font-family:Arial, sans-serif;
+    font-size:medium;
+    font-weight:medium;
+    font-weight:bold;
+    text-align:center;
+    vertical-align:middle;
+    overflow:hidden;
+    padding:10px 5px;
+    word-break:normal;
+  }
+
+  .tg td{
+    border-color:black;
+    border-style:solid;
+    border-width:1px;
+    font-family:Arial, sans-serif;
+    font-size:14px;
+    overflow:hidden;
+    padding:10px 5px;
+    word-break:normal;
+    text-align:center;
+    vertical-align:middle;
+  }
+
+  .tg .tg-parameter{
+    font-weight:bold;
+  }
+
+  .tg .tg-paramsec{
+    color:#656565;
+  }
+
+  /* Dark theme preference styling */
+  
+  @media (prefers-color-scheme: dark) {
+    body[data-theme="auto"] .tg th {
+      border-color: white;
+    }
+  
+    body[data-theme="auto"] .tg td {
+      border-color: white;
+    }
+  
+    body[data-theme="auto"] .tg-paramsec {
+      color:rgba(221, 228, 234, 0.893);
+    }
+  }
+  
+  /* Explicit dark theme styling */
+  
+  body[data-theme="dark"] .tg th {
+      border-color: white;
+  }
+  
+  body[data-theme="dark"] .tg td {
+      border-color: white;
+  }
+  
+  body[data-theme="dark"] .tg-paramsec {
+      color:rgba(221, 228, 234, 0.893);
+  }
 
 /* Fix code-tabs appearance */
   .sphinx-tabs {

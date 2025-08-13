@@ -245,7 +245,10 @@
           <span id="SequenceNbsp">&nbsp;</span>
           <div class="tooltip-icon" id="SequenceTooltip">&#9432;
             <span class="tooltip-text">
-              Path to structure/sequence in .pdb or .txt format.
+              Path to structure/sequence in .pdb or .txt format.<br>
+              A UniProt accession code can also be provided, in<br>
+              which case the corresponding structure from the<br>
+              AlphaFold Protein Structure Database is retrieved.
             </span>
           </div>
           <br id="SequenceBr">
@@ -372,7 +375,19 @@
               Advanced Parameters PAE section.
             </span>
           </div>
-          <input type="text" id="PAEPath" placeholder="Path to PAE matrix .json file from AlphaFold output" style="display:none;">
+          <input type="text" id="PAEPath" placeholder="/home/user/alphafold/myprotein/pae_matrix.json" style="display:none;">
+          <span id="PAEPathNbsp" style="display:none;">&nbsp;</span>
+          <div class="tooltip-icon" id="PAEPathTooltip" style="display:none;">&#9432;
+            <span class="tooltip-text">
+              Path to PAE matrix .json file<br>
+              from AlphaFold output. A UniProt<br>
+              accession code can also be<br>
+              provided, in which case the<br>
+              corresponding PAE matrix from<br>
+              the AlphaFold Protein Structure<br>
+              Database is retrieved.
+            </span>
+          </div>
         </fieldset>
 
         <h2>Restraint(s)</h2>&nbsp;
@@ -829,12 +844,18 @@
     // Show PAE path input field when checkbox is checked
     document.getElementById('PAECheckbox').addEventListener('change', function() {
       var PAEPath = document.getElementById('PAEPath');
+      var PAEPathTooltip = document.getElementById('PAEPathTooltip');
+      var PAEPathNbsp = document.getElementById('PAEPathNbsp');
       if (this.checked) {
         PAEPath.style.display = 'inline-block';
         PAEPath.required = true;
+        PAEPathTooltip.style.display = 'inline-block';
+        PAEPathNbsp.style.display = 'inline';
       } else {
         PAEPath.style.display = 'none';
         PAEPath.required = false;
+        PAEPathTooltip.style.display = 'none';
+        PAEPathNbsp.style.display = 'none';
       }
     });
 

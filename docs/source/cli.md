@@ -133,10 +133,12 @@ Access information about the Ensemblify `reweighting` module.
        -h, --help              show this help message and exit
        -trj, --trajectory      Path to trajectory file (.xtc).
        -top, --topology        Path to topology file (.pdb).
-       -tid, --trajectoryid    Prefix identifier for trajectory file.
-       -exp, --expdata         Path to experimental SAXS data file (.dat).
+       -tid, --trajectoryid    Name to give reweighted trajectory file(s) in created reweighting figures.
+       -exp, --expdata         Path to experimental data file (.dat).
+       -expt, --exptype        Type of provided experimental data.
        -out, --outputdir       (Optional) Path to output directory. Defaults to current working directory.
-       -tht, --theta           (Optional) List of values to try as the theta parameter in BME. Defaults to [1, 10, 20, 50, 75, 100, 200, 400, 750, 1000, 5000, 10000]
+       -tht, --theta           (Optional) List of values to try as the theta parameter in BME. Defaults to [1, 10, 20, 50, 75, 100, 200, 400, 750, 1000, 5000, 10000].
+       -csaxs, --calcsaxs      (Optional) Path to file (.dat) with calculated SAXS profiles for each conformer in the ensemble. Defaults to None.
        -cmx, --contactmatrix   (Optional) Path to calculated contact matrix file (.csv). Defaults to None.
        -dmx, --distancematrix  (Optional) Path to calculated distance matrix file (.csv). Defaults to None.
        -ssf, --ssfrequency     (Optional) Path to calculated secondary structure frequency matrix file (.csv). Defaults to None.
@@ -145,6 +147,7 @@ Access information about the Ensemblify `reweighting` module.
        -mxd, --compare_dmax    (Optional) Whether to calculate and compare uniform/reweighted maximum distance distributions. Defaults to True.
        -eed, --compare_eed     (Optional) Whether to calculate and compare uniform/reweighted end-to-end distance distributions. Defaults to True.
        -cmd, --compare_cmdist  (Optional) Pair(s) of MDAnalysis selection strings for which to calculate and compare uniform/reweighted center of mass distance distributions. Defaults to None.
+       -pso, --pepsi_saxs_opt  (Optional) Additional command line options that will be passed onto Pepsi-SAXS invocation. Defaults to None.
    ```
 
 ----

@@ -441,6 +441,6 @@ def fuse_structures(
     print('Processing fused Pose...')
     processed_fused_pdb_log, \
     processed_fused_pdb = process_pdb_structure(pdb=fused_pdb_path)
-    print('Processing complete.\nYour full-length structure is ready.')
+    print('Processing complete.')
 
     return processed_fused_pdb_log, processed_fused_pdb

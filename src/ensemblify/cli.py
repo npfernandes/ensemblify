@@ -156,24 +156,24 @@ def main():
                                                           'Ensemblify Python library.'),
                                              formatter_class=CustomHelpFormatter)
 
-    parser_modelling.add_argument('-f', '--fasta',
-                                  type=str, required=True, metavar='',
+    parser_modelling.add_argument('-f', '--fastas',
+                                  nargs='+', type=str, required=True, metavar='',
                                   help=('Path(s) to FASTA file(s) containing the sequences of '
                                         'all protein domains (folded + disordered) to be fused, '
                                         'in order from N- to C-terminal.'))
 
-    parser_modelling.add_argument('-p', '--pdb',
-                                  default=None, type=str, metavar='',
+    parser_modelling.add_argument('-p', '--pdbs',
+                                  nargs='+', type=str, required=True, metavar='',
                                   help=('Path(s) to PDB file(s) containing the structures of '
                                         'folded protein domains to be fused, in order from '
                                         'N- to C-terminal.'))
 
     parser_modelling.add_argument('-i', '--id',
-                                  default=None, type=str, metavar='',
+                                  type=str, required=True, metavar='',
                                   help='Name for the output fused PDB file (without extension).')
 
     parser_modelling.add_argument('-o', '--output_dir',
-                                  default=None, type=str, metavar='',
+                                  type=str, metavar='',
                                   help=('(Optional) Directory where the output fused PDB file '
                                         'will be saved. Defaults to current working directory.'))
 
@@ -427,8 +427,8 @@ def main():
 
     elif full_args.module in ['modelling', 'mod', 'm']:
         from ensemblify.modelling import fuse_structures
-        fuse_structures(input_fastas=full_args.fasta,
-                        input_pdbs=full_args.pdb,
+        fuse_structures(input_fastas=full_args.fastas,
+                        input_pdbs=full_args.pdbs,
                         output_name=full_args.id,
                         output_dir=full_args.output_dir)
         

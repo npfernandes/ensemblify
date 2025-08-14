@@ -6,9 +6,9 @@ With the `generation` module, you can generate a conformational ensemble for you
 
 Before generating an ensemble, you must create a parameters file either:
 
-- Using the provided [.html form](https://github.com/npfernandes/ensemblify/releases/download/v0.0.1-downloads/parameters_form.html);
+- Using the provided [.html form](../../examples/parameters_form.html);
 
-- Directly, by editing the provided [parameters file template](../../examples/input_parameters/parameters_template.yml).
+- Directly, by editing the provided [parameters file template](../../examples/parameters_template.yml).
 
 Below you can find a description of the minimum required parameters.
 

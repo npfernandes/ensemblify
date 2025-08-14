@@ -92,7 +92,7 @@ def reweight_ensemble(
             List of values to try as the theta parameter in BME. The ensemble will be reweighted
             each time using a different theta value. The effect of different theta values can be
             analyzed in the created effective frames figure.
-        calculated_SAXS_data (np.ndarray | str , optional): 
+        calculated_SAXS_data (np.ndarray | str, optional): 
             Array with calculated SAXS profiles for each conformer in the ensemble or path to 
             this file in .dat format. Number of rows must match number of different conformers
             in the ensemble. Number of calculated data points (columns) must match the number

@@ -1,6 +1,6 @@
 # 💻 Usage
 
-Ensemblify offers four main modules, all of which can be accessed either through the command line or from inside a Python script/Jupyter Notebook.
+Ensemblify offers several main modules, all of which can be accessed either through the command line or from inside a Python script/Jupyter Notebook.
 
 ```{toctree}
 :titlesonly:

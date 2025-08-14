@@ -248,8 +248,7 @@ def apply_pae_constraints(
     tolerance: float | None = None,
     adjacency_threshold: int = 8,
     plddt_scaling_factor: float = 1.0):
-    """Apply energy constraints to a Pose created from an AlphaFold structure based on its
-    Predicted Aligned Error (PAE) matrix.
+    """Apply energy constraints to a AlphaFold Pose based on its PAE matrix.
     
     The strength of the constraints scales with the value of the predicted aligned error for that
     residue pair.

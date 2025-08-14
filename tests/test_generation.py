@@ -5,7 +5,8 @@
 import pytest
 
 ## Local Imports
-from ensemblify.generation.ensemble_utils.functions import setup_pose, derive_constraint_targets
+from ensemblify.modelling import setup_pose
+from ensemblify.generation.ensemble_utils.functions import derive_constraint_targets
 
 def test_derive_constraint_targets():
     pose = setup_pose('AAAAAAAAAAAAAAAAAAAAAAAA') # 24 residues

@@ -381,8 +381,9 @@ def create_fusion_pose(
 
     # Perform FastRelax on flexible regions of the fused Pose
     fastrelax.apply(FLpose)
-
+    
     # Dump the final relaxed Pose object to a PDB file
+    print('Pose fusion complete.')
     FLpose.dump_pdb(f'{os.path.join(output_dir,output_name)}.pdb')
 
     return FLpose
@@ -437,7 +438,9 @@ def fuse_structures(
     fused_pdb_path = f'{os.path.join(output_dir,output_name)}.pdb'
 
     # Process the fused PDB to optimize its structure and avoid steric clashes
+    print('Processing fused Pose...')
     processed_fused_pdb_log, \
     processed_fused_pdb = process_pdb_structure(pdb=fused_pdb_path)
+    print('Processing complete.\nYour full-length structure is ready.')
 
     return processed_fused_pdb_log, processed_fused_pdb

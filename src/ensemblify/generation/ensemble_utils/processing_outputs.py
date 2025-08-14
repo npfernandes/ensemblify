@@ -3,7 +3,6 @@
 # IMPORTS
 ## Standard Library Imports
 import io
-import logging
 import os
 import re
 import subprocess
@@ -12,6 +11,12 @@ import subprocess
 import ray
 
 ## Local Imports
+from ensemblify.modelling.pdb_processing import (
+    apply_faspr_single,
+    apply_rewrite_single,
+    apply_pulchra_single,
+    apply_restore_single
+)
 from ensemblify.utils import cleanup_pdbs, extract_pdb_info
 
 # FUNCTIONS

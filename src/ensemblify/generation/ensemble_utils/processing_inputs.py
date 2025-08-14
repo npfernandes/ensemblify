@@ -13,6 +13,7 @@ import yaml
 
 ## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
+from ensemblify.modelling import fuse_structures
 from ensemblify.modelling.pdb_processing import (
     apply_faspr_single,
     apply_pulchra_single,
@@ -24,7 +25,7 @@ from ensemblify.utils import df_from_pdb, df_to_pdb
 # CONSTANTS
 VALID_PARAMS_TYPES = {
     'job_name': str,
-    'sequence': str,
+    'sequence': str | dict,
     'alphafold': bool,
     'pae': str,
     'size': int,
@@ -425,14 +426,29 @@ def read_input_parameters(parameter_path: str) -> dict:
 
     # Check all parameters
     for key in params:
-        # Check parameter types
+        # Check empty parameters
         if params[key] is None:
             try:
                 params[key] = ADVANCED_PARAMS_DEFAULTS[key]
             except KeyError as e:
                 raise AssertionError(f'{key} cannot be empty!') from e
+        
+        # Check parameter types
         elif not isinstance(params[key],VALID_PARAMS_TYPES[key]):
             raise AssertionError(f'{key} must be of type {VALID_PARAMS_TYPES[key]} !')
+
+        # Apply modelling module if applicable
+        elif key == 'sequence' and isinstance(params[key],dict):
+            job_name = params['job_name']
+            output_name = f'{job_name}_fused'
+            output_dir = os.path.join(params['output_path'],
+                                      f'{job_name}_fusion')
+
+            # Fuse structure and update 'sequence' accordingly
+            _, params[key] = fuse_structures(input_fastas=params['sequence']['fastas'],
+                                             input_pdbs=params['sequence']['pdbs'],
+                                             output_name=output_name,
+                                             output_dir=output_dir)
 
         # Always leave one core free
         elif key =='core_amount' and params[key] >= os.cpu_count():

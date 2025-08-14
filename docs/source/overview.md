@@ -26,7 +26,7 @@ Ensemblify can be used either as a Command Line Interface (CLI):
 or as a Python library inside a script or Jupyter notebook:
 
     import ensemblify as ey
-    ey.do_cool_stuff()
+    ey.show_config()
 
 Check the [Usage](usage.md#-usage) section for more details.
 

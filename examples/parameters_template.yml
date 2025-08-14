@@ -1,7 +1,7 @@
 job_name: # Name to give the files/folders resulting from this script
   myprotein
 sequence: # Path to the input sequence/structure, in .pdb or .txt format, or just the sequence string
-  /home/user/myprotein.pdb
+  /home/user/myprotein.pdb # or UniProt accession code
   # or build your full-length input structure
   # fastas: # sequences of all domains (folded + disordered) from N- to C-terminal
   #   - /home/user/myprotein.fa # multi-sequence FASTA file, can also be separate
@@ -19,7 +19,7 @@ targets: # Dictionary of chain:List of lists, indicating sampling targets
 alphafold: # Inside target range, target only residues below pddt threshold?
   False
 pae: # Apply constraints solely based on given pae matrix
-  None
+  None # or path to matrix / UniProt accession code
 restraints: # Force secondary structure or conserve contacts present in starting structure
   ss_bias :
     - 

@@ -57,7 +57,7 @@ To install the `ensemblify` Python package, you can follow these commands:
       ```
     </details><br>
 
-3. Install the `ensemblify` python package into your newly created environment.
+3. Install the `ensemblify` Python package into your newly created environment.
 
     ```{code-block} console
     (ensemblify_env) $ pip install .
@@ -76,17 +76,17 @@ To install the `ensemblify` Python package, you can follow these commands:
 
 Each of Ensemblify's modules has different dependencies to third party software, so if you only plan on using a certain module you do not have to install software required for others. The requirements are:
 
-- `generation` module: [PyRosetta](#pyrosetta), [FASPR](#faspr) and [PULCHRA](#pulchra).
+- `generation` and `modelling` modules: [PyRosetta](#pyrosetta), [FASPR](#faspr) and [PULCHRA](#pulchra).
 
-- `conversion` module: [GROMACS](#gromacs) (optional), [Pepsi-SAXS](#pepsi-saxs) and [BIFT](#bift) (optional).
+- `conversion` module: [GROMACS](#gromacs) (optional) and [Pepsi-SAXS](#pepsi-saxs).
 
 - `analysis` module: no other software required.
 
-- `reweighting` module: no other software required.
+- `reweighting` module: [BIFT](#bift) (optional).
 
 ### PyRosetta
   
-PyRosetta<sup>[[2]](#ref2)</sup> is a Python-based interface to the powerful Rosetta molecular modeling suite. Its functionalities are used through Ensemblify in order to generate conformational ensembles. You can install it by following these commands:
+PyRosetta<sup>[[2]](#ref2)</sup> is a Python-based interface to the powerful Rosetta molecular modeling suite. Its functionalities are used through Ensemblify in order to manipulate protein structures and generate conformational ensembles. You can install it by following these commands:
 
 1. Activate your `ensemblify_env` conda environment:
 
@@ -128,10 +128,10 @@ FASPR<sup>[[3]](#ref3)</sup> is an ultra-fast and accurate program for determini
     ```
     If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
 
-2. Navigate to where the FASPR source code is located:
+2. Navigate to where the FASPR source code is located. Assuming the root directory of the cloned repository is your current working directory:
 
     ```{code-block} console
-    (ensemblify_env) $ cd src/ensemblify/third_party/FASPR-master/ # assuming the cloned repository is your current working directory
+    (ensemblify_env) $ cd src/ensemblify/third_party/FASPR-master/
     ```
 
     <!-- ```bash
@@ -174,10 +174,10 @@ PULCHRA<sup>[[4]](#ref4)</sup> (PowerfUL CHain Restoration Algorithm) is a progr
 
     If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
 
-2. Navigate to where the PULCHRA source code is located.
+2. Navigate to where the PULCHRA source code is located. Assuming the root directory of the cloned repository is your current working directory:
     
     ```{code-block} console
-    (ensemblify_env) $ cd src/ensemblify/third_party/pulchra-master/ # assuming the cloned repository is your current working directory:
+    (ensemblify_env) $ cd src/ensemblify/third_party/pulchra-master/
     ```
 
     <!-- ```bash
@@ -296,10 +296,10 @@ To compile the provided BIFT source code, you can follow these commands:
     ```
     If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
 
-2. Navigate to where the BIFT source code is located:
+2. Navigate to where the BIFT source code is located. Assuming the root directory of the cloned repository is your current working directory:
 
     ```{code-block} console
-    (ensemblify_env) $ cd src/ensemblify/third_party/BIFT/ # assuming the cloned repository is your current working directory
+    (ensemblify_env) $ cd src/ensemblify/third_party/BIFT/
     ```
 
     <!-- ```bash

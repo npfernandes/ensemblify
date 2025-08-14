@@ -8,11 +8,11 @@ This structure can then be used as an input starting structure for conformationa
 
 To fuse disordered sequences with PDB structures into a full-length PDB structure, provide Ensemblify with:
 
-- The path(s) to FASTA file(s) containing the sequences of all (folded + disordered) protein domains, from N- to C-terminal. Can be provided either in FASTA or Multi-FASTA format.
+- the path(s) to FASTA file(s) containing the sequences of all (folded + disordered) protein domains, from N- to C-terminal. Can be provided either in FASTA or Multi-FASTA format.
 
-- The path(s) to PDB file(s) containing the structures of all folded protein domains, from N- to C-terminal. Can be provided as a single PDB file with multiple MODEL entries.
+- the path(s) to PDB file(s) containing the structures of all folded protein domains, from N- to C-terminal. Can be provided as a single PDB file with multiple MODEL entries.
 
-- The name for the created full-length fused structure (without .pdb extension).
+- the name for the created full-length fused structure (without .pdb extension).
 
 ````{tabs}
 

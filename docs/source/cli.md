@@ -49,8 +49,8 @@ Access information about the Ensemblify `modelling` module.
    
    options:
         -h, --help        show this help message and exit
-        -f, --fasta       Path(s) to FASTA file(s) containing the sequences of all protein domains (folded + disordered) to be fused, in order from N- to C-terminal.
-        -p, --pdb         Path(s) to PDB file(s) containing the structures of folded protein domains to be fused, in order from N- to C-terminal.
+        -f, --fastas      Path(s) to FASTA file(s) containing the sequences of all protein domains (folded + disordered) to be fused, in order from N- to C-terminal.
+        -p, --pdbs        Path(s) to PDB file(s) containing the structures of folded protein domains to be fused, in order from N- to C-terminal.
         -i, --id          Name for the output fused PDB file (without extension).
         -o, --output_dir  (Optional) Directory where the output fused PDB file will be saved. Defaults to current working directory.
    ```

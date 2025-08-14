@@ -17,7 +17,7 @@ To fuse disordered sequences with PDB structures into a full-length PDB structur
 ````{tabs}
 
    ```{code-tab} console CLI
-   (ensemblify_env) $ ensemblify modelling -fasta protein_name_all.fa -pdb protein_name_all.pdb -id protein_name
+   (ensemblify_env) $ ensemblify modelling -f protein_name_all.fa -p protein_name_all.pdb -id protein_name
    ```
 
    ```{code-tab} python Python

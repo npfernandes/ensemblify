@@ -285,7 +285,7 @@ To download the Pepsi-SAXS executable from their [website](https://team.inria.fr
 
 Bayesian indirect Fourier transformation (BIFT) of small-angle experimental data allows for an estimation of parameters that describe the data<sup>[[7]](#ref7)</sup>. Larsen *et al.* show in [[8]](#ref8) that BIFT can identify whether the experimental error in small-angle scattering data is over or underestimated. Here we use their implementation of this method to make this determination and scale the error values accordingly.
 
-If you decide not to install BIFT, the Ensemblify `conversion` module will still work, but provided experimental errors will not be adjusted.
+If you decide not to install BIFT, the Ensemblify `reweighting` module will still work, but provided experimental errors will not be adjusted.
 
 To compile the provided BIFT source code, you can follow these commands:
 

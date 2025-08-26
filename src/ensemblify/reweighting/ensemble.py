@@ -93,11 +93,11 @@ def reweight_ensemble(
             each time using a different theta value. The effect of different theta values can be
             analyzed in the created effective frames figure.
         calculated_SAXS_data (np.ndarray | str, optional): 
-            Array with calculated SAXS profiles for each conformer in the ensemble or path to 
-            this file in .dat format. Number of rows must match number of different conformers
-            in the ensemble. Number of calculated data points (columns) must match the number
-            of experimental data points provided in exp_data. If provided, this data is used
-            instead of back-calculating it from the ensemble. Defaults to None.
+            Array with calculated SAXS profiles for each conformer in the ensemble or path to this
+            file. Number of rows must match number of different conformers in the ensemble. Number
+            of calculated data points (columns) must match the number of experimental data points
+            provided in exp_data. If provided, this data is used instead of back-calculating it
+            from the ensemble. Defaults to None.
         calculated_cmatrix (pd.DataFrame | str, optional):
             DataFrame with the calculated average contact matrix for the current trajectory or
             path to this file in .csv format. Defaults to None, and this data is calculated anew.
@@ -227,6 +227,7 @@ def reweight_ensemble(
                 # Add processed experimental data file to list
                 exp_data_BME[i] = exp_file_BME
 
+            # No additional processing
             elif data_type in ['CS','JCOUPLINGS','RDC']:
 
                 # Add experimental data file to list
@@ -262,7 +263,7 @@ def reweight_ensemble(
             calc_data_BME[i] = all_calc_file
 
     if thetas_array is None or stats is None or weights is None:
-        # Reweigh ensemble using different theta values
+        # Reweight ensemble using different theta values
         thetas_array = np.array(thetas)
 
         print((f'Applying BME reweighting to {trajectory_id} ensemble '

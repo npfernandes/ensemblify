@@ -1,4 +1,4 @@
-job_name: # Name to give the files/folders resulting from this script
+job_name: # Name to give resulting files/folders
   myprotein
 sequence: # Path to the input sequence/structure, in .pdb or .txt format, or just the sequence string
   /home/user/myprotein.pdb # or UniProt accession code
@@ -16,18 +16,18 @@ databases: # Path to database(s) to use during sampling
 targets: # Dictionary of chain:List of lists, indicating sampling targets
   A : [ [ MC, [1,49], all , TRIPEPTIDE] ]
   B : [ [ MC, [51,100], coil, SINGLERESIDUE] ]
-alphafold: # Inside target range, target only residues below pddt threshold?
+alphafold: # Inside target range, target only residues below pLDDT threshold?
   False
-pae: # Apply constraints solely based on given pae matrix
-  None # or path to matrix / UniProt accession code
-restraints: # Force secondary structure or conserve contacts present in starting structure
+pae: # Apply constraints solely based on given PAE matrix
+  None # or path to matrix .json / UniProt accession code
+restraints: # Force secondary structure or conserve relative positions present in starting structure
   ss_bias :
     - 
       - [ A, [25,49], alpha_helix ] # chain, region, sstruc
       - [ B, [51,75], beta_strand ] # chain, region, sstruc
       # add more ssbias here
     - 100 # ssbias percentage
-  contacts : # Defines what contacts between regions we want to keep conserved
+  contacts : # Defines what relative positions between regions we want to keep conserved
     - [ [A, [50,100]] , [B,  [1,49]] ]
     # add more contacts here
 output_path: # Path to output directory

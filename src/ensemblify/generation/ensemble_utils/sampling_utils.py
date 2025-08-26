@@ -154,7 +154,7 @@ def setup_sampling_parameters(parameters_file: str) -> dict:
     
     In the 'targets' parameter, change a target from e.g. [1,54] to (range(1,55)).
     If using an AlphaFold model as a starting structure, keep in the sampling ranges only regions
-    of at least a certain contiguous size where each residue's pLDTT is below a threshold.
+    of at least a certain contiguous size where each residue's pLDDT is below a threshold.
     Targets, secondary structure biases and contacts are also updated to tuples instead of lists.
 
     Args:
@@ -169,10 +169,10 @@ def setup_sampling_parameters(parameters_file: str) -> dict:
         prepared_parameters = yaml.safe_load(document)
 
     if prepared_parameters['alphafold']:
-        # Get list of target residues considering pldTT threshold
+        # Get list of target residues considering pLDDT threshold
         chains_targets = get_targets_from_plddt(parameters=prepared_parameters)
 
-        # Update targets to a continuous range according to pldTT threshold
+        # Update targets to a continuous range according to pLDDT threshold
         updated_targets_all = {}
         for chain in prepared_parameters['targets']:
             updated_targets = []
@@ -186,7 +186,7 @@ def setup_sampling_parameters(parameters_file: str) -> dict:
             updated_targets_all[chain] = tuple(updated_targets)
         prepared_parameters['targets'] = updated_targets_all
     else:
-        # Update targets to a continuous range not using pldTT info
+        # Update targets to a continuous range not using pLDDT info
         updated_targets_all = {}
         for chain in prepared_parameters['targets']:
             updated_targets = []

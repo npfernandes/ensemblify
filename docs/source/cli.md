@@ -135,7 +135,7 @@ Access information about the Ensemblify `reweighting` module.
        -top, --topology        Path to topology file (.pdb).
        -tid, --trajectoryid    Name to give reweighted trajectory file(s) in created reweighting figures.
        -exp, --expdata         Path to experimental data file (.dat).
-       -expt, --exptype        Type of provided experimental data.
+       -expt, --exptype        (Optional) Type of provided experimental data. Required if not specified in experimental data file. 
        -out, --outputdir       (Optional) Path to output directory. Defaults to current working directory.
        -tht, --theta           (Optional) List of values to try as the theta parameter in BME. Defaults to [1, 10, 20, 50, 75, 100, 200, 400, 750, 1000, 5000, 10000].
        -csaxs, --calcsaxs      (Optional) Path to file (.dat) with calculated SAXS profiles for each conformer in the ensemble. Defaults to None.

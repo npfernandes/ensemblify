@@ -323,7 +323,9 @@ def main():
 
     parser_reweighting.add_argument('-expt', '--exptype',
                                     default=None, nargs='+', type=str,
-                                    help='Type of provided experimental data.')
+                                    help=('(Optional) Type of provided experimental data. '
+                                          'Required if not specified in experimental data '
+                                          'file. '))
 
     parser_reweighting.add_argument('-out', '--outputdir',
                                     default=None, type=str,  metavar='',

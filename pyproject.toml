@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools >= 61.0", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ensemblify"
+version = "1.0.0"
+authors = [
+  { name="Nuno P. Fernandes", email="nmpfernandes@itqb.unl.pt" },
+]
+description = "A Python package for generating ensembles of intrinsically disordered regions of AlphaFold or user defined models."
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: POSIX :: Linux",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics"
+]
+dependencies = [
+  "biopython == 1.81",
+  "MDAnalysis == 2.6.1",
+  "mdtraj == 1.9.9",
+  "numpy == 1.26.4",
+  "pandas == 2.2.2",
+  "plotly == 5.23.0",
+  "pyarrow == 13.0.0",
+  "pyyaml == 6.0.1",
+  "ray == 2.33.0",
+  "scikit-learn == 1.4.2",
+  "scipy == 1.12.0",
+  "tqdm == 4.66.2",
+]
+
+[project.urls]
+Repository = "https://github.com/npfernandes/ensemblify"
+
+[project.scripts]
+ensemblify = "ensemblify.cli:main"

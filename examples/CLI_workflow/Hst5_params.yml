@@ -1,0 +1,12 @@
+job_name:
+  Hst5_test
+sequence:
+  DSHAKRHHGYKRKFHEKHHSHRGY
+size:
+  10
+databases:
+  coil: <path_to_database>
+targets:
+  A : [ [ MC, [1,24], coil, TRIPEPTIDE ] ]
+output_path:
+  .

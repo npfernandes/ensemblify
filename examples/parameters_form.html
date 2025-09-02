@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ensemblify</title>
+  <style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Jersey+25&display=swap');
+       
+    header {
+      padding-right:38px;
+      padding-left:38px;
+      padding-top:5px;
+      padding-bottom: 5px;
+      font-family: "Jersey 25", sans-serif;
+      font-size: 148px;
+      text-align: center;
+      background: radial-gradient(circle, rgba(0,38,66,1) 25%, rgba(48,77,109,1) 100%);
+      color: white;
+      display: inline-block;
+      width: auto;
+      border-radius: 10px;
+    }
+
+    .header-container {
+      text-align: center;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      width: 100%;
+    }
+
+    #content {
+      max-width: max-content;
+      padding-top: 20px;
+      padding-left: 20px;
+      padding-right: 20px;
+      font-family: Helvetica, Arial, sans-serif;
+    }
+  
+    h2 {
+      display: inline-block;
+      font-weight: 1;
+      color:rgba(0,38,66,1);
+      font-size: 20px;
+      margin-top: 0px;
+      margin-bottom: 0px;
+    }
+
+    input {
+      display: block;
+      margin-top: 10px;
+      outline: none;
+      border: 1px solid;
+      border-radius: 3px;
+      border-color: rgba(48,77,109,1);
+    }
+
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    input:focus {
+      border: 3px solid;
+      border-color: rgba(0,38,66,1);
+    }
+
+    fieldset {
+      margin-top: 5px;
+      margin-bottom: 15px;
+      max-width: max-content;
+      border: 1px solid;
+      border-radius: 3px;
+      border-color: rgba(48,77,109,1);
+    }
+    
+    fieldset input {
+      display: inline-block;
+      border: 1px solid;
+      border-radius: 3px;
+      border-color: rgba(130,156,188,1);
+    }
+
+    button {
+      cursor: pointer;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      border: 1px solid;
+      border-radius: 3px;
+      border-color: rgba(0,38,66,1);
+    }
+
+    button[type=yamlbutton] {
+      width: 100%;
+      height: 50px;
+    }
+
+    .advancedParametersButtonContainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .dynamicDatabase {
+      margin-bottom: 10px;
+    }
+
+    .dynamicDatabase label, .dynamicDatabase input {
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .dynamicDatabase button {
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+
+    .dynamicTarget {
+      margin-bottom: 10px;
+    }
+
+    .dynamicTarget label, .dynamicTarget input {
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .dynamicTarget button {
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+
+    .dynamicSecondaryStructure {
+      margin-bottom: 10px;
+    }
+
+    .dynamicSecondaryStructure label, .dynamicSecondaryStructure input {
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .dynamicSecondaryStructure button {
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+
+    .dynamicContact {
+      margin-bottom: 10px;
+    }
+
+    .dynamicContact label, .dynamicContact input {
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .dynamicContact button {
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+ 
+    .tooltip-icon {
+      position: relative;
+      display: inline-block;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .tooltip-icon .tooltip-text {
+      visibility: hidden;
+      font-size: 18px;
+      background-color: rgba(0,38,66,1);
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 10px 10px 10px 10px;
+      
+      width:max-content;
+
+      position: absolute;
+      z-index: 1;
+      left: 150%;
+      top: -40%;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .tooltip-icon:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Instruction box styling */
+    .instruction-box {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      color: #4b5258;
+      font-size: 14px;
+      line-height: 1.4;
+      text-align:center;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="header-container">
+    <header>
+      Ensemblify
+    </header>
+  </div>
+  
+  <div class="container">
+    <div id="content">
+      <form id="yamlForm" onsubmit="return false;">
+        <div class="instruction-box">
+          Required entries are marked with an asterisk (*).
+          Hover over the tooltip icons (&#9432;) for more information.
+        </div>
+        <h2>Job Name*</h2>
+        <div class="tooltip-icon">&#9432;
+          <span class="tooltip-text">
+            Name for generated files and folders.
+          </span>
+        </div>
+        <input type="text" id="jobName" placeholder="myprotein" required><br>
+        
+        <h2>Input Structure/Sequence*</h2>
+        <fieldset id="InputStructureSequence" style="padding-top: 3px; padding-bottom: 10px;">
+          <input type="text" id="sequence" placeholder="/home/user/myprotein.pdb" required>
+          <span id="SequenceNbsp">&nbsp;</span>
+          <div class="tooltip-icon" id="SequenceTooltip">&#9432;
+            <span class="tooltip-text">
+              Path to structure/sequence in .pdb or .txt format.<br>
+              A UniProt accession code can also be provided, in<br>
+              which case the corresponding structure from the<br>
+              AlphaFold Protein Structure Database is retrieved.
+            </span>
+          </div>
+          <br id="SequenceBr">
+          <label>Do you want to build your full-length structure by joining IDRs with folded domains?</label>&nbsp;
+          <input type="checkbox" id="BuildSequenceCheckbox"style="display:inline-block">&nbsp;<br>
+          <div class="tooltip-icon" id="FASTAPathTooltip"style="display: none;">&#9432;
+            <span class="tooltip-text">
+              Path to FASTA file(s) containing the sequences<br>
+              of all (folded + disordered) protein domains,<br>
+              from N- to C-terminal. Can be provided either in<br>
+              FASTA or Multi-FASTA format.
+            </span>
+          </div>
+          <span id="FASTAPathNbsp" style="display:none;">&nbsp;</span>
+          <input type="text" id="FASTAPath" placeholder="['/home/user/Ndomain.fa', '/home/user/IDR.fa', '/home/user/Cdomain.fa']" style="display:none;">
+          <br id="FASTAPathBr" style="display:none;">
+          <div class="tooltip-icon" id="PDBPathTooltip"style="display: none;">&#9432;
+            <span class="tooltip-text">
+              Path to PDB file(s) containing the structures of all<br>
+              <b>folded</b> protein domains, from N- to C-terminal.<br>
+              Can be provided as a single PDB file with multiple<br>
+              MODEL entries.
+            </span>
+          </div>
+          <span id="PDBPathNbsp" style="display:none;">&nbsp;</span>
+          <input type="text" id="PDBPath" placeholder="['/home/user/Ndomain.pdb', '/home/user/Cdomain.pdb']" style="display:none;">
+          <br id="PDBPathBr" style="display:none;">
+        </fieldset>
+
+        <h2>Size of Ensemble*</h2>
+        <div class="tooltip-icon">&#9432;
+          <span class="tooltip-text">
+            Size of ensemble to generate (1-100000).
+          </span>
+        </div>
+        <input type="number" id="size" min="1" max="100000" placeholder="10000" required><br>
+    
+        <h2>Database(s)*</h2>
+        <div class="tooltip-icon">&#9432;
+          <span class="tooltip-text">
+            To better utilize your computer's resources,<br>
+            please add only databases that will be sampled<br>
+            from in the Sampling Targets section.
+          </span>
+        </div>
+        <fieldset id ="databases">
+          <div id="dynamicDatabasesContainer">
+            <div class="dynamicDatabase">
+              <label>ID:</label>
+              <input type="text" placeholder="coil" required >
+              <label>Path:</label>
+              <input type="text" placeholder="/home/user/databases/coil.parquet" required >
+            </div>
+          </div>
+          <button type="button" onclick="addDynamicDatabase()">+ Add Database</button>
+        </fieldset>  
+    
+        <h2>Sampling Target(s)*</h2>
+        <div class="tooltip-icon">&#9432;
+          <span class="tooltip-text">
+            Any chains or residues indicated must be present in<br>
+            the input structure. Any database ID indicated must<br>
+            refer to a database present in the Databases section.<br>
+            Any non-sampled region will be constrained to its<br>
+            initial structure.
+          </span>
+        </div>
+        <fieldset id="samplingTargets">
+          <div id="dynamicTargetsContainer">
+            <div class="dynamicTarget">
+              <label>Chain:</label>
+                <input type="text" class="inputChain" placeholder="A" required >
+              <label>Residue Range:</label>
+                <input type="text" class="inputResidueRange" placeholder="[10,20]" required >
+              <label>Database:</label>
+                <input type="text" class="inputDatabaseID" placeholder="coil" required >
+              <label>Mode:</label>
+                <select class="inputSamplingMode" required >
+                  <option value="TRIPEPTIDE" selected>Tripeptide</option>
+                  <option value="SINGLERESIDUE">Single Residue</option>
+                </select>
+            </div>
+          </div>
+          <button type="button" onclick="addDynamicTarget()">+ Add Target</button>
+        </fieldset>
+
+        <h2>Output Path*</h2>
+        <div class="tooltip-icon">&#9432;
+          <span class="tooltip-text">
+            Path to output directory. A directory<br>
+            named Job Name will be created here.
+          </span>
+        </div>
+        <input type="text" id="outputPath" placeholder="/home/user/" required><br>
+    
+        <h2>AlphaFold</h2>&nbsp;
+        <div class="tooltip-icon">&#9432;
+          <span class="tooltip-text">
+            To use any of the following options, input structure must<br>
+            be an AlphaFold model, i.e. it must have a B-Factor column<br>
+            containing the value for each residue's pLDDT.
+          </span>
+        </div>
+        <fieldset id="alphafold" style="padding-top: 10px; padding-bottom: 10px;">
+          <label>Do you want to sample residues based on their pLDDT?</label><br>
+          <input type="checkbox" id="plddt"style="display:inline-block">&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Residues contained in regions defined in Sampling Targets<br>
+              will only be sampled if their pLDDT is below a threshold.<br>
+              If you want to change the pLDDT threshold from the default 70,<br>
+              check the Advanced Parameters section.
+            </span>
+          </div>
+          <br>
+          <label>Do you want structure constraints to be applied based solely on the PAE matrix?</label><br>
+          <input type="checkbox" id="PAECheckbox"style="display:inline-block">&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Any constraints derived from Sampling Targets or defined<br>
+              in Restraints will be ignored and constraints created from<br>
+              the given PAE matrix will be used instead. If you want to<br>
+              customize how these constraints are created, check the<br>
+              Advanced Parameters PAE section.
+            </span>
+          </div>
+          <input type="text" id="PAEPath" placeholder="/home/user/alphafold/myprotein/pae_matrix.json" style="display:none;">
+          <span id="PAEPathNbsp" style="display:none;">&nbsp;</span>
+          <div class="tooltip-icon" id="PAEPathTooltip" style="display:none;">&#9432;
+            <span class="tooltip-text">
+              Path to PAE matrix .json file<br>
+              from AlphaFold output. A UniProt<br>
+              accession code can also be<br>
+              provided, in which case the<br>
+              corresponding PAE matrix from<br>
+              the AlphaFold Protein Structure<br>
+              Database is retrieved.
+            </span>
+          </div>
+        </fieldset>
+
+        <h2>Restraint(s)</h2>&nbsp;
+        <div class="tooltip-icon">&#9432;
+          <span class="tooltip-text">
+            Ways to bias sampling towards<br>
+            desired structural properties.
+          </span>
+        </div>
+        <fieldset id="restraints">
+          <label><b>Secondary Structure Bias</b> ( <input type="number" style="display:inline-block" class="inputSSPercentage" min="1" max="100" value="100" placeholder="100">   %  )</label>
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Force the desired secondary structure<br>
+              element in the desired region on X % <br>
+              of generated structures.
+            </span>
+          </div>
+          <div id="dynamicSecondaryStructuresContainer">
+            <button type="button" onclick="addDynamicSecondaryStructure()">+ Add Secondary Structure Bias</button>
+          </div>
+          <br>
+          <label><b>Contacts</b></label>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Inter-chain contacts present in the input structure (e.g.<br>
+              dimerization sites) you want to conserve during sampling.
+            </span>
+          </div>
+          <br>
+          <div id="dynamicContactsContainer">
+            <button type="button" onclick="addDynamicContact()">+ Add Contact</button>
+          </div>
+        </fieldset>
+        
+        <div class="advancedParametersButtonContainer">
+          <button type="button" id="toggleAdvancedParametersButton" onclick="toggleAdvancedParameters()">Show Advanced Parameters</button><br>
+        </div>
+        
+        <div id="advancedParametersContainer" style="display: none;">  
+          <br>
+          <h2>FASPR Path</h2>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Path to FASPR executable. Defaults to location<br>
+              defined during Ensemblify installation.
+            </span>
+          </div>
+          <input type="text" id="fasprPath" placeholder="/home/user/software/FASPR-master/FASPR"><br>
+      
+          <h2>PULCHRA Path</h2>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Path to PULCHRA executable. Defaults to location<br>
+              defined during Ensemblify installation.
+            </span>
+          </div>
+          <input type="text" id="pulchraPath" placeholder="/home/user/software/pulchra-master/pulchra"><br>
+
+          <h2>Core amount</h2>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Number of processor cores to use. Defaults<br>
+              to all cores in machine minus 1.
+            </span>
+          </div>
+          <input type="number" id="cores" min="1" max="32" placeholder="16"><br>
+          
+          <h2>ScoreFunction</h2>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              PyRosetta Score Function .wts weights file,<br>
+              default or custom, must be defined in<br>
+              /.../pyrosetta/database/scoring/weights/ .
+            </span>
+          </div>
+          <fieldset id="scorefxnParameters">
+            <label>ID:</label>
+            <input type="text" id="scorefxnid" value="score0" placeholder="ScoreFunction weights filename">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                Default ScoreFunction used is <br>
+                score0, with only a repulsive<br>
+                VdW score term.
+              </span>
+            </div><br>
+            <label>VdW score term weight:</label>
+            <input type="number" id="scorefxweight" value="1.0" placeholder="1.0">
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                Will only have an effect if the<br>
+                ScoreFunction has a repulsive<br>
+                Van der Waals term.
+              </span>
+            </div><br>
+          </fieldset>
+
+          <h2>Minimizer</h2>
+          <fieldset id="minimizerparameters">
+            <label>ID:</label>
+            <select id="minimizeridSelect">
+              <option value="dfpmin">dfpmin</option>
+              <option value="dfpmin_armijo">dfpmin_armijo</option>
+              <option value="dfpmin_armijo_nonmonotone" selected>dfpmin_armijo_nonmonotone</option>
+              <option value="dfpmin_strong_wolfe">dfpmin_strong_wolfe</option>
+              <option value="lbfgs_armijo">lbfgs_armijo</option>
+              <option value="lbfgs_armijo_nonmonotone">lbfgs_armijo_nonmonotone</option>
+              <option value="lbfgs_strong_wolfe">lbfgs_strong_wolfe</option>
+            </select>&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                PyRosetta minimization algorithm.
+              </span>
+            </div><br>  
+            <label>Tolerance:</label>
+            <input type="number" id="minimizertol" value="0.001" placeholder="0.001"><br>
+            <label>Maximum iterations:</label>
+            <input type="number" id="minimizermaxiters" value="5000" placeholder="5000"><br>
+            <label>Final Cycles:</label>
+            <input type="number" id="minimizerfinalcycles" value="5" placeholder="5">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                Number of final rounds of minimization<br>
+                to perform on each sampled structure.
+              </span>
+            </div><br>
+          </fieldset>
+
+          <h2>Variability</h2>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Ways to increase conformational sampling<br>
+              variability between sampled structures.
+            </span>
+          </div><br>
+          <fieldset id="variabilityParameters">
+            <label>Variance:</label>
+            <input type="number" id="variabilityvariance" value="0.10" placeholder="0.10">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                New dihedral angle values to insert into flexible<br>
+                regions are sampled from a Gaussian distribution<br>
+                centred on the values found in the database and<br>
+                percentage variance equal to this value.
+              </span>
+            </div><br>
+          </fieldset>
+
+          <h2>Monte Carlo Sampler Parameters</h2>
+          <fieldset id="samplerParameters">
+              <label>Temperature:</label>
+              <input type="number" id="MCTemperature" value="200" placeholder="200">
+              <br>
+              <label>Maximum Loops:</label>
+              <input type="number" id="MCMaxLoops" value="200" placeholder="200">
+          </fieldset>
+
+          <h2>Constraints</h2>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              An AtomPairConstraint's value is given by:<br>
+              f(x) = ((x - x<sub>0</sub>) / stdev)<sup>2</sup>,<br>
+              where f(x) = 0 for x in [x<sub>0</sub>-tol,x<sub>0</sub>+tol].<br>
+              The higher the value, the worse that<br>
+              residue pair's score will be.
+            </span>
+          </div>
+          <fieldset id="constraintsParameters">
+            <label>Weight:</label>
+            <input type="number" id ="constraintsweight" value="1.0" placeholder="1.0">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                Weight of the AtomPairConstraint<br>
+                score term in the ScoreFunction.
+              </span>
+            </div><br>
+            <label>Standard deviation:</label>
+            <input type="number" id ="constraintsstdev" value="10.0" placeholder="10.0"><br>
+            <label>Tolerance:</label>
+            <input type="number" id ="constraintstolerance" value="0.001" placeholder="0.001"><br>
+          </fieldset>
+
+          <h2>Constraints Violation</h2>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Number of residues whose<br>
+              AtomPairConstraint's values are<br>
+              allowed to be above a certain threshold.
+            </span>
+          </div>
+          <fieldset id="constraintsviolationParameters">
+            <label>Threshold:</label>
+            <input type="number" id ="constraintsviolationthreshold" value="0.015" placeholder="0.015"><br>
+            <label>Maximum residues:</label>
+            <input type="number" id ="constraintsviolationmaxres" value="20" placeholder="20"><br>
+          </fieldset>
+
+          <h2>pLDDT</h2>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text" style="text-align: left;">
+              predicted Local Distance Difference Test (pLDDT),<br>
+              AlphaFold's confidence metric:<br>
+              - pLDDT > 90: good backbone and sidechain prediction.<br>
+              - 70 < pLDDT < 90: good backbone prediction.<br>
+              - 50 < pLDDT < 70: should be treated with caution.<br>
+              - pLDDT < 50: strong indication of disorder.
+            </span>
+          </div>
+          <fieldset id="plddtParameters">
+            <label>Threshold:</label>
+            <input type="number" id ="plddtthreshold" value="70" placeholder="70">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                Only sample residues with pLDDT below this number.
+              </span>
+            </div><br>
+            <label>Number of contiguous residues:</label>
+            <input type="number" id ="plddtcontigres" value="4" placeholder="4">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                If residue's pLDDT is below threshold,<br>
+                sample them only if they make up a<br>
+                contiguous region of at least this size.
+              </span>
+            </div>
+          </fieldset>
+
+          <h2>PAE</h2>&nbsp;
+          <div class="tooltip-icon">&#9432;
+            <span class="tooltip-text">
+              Predicted Aligned Error (PAE) matrix.<br>
+              If PAE is generally low for a residue pair x, y from two<br>
+              different domains, it indicates that AlphaFold predicts<br>
+              well-defined relative positions and orientations for them. 
+            </span>
+          </div>
+          <fieldset id="PAEParameters">
+            <label>Cutoff:</label>
+            <input type="number" id ="PAEcutoff" value="10.0" placeholder="10.0">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                Only consider PAE values below this number.
+              </span>
+            </div><br>
+            <label>Flatten cutoff:</label>
+            <input type="number" id ="PAEflattencutoff" value="10.0" placeholder="10.0">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                Any PAE values below this value will<br>
+                be changed to match flatten value.
+              </span>
+            </div><br>
+            <label>Flatten value:</label>
+            <input type="number" id ="PAEflattenvalue" value="10.0" placeholder="10.0">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                Any PAE values below flatten cutoff will<br>
+                be changed to match this value.
+              </span>
+            </div><br>
+            <label>Weight:</label>
+            <input type="number" id ="PAEweight" value="1.0" placeholder="1.0">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                The stdev of AtomPairConstraints<br>
+                created from the PAE matrix is<br>
+                given by error&#215;weight.
+              </span>
+            </div><br>
+            <label>Tolerance:</label>
+            <input type="number" id ="PAEtolerance" value="0.001" placeholder="0.001">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                The tol of AtomPairConstraints<br>
+                created from the PAE matrix is<br>
+                given by this value.
+              </span>
+            </div><br>
+            <label>Adjacency Threshold:</label>
+            <input type="number" id ="PAEadjthreshold" value="8" placeholder="8">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                How far away two residues need to be<br>
+                to consider their PAE value.
+              </span>
+            </div><br>
+            <label>pLDDT Scaling Factor:</label>
+            <input type="number" id ="PAEpLDDTscalingfactor" value="30.0" placeholder="30.0">&nbsp;
+            <div class="tooltip-icon">&#9432;
+              <span class="tooltip-text">
+                Constraints between high pLDDT and low<br>
+                pLDDT residues will be made weaker<br>
+                through this scaling factor (high<br>
+                scaling factor -> weaker constraints).
+              </span>
+            </div><br>
+          </fieldset>
+        </div>
+
+        <div class="advancedParametersButtonContainer">
+          <button type="reset" id="ResetFormButton">Reset Form</button>
+        </div>
+
+        <button type="yamlbutton" onclick="generateYAML()">Generate YAML</button>
+    
+      </form>
+    </div>
+  </div>
+  <script>
+        
+    // Set the width of the input based on the placeholder text
+    function setWidthToPlaceholder(inputElement) {
+      if (inputElement.type != "checkbox") {
+        var placeholderText = inputElement.placeholder;
+        // Character width calculation
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        context.font = window.getComputedStyle(inputElement).font;
+        var textWidth = context.measureText(placeholderText).width;
+        inputElement.style.width = (textWidth + 10) + 'px';
+      }
+    }
+
+    // Apply width setting to all input elements within the form
+    function setWidthToAllInputs() {
+      var formInputs = document.querySelectorAll('#yamlForm input');
+      formInputs.forEach(function (input) {
+        setWidthToPlaceholder(input);
+        // Add an event listener to dynamically update width when placeholder changes
+        input.addEventListener('input', function () {
+          setWidthToPlaceholder(input);
+        });
+      });
+
+    }
+
+    // Initial call to set the width for all inputs
+    setWidthToAllInputs();
+
+    // Show FASTA and PDB path input fields when BuildSequence checkbox is checked
+    document.getElementById('BuildSequenceCheckbox').addEventListener('change', function() {
+      var SequencePath = document.getElementById('sequence');
+      var SequenceTooltip = document.getElementById('SequenceTooltip');
+      var SequenceBr = document.getElementById('SequenceBr');
+      var SequencePathNbsp = document.getElementById('SequenceNbsp');
+      var FASTAPath = document.getElementById('FASTAPath');
+      var FASTATooltip = document.getElementById('FASTAPathTooltip');
+      var FASTAPathBr = document.getElementById('FASTAPathBr');
+      var FASTAPathNbsp = document.getElementById('FASTAPathNbsp');
+      var PDBPath = document.getElementById('PDBPath');
+      var PDBTooltip = document.getElementById('PDBPathTooltip');
+      var PDBPathBr = document.getElementById('PDBPathBr');
+      var PDBPathNbsp = document.getElementById('PDBPathNbsp');
+
+      if (this.checked) {
+        SequencePath.style.display = 'none';
+        SequencePath.required = false;
+        SequenceTooltip.style.display = 'none';
+        SequenceBr.style.display = 'none';
+        SequencePathNbsp.style.display = 'none';
+        FASTAPath.style.display = 'inline-block';
+        FASTAPath.required = true;
+        FASTATooltip.style.display = 'inline-block';
+        FASTAPathBr.style.display = 'block';
+        FASTAPathNbsp.style.display = 'inline';
+        PDBPath.style.display = 'inline-block';
+        PDBPath.required = true;
+        PDBTooltip.style.display = 'inline-block';
+        PDBPathBr.style.display = 'block';
+        PDBPathNbsp.style.display = 'inline';
+      } else {
+        SequencePath.style.display = 'inline-block';
+        SequencePath.required = true;
+        SequenceTooltip.style.display = 'inline-block';
+        SequenceBr.style.display = 'block';
+        SequencePathNbsp.style.display = 'inline';
+        FASTAPath.style.display = 'none';
+        FASTAPath.required = false;
+        FASTATooltip.style.display = 'none';
+        FASTAPathBr.style.display = 'none';
+        FASTAPathNbsp.style.display = 'none';
+        PDBPath.style.display = 'none';
+        PDBPath.required = false;
+        PDBTooltip.style.display = 'none';
+        PDBPathBr.style.display = 'none';
+        PDBPathNbsp.style.display = 'none';
+      }
+      
+      // Call setWidthToAllInputs to set the width for the newly added inputs
+      setWidthToAllInputs();
+    });
+
+    // Add a Database
+    function addDynamicDatabase() {
+      var container = document.getElementById('dynamicDatabasesContainer');
+      var newDatabase = document.createElement('div');
+      newDatabase.className = 'dynamicDatabase';
+
+      var htmlContent = `
+      <label>ID:</label>
+      <input type="text" placeholder="coil">
+      <label>Path:</label>
+      <input type="text" placeholder="/home/user/databases/coil.parquet">
+      
+      <button type="button" onclick="removeDynamicDatabase(this)">&nbsp;&nbsp;-&nbsp;&nbsp;</button>
+      `;
+      newDatabase.innerHTML = htmlContent;
+      container.appendChild(newDatabase);
+
+      // Call setWidthToAllInputs to set the width for the newly added inputs
+      setWidthToAllInputs();
+    }
+
+    // Remove a Database
+    function removeDynamicDatabase(button) {
+      var dynamicDatabase = button.parentNode;
+      dynamicDatabase.parentNode.removeChild(dynamicDatabase);
+    }
+
+    // Add a Target
+    function addDynamicTarget() {
+      var container = document.getElementById('dynamicTargetsContainer');
+      var newTarget = document.createElement('div');
+      newTarget.className = 'dynamicTarget';
+
+      var htmlContent = `
+        <label>Chain:</label>
+        <input type="text" class="inputChain" placeholder="A">
+        <label>Residue Range:</label>
+        <input type="text" class="inputResidueRange" placeholder="[10,20]">
+        <label>Database:</label>
+        <input type="text" class="inputDatabaseID" placeholder="coil">
+        <label>Mode:</label>
+        <select class="inputSamplingMode" required >
+          <option value="TRIPEPTIDE" selected>Tripeptide</option>
+          <option value="SINGLEPEPTIDE">Single Residue</option>
+        </select>
+        <button type="button" onclick="removeDynamicTarget(this)">&nbsp&nbsp-&nbsp&nbsp</button>
+      `;
+
+      newTarget.innerHTML = htmlContent;
+      container.appendChild(newTarget);
+
+      // Call setWidthToAllInputs to set the width for the newly added inputs
+      setWidthToAllInputs();
+    }
+
+    // Remove a Target
+    function removeDynamicTarget(button) {
+      var dynamicTarget = button.parentNode;
+      dynamicTarget.parentNode.removeChild(dynamicTarget);
+    }
+
+    // Show PAE path input field when checkbox is checked
+    document.getElementById('PAECheckbox').addEventListener('change', function() {
+      var PAEPath = document.getElementById('PAEPath');
+      var PAEPathTooltip = document.getElementById('PAEPathTooltip');
+      var PAEPathNbsp = document.getElementById('PAEPathNbsp');
+      if (this.checked) {
+        PAEPath.style.display = 'inline-block';
+        PAEPath.required = true;
+        PAEPathTooltip.style.display = 'inline-block';
+        PAEPathNbsp.style.display = 'inline';
+      } else {
+        PAEPath.style.display = 'none';
+        PAEPath.required = false;
+        PAEPathTooltip.style.display = 'none';
+        PAEPathNbsp.style.display = 'none';
+      }
+    });
+
+    // Add a SecondaryStructure
+    function addDynamicSecondaryStructure() {
+      var button = document.querySelector('#dynamicSecondaryStructuresContainer button');
+      var container = document.getElementById('dynamicSecondaryStructuresContainer');
+      var newSecondaryStructure = document.createElement('div');
+      newSecondaryStructure.className = 'dynamicSecondaryStructure';
+
+      var htmlContent = `&nbsp;
+      <label>Chain:</label>
+      <input type="text" class="inputChain" placeholder="A">
+      
+      <label>Residue Range:</label>
+      <input type="text" class="inputResidueRange" placeholder="[10,20]">
+      
+      <label>Secondary Structure:</label>
+      <select id="secondarystructureSelect">
+        <option value="alpha_helix" selected>alpha helix</option>
+        <option value="beta_strand">beta strand</option>
+      </select>
+
+      <button type="button" onclick="removeDynamicSecondaryStructure(this)">&nbsp;&nbsp;-&nbsp;&nbsp;</button>
+      `;
+
+      newSecondaryStructure.innerHTML = htmlContent;
+      if (container.children[container.children.length - 2]) {
+        container.insertBefore(newSecondaryStructure,container.children[container.children.length - 2].nextSibling);
+      }
+      else {
+        container.insertBefore(newSecondaryStructure,button);
+      }
+
+      // Call setWidthToAllInputs to set the width for the newly added inputs
+      setWidthToAllInputs();
+    }
+
+    // Remove a SecondaryStructure
+    function removeDynamicSecondaryStructure(button) {
+      var dynamicSecondaryStructure = button.parentNode;
+      dynamicSecondaryStructure.parentNode.removeChild(dynamicSecondaryStructure);
+    }
+
+    // Add a Contact
+    function addDynamicContact() {
+      var button = document.querySelector('#dynamicContactsContainer button');
+      var container = document.getElementById('dynamicContactsContainer');
+      var newContact = document.createElement('div');
+      newContact.className = 'dynamicContact';
+
+      var htmlContent = `&nbsp;
+      <label>Chain:</label>
+      <input type="text" class="inputChain1" placeholder="A">
+      
+      <label>Residue Range:</label>
+      <input type="text" class="inputResidueRange1" placeholder="[50,100]">
+      
+      &nbsp;>|<&nbsp;
+      
+      <label>Chain:</label>
+      <input type="text" class="inputChain2" placeholder="B">
+      
+      <label>Residue Range:</label>
+      <input type="text" class="inputResidueRange2" placeholder="[1,49]">
+      
+      <button type="button" onclick="removeDynamicContact(this)">&nbsp;&nbsp;-&nbsp;&nbsp;</button>
+      `;
+      newContact.innerHTML = htmlContent;
+      if (container.children[container.children.length - 2]) {
+        container.insertBefore(newContact,container.children[container.children.length - 2].nextSibling);
+      }
+      else {
+        container.insertBefore(newContact,button);
+      }
+
+      // Call setWidthToAllInputs to set the width for the newly added inputs
+      setWidthToAllInputs();
+    }
+
+    // Remove a Contact
+    function removeDynamicContact(button) {
+      var dynamicContact = button.parentNode;
+      dynamicContact.parentNode.removeChild(dynamicContact);
+    }
+
+    // Update the visibility of Advanced Parameters
+    function toggleAdvancedParameters() {
+      var advancedParametersContainer = document.getElementById('advancedParametersContainer');
+
+      // Toggle the visibility of the container and sampler parameters
+      if (advancedParametersContainer.style.display === 'none') {
+        advancedParametersContainer.style.display = 'block';
+        toggleAdvancedParametersButton.innerText = 'Hide Advanced Parameters';
+      } else {
+        advancedParametersContainer.style.display = 'none';
+        toggleAdvancedParametersButton.innerText = 'Show Advanced Parameters';
+      }
+
+      // Update the button text based on the container's visibility
+      var buttonText = (advancedParametersContainer.style.display === 'none') ? 'Show Advanced Parameters' : 'Hide Advanced Parameters';
+      document.getElementById('toggleAdvancedParametersButton').innerText = buttonText;
+    }
+    
+    function generateYAML() {
+      
+      // Collect sequence data
+      var inputSequence;
+      var buildSequenceChecked = document.getElementById('BuildSequenceCheckbox').checked;
+      
+      if (buildSequenceChecked) {
+        // BuildSequence checkbox is checked - create YAML dictionary format
+        var fastaPath = document.getElementById('FASTAPath').value;
+        var pdbPath = document.getElementById('PDBPath').value;
+        
+        // Parse the input strings as arrays (assuming they're in format like "['file1.fa', 'file2.fa']")
+        var fastaFiles, pdbFiles;
+        
+        try {
+          // Try to parse as JSON array first
+          fastaFiles = JSON.parse(fastaPath.replace(/'/g, '"'));
+        } catch (e) {
+          // If parsing fails, treat as comma-separated string
+          fastaFiles = fastaPath.split(',').map(function(file) {
+            return file.trim().replace(/[\[\]']/g, '');
+          }).filter(function(file) {
+            return file.length > 0;
+          });
+        }
+        
+        try {
+          // Try to parse as JSON array first
+          pdbFiles = JSON.parse(pdbPath.replace(/'/g, '"'));
+        } catch (e) {
+          // If parsing fails, treat as comma-separated string
+          pdbFiles = pdbPath.split(',').map(function(file) {
+            return file.trim().replace(/[\[\]']/g, '');
+          }).filter(function(file) {
+            return file.length > 0;
+          });
+        }
+        
+        // Format as YAML dictionary string
+        var fastaList = fastaFiles.map(function(file) {
+          return '    - ' + file;
+        }).join('\n');
+        
+        var pdbList = pdbFiles.map(function(file) {
+          return '    - ' + file;
+        }).join('\n');
+        
+        inputSequence = 'fastas:\n' + fastaList + '\n  pdbs:\n' + pdbList;
+      } else {
+        // BuildSequence checkbox is not checked - use single sequence string
+        inputSequence = document.getElementById('sequence').value;
+      }
+      
+      // Collect databases data
+      var databases = Array.from(document.getElementById('dynamicDatabasesContainer').querySelectorAll('.dynamicDatabase')).map(function (database) {
+        var dbId = database.querySelector('input').value;
+        var dbPath = database.querySelector('input:nth-of-type(2)').value;
+        return `  ${dbId}: ${dbPath}`;
+      }).join('\n');
+
+      // Collect targets data
+      var targetsMap = new Map();
+      Array.from(document.getElementById('dynamicTargetsContainer').querySelectorAll('.dynamicTarget')).forEach(function (target) {
+          var chain = target.querySelector('.inputChain').value;
+          var residueRange = target.querySelector('.inputResidueRange').value;
+          var databaseId = target.querySelector('.inputDatabaseID').value;
+          var samplingMode = target.querySelector('.inputSamplingMode').value;
+          var samplerType = 'MC';
+
+          // Check if the chain is already in the map
+          if (targetsMap.has(chain)) {
+              // Chain exists, push the new target data to the existing array
+              targetsMap.get(chain).push([samplerType, [residueRange], databaseId, samplingMode]);
+          } else {
+              // Chain doesn't exist, create a new array with the target data
+              targetsMap.set(chain, [[samplerType, [residueRange], databaseId, samplingMode]]);
+          }
+      });
+      targets="";
+      targetsMap.forEach(function (value, key) {
+      targets += `  ${key} : [ ${value.map(target => `[ ${target.join(',')} ]`).join(', ')} ]\n`;
+      });
+      targets = targets.slice(0,-1);
+
+      // Collect constraints data
+
+        // Collect secondary structures data
+        var ssBiasesMap = new Map();
+        Array.from(document.getElementById('dynamicSecondaryStructuresContainer').querySelectorAll('.dynamicSecondaryStructure')).forEach(function (constraint) {
+            var chain = constraint.querySelector('.inputChain').value;
+            var residueRange = constraint.querySelector('.inputResidueRange').value;
+            var secondaryStructure = constraint.querySelector('#secondarystructureSelect').value;
+            var percentage = constraint.querySelector('.inputSSPercentage').value;
+
+            // Check if the chain is already in the map
+            if (ssBiasesMap.has(chain)) {
+                // Chain exists, push the new secondary structure data to the existing array
+                ssBiasesMap.get(chain).push([residueRange, secondaryStructure, percentage]);
+            } else {
+                // Chain doesn't exist, create a new array with the secondary structure data
+                ssBiasesMap.set(chain, [[residueRange, secondaryStructure, percentage]]);
+            }
+        });
+        var ssBiases = "  ";
+        ssBiasesMap.forEach(function (value, key) {
+            ssBiases += `  ${key} : [ ${value.map(ss => `[ ${ss.join(',')} ]`).join(', ')} ]\n`;
+        });
+        ssBiases = ssBiases.slice(0,-1);
+
+        // Collect contacts data 
+        var contacts = Array.from(document.getElementById('dynamicContactsContainer').querySelectorAll('.dynamicContact')).map(function (contact) {
+          var chainA = contact.querySelector('.inputChain1').value;
+          var residueRangeA = contact.querySelector('.inputResidueRange1').value;
+          var chainB = contact.querySelector('.inputChain2').value;
+          var residueRangeB = contact.querySelector('.inputResidueRange2').value;
+          return `    - [ [${chainA}, ${residueRangeA}], [${chainB}, ${residueRangeB}] ]`;
+        }).join('\n');
+
+      var yamlContent =
+`job_name:
+  ${document.getElementById('jobName').value}
+sequence:
+  ${inputSequence}
+size:
+  ${document.getElementById('size').value}
+databases:
+${databases}
+targets:
+${targets}
+alphafold:
+  ${document.getElementById('plddt').checked}
+pae:
+  ${document.getElementById('PAEPath').value}
+restraints:
+  ss_bias :
+    ${ssBiases}
+  contacts :
+    ${contacts}
+output_path:
+  ${document.getElementById('outputPath').value}
+faspr_path:
+  ${document.getElementById('fasprPath').value}
+pulchra_path:
+  ${document.getElementById('pulchraPath').value}
+core_amount:
+  ${document.getElementById('cores').value}
+scorefxn:
+  id: ${document.getElementById('scorefxnid').value}
+  weight: ${document.getElementById('scorefxweight').value}
+minimizer:
+  id: ${document.getElementById('minimizeridSelect').value}
+  tolerance: ${document.getElementById('minimizertol').value}
+  max_iters: ${document.getElementById('minimizermaxiters').value}
+  finalcycles: ${document.getElementById('minimizerfinalcycles').value}
+variability:
+  variance: ${document.getElementById('variabilityvariance').value}
+sampler_params:
+  MC:
+    temperature: ${document.getElementById('MCTemperature').value}
+    max_loops: ${document.getElementById('MCMaxLoops').value}
+constraints:
+  weight: ${document.getElementById('constraintsweight').value}
+  stdev: ${document.getElementById('constraintsstdev').value}
+  tolerance: ${document.getElementById('constraintstolerance').value}
+constraints_violation:
+  threshold: ${document.getElementById('constraintsviolationthreshold').value}
+  maxres: ${document.getElementById('constraintsviolationmaxres').value}
+plddt_params:
+  threshold: ${document.getElementById('plddtthreshold').value}
+  contiguous_res: ${document.getElementById('plddtcontigres').value}
+pae_params:
+  cutoff: ${document.getElementById('PAEcutoff').value}
+  flatten_cutoff: ${document.getElementById('PAEflattencutoff').value}
+  flatten_value: ${document.getElementById('PAEflattenvalue').value}
+  weight: ${document.getElementById('PAEweight').value}
+  adjacency_threshold: ${document.getElementById('PAEadjthreshold').value}
+  tolerance: ${document.getElementById('PAEtolerance').value}
+  plddt_scaling_factor: ${document.getElementById('PAEpLDDTscalingfactor').value}
+`;
+
+      // Prompt the user for a filename, with a default name suggested
+      var filename = prompt("Enter a filename for the YAML file:", `${document.getElementById('jobName').value}_params.yml`);
+      if (!filename) {
+          return; // If the user cancels or enters nothing, don't proceed with download
+      }
+
+      // Ensure the filename ends with .yml
+      if (!filename.endsWith(".yml")) {
+          filename += ".yml";
+      }
+      
+      // Create and download YAML file
+      var blob = new Blob([yamlContent], { type: 'text/yaml' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+  </script>
+</body>
+</html>

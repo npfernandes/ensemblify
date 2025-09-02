@@ -1,0 +1,6 @@
+sphinx-autoapi
+sphinxcontrib-napoleon
+furo
+sphinx_copybutton
+sphinx_tabs
+myst_parser

@@ -1,0 +1,26 @@
+Third-Party Software Notice
+---------------------------
+
+The ./BIFT directory contains files from the GenApp-BayesApp software distribution.
+Source: https://github.com/ehb54/GenApp-BayesApp
+
+Note:
+-----
+
+Only parts of the original software are included in this package:
+    - the original README.md file found at https://github.com/ehb54/GenApp-BayesApp/blob/main/README.md
+    - the original bift.f source code file found at https://github.com/ehb54/GenApp-BayesApp/blob/main/bin/source/bift.f
+    - the original license file found at https://github.com/ehb54/GenApp-BayesApp/blob/main/LICENCE
+
+For the full version, please refer to the source link provided above.
+
+License:
+---------
+
+This software is distributed under the GNU General Public License, as detailed in the ./BIFT/LICENCE
+file.
+
+Modifications:
+--------------
+
+All the files taken from the original distribution were not modified in any way.

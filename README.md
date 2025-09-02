@@ -27,9 +27,7 @@ or as a Python library inside a script or Jupyter notebook:
 Check the [Documentation](https://ensemblify.readthedocs.io/latest/usage.html) for more details.
 
 ### 🔎 How does Ensemblify work?
-A general overview of Ensemblify, descriptions of employed methods and applications can be found in the Ensemblify paper:
-
-    IN SUBMISSION
+A general overview of Ensemblify, descriptions of employed methods and applications can be found in the Ensemblify [pre-print](https://www.biorxiv.org/content/10.1101/2025.08.26.672300v1) and accompanying support information.
 
 ## 🗃 Tripeptide Database
 
@@ -37,7 +35,7 @@ Ensemblify provides a three-residue fragment (tripeptide) database from which to
 
 This database is provided separately from the Ensemblify source-code.
 
-You can learn where to get it and more about its creation in the [Documentation](https://ensemblify.readthedocs.io/latest/database.html).
+You can get it [here](https://zenodo.org/records/16948909) and more about its creation in the [Documentation](https://ensemblify.readthedocs.io/latest/database.html).
 
 ## 📚 Accessing Documentation
 
@@ -46,9 +44,18 @@ Alternatively, the source-code contains docstrings with relevant information.
 
 ## 🗨️ Citation and Publications
 
-If you use Ensemblify, please cite its original publication:
+If you use Ensemblify, please cite its original paper:
 
-    IN SUBMISSION
+    @article {ensemblify2025,
+	title = {Ensemblify: a user-friendly tool for generating ensembles of intrinsically disordered regions of AlphaFold and user-defined models},
+    author = {Fernandes, Nuno and Gomes, Tiago Lopes and Cordeiro, Tiago N},
+    journal = {bioRxiv}
+	year = {2025},
+	publisher = {Cold Spring Harbor Laboratory},
+    doi = {10.1101/2025.08.26.672300},
+	URL = {https://www.biorxiv.org/content/early/2025/08/30/2025.08.26.672300},
+    }
+
 
 ## 🤝 Acknowledgements
 

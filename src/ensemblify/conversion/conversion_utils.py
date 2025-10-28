@@ -135,7 +135,10 @@ def join_pdbs(
                 for line in content:
                     if line.startswith(('ATOM', 'HETA', 'TER')):
                         output.write(line)
-            output.write('ENDMDL\n')
+                if content[-1].endswith('\n'):
+                    output.write('ENDMDL\n')
+                else:
+                    output.write('\nENDMDL\n')
             model += 1
     return ensemble_path
 

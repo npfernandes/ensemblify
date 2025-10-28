@@ -511,7 +511,11 @@ def reweight_ensemble(
         diff_cmap_fig = create_contact_map_fig(contact_matrix=diff_cm,
                                                topology=topology,
                                                trajectory_id=trajectory_id,
-                                               output_path=output_dir,
+                                               output_path=os.path.join(output_dir,
+                                                                        (f'{trajectory_id}_'
+                                                                        'contact_map_'
+                                                                        f't{chosen_theta}_'
+                                                                        'difference.html')),
                                                difference=True)
         theta_2_reweighted_figures[chosen_theta]['diff_cmap'] = diff_cmap_fig
 
@@ -557,7 +561,11 @@ def reweight_ensemble(
         diff_dmatrix_fig = create_distance_matrix_fig(distance_matrix=diff_dm,
                                                       topology=topology,
                                                       trajectory_id=trajectory_id,
-                                                      output_path=output_dir,
+                                                      output_path=os.path.join(output_dir,
+                                                                               (f'{trajectory_id}_'
+                                                                               'distance_matrix_'
+                                                                               f't{chosen_theta}_'
+                                                                               'difference.html')),
                                                       max_colorbar=max_diff_colorbar,
                                                       min_colorbar=min_diff_colorbar,
                                                       difference=True)
@@ -587,7 +595,11 @@ def reweight_ensemble(
         diff_ssfreq_fig = create_ss_frequency_figure(ss_frequency=diff_ssf,
                                                      topology=topology,
                                                      trajectory_id=trajectory_id,
-                                                     output_path=output_dir,
+                                                     output_path=os.path.join(output_dir,
+                                                                              (f'{trajectory_id}_'
+                                                                               'ss_frequency_'
+                                                                               f't{chosen_theta}_'
+                                                                               'difference.html')),
                                                      difference=True)
         theta_2_reweighted_figures[chosen_theta]['diff_ssfreq'] = diff_ssfreq_fig
 

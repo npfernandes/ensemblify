@@ -271,7 +271,7 @@ def setup_sampling_initial_pose(
                               plddt_scaling_factor=params['pae_params']['plddt_scaling_factor'])
 
     # Derive constraint targets from sampling targets
-    logger.info('Deriving regions to constrain (if any)...')
+    logger.info('Deriving regions to constrain...')
     c_targets = derive_constraint_targets(pose=initial_pose,
                                           sampling_targets=params['targets'])
 
@@ -289,6 +289,8 @@ def setup_sampling_initial_pose(
         setup_fold_tree(pose=initial_pose,
                         constraint_targets=c_targets,
                         contacts=params['restraints']['contacts'])
+    else:
+        logger.info('No regions to constrain detected.')
 
     # Save applied constraints to file
     cs = initial_pose.constraint_set()

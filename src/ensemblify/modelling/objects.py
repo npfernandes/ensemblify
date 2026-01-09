@@ -48,7 +48,7 @@ def setup_pose(
 
 
 def setup_minmover(
-    scorefxn: pyrosetta.rosetta.core.scoring.ScoreFunction,
+    scorefxn: pyrosetta.rosetta.core.scoring.ScoreFunction | str,
     min_id: str,
     tolerance: float,
     max_iters: int | None = None,
@@ -57,8 +57,9 @@ def setup_minmover(
     """Setup a PyRosetta MinMover object given the necessary parameters.
 
     Args:
-        scorefxn (pyrosetta.rosetta.core.scoring.ScoreFunction):
-            Score function that will be used during Pose minimization.
+        scorefxn (pyrosetta.rosetta.core.scoring.ScoreFunction | str):
+            Score function that will be used during Pose minimization. If ScoreFunction id is
+            provided instead, a ScoreFunction object is created automatically.
         min_id (str):
             Identifier for the used PyRosetta minimization algorithm.
         tolerance (float):
@@ -81,9 +82,15 @@ def setup_minmover(
     if 'chi' in dofs:
         mmap.set_chi(True) # and chi torsion angles (side chains)
     
+    # Setup ScoreFunction according to provided type
+    if isinstance(scorefxn,str):
+        sfxn = pyrosetta.rosetta.core.scoring.ScoreFunctionFactory.create_score_function(scorefxn)
+    else:
+        sfxn = scorefxn
+
     # Setup the MinMover object with required paremeters
     min_mover = pyrosetta.rosetta.protocols.minimization_packing.MinMover(mmap,
-                                                                          scorefxn,
+                                                                          sfxn,
                                                                           min_id,
                                                                           tolerance,
                                                                           True) # use neighbor list

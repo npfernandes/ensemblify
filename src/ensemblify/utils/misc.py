@@ -10,7 +10,7 @@ import scipy
 def kde(
     data: np.ndarray,
     weights: list | None = None,
-    ) -> tuple[np.ndarray,np.ndarray,float]:
+    ) -> tuple[np.ndarray,np.ndarray,float,float]:
     """Calculate a Kernel Density Estimate (KDE) distribution for a given dataset.
 
     Weights for the given dataset can be provided to alter the contribution of each

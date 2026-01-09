@@ -68,6 +68,9 @@ def run_sampling(
     # Setup logging
     logger, RAY_LOG, PYROSETTA_LOG = setup_sampling_logging(sampling_log=sampling_log)
 
+    # Setup sampling constants and variables
+    logger.info('Setting up sampling protocol...')
+
     # Setup parameters file
     PARAMETERS = setup_sampling_parameters(parameters_file=input_parameters)
 
@@ -93,9 +96,6 @@ def run_sampling(
                                                 sampling_log=sampling_log)
     databases = _HashableDict(setup_databases(PARAMETERS['databases']))
     databases_mem_size = _get_dbs_mem_size(databases=databases)
-
-    # Setup sampling constants and variables
-    logger.info('Setting up sampling...')
 
     ## Assign constants
     VALID_PDBS_DIR = valid_pdbs_dir
@@ -140,9 +140,10 @@ def run_sampling(
                 miniters=1,
                 dynamic_ncols=True)
 
-    logger.info('Sampling has been setup successfully.')
+    logger.info('Sampling protocol has been setup successfully.')
 
     # Setup Ray
+    logger.info('Setting up Ray client...')
     ray.init(num_cpus=PARAMETERS['core_amount'],
              object_store_memory=databases_mem_size+100000000, # +100MiB to store computed results
              log_to_driver=False,
@@ -172,6 +173,8 @@ def run_sampling(
     unfinished_obj_refs_batch = []
     MAX_PENDING_TASKS = PARAMETERS['core_amount'] # Max nr of tasks to allow in the system at once
     decoy_num = 0
+
+    logger.info('Ray client setup sucessfully.')
 
     # Sample with secondary structure bias (if applicable)
     if SS_BIAS_CUTPOINT is not None:

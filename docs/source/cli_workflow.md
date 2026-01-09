@@ -34,7 +34,7 @@ For this example, we will use a parameters file created for Histatin5, a small i
       Assuming you have an Ensemblify parameters file `Hst5_params.yml` in the current working directory, you can run:
 
       ```{code-block} console
-      (ensemblify_env) $ ensemblify gen -p params.yml
+      (ensemblify_env) $ ensemblify gen -p Hst5_params.yml
       Generating ensemble of 10 valid pdbs using 31 processor cores... 
       Ensemblified!: 100%|██████████| 10/10 [00:07<00:00,  1.43valid_pdb/s]   
       There are 10 valid pdbs, 14 were discarded ( 14 clashed | 0 violated constraints).

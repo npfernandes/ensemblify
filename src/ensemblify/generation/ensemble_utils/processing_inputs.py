@@ -77,7 +77,7 @@ ADVANCED_PARAMS_DEFAULTS = {
                    'weight': 1.0,
                    'tolerance': 0.001,
                    'adjacency_threshold': 8,
-                   'plddt_scaling_factor': 20.0}
+                   'plddt_scaling_factor': 30.0}
 }
 
 # FUNCTIONS

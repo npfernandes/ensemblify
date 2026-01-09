@@ -252,8 +252,8 @@ def apply_pae_constraints(
     
     The strength of the constraints scales with the value of the predicted aligned error for that
     residue pair.
-    After scaling with PAE value, applied constraints are made weaker when between a residue with
-    high pLDDT and a residue with low pLDDT.
+    After scaling with PAE value, applied constraints are made weaker when one of the participating
+    residues has low pLDDT.
     This function is incompatible with the apply_constraints function, and they should not be
     used on the same Pose.
     
@@ -283,9 +283,14 @@ def apply_pae_constraints(
             How far away two residues need to be to consider their PAE value. Neighbours are
             skipped as PAE is best used for determining between domain or between chain confidence.
         plddt_scaling_factor (float):
-            Any constraints setup between residues where one of them has a low pLDDT and another a
-            high pLDDT will be scaled by multiplying its weight by this factor. The higher this
-            value the weaker those constraints will be.
+            Any constraints setup between residues where either of them has a low pLDDT will be
+            scaled by multiplying its weight by this factor. The higher this value the weaker those
+            constraints will be.
+    
+    Returns:
+        list:
+            List of Pose residue numbers that participate in created constraints.
+
     """
     # Get PAE Matrix
     with open(pae_filepath,'r',encoding='utf-8-sig') as f:
@@ -306,12 +311,12 @@ def apply_pae_constraints(
                                  '"predicted_aligned_error" or "pae".') from e
 
     # Check which residues have pLDTT below threshold
-    low_plddt_res = []
+    low_plddt_res = set()
     for chain_id,targets in plddt_targets.items():
         for target in targets:
             res_range = target[1]
             for res in res_range:
-                low_plddt_res.append(pose.pdb_info().pdb2pose(chain_id,res))
+                low_plddt_res.add(pose.pdb_info().pdb2pose(chain_id,res))
 
     # Initialize temporary Pose object
     tmp_pose = pyrosetta.rosetta.core.pose.Pose()
@@ -319,12 +324,15 @@ def apply_pae_constraints(
 
     # Create constraint set
     working_cs = pyrosetta.rosetta.core.scoring.constraints.ConstraintSet(pose.constraint_set())
+    
+    # Store constrained_residues
+    constrained_res = set()
 
-    # Apply constraints based on pae
+    # Apply constraints based on PAE
     for r1_idx, r2_idx in np.argwhere(pae_matrix < cutoff):
-        # Between two residues with low plddt, pae value is
+        # Between two residues with low pLDDT, PAE value is
         # often high so its already discarded here
-
+        
         if abs(r1_idx - r2_idx) < adjacency_threshold:
             # This will also discard constraints between residues and themselves
             continue
@@ -333,42 +341,35 @@ def apply_pae_constraints(
             # Do not add redundant constraints (more constraints mean longer energy calculations)
             continue
 
-        elif (r1_idx+1 not in low_plddt_res and r2_idx+1 in low_plddt_res or \
-              r1_idx+1 in low_plddt_res and r2_idx+1 not in low_plddt_res):
-            # Add weaker constraints between residues when one of them has low plddt and
-            # the other has high plddt
+        mean_error = (pae_matrix[r1_idx, r2_idx] + pae_matrix[r2_idx,r1_idx]) / 2
+        if mean_error < flatten_cutoff:
+            mean_error = flatten_value
 
-            error = pae_matrix[r1_idx, r2_idx]
-            if error < flatten_cutoff:
-                error = flatten_value
+        res_num_1 = r1_idx + 1
+        res_num_2 = r2_idx + 1
 
-            # Higher stdev -> Lower apc value increase rate -> Lower Pose score => Weaker cst
-            apc = make_atom_pair_constraint(pose=tmp_pose,
-                                            res_num_1=r1_idx + 1,
-                                            res_num_2=r2_idx + 1,
-                                            stdev=error*weight*plddt_scaling_factor,
-                                            tolerance=tolerance)
-            
-            working_cs.add_constraint(apc)
-
-        elif r1_idx+1 not in low_plddt_res and r2_idx+1 not in low_plddt_res:
-            # Add stronger (not weakened) constraints between res when both of them have high plddt
+        r1_has_low_plddt = res_num_1 in low_plddt_res
+        r2_has_low_plddt = res_num_2 in low_plddt_res
+        if r1_has_low_plddt or r2_has_low_plddt:
+            # Weaker constraints when at least one residue has low pLDDT
+            curr_stdev = mean_error*weight*plddt_scaling_factor
+        else:
+            # Add regular (not weakened) constraints between res when both of them have high pLDDT
             # This if clause also includes pairs of non-sampled residues, if they have low PAE
             # (e.g. folded proteins domains whose structure should remain conserved)
+            curr_stdev = mean_error*weight
 
-            error = pae_matrix[r1_idx, r2_idx]
-
-            if error < flatten_cutoff:
-                error = flatten_value
-            
-            # Lower stdev -> Higher apc value increase rate -> Higher Pose score => Stronger cst
-            apc = make_atom_pair_constraint(pose=tmp_pose,
-                                            res_num_1=r1_idx + 1,
-                                            res_num_2=r2_idx + 1,
-                                            stdev=error*weight,
-                                            tolerance=tolerance)
-            
-            working_cs.add_constraint(apc)
+        # Higher stdev -> Lower apc value increase rate -> Lower Pose score => Weaker cst
+        # Lower stdev -> Higher apc value increase rate -> Higher Pose score => Stronger cst
+        apc = make_atom_pair_constraint(pose=tmp_pose,
+                                        res_num_1=res_num_1,
+                                        res_num_2=res_num_2,
+                                        stdev=curr_stdev,
+                                        tolerance=tolerance)
+        
+        working_cs.add_constraint(apc)
+        constrained_res.add(res_num_1)
+        constrained_res.add(res_num_2)
 
     # Apply constraint set to pose
     setup = pyrosetta.rosetta.protocols.constraint_movers.ConstraintSetMover()
@@ -377,4 +378,6 @@ def apply_pae_constraints(
 
     # Update working pose
     pose.assign(tmp_pose)
+
+    return sorted(constrained_res)
     

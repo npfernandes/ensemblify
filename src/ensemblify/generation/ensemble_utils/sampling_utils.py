@@ -258,39 +258,42 @@ def setup_sampling_initial_pose(
                               make_centroid=True)
 
     if params['pae'] != 'None':
-        logger.info('Applying pae constraints...')
-        apply_pae_constraints(pose=initial_pose,
-                              pae_filepath=params['pae'],
-                              plddt_targets=params['targets'],
-                              cutoff=params['pae_params']['cutoff'],
-                              flatten_cutoff=params['pae_params']['flatten_cutoff'],
-                              flatten_value=params['pae_params']['flatten_value'],
-                              weight=params['pae_params']['weight'],
-                              tolerance=params['pae_params']['tolerance'],
-                              adjacency_threshold=params['pae_params']['adjacency_threshold'],
-                              plddt_scaling_factor=params['pae_params']['plddt_scaling_factor'])
+        c_targets = []
+        logger.info('Applying PAE-derived constraints...')
+        c_res = apply_pae_constraints(pose=initial_pose,
+                                      pae_filepath=params['pae'],
+                                      plddt_targets=params['targets'],
+                                      cutoff=params['pae_params']['cutoff'],
+                                      flatten_cutoff=params['pae_params']['flatten_cutoff'],
+                                      flatten_value=params['pae_params']['flatten_value'],
+                                      weight=params['pae_params']['weight'],
+                                      tolerance=params['pae_params']['tolerance'],
+                                      adjacency_threshold=params['pae_params']['adjacency_threshold'],
+                                      plddt_scaling_factor=params['pae_params']['plddt_scaling_factor'])
 
-    # Derive constraint targets from sampling targets
-    logger.info('Deriving regions to constrain...')
-    c_targets = derive_constraint_targets(pose=initial_pose,
-                                          sampling_targets=params['targets'])
-
-    # Apply constraints if needed
-    if c_targets:
-        logger.info('Applying constraints...')
-        apply_constraints(pose=initial_pose,
-                          cst_targets=c_targets,
-                          contacts=params['restraints']['contacts'],
-                          stdev=params['constraints']['stdev'],
-                          tolerance=params['constraints']['tolerance'])
-
-        # Adjust fold_tree to improve sampling yield
-        logger.info('Setting up FoldTree...')
-        setup_fold_tree(pose=initial_pose,
-                        constraint_targets=c_targets,
-                        contacts=params['restraints']['contacts'])
     else:
-        logger.info('No regions to constrain detected.')
+        c_res = None
+        # Derive constraint targets from sampling targets
+        logger.info('Deriving regions to constrain...')
+        c_targets = derive_constraint_targets(pose=initial_pose,
+                                              sampling_targets=params['targets'])
+
+        # Apply constraints if needed
+        if c_targets:
+            logger.info('Applying constraints...')
+            apply_constraints(pose=initial_pose,
+                              cst_targets=c_targets,
+                              contacts=params['restraints']['contacts'],
+                              stdev=params['constraints']['stdev'],
+                              tolerance=params['constraints']['tolerance'])
+
+            # Adjust fold_tree to improve sampling yield
+            logger.info('Setting up FoldTree...')
+            setup_fold_tree(pose=initial_pose,
+                            constraint_targets=c_targets,
+                            contacts=params['restraints']['contacts'])
+        else:
+            logger.info('No regions to constrain detected.')
 
     # Save applied constraints to file
     cs = initial_pose.constraint_set()
@@ -304,7 +307,9 @@ def setup_sampling_initial_pose(
 
     # Save initial pose information to log file
     logger.info(f'Initial Pose:\n{initial_pose}')
-    if c_targets:
+    if c_res is not None:
+        logger.info(f'Constrained residues (Pose numbering):\n{c_res}')
+    elif c_targets:
         logger.info(f'Intra-chain constrained regions (Pose numbering):\n{c_targets}')
     logger.info('Initial structure has been setup sucessfully.')
 

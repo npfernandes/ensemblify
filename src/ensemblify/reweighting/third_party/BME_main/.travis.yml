@@ -1,0 +1,20 @@
+language: python
+python:
+   - "3.4"	
+   - "3.5"	
+   - "3.6"
+   - "3.7"	
+   - "3.8"
+
+
+install:
+   - pip install numpy scipy 
+   - pip install nose2
+   - pip install pandas sklearn
+   - pip install matplotlib		
+script:
+  # Your test script goes here
+  nose2
+branches:
+  only:
+  - main

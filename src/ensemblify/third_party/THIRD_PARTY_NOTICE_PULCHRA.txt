@@ -1,0 +1,29 @@
+Third-Party Software Notice
+---------------------------
+
+The ./pulchra-master directory contains all files from the PULCHRA software distribution.
+Source: https://github.com/euplotes/pulchra
+
+License:
+---------
+
+This software is distributed under the MIT License, detailed in the ./pulchra-master/LICENSE file.
+
+Modifications:
+--------------
+
+The pulchra_CHANGED.c file is a modified version of the original source code file pulchra.c,
+with the addition of the following code on line 3024:
+
+    // Display all conflicts after all iterations
+    res = chain->residua;
+    while (res) {
+        if (res->protein) {
+            display_conflicts(res, grid, xgrid, ygrid, zgrid);
+        }
+        res = res->next;
+    }
+
+This makes it so PULCHRA outputs the residue numbers of the residues involved in a steric
+clash when it detects one.
+All other files taken from the original distribution were not modified in any way.

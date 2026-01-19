@@ -1,0 +1,73 @@
+job_name: # Name to give resulting files/folders
+  myprotein
+sequence: # Path to the input sequence/structure, in .pdb or .txt format, or just the sequence string
+  /home/user/myprotein.pdb # or UniProt accession code
+  # or build your full-length input structure
+  # fastas: # sequences of all domains (folded + disordered) from N- to C-terminal
+  #   - /home/user/myprotein.fa # multi-sequence FASTA file, can also be separate
+  # pdbs: # PDB structures of all folded domains from N- to C-terminal
+  #   - /home/user/myprotein.pdb # multi model PDB file, can also be separate
+size: # Size of ensemble to generate (1-100000)
+  1
+databases: # Path to database(s) to use during sampling
+  all: /home/user/databases/all.parquet
+  coil: /home/user/databases/coil.parquet
+  # add more databases here
+targets: # Dictionary of chain:List of lists, indicating sampling targets
+  A : [ [ MC, [1,49], all , TRIPEPTIDE] ]
+  B : [ [ MC, [51,100], coil, SINGLERESIDUE] ]
+alphafold: # Inside target range, target only residues below pLDDT threshold?
+  False
+pae: # Apply constraints solely based on given PAE matrix
+  None # or path to matrix .json / UniProt accession code
+restraints: # Force secondary structure or conserve relative positions present in starting structure
+  ss_bias :
+    - 
+      - [ A, [25,49], alpha_helix ] # chain, region, sstruc
+      - [ B, [51,75], beta_strand ] # chain, region, sstruc
+      # add more ssbias here
+    - 100 # ssbias percentage
+  contacts : # Defines what relative positions between regions we want to keep conserved
+    - [ [A, [50,100]] , [B,  [1,49]] ]
+    # add more contacts here
+output_path: # Path to output directory
+  /home/user/
+######################################################################## Advanced Parameters ########################################################################
+faspr_path: # Path to FASPR
+  # /home/user/software/FASPR-master/FASPR
+pulchra_path: # Path to (changed!) Pulchra
+  # /home/user/software/pulchra-master/pulchra
+core_amount: # Number of processor cores to use for parallel sampling
+  32
+scorefxn: # PyRosetta Score Function .wts weights file, default or custom, must be defined in /.../pyrosetta/database/scoring/weights/ .
+  id: score0 # Default ScoreFunction used is score0, with only a VdW score term.
+  weight: 1.0 # VdW score term weight. Will only have an effect if the ScoreFunction has a Van der Waals term.
+minimizer: # PyRosetta Minimizer (for MinMover)
+  id: dfpmin_armijo_nonmonotone # PyRosetta minimization algorithm.
+  tolerance: 0.001
+  max_iters: 5000
+  finalcycles: 5 # Number of final rounds of minimization to perform on each sampled structure.
+variability:
+  variance: 0.10 # Values are sampled from a gaussian distribution centred on the values found in the database and percentage variance equal to this value
+sampler_params:
+  MC: # Dictionary of parameters for each sampler used in targets
+    temperature: 200
+    max_loops: 200 
+constraints:
+  weight: 1.0 # Weight of the AtomPairConstraint score term in the ScoreFunction.
+  stdev: 10.0
+  tolerance: 0.001
+constraints_violation:
+  threshold: 0.015
+  maxres: 20 # Number of residues whose AtomPairConstraint's values are allowed to be above a certain threshold.
+plddt_params:
+  threshold: 70 # Sample residues with pLDDT below this number.
+  contiguous_res: 4 # If residue's pLDDT is below threshold, sample them only if they make up a contigous region of at least this size.
+pae_params:
+  cutoff: 10.0 # Only consider PAE values below this number.
+  flatten_cutoff: 10.0 # Any PAE values below this value will be changed to match flatten value.
+  flatten_value: 10.0 # Any PAE values below flatten cutoff will be changed to match this value.
+  weight: 1.0 # The stdev of AtomPairConstraints created from the PAE matrix is given by error x weight.
+  tolerance: 0.001 # The tol of AtomPairConstraints created from the PAE matrix is given by this value.
+  adjacency_threshold: 8 # How far away two residues need to be to consider their PAE value.
+  plddt_scaling_factor: 30.0 # Constraints between high pLDDT and low pLDDT residues will be made weaker through this scaling factor (high scaling factor -> weaker constraints)

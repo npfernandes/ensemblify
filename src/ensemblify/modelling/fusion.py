@@ -224,7 +224,7 @@ def create_fusion_pose(
     output_dir: str | None = None,
     fusion_verbose: bool = True,
     pyrosetta_verbose: bool = False,
-    ) -> pyrosetta.rosetta.core.pose.Pose:
+    ) -> tuple[pyrosetta.rosetta.core.pose.Pose, list[tuple[str, tuple[int, int]]]]:
     """Create a full-length fused Pose object from provided sequences and PDB structures.
 
     Args:
@@ -247,6 +247,9 @@ def create_fusion_pose(
     Returns:
         pyrosetta.rosetta.core.pose.Pose:
             The final fused Pose object containing all sequences and PDB structures.
+        list[tuple[str, tuple[int, int]]]]:
+            The list of fusion objects used in Pose fusion, reporting on their sequence or PDB
+            filepath and their residue ranges in the full length sequence.
     """
     # Setup output directory
     if output_dir is None:
@@ -386,7 +389,7 @@ def create_fusion_pose(
     print('Pose fusion complete.')
     FLpose.dump_pdb(f'{os.path.join(output_dir,output_name)}.pdb')
 
-    return FLpose
+    return FLpose, fusion_objects
 
 
 def fuse_structures(
@@ -429,10 +432,10 @@ def fuse_structures(
 
     # Create the fused Pose object from sequences and PDB structures
     ## This step outputs a .pdb file with the fused structure
-    _ = create_fusion_pose(sequences=sequences,
-                           pdb_structures=pdb_structures,
-                           output_name=output_name,
-                           output_dir=output_dir)
+    _, fusion_objects = create_fusion_pose(sequences=sequences,
+                                           pdb_structures=pdb_structures,
+                                           output_name=output_name,
+                                           output_dir=output_dir)
     
     # Define the path for the output fused PDB file
     fused_pdb_path = f'{os.path.join(output_dir,output_name)}.pdb'
@@ -441,6 +444,11 @@ def fuse_structures(
     print('Processing fused Pose...')
     processed_fused_pdb_log, \
     processed_fused_pdb = process_pdb_structure(pdb=fused_pdb_path)
-    print('Processing complete.')
+    print('Pose processing complete.')
+
+    # Report on new domain boundaries for full-length construct
+    print('New full-length Pose domain boundaries:')
+    for fo in fusion_objects:
+        print(f'    {fo[0]} : {fo[1]}')
 
     return processed_fused_pdb_log, processed_fused_pdb

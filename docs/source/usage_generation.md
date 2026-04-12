@@ -64,6 +64,7 @@ To generate an ensemble, simply provide Ensemblify with the path to your paramet
 
    ```{code-tab} python Python
    from ensemblify.generation import generate_ensemble
+
    generate_ensemble('parameters_file.yml')
    ```
 ````

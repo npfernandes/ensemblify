@@ -15,11 +15,19 @@ To create an interactive graphical dashboard with structural information calcula
 ````{tabs}
 
    ```{code-tab} console CLI
-   (ensemblify_env) $ ensemblify analysis -trj trajectory.xtc -top topology.pdb -tid protein_name
+   (ensemblify_env) $ ensemblify analysis \
+       -trj trajectory.xtc \
+       -top topology.pdb \
+       -tid protein_name
    ```
 
    ```{code-tab} python Python
    from ensemblify.analysis import analyze_trajectory
-   analyze_trajectory('trajectory.xtc','topology.pdb','protein_name')
+
+   analyze_trajectory(
+       'trajectory.xtc',
+       'topology.pdb',
+       'protein_name'
+   )
    ```
 ````

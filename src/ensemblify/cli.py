@@ -202,7 +202,7 @@ def main():
     parser_conversion.add_argument('-e', '--ensembledir',
                                    default=None, type=str,  metavar='',
                                    help=('(Optional) Path to directory where ensemble files (.pdb)'
-                                         'are located. Defaults to current working directory.'))
+                                         ' are located. Defaults to current working directory.'))
 
     parser_conversion.add_argument('-t', '--trajectorydir',
                                    default=None, type=str,  metavar='',

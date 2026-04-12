@@ -15,11 +15,19 @@ To convert your generated .pdb structures into a single .xtc trajectory file, pr
 ````{tabs}
 
    ```{code-tab} console CLI
-   (ensemblify_env) $ ensemblify conversion -e ensemble_dir -t trajectory_dir -i trajectory_name
+   (ensemblify_env) $ ensemblify conversion \
+       -e ensemble_dir \
+       -t trajectory_dir \
+       -i trajectory_name
    ```
 
    ```{code-tab} python Python
    from ensemblify.conversion import ensemble2traj
-   ensemble2traj('ensemble_dir','trajectory_dir','trajectory_name')
+
+   ensemble2traj(
+       'ensemble_dir',
+       'trajectory_dir',
+       'trajectory_name'
+   )
    ```
 ````

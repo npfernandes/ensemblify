@@ -14,6 +14,7 @@ To check for steric clashes in your conformational ensemble, provide Ensemblify 
 
    ```{code-tab} python Python
    from ensemblify.clash_checking import check_steric_clashes
+
    check_steric_clashes('ensemble_dir')
    ```
 ````

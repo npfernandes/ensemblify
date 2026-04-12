@@ -18,12 +18,22 @@ To use experimental SAXS data to reweight your conformational ensemble following
 ````{tabs}
 
    ```{code-tab} console CLI
-   (ensemblify_env) $ ensemblify reweighting -trj trajectory.xtc -top topology.pdb -tid protein_name -exp exp_SAXS_data.dat
+   (ensemblify_env) $ ensemblify reweighting \
+       -trj trajectory.xtc \
+       -top topology.pdb \
+       -tid protein_name \
+       -exp exp_SAXS_data.dat
    ```
 
    ```{code-tab} python Python
    from ensemblify.reweighting import reweight_ensemble
-   reweight_ensemble('trajectory.xtc','topology.pdb','trajectory_name','exp_SAXS_data.dat')
+
+   reweight_ensemble(
+       'trajectory.xtc',
+       'topology.pdb',
+       'trajectory_name',
+       'exp_SAXS_data.dat'
+   )
    ```
 ````
 

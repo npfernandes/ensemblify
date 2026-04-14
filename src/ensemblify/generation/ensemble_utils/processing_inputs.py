@@ -20,7 +20,7 @@ from ensemblify.modelling.pdb_processing import (
     apply_rewrite_single,
     apply_restore_single
 )
-from ensemblify.utils import df_from_pdb, df_to_pdb
+from ensemblify.utils import cif_to_pdb, df_from_pdb, df_to_pdb
 
 # CONSTANTS
 VALID_PARAMS_TYPES = {
@@ -363,6 +363,14 @@ def setup_ensemble_gen_params(input_params: dict, inputs_dir: str) -> tuple[str,
 
             # Update sequence with PAE
             input_params_processed['pae'] = pae_matrix_path
+
+    # Convert input PDBx/mmCIF to PDB if applicable
+    input_sequence = input_params_processed['sequence']
+    if input_sequence.endswith('.cif'):
+        pdb_path = os.path.splitext(input_sequence)[0] + '.pdb'
+        cif_to_pdb(cif_path=input_sequence,
+                   pdb_path=pdb_path)
+        input_params_processed['sequence'] = pdb_path
 
     # Process input .pdb through FASPR and PULCHRA
     input_sequence = input_params_processed['sequence']

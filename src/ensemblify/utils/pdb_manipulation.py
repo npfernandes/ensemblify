@@ -6,7 +6,7 @@ import os
 
 ## Third Party Imports
 import pandas as pd
-from Bio.PDB import PDBIO, PDBParser
+from Bio.PDB import MMCIFParser, PDBIO, PDBParser
 from Bio.PDB.Atom import Atom
 from Bio.PDB.Chain import Chain
 from Bio.PDB.Model import Model
@@ -14,6 +14,27 @@ from Bio.PDB.Residue import Residue
 from Bio.PDB.Structure import Structure
 
 # FUNCTIONS
+def cif_to_pdb(cif_path: str, pdb_path: str) -> None:
+    """
+    Convert a PDBx/mmCIF file to PDB format.
+
+    Args:
+        cif_path (str):
+            Path to the input .cif file.
+        pdb_path (str):
+            Path to the output .pdb file.
+    """
+
+    # Create a MMCIFParser object to parse the mmCIF file
+    parser = MMCIFParser(QUIET=True)
+    structure = parser.get_structure("structure", cif_path)
+
+    # Assign structure to PDBIO object and save as PDB file
+    pdb_io = PDBIO()
+    pdb_io.set_structure(structure)
+    pdb_io.save(pdb_path)
+
+
 def df_from_pdb(pdb: str) -> pd.DataFrame:
     """Convert the information in a .pdb file into a pandas DataFrame using BioPDB.
 

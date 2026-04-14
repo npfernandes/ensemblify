@@ -86,13 +86,15 @@ from ensemblify.utils.misc import (
     round_to_nearest_multiple,
 )
 from ensemblify.utils.pdb_manipulation import (
+    cif_to_pdb,
     cleanup_pdbs,
     df_from_pdb,
     df_to_pdb,
     extract_pdb_info,
 )
 
-__all__ = ['cleanup_pdbs',
+__all__ = ['cif_to_pdb',
+           'cleanup_pdbs',
            'df_from_pdb',
            'df_to_pdb',
            'extract_pdb_info',

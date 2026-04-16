@@ -18,6 +18,7 @@ from ensemblify.modelling._alignment import (
 from ensemblify.modelling.objects import setup_pose, setup_minmover
 from ensemblify.modelling.constraints import apply_constraints
 from ensemblify.modelling.pdb_processing import process_pdb_structure
+from ensemblify.utils import cif_to_pdb
 
 # FUNCTIONS
 def apply_basic_idealize(
@@ -392,6 +393,33 @@ def create_fusion_pose(
     return FLpose, fusion_objects
 
 
+def check_is_pdb(input_pdbs: list[str]):
+    """Check provided filepaths: if they are not PDB files and are instead mmCIF, convert to PDB.
+    
+    Args:
+        input_pdbs (list[str]):
+            Path(s) to file(s) to check.
+    
+    Returns:
+        list[str]:
+            Same as input if all files are in PDB format. If inputs are in mmCIF format,
+            they are converted to PDB and the new filepaths are returned.
+    """
+    new_input_pdbs = []
+    for pdb in input_pdbs:
+        if pdb.endswith('.pdb'):
+            new_input_pdbs.append(pdb)
+        elif pdb.endswith('.cif'):
+            new_pdb = os.path.splitext(pdb)[0] + '.pdb'
+            cif_to_pdb(cif_path=pdb,
+                       pdb_path=new_pdb)
+            new_input_pdbs.append(new_pdb)
+        else:
+            raise ValueError('Provided structures must be in .pdb or .cif format!')
+    
+    return new_input_pdbs
+
+
 def fuse_structures(
     input_fastas: list[str],
     input_pdbs: list[str],
@@ -405,7 +433,7 @@ def fuse_structures(
             Path(s) to FASTA file(s) containing the sequences of all protein domains
             (folded + disordered) to be fused, in order from N- to C-terminal.
         input_pdbs (list[str]):
-            Path(s) to PDB file(s) containing the structures of folded protein domains
+            Path(s) to PDB or mmCIF file(s) containing the structures of folded protein domains
             to be fused, in order from N- to C-terminal.
         output_name (str):
             Name for the output fused PDB file (without extension).
@@ -425,6 +453,9 @@ def fuse_structures(
     elif not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 
+    # Convert PDBx/mmCIF files to PDB if needed
+    input_pdbs = check_is_pdb(input_pdbs)
+    
     # Setup sequences and PDB structures from input files
     sequences, \
     pdb_structures = setup_sequences_structures(input_fastas=input_fastas,

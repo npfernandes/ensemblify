@@ -187,8 +187,14 @@ def main():
                                               formatter_class=CustomHelpFormatter)
 
     parser_generation.add_argument('-p', '--parameters',
-                                   type=str, required=True, metavar='',
-                                   help='Path to parameters file (.yml).')
+                                   type=str, metavar='',
+                                   help=('(Optional) Path to parameters file for ensemble '
+                                         'generation (.yml). Incompatible with --suggest-targets.'))
+
+    parser_generation.add_argument('-st', '--suggest_targets',
+                                   default=None, type=str, metavar='',
+                                   help=('(Optional) UniProt accession to query MobiDB, TED '
+                                         'and AFDB. Incompatible with --parameters.'))
 
     # Subparser for the 'conversion' module with aliases
     parser_conversion = subparsers.add_parser(name='conversion',
@@ -435,8 +441,12 @@ def main():
                         output_dir=full_args.output_dir)
         
     elif full_args.module in ['generation', 'g', 'gen']:
-        from ensemblify.generation import generate_ensemble
-        generate_ensemble(parameters_path=full_args.parameters)
+        if full_args.suggest_targets is not None:
+            from ensemblify.generation import suggest_targets
+            suggest_targets(user_input=full_args.suggest_targets)
+        else:
+            from ensemblify.generation import generate_ensemble
+            generate_ensemble(parameters_path=full_args.parameters)
 
     elif full_args.module in ['conversion', 'c', 'con']:
         from ensemblify.conversion import ensemble2traj

@@ -80,6 +80,11 @@ ADVANCED_PARAMS_DEFAULTS = {
                    'plddt_scaling_factor': 30.0}
 }
 
+DISORDER_DATA_KEYS = [
+    'curated-disorder-merge',
+    'prediction-disorder-mobidb_lite',
+]
+
 # FUNCTIONS
 def process_input_pdb(
     faspr_path: str,
@@ -218,7 +223,10 @@ def get_protein_info(uniprot_accession: str) -> dict:
         dict:
             Information about the protein identified by the given UniProt accession, including
             links to its .pdb structure and .json PAE matrix.
-    
+
+    Raises:
+        RequestException with HTTPError if request timed out or encountered an issue.
+
     Adapted from:
         https://github.com/PDBeurope/afdb-notebooks/blob/main/AFDB_API.ipynb
     """
@@ -302,10 +310,10 @@ def setup_ensemble_gen_params(input_params: dict, inputs_dir: str) -> tuple[str,
                 Path to file with PULCHRA output from processing input .pdb.
     """
     input_params_processed = copy.deepcopy(input_params)
-
-    # Check if there are any UniProt Accessions in user inputs
     input_sequence = input_params_processed['sequence']
     input_pae_matrix = input_params_processed['pae']
+
+    # Check if there are any UniProt Accessions in user inputs
     uniprotid_pattern = re.compile(r'[OPQ][0-9][A-Z0-9]{3}[0-9]|'
                                    r'[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}')
     uniprotid_match_sequence = re.search(uniprotid_pattern,input_sequence)
@@ -343,7 +351,7 @@ def setup_ensemble_gen_params(input_params: dict, inputs_dir: str) -> tuple[str,
 
         except NameError:
             # Get protein info from UniProt accession
-            protein_info = get_protein_info(uniprotid_match_paematrix.group(0))
+            protein_info = get_alphafold_data(uniprotid_match_paematrix.group(0))
 
             # Extract PAE URL
             pae_url = protein_info.get('paeDocUrl')
@@ -608,3 +616,384 @@ def read_input_parameters(parameter_path: str) -> dict:
                                                                      'must be of type float!')
 
     return params
+
+
+def get_mobidb_data(uniprot_accession: str) -> dict:
+    """Get disorder data for a protein from MobiDB using a given UniProt accession.
+
+    Args:
+        uniprot_accession (str):
+            UniProt accession to use in request for MobiDB's API.
+
+    Returns:
+        dict:
+            Intrinsic disorder data for the protein identified by the given UniProt accession,
+            including experimentally confirmed and predicted disordered regions.
+            Returns None if no disorder data is found or if the request fails.
+
+    Raises:
+        RequestException with HTTPError if request timed out or encountered an issue.
+    """
+    api_endpoint = 'https://mobidb.org/api/download_page'
+    params = {
+        'acc': uniprot_accession,
+        'limit': 10,
+        'format': 'json',
+    }
+
+    try:
+        # Use a timeout to handle potential connection issues
+        response = requests.get(api_endpoint, params=params, timeout=10)
+
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            data = response.json()
+            entries = data.get('data', [])
+            if not entries:
+                raise RuntimeError(f'Error: No MobiDB entry found for accession {uniprot_accession}')
+
+            entry = entries[0]
+            disorder_data = {}
+            for disorder_key in DISORDER_DATA_KEYS:
+                if disorder_key in entry:
+                    disorder_data[disorder_key] = entry[disorder_key]
+            if not disorder_data:
+                raise RuntimeError(f'Error: No disorder annotations found in MobiDB for {uniprot_accession}')
+
+            return disorder_data
+
+        else:
+            # Raise an exception for better error handling
+            response.raise_for_status()
+
+    except requests.exceptions.RequestException as e:
+        print(f'Error: {e}')
+
+
+def format_mobidb_report(
+    uniprot_accession: str,
+    disorder_data: dict,
+    ) -> str:
+    """Format a human-readable report of disordered data from MobiDB.
+
+    Args:
+        uniprot_accession (str):
+            UniProt accession used to extract the MobiDB data.
+        disorder_data (dict):
+            Extracted data from MobiDB.
+
+    Returns:
+        str:
+            Formatted multi-line report string.
+    """
+    lines = [
+        f'\nMobiDB report for {uniprot_accession} (Most to least reliable)',
+        '=' * 68,
+    ]
+
+    for data_type, region_data in disorder_data.items():
+        regions = region_data.get('regions', [])
+        fraction = region_data.get('content_fraction', 0.0)
+        count = region_data.get('content_count', 0)
+
+        lines.append(f'Evidence Type       : {data_type}')
+        lines.append(f'Disordered residues : {count} ({fraction:.1%} of sequence)')
+        lines.append(f'Regions             : {len(regions)}')
+
+        for i, (start, end) in enumerate(regions, start=1):
+            lines.append(f'    [{i}] residues {start}-{end}  (length {end - start + 1})')
+
+        lines.append('')
+
+    return '\n'.join(lines)
+
+
+def get_ted_data(uniprot_accession: str) -> dict:
+    """Get structured domain annotations for a protein from The Encyclopedia of Domains (TED).
+
+    Args:
+        uniprot_accession (str):
+            UniProt accession used to query TED.
+
+    Returns:
+        dict:
+            Dictionary containing parsed domain annotations.
+            Returns None if request fails or no domains are found.
+
+    Raises:
+        RequestException with HTTPError if request timed out or encountered an issue.
+    """
+    api_endpoint = f'https://ted.cathdb.info/api/v1/uniprot/summary/{uniprot_accession}'
+
+    try:
+        response = requests.get(api_endpoint, timeout=10)
+
+        if response.status_code == 200:
+            data = response.json()
+            entries = data.get('data', [])
+
+            if not entries:
+                raise RuntimeError(
+                    f'Error: No TED domain entries found for accession {uniprot_accession}'
+                )
+
+            domain_data = []
+
+            for entry in entries:
+                chopping = entry.get('chopping', '')
+                segments = []
+                if chopping:
+                    for part in chopping.split(','):
+                        if '_' in part:
+                            domains = part.split('_')
+                            for domain in domains:
+                                start, end = domain.split('-')
+                                segments.append((int(start), int(end)))
+                        elif '-' in part:
+                            start, end = part.split('-')
+                            segments.append((int(start), int(end)))
+
+                domain_data.append({
+                    'ted_id': entry.get('ted_id'),
+                    'consensus_level': entry.get('consensus_level'),
+                    'segments': segments,
+                    'nres_domain': entry.get('nres_domain'),
+                    'plddt': entry.get('plddt'),
+                    'cath_label': entry.get('cath_label'),
+                })
+
+            if not domain_data:
+                raise RuntimeError(
+                    f'Error: No valid domain annotations found for {uniprot_accession}'
+                )
+
+            return {'domains': domain_data}
+
+        else:
+            response.raise_for_status()
+
+    except requests.exceptions.RequestException as e:
+        print(f'Error: {e}')
+
+def format_ted_report(uniprot_accession: str, domain_data: dict) -> str:
+    """Format a human-readable report of TED domain annotations.
+
+    Args:
+        uniprot_accession (str):
+            UniProt accession used to extract the TED data.
+        disorder_data (dict):
+            Extracted data from TED.
+
+    Returns:
+        str:
+            Formatted multi-line report string.
+    """
+
+    lines = [
+        f'\nTED report for {uniprot_accession}',
+        '=' * 68,
+    ]
+
+    domains = domain_data.get('domains', [])
+
+    for i, domain in enumerate(domains, start=1):
+        segments = domain.get('segments', [])
+
+        lines.append(f'Domain #{i}')
+        lines.append(f'TED ID            : {domain.get("ted_id")}')
+        lines.append(f'Consensus level   : {domain.get("consensus_level")}')
+        lines.append(f'CATH annotation   : {domain.get("cath_label")}')
+        lines.append(f'Residues          : {domain.get("nres_domain")}')
+        lines.append(f'Mean pLDDT        : {domain.get("plddt"):.2f}')
+        lines.append(f'Segments          : {len(segments)}')
+
+        for j, (start, end) in enumerate(segments, start=1):
+            lines.append(
+                f'    [{j}] residues {start}-{end} (length {end - start + 1})'
+            )
+
+        lines.append('')
+
+    return '\n'.join(lines)
+
+
+def get_alphafold_plddt(uniprot_accession: str) -> list:
+    """Retrieve per-residue pLDDT scores from AlphaFold."""
+
+    info = get_protein_info(uniprot_accession)
+    if info is None:
+        return None
+
+    pdb_url = info.get('pdbUrl')
+    if pdb_url is None:
+        raise RuntimeError(f'Error: No PDB URL found for {uniprot_accession}')
+
+    pdb_content = _download_from_url(pdb_url)
+    
+    # Extract pLDDT from PDB
+    seen_residues = set()
+    plddt_scores = []
+    for line in pdb_content.decode().splitlines():
+        if line.startswith("ATOM"):
+            res_id = int(line[22:26].strip())
+
+            # Only take first atom per residue
+            if res_id not in seen_residues:
+                seen_residues.add(res_id)
+                plddt = float(line[60:66].strip())
+                plddt_scores.append(plddt)
+
+    return plddt_scores
+
+
+def extract_plddt_regions(plddt_scores: list, plddt_range: tuple = (70,101)) -> list:
+    """Convert pLDDT scores into contiguous regions based on a given pLDDT range."""
+
+    regions = []
+    start = None
+
+    for i, score in enumerate(plddt_scores, start=1):
+        if score >= plddt_range[0] and score < plddt_range[1]:
+            if start is None:
+                start = i
+        else:
+            if start is not None:
+                regions.append((start, i - 1))
+                start = None
+
+    if start is not None:
+        regions.append((start, len(plddt_scores)))
+
+    return regions
+
+
+def get_alphafold_data(
+    uniprot_accession: str,
+    detail: str = 'low+very_low',
+    ) -> dict:
+    """Convert AlphaFold pLDDT into disorder-like region format."""
+
+    plddt_scores = get_alphafold_plddt(uniprot_accession)
+    if not plddt_scores:
+        raise RuntimeError(f'Error: Could not retrieve pLDDT scores for {uniprot_accession}')
+
+    # Assign confidence levels
+    if detail == 'all':
+        confidence_levels = [
+            ('very_high', '(pLDDT >= 90)', (90,101)),
+            ('high', '(70 <= pLDDT < 90)', (70,90)),
+            ('low', '(50 <= pLDDT < 70)', (50,70)),
+            ('very_low', '(pLDDT < 50)', (0,50)),       
+        ]
+    elif detail == 'low+very_low':
+        confidence_levels = [
+            ('low+very_low', '(pLDDT < 70)', (0,71)),      
+        ]
+
+    confidence_regions_data = {}
+    for level_id, level_metadata, level_range in confidence_levels:
+        regions = extract_plddt_regions(plddt_scores, plddt_range=level_range)
+        total_res = len(plddt_scores)
+        confident_res = sum(end - start + 1 for start, end in regions)
+        confidence_regions_data[f'alphafold_{level_id}_confidence {level_metadata}'] = {
+            'regions': regions,
+            'content_count': confident_res,
+            'content_fraction': (confident_res / total_res if total_res else 0.0)
+        }
+    return confidence_regions_data
+
+
+def format_alphafold_report(uniprot_accession: str, afdb_data: dict) -> str:
+    """Format a human-readable report of data from AlphaFold Protein Structure Database.
+
+    Args:
+        uniprot_accession (str):
+            UniProt accession used to extract the AFDB data.
+        afdb_data (dict):
+            Extracted AFDB data.
+
+    Returns:
+        str:
+            Formatted multi-line report string.
+    """
+    lines = [
+        f'\nAFDB confidence regions report for {uniprot_accession}',
+        '=' * 68,
+    ]
+
+    for confidence_level, region_data in afdb_data.items():
+        regions = region_data.get('regions', [])
+        fraction = region_data.get('content_fraction', 0.0)
+        count = region_data.get('content_count', 0)
+
+        lines.append(f'Confidence level    : {confidence_level}')
+        lines.append(f'Disordered residues : {count} ({fraction:.1%} of sequence)')
+        lines.append(f'Regions             : {len(regions)}')
+
+        for i, (start, end) in enumerate(regions, start=1):
+            lines.append(f'    [{i}] residues {start}-{end}  (length {end - start + 1})')
+
+        lines.append('')
+
+    return '\n'.join(lines)
+
+
+def suggest_targets(user_input: str):
+
+    # Attempt to extract UniProt accession
+    uniprotid_pattern = re.compile(r'[OPQ][0-9][A-Z0-9]{3}[0-9]|'
+                                    r'[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}')
+    uniprotid_match_targets = re.search(uniprotid_pattern,user_input)
+
+    if uniprotid_match_targets is not None:
+
+        # Extract UniProt accession
+        accession = uniprotid_match_targets.group(0)
+
+        # MobiDB disordered regions
+        try:
+            # Get disorder data from UniProt accession
+            disorder_data = get_mobidb_data(accession)
+            if disorder_data is not None:
+                # Report on disordered regions
+                report = format_mobidb_report(accession, disorder_data)
+                print(report)
+            else:
+                raise RuntimeError(
+                    f'Error: Could not retrieve MobiDB disorder information for {accession}.'
+                )
+        except RuntimeError as e:
+            print(e)
+
+        # TED structured domains
+        try:
+            # Get TED domains data from UniProt accession
+            domain_data = get_ted_data(accession)
+            if domain_data is not None:
+                # Report on structured domains
+                report = format_ted_report(accession, domain_data)
+                print(report)
+            else:
+                raise RuntimeError(
+                    f'Error: Could not retrieve TED domain annotations for {accession}.'
+                )
+        except RuntimeError as e:
+            print(e)
+
+        # AlphaFold Protein Structure Database confidence levels
+        try:
+            # Get AlphaFold data from UniProt accession
+            afdb_data = get_alphafold_data(accession)
+            if afdb_data is not None:
+                # Report on AF results
+                report = format_alphafold_report(accession, afdb_data)
+                print(report)
+            else:
+                raise RuntimeError(
+                    f'Error: Could not retrieve AlphaFold prediction data for {accession}.'
+                )
+        except RuntimeError as e:
+            print(e)
+
+    else:
+        raise AssertionError(f'Error: {user_input} must be a valid UniProt accession!')

@@ -2,6 +2,7 @@
 
 # IMPORTS
 ## Standard Library Imports
+from collections import deque  
 from copy import deepcopy
 
 ## Third Party Imports
@@ -194,26 +195,10 @@ def setup_fold_tree(
     constraint_targets: tuple[tuple[int,int],...],
     contacts: tuple[tuple[tuple[str,tuple[int,int]],tuple[str,tuple[int,int]]],...] | None ):
     """Change a Pose's FoldTree in order to minimize "lever arm" effects during sampling.
-        
-    Perform slight alterations to the given Pose's FoldTree to minimize "lever arm" effects
-    that might result in movement in constrained regions. These changes are based on which
-    residues are going to be constrained. First the most "central" residue of the constrained
-    residues in each chain is found, and the FoldTree is changed to a tree that has this
-    residue as a parent in that chain: it starts from this residue and goes in both the
-    N-terminal and C-terminal direction of the protein chain.
-
-    Resulting FoldTree (2 chains example):
-
-        Chain 1:  1 <----------- "central" res ------------> chain.size()
-
-        Chain 2:  1 <----------- "central" res ------------> chain.size()
-        
-        Jump between the two "central" residues.
-
-    If there are inter-chain contacts, after deriving the optimal "central" residues they are
-    updated so that every central residue is part of a region that is in contact with another
-    chain. This avoids cases where, in multi-chain, proteins, certain folded domains would not
-    move relative to other chains which would inadvertedly bias conformational sampling.
+ 
+    Upate the given Pose's FoldTree to minimize "lever arm" effects that might result in movement
+    in constrained regions during sampling. The goal is to try to maximmize the amount of
+    constrained residues that are 'upstream' in relation to sampled residues.
 
     Args:
         pose (pyrosetta.rosetta.core.pose.Pose):
@@ -231,138 +216,106 @@ def setup_fold_tree(
     ft_pose = pyrosetta.rosetta.core.pose.Pose()
     ft_pose.detached_copy(pose)
 
-    # Calculate the optimal central residues
-    central_residues = []
-    for i in range(1,ft_pose.num_chains()+1):
+    num_chains = ft_pose.num_chains()
+
+    # Calculate optimal central residue per chain (constrained res closest to chain midpoint)
+    central_residues = {}
+    for i in range(1, num_chains + 1):
         chain_start = ft_pose.chain_begin(i)
         chain_end = ft_pose.chain_end(i)
-        ideal_central_res = (chain_start + chain_end) // 2
-
-        # Start from any value in constrained res range
-        central_res = constraint_targets[0][0]
-
-        # Get how far the current res is from the ideal mid-point
-        minimum_distance = abs(central_res - ideal_central_res)
-
-        for res_range in constraint_targets:
-            for res in range(res_range[0],res_range[1]+1):
+        ideal_mid = (chain_start + chain_end) // 2
+        best_res, min_dist = ideal_mid, float('inf')
+        for first, last in constraint_targets:
+            for res in range(first, last + 1):
                 if ft_pose.chain(res) == i:
-                    dist = abs(res - ideal_central_res) # distance between residue numbers
-                    if dist < minimum_distance:
-                        minimum_distance = dist
-                        central_res = res
-        central_residues.append(central_res)
+                    dist = abs(res - ideal_mid) # distance between residue numbers
+                    if dist < min_dist:
+                        min_dist, best_res = dist, res
+        central_residues[i] = best_res
 
-    # If there are contacts, use them to update central residues if needed
-    # This is important in multi-chain proteins, to avoid cases where the central residue of a
-    # chain is not in a contacted region, which would make it so that folded domain that central
-    # residue belongs to would not move relative to other chains during sampling
+    # Build inter-chain contact graph
+    # contact_graph[(c_lo, c_hi)] = (res_in_c_lo, res_in_c_hi)
+    contact_graph = {}
     if contacts is not None:
-        chains_contact_regions = {}
         for contact in contacts:
-            # contact: ( ('X', (x1,x2) ) , ( 'Y', (y1,y2) ) )
+            chain_x_id, (x_first, x_last) = contact[0]
+            chain_y_id, (y_first, y_last) = contact[1]
+            x_mid = (x_first + x_last) // 2
+            y_mid = (y_first + y_last) // 2
+            x_res = pyrosetta.rosetta.core.pose.pdb_to_pose(ft_pose, x_mid, chain_x_id)  
+            y_res = pyrosetta.rosetta.core.pose.pdb_to_pose(ft_pose, y_mid, chain_y_id)
+            cx, cy = ft_pose.chain(x_res), ft_pose.chain(y_res)
+            if cx == cy:  
+                continue
+            key = (min(cx, cy), max(cx, cy))
+            if key not in contact_graph:
+                contact_graph[key] = (x_res, y_res) if cx < cy else (y_res, x_res)
 
-            # Chain X
-            chain_x = contact[0][0]
+    # Root chain = chain with most sampled residues
+    sampled_count = {i: 0 for i in range(1, num_chains + 1)}
+    for lo, hi in constraint_targets:  
+        for res in range(lo, hi + 1):
+            sampled_count[ft_pose.chain(res)] += 1
+    root_chain = max(sampled_count, key=sampled_count.get)
 
-            # Contact residue range for X
-            x_start = contact[0][1][0]
-            x_end = contact[0][1][1]
-            inter_range_x = set([pyrosetta.rosetta.core.pose.pdb_to_pose(
-                                    ft_pose,
-                                    res_id,
-                                    chain_x)
-                                for res_id in range(x_start, x_end+1) ])
-            try:
-                if inter_range_x not in chains_contact_regions[chain_x]:
-                    chains_contact_regions[chain_x].append(inter_range_x)
-            except KeyError:
-                chains_contact_regions[chain_x] = [inter_range_x]
+    # Breadth first search spanning tree of contact graph from root_chain
+    adjacency = {i: [] for i in range(1, num_chains + 1)}
+    for (ci, cj), (ri, rj) in contact_graph.items():
+        adjacency[ci].append((cj, ri, rj))  
+        adjacency[cj].append((ci, rj, ri))
+    visited = {root_chain}
+    queue = deque([root_chain])
+    spanning_edges = [] # (upstream_res, downstream_res)
+    while queue:
+        current = queue.popleft()
+        for neighbor, res_in_current, res_in_neighbor in adjacency[current]:
+            if neighbor not in visited:
+                visited.add(neighbor) 
+                queue.append(neighbor)
+                spanning_edges.append((res_in_current, res_in_neighbor))
 
-            # Chain Y
-            chain_y = contact[1][0]
+    # Connect isolated chains (no contacts) directly to root
+    for chain_num in range(1, num_chains + 1):
+        if chain_num not in visited:
+            spanning_edges.append((central_residues[root_chain], central_residues[chain_num]))
+            visited.add(chain_num)
 
-            # Contact residue range for Y
-            y_start = contact[1][1][0]
-            y_end = contact[1][1][1]
-            inter_range_y = [pyrosetta.rosetta.core.pose.pdb_to_pose(
-                                ft_pose,
-                                res_id,
-                                chain_y)
-                            for res_id in range(y_start,y_end+1) ]
-            try:
-                if inter_range_y not in chains_contact_regions[chain_y]:
-                    chains_contact_regions[chain_y].append(inter_range_y)
-            except KeyError:
-                chains_contact_regions[chain_y] = [inter_range_y]
+    # Assign cutpoints (chain boundaries between jump residues)
+    # Process edges with fewest valid options first to avoid conflicts.
+    def valid_cutpoints(r1, r2, used):
+        first, last = min(r1, r2), max(r1, r2)
+        return [ft_pose.chain_end(c) for c in range(1, num_chains)
+                if first < ft_pose.chain_end(c) < last and ft_pose.chain_end(c) not in used]
 
-        for chain,regions in chains_contact_regions.items():
-            regions_lists = []
-            for region in regions:
-                regions_lists.append(sorted([x for x in region]))
-            chains_contact_regions[chain] = regions_lists
+    used_cuts = set()
+    # Sort by number of valid options (most constrained first)
+    ordered = sorted(spanning_edges, key=lambda e: len(valid_cutpoints(e[0], e[1], set())))
+    jump_specs = []  # (r1, r2, cutpoint)
+    for r1, r2 in ordered:
+        options = valid_cutpoints(r1, r2, used_cuts)
+        if not options:
+            raise ValueError(
+                f'No valid cutpoint between residues {r1} (chain {ft_pose.chain(r1)}) and {r2} '
+                f'(chain {ft_pose.chain(r2)}). Please check that contacts span distinct chains '
+                'and chain order is correct.'
+            )
+        cut = options[0]
+        used_cuts.add(cut)
+        jump_specs.append((r1, r2, cut))
 
-        updated_central_residues = []
-        for cen_res in central_residues:
-            # Get chain of current central res
-            res_chain = ft_pose.pdb_info().chain(cen_res)
+    # Build new FoldTree from scratch
+    ft = pyrosetta.rosetta.core.kinematics.FoldTree()
+    ft.simple_tree(ft_pose.size())
+    for r1, r2, cut in jump_specs:
+        ft.new_jump(r1, r2, cut)
 
-            # Get regions of that chain that are in contact
-            chain_contact_regions = chains_contact_regions[res_chain]
-
-            # See if the central residue is already inside a region that is in contact
-            in_contact_region = False
-            for contact_region in chain_contact_regions:
-                if cen_res in contact_region:
-                    in_contact_region = True
-                    break
-
-            # If not, replace it with the nearest residue that is inside a region in contact
-            if not in_contact_region:
-                distances = {}
-                for region in chain_contact_regions:
-                    distances[region[0]] = abs(cen_res - region[0])
-                    distances[region[1]] = abs(cen_res - region[1])
-                min_distance = min(distances.values())
-                for resnum, distance in distances.items():
-                    if distance == min_distance:
-                        updated_central_residues.append(resnum)
-            else:
-                updated_central_residues.append(cen_res)
-
-        # Update central residues with new residue numbers
-        central_residues = updated_central_residues
-
-    # Update FoldTree using new 'central residues'
-    ft = ft_pose.fold_tree()
-
-    # Split tree
-    for cen_res in central_residues:
-        ft.split_existing_edge_at_residue(cen_res)
-
-    # Get chain starting residues
-    chain_starts = []
-    for chain_num in range(1,ft_pose.num_chains()+1):
-        chain_starts.append(ft_pose.chain_begin(chain_num))
-
-    # Delete old jumps
-    jump_counter = 1
-    for i in chain_starts[1:]:
-        ft.delete_unordered_edge(chain_starts[0],i,jump_counter)
-        jump_counter += 1
-
-    # Set new jumps between chain's new parents
-    jump_counter = 1
-    for i in central_residues[1:]:
-        ft.add_edge(central_residues[0],i,jump_counter)
-        jump_counter += 1
-
-    # Reorder tree to flow to N and C terminals
-    for cen_res in central_residues:
-        ft.reorder(cen_res)
+    # Root at the sampled chain's central residue, upstream of sampled regions
+    ft.reorder(central_residues[root_chain])
 
     # Check validity before continuing
-    assert ft.check_fold_tree(), print('Invalid FoldTree setup:\n',ft)
+    assert ft.check_fold_tree(), f'Invalid FoldTree setup:\n{ft}'
+
+    # Finally, assign new FoldTree and exit
     pose.fold_tree(ft)
 
 

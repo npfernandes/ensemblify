@@ -68,3 +68,24 @@ To generate an ensemble, simply provide Ensemblify with the path to your paramet
    generate_ensemble('parameters_file.yml')
    ```
 ````
+
+## Get suggestions for target sampling regions
+
+In case you are unsure which regions of your protein you want to sample, you can provide Ensemblify with your protein's UniProt accession.
+
+This will trigger automatic queries of useful structure/disorder related databases (MobiDB, TED, AFDB), outputting informative reports about the protein's domain annotations.
+
+For example, if you were interested in modelling full-length Galectin-3 (UniProt accession P17931):
+
+````{tabs}
+
+   ```{code-tab} console CLI
+   (ensemblify_env) $ ensemblify generation -st P17931
+   ```
+
+   ```{code-tab} python Python
+   from ensemblify.generation import suggest_targets
+
+   suggest_targets('P17931')
+   ```
+````

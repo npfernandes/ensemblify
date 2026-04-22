@@ -10,10 +10,32 @@ Calculations are done for the ensemble before and after reweighting, facilitatin
 
 To use experimental SAXS data to reweight your conformational ensemble following the BME method, provide Ensemblify with:
 
-- your ensemble in trajectory format;
-- your trajectory's corresponding topology file;
-- the name you want to use for your protein in the resulting graphical dashboard;
-- the experimental SAXS data of your protein.
+<table class="tg">
+<thead>
+  <tr>
+    <th>CLI Parameter</th>
+    <th>Description</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-parameter">Trajectory (--trajectory, -trj)</td>
+    <td class="tg-description">Your generated ensemble in trajectory format.</td>
+  </tr>
+  <tr>
+    <td class="tg-parameter">Topology (--topology, -top)</td>
+    <td class="tg-description">Your trajectory's corresponding topology file.</td>
+  </tr>
+  <tr>
+    <td class="tg-parameter">Trajectory ID (--trajectoryid, -tid)</td>
+    <td class="tg-description">Name used to identify your protein in the created graphical dashboard.</td>
+  </tr>
+  <tr>
+    <td class="tg-parameter">Experimental SAXS data (--expdata, -exp)</td>
+    <td class="tg-description">Experimental SAXS data of your protein.</td>
+  </tr>
+</tbody>
+</table>
 
 ````{tabs}
 
@@ -41,4 +63,4 @@ To use experimental SAXS data to reweight your conformational ensemble following
 
 ## References
 
-<a id="ref12">[12]</a> S. Bottaro , T. Bengsten and K. Lindorff-Larsen, "Integrating Molecular Simulation and Experimental Data: A Bayesian/Maximum Entropy Reweighting Approach," pp. 219-240, Feb. 2020. In: Z. Gáspári, (eds) *Structural Bioinformatics*, *Methods in Molecular Biology*, vol. 2112, Humana, New York, NY. [[Link](https://doi.org/10.1007/978-1-0716-0270-6_15)]
+<a id="ref12">[12]</a> S. Bottaro , T. Bengsten and K. Lindorff-Larsen, "Integrating Molecular Simulation and Experimental Data: A Bayesian/Maximum Entropy Reweighting Approach," pp. 219-240, Feb. 2020. In: Z. Gáspári, (eds) *Structural Bioinformatics*, *Methods in Molecular Biology*, vol. 2112, Humana, New York, NY. [[DOI](https://doi.org/10.1007/978-1-0716-0270-6_15)]

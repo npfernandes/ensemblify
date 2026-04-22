@@ -17,6 +17,7 @@ You can access the Ensemblify Command Line Interface (CLI) using the `ensemblify
 ----
 
 ## `ensemblify help`
+
 Access information about the available Ensemblify modules.
 
    ```{code-block} console
@@ -39,6 +40,7 @@ Access information about the available Ensemblify modules.
 ----
 
 ## `ensemblify modelling --help`
+
 Access information about the Ensemblify `modelling` module.
 
    ```{code-block} console
@@ -58,6 +60,7 @@ Access information about the Ensemblify `modelling` module.
 ----
 
 ## `ensemblify generation --help`
+
 Access information about the Ensemblify `generation` module.
 
    ```{code-block} console
@@ -75,6 +78,7 @@ Access information about the Ensemblify `generation` module.
 ----
 
 ## `ensemblify conversion --help`
+
 Access information about the Ensemblify `conversion` module.
 
    ```{code-block} console
@@ -94,9 +98,10 @@ Access information about the Ensemblify `conversion` module.
 ----
 
 ## `ensemblify analysis --help`
+
 Access information about the Ensemblify `analysis` module.
 
-   ```{code-block} console 
+   ```{code-block} console
    (ensemblify_env) $ ensemblify analysis --help
    usage: ensemblify {analysis, ana, a} [options]
 
@@ -122,6 +127,7 @@ Access information about the Ensemblify `analysis` module.
 ----
 
 ## `ensemblify reweighting --help`
+
 Access information about the Ensemblify `reweighting` module.
 
    ```{code-block} console
@@ -154,6 +160,7 @@ Access information about the Ensemblify `reweighting` module.
 ----
 
 ## `ensemblify clash_checking --help`
+
 Access information about the Ensemblify `clash_checking` module.
 
    ```{code-block} console

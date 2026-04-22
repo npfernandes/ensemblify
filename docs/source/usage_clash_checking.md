@@ -2,9 +2,24 @@
 
 The `clash_checking` module offers a streamlined method to check if previously generated ensembles contain steric clashes using PULCHRA.
 
-## Check if there are steric clashes present in a conformational ensemble
+## Check a conformational ensemble for steric clashes
 
-To check for steric clashes in your conformational ensemble, provide Ensemblify with the path to the directory where your .pdb files are stored.
+To check for steric clashes in your conformational ensemble, provide Ensemblify with:
+
+<table class="tg">
+<thead>
+  <tr>
+    <th>CLI Parameter</th>
+    <th>Description</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-parameter">Ensemble directory (--ensembledir, -e)</td>
+    <td class="tg-description">Directory where your .pdb files are stored.</td>
+  </tr>
+</tbody>
+</table>
 
 ````{tabs}
 

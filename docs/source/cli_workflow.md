@@ -1,4 +1,5 @@
 # CLI Workflow
+
 In this short example, we will:
 
 - [Generate](#1-generate-a-protein-conformational-ensemble) an ensemble of 10 conformations for Histatin 5 (Hst5), an intrinsically disordered peptide with 24 residues;
@@ -30,7 +31,7 @@ For this example, we will use a parameters file created for Histatin5, a small i
       If you are following along with the example, please remember to update the <path_to_database> with the location on your machine of the database you want to sample from.
 
 2. Generate an ensemble via the Ensemblify CLI:
-    
+
       Assuming you have an Ensemblify parameters file `Hst5_params.yml` in the current working directory, you can run:
 
       ```{code-block} console
@@ -131,5 +132,5 @@ To do this, specify the location of your **trajectory**, **topology** and experi
    Building Hst5 reweighting dashboard...
    Ensemble reweighting has finished. Please refer to the interactive reweighting_dashboard.html figure for analysis.
    ```
-   
+
    You could now open your `reweighting_dashboard.html` file in your browser and interpret your results.

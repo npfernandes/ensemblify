@@ -2,9 +2,9 @@
 
 ## 1. Ensemblify Python Package
 
-It is **heavily** recommended to install the `ensemblify` Python package in a dedicated virtual environment.
+We **strongly** recommend installing the `ensemblify` Python package in a dedicated virtual environment.
 
-You can create a new virtual environment using your favorite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html). We recommend [miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install), a free minimal installer for `conda`.
+You can create a new virtual environment using your favourite virtual environment manager. Examples shown will use `conda`. If you want to download `conda` you can do so through their [website](https://conda.io/projects/conda/en/latest/user-guide/install/index.html). We recommend [miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install), a free minimal installer for `conda`.
 
 To install the `ensemblify` Python package, you can follow these commands:
 
@@ -55,6 +55,7 @@ To install the `ensemblify` Python package, you can follow these commands:
       $ conda activate ensemblify_env
       (ensemblify_env) $ pip install biopython==1.81 plotly==5.23.0 pyyaml==6.0.1 "ray[default]"==2.33.0
       ```
+
     </details><br>
 
 3. Install the `ensemblify` Python package into your newly created environment.
@@ -62,13 +63,6 @@ To install the `ensemblify` Python package, you can follow these commands:
     ```{code-block} console
     (ensemblify_env) $ pip install .
     ```
-
-<!-- Alternatively, Ensemblify is available via the Python Package Index:
-
-  ```bash
-  conda activate ensemblify_env   
-  pip install -U ensemblify
-  ``` -->
 
 ----
 
@@ -86,14 +80,15 @@ Each of Ensemblify's modules has different dependencies to third party software,
 
 ### PyRosetta
   
-PyRosetta<sup>[[2]](#ref2)</sup> is a Python-based interface to the powerful Rosetta molecular modeling suite. Its functionalities are used through Ensemblify in order to manipulate protein structures and generate conformational ensembles. You can install it by following these commands:
+PyRosetta<sup>[[2]](#ref2)</sup> is a Python-based interface to the powerful Rosetta molecular modelling suite. Its functionalities are used through Ensemblify in order to manipulate protein structures and generate conformational ensembles. You can install it by following these commands:
 
 1. Activate your `ensemblify_env` conda environment:
 
     ```{code-block} console
     $ conda activate ensemblify_env
     ```
-    If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
+
+    If you have not yet created it, check the [Ensemblify Python Package](#1-ensemblify-python-package) section.
 
 2. Install the [`pyrosetta-installer`](https://pypi.org/project/pyrosetta-installer/) Python package, kindly provided by RosettaCommons, to aid in the `pyrosetta` installation:
 
@@ -102,7 +97,7 @@ PyRosetta<sup>[[2]](#ref2)</sup> is a Python-based interface to the powerful Ros
     ```
 
 3. Use `pyrosetta-installer` to download (~ 1.6 GB) and install `pyrosetta` (note the distributed and serialization parameters):
-    
+
     ```{code-block} console
     (ensemblify_env) $ python -c 'import pyrosetta_installer; pyrosetta_installer.install_pyrosetta(distributed=True,serialization=True)'
     ```
@@ -126,17 +121,14 @@ FASPR<sup>[[3]](#ref3)</sup> is an ultra-fast and accurate program for determini
     ```{code-block} console
     $ conda activate ensemblify_env
     ```
-    If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
+
+    If you have not yet created it, check the [Ensemblify Python Package](#1-ensemblify-python-package) section.
 
 2. Navigate to where the FASPR source code is located. Assuming the root directory of the cloned repository is your current working directory:
 
     ```{code-block} console
     (ensemblify_env) $ cd src/ensemblify/third_party/FASPR-master/
     ```
-
-    <!-- ```bash
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/FASPR-master/
-    ``` -->
 
 3. Compile the FASPR source code:
 
@@ -172,17 +164,13 @@ PULCHRA<sup>[[4]](#ref4)</sup> (PowerfUL CHain Restoration Algorithm) is a progr
     $ conda activate ensemblify_env
     ```
 
-    If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
+    If you have not yet created it, check the [Ensemblify Python Package](#1-ensemblify-python-package) section.
 
 2. Navigate to where the PULCHRA source code is located. Assuming the root directory of the cloned repository is your current working directory:
-    
+
     ```{code-block} console
     (ensemblify_env) $ cd src/ensemblify/third_party/pulchra-master/
     ```
-
-    <!-- ```bash
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/pulchra-master/
-    ``` -->
 
 3. Compile the PULCHRA source code:
 
@@ -206,7 +194,7 @@ PULCHRA<sup>[[4]](#ref4)</sup> (PowerfUL CHain Restoration Algorithm) is a progr
 ### GROMACS
 
 GROMACS<sup>[[5]](#ref5)</sup> is a molecular dynamics package mainly designed for simulations of proteins, lipids, and nucleic acids.
-It comes with a large selection of flexible tools for trajectory analysis and the output formats are also supported by all major analysis and visualisation packages.
+It comes with a large selection of flexible tools for trajectory analysis and the output formats are also supported by all major analysis and visualization packages.
 
 If you decide not to install GROMACS in your system, the Ensemblify `conversion` module will still work as intended, but will be much slower.
 
@@ -294,7 +282,8 @@ To compile the provided BIFT source code, you can follow these commands:
     ```{code-block} console
     $ conda activate ensemblify_env
     ```
-    If you have not yet created it, check the [Ensemblify Python Package](#ensemblify-python-package) section.
+
+    If you have not yet created it, check the [Ensemblify Python Package](#1-ensemblify-python-package) section.
 
 2. Navigate to where the BIFT source code is located. Assuming the root directory of the cloned repository is your current working directory:
 
@@ -302,15 +291,12 @@ To compile the provided BIFT source code, you can follow these commands:
     (ensemblify_env) $ cd src/ensemblify/third_party/BIFT/
     ```
 
-    <!-- ```bash
-    cd $CONDA_PREFIX/lib/python3.10/ensemblify/third_party/BIFT/
-    ``` -->
-
 3. Compile the BIFT source code:
 
     ```{code-block} console
     (ensemblify_env) $ gfortran -march=native -O3 bift.f -o bift
     ```
+
     the `-march=native` flag may be replaced with `-m64` or `-m32`, and it may be necessary to include the `-static` flag depending on which system you are on.
 
 4. Add an environment variable with the path to your BIFT executable to your `ensemblify_env` conda environment:
@@ -335,16 +321,16 @@ Visit the [Tripeptide Database](database.md#-tripeptide-database) section to lea
 
 ## References
 
-<a id="ref2">[2]</a> S. Chaudhury, S. Lyskov and J. J. Gray, "PyRosetta: a script-based interface for implementing molecular modeling algorithms using Rosetta," *Bioinformatics*, vol. 26, no. 5, pp. 689-691, Mar. 2010 [[Link](https://doi.org/10.1093/bioinformatics/btq007)]
+<a id="ref2">[2]</a> S. Chaudhury, S. Lyskov and J. J. Gray, "PyRosetta: a script-based interface for implementing molecular modeling algorithms using Rosetta," *Bioinformatics*, vol. 26, no. 5, pp. 689-691, Mar. 2010 [[DOI](https://doi.org/10.1093/bioinformatics/btq007)]
 
-<a id="ref3">[3]</a> X. Huang, R. Pearce and Y. Zhang, "FASPR: an open-source tool for fast and accurate protein side-chain packing," *Bioinformatics*, vol. 36, no. 12, pp. 3758-3765, Jun. 2020 [[Link](https://doi.org/10.1093/bioinformatics/btaa234)]
+<a id="ref3">[3]</a> X. Huang, R. Pearce and Y. Zhang, "FASPR: an open-source tool for fast and accurate protein side-chain packing," *Bioinformatics*, vol. 36, no. 12, pp. 3758-3765, Jun. 2020 [[DOI](https://doi.org/10.1093/bioinformatics/btaa234)]
 
-<a id="ref4">[4]</a> P. Rotkiewicz and J. Skolnick, "Fast procedure for reconstruction of full-atom protein models from reduced representations," *Journal of Computational Chemistry*, vol. 29, no. 9, pp. 1460-1465, Jul. 2008 [[Link](https://doi.org/10.1002/jcc.20906)] 
+<a id="ref4">[4]</a> P. Rotkiewicz and J. Skolnick, "Fast procedure for reconstruction of full-atom protein models from reduced representations," *Journal of Computational Chemistry*, vol. 29, no. 9, pp. 1460-1465, Jul. 2008 [[DOI](https://doi.org/10.1002/jcc.20906)] 
 
-<a id="ref5">[5]</a> S. Pronk, S. Páll, R. Schulz, P. Larsson, P. Bjelkmar, R. Apostolov, M.R. Shirts, and J.C. Smith et al., “GROMACS 4.5: A high-throughput and highly parallel open source molecular simulation toolkit,” *Bioinformatics*, vol. 29, no. 7, pp. 845–854, 2013 [[Link](https://doi.org/10.1093/bioinformatics/btt055)].
+<a id="ref5">[5]</a> S. Pronk, S. Páll, R. Schulz, P. Larsson, P. Bjelkmar, R. Apostolov, M.R. Shirts, and J.C. Smith et al., “GROMACS 4.5: A high-throughput and highly parallel open source molecular simulation toolkit,” *Bioinformatics*, vol. 29, no. 7, pp. 845–854, 2013 [[DOI](https://doi.org/10.1093/bioinformatics/btt055)].
 
-<a id="ref6">[6]</a> S. Grudinin, M. Garkavenko and A. Kazennov, "Pepsi-SAXS: an adaptive method for rapid and accurate computation of small-angle X-ray scattering profiles," *Structural Biology*, vol. 73, no. 5, pp. 449-464, May 2017 [[Link](https://doi.org/10.1107/S2059798317005745)]
+<a id="ref6">[6]</a> S. Grudinin, M. Garkavenko and A. Kazennov, "Pepsi-SAXS: an adaptive method for rapid and accurate computation of small-angle X-ray scattering profiles," *Structural Biology*, vol. 73, no. 5, pp. 449-464, May 2017 [[DOI](https://doi.org/10.1107/S2059798317005745)]
 
-<a id="ref7">[7]</a> B. Vestergaard and S. Hansen, "Application of Bayesian analysis to indirect Fourier transformation in small-angle scattering," *Journal of Applied Crystallography*, vol. 39, no. 6, pp. 797-804, Dec. 2006 [[Link](https://doi.org/10.1107/S0021889806035291)] 
+<a id="ref7">[7]</a> B. Vestergaard and S. Hansen, "Application of Bayesian analysis to indirect Fourier transformation in small-angle scattering," *Journal of Applied Crystallography*, vol. 39, no. 6, pp. 797-804, Dec. 2006 [[DOI](https://doi.org/10.1107/S0021889806035291)] 
 
-<a id="ref8">[8]</a> A. H. Larsen and M. C. Pedersen, "Experimental noise in small-angle scattering can be assessed using the Bayesian indirect Fourier transformation," *Journal of Applied Crystallography*, vol. 54, no. 5, pp. 1281-1289, Oct. 2021 [[Link](https://doi.org/10.1107/S1600576721006877)]
+<a id="ref8">[8]</a> A. H. Larsen and M. C. Pedersen, "Experimental noise in small-angle scattering can be assessed using the Bayesian indirect Fourier transformation," *Journal of Applied Crystallography*, vol. 54, no. 5, pp. 1281-1289, Oct. 2021 [[DOI](https://doi.org/10.1107/S1600576721006877)]

@@ -8,11 +8,28 @@ This structure can then be used as an input starting structure for conformationa
 
 To fuse disordered sequences with PDB structures into a full-length PDB structure, provide Ensemblify with:
 
-- the path(s) to FASTA file(s) containing the sequences of all (folded + disordered) protein domains, from N- to C-terminal. Can be provided either in FASTA or Multi-FASTA format.
-
-- the path(s) to PDB file(s) containing the structures of all folded protein domains, from N- to C-terminal. Can be provided as a single PDB file with multiple MODEL entries.
-
-- the name for the created full-length fused structure (without .pdb extension).
+<table class="tg">
+<thead>
+  <tr>
+    <th>CLI Parameter</th>
+    <th>Description</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-parameter" rowspan="2">FASTA(s) (--fastas, -f)</td>
+    <td class="tg-description">FASTA file(s) containing the sequences of all (folded + disordered) protein domains, from N- to C-terminal.<br>Can be provided either in FASTA or Multi-FASTA format.</td>
+  </tr>
+  <tr>
+    <td class="tg-parameter" rowspan="2">PDB(s) (--pdbs, -p)</td>
+    <td class="tg-description">PDB file(s) containing the structures of all folded protein domains, from N- to C-terminal.<br>Can also be provided as a single PDB file with multiple MODEL entries.</td>
+  </tr>
+  <tr>
+    <td class="tg-parameter">Trajectory ID (--id, -i)</td>
+    <td class="tg-description">Name for the created full-length fused PDB structure (without .pdb extension).</td>
+  </tr>
+</tbody>
+</table>
 
 ````{tabs}
 

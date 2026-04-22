@@ -3,15 +3,15 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# -- Project information -----------------------------------------------------
+# -- Project information ---------------------------------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'ensemblify'
-copyright = '2025, Nuno P. Fernandes'
+copyright = '2026, Nuno P. Fernandes'
 author = 'Nuno P. Fernandes'
 release = '1.0.0'
 
-# -- General configuration ---------------------------------------------------
+# -- General configuration -------------------------------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
@@ -31,7 +31,7 @@ templates_path = ['_templates']
 exclude_patterns = []
 suppress_warnings = ['autoapi.python_import_resolution','myst.xref_missing']
 
-# -- Options for HTML output -------------------------------------------------
+# -- Options for HTML output -----------------------------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_title = "Ensemblify"
@@ -62,7 +62,7 @@ html_css_files = [
     'css/custom.css',
 ]
 
-# # -- Options for napoleon -----------------------------------------------------
+# -- Options for napoleon --------------------------------------------------------------------------
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 napoleon_include_init_with_doc = True
@@ -78,7 +78,7 @@ napoleon_preprocess_types = True
 napoleon_type_aliases = None
 napoleon_attr_annotations = True
 
-# -- Options for autoapi -----------------------------------------------------
+# -- Options for autoapi ---------------------------------------------------------------------------
 autoapi_dirs = ['../../src/ensemblify']
 autoapi_type = "python"
 autoapi_template_dir = "_templates/autoapi"
@@ -91,18 +91,18 @@ autoapi_add_toctree_entry = False
 autoapi_keep_files = False
 autodoc_typehints = "description"
 
-# -- Options for sphinx_copybutton -------------------------------------------------
+# -- Options for sphinx_copybutton -----------------------------------------------------------------
 copybutton_prompt_text = r"\$ |\(ensemblify_env\) \$ |>>> "
 copybutton_prompt_is_regexp = True
 copybutton_copy_empty_lines = False
 
-# -- Options for myst --------------------------------------------------------
+# -- Options for myst ------------------------------------------------------------------------------
 myst_enable_extensions = [
     "html_image",
     "colon_fence",
 ]
 myst_heading_anchors = 6
 
-# -- Options for sphinx_tabs ------------------------------------------------
+# -- Options for sphinx_tabs -----------------------------------------------------------------------
 sphinx_tabs_disable_tab_closing = True
 sphinx_tabs_disable_css_loading = True

@@ -8,9 +8,28 @@ The resulting information is then presented in a user-friendly interactive graph
 
 To create an interactive graphical dashboard with structural information calculated from your conformational ensemble, provide Ensemblify with:
 
-- your ensemble in trajectory format;
-- your trajectory's corresponding topology file;
-- the name you want to use for your protein in the created graphical dashboard.
+<table class="tg">
+<thead>
+  <tr>
+    <th>CLI Parameter</th>
+    <th>Description</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-parameter">Trajectory (--trajectory, -trj)</td>
+    <td class="tg-description">Your generated ensemble in trajectory format.</td>
+  </tr>
+  <tr>
+    <td class="tg-parameter">Topology (--topology, -top)</td>
+    <td class="tg-description">Your trajectory's corresponding topology file.</td>
+  </tr>
+  <tr>
+    <td class="tg-parameter">Trajectory ID (--trajectoryid, -tid)</td>
+    <td class="tg-description">Name used to identify your protein in the created graphical dashboard.</td>
+  </tr>
+</tbody>
+</table>
 
 ````{tabs}
 

@@ -10,7 +10,9 @@ Welcome to ``ensemblify``'s documentation!
 .. image:: ../assets/ensemblify_presentation.svg
   :alt: Ensemblify Overview Schematic
 
-.. rst-class:: spaced-top
+.. raw:: html
+
+    <div style="margin-bottom: 30px;"></div>
 
 This documentation provides a comprehensive guide to using ``ensemblify``, a Python package for the generation, analysis and reweighting of protein conformational ensembles.
 Below, you will find links to various sections that cover everything from installation to advanced usage.

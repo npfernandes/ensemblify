@@ -17,16 +17,16 @@ To convert your generated .pdb structures into a single .xtc trajectory file, pr
 </thead>
 <tbody>
   <tr>
-    <td class="tg-parameter">Ensemble Directory (--ensembledir, -e)</td>
-    <td class="tg-description">Directory where the generated ensemble is stored.</td>
+    <td class="tg-parameter"> Ensemble Directory (--ensembledir, -e) </td>
+    <td class="tg-description"> Directory where the generated ensemble is stored. </td>
   </tr>
   <tr>
-    <td class="tg-parameter">Trajectory Directory (--trajectorydir, -t)</td>
-    <td class="tg-description">Directory where the trajectory file should be created.</td>
+    <td class="tg-parameter"> Trajectory Directory (--trajectorydir, -t) </td>
+    <td class="tg-description"> Directory where the trajectory file should be created. </td>
   </tr>
   <tr>
-    <td class="tg-parameter">Trajectory ID (--trajectoryid, -i)</td>
-    <td class="tg-description">Name for the trajectory file that will be created.</td>
+    <td class="tg-parameter"> Trajectory ID (--trajectoryid, -i) </td>
+    <td class="tg-description"> Name for the trajectory file that will be created. </td>
   </tr>
 </tbody>
 </table>

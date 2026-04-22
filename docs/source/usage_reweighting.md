@@ -19,20 +19,20 @@ To use experimental SAXS data to reweight your conformational ensemble following
 </thead>
 <tbody>
   <tr>
-    <td class="tg-parameter">Trajectory (--trajectory, -trj)</td>
-    <td class="tg-description">Your generated ensemble in trajectory format.</td>
+    <td class="tg-parameter"> Trajectory (--trajectory, -trj) </td>
+    <td class="tg-description"> Your generated ensemble in trajectory format. </td>
   </tr>
   <tr>
-    <td class="tg-parameter">Topology (--topology, -top)</td>
-    <td class="tg-description">Your trajectory's corresponding topology file.</td>
+    <td class="tg-parameter"> Topology (--topology, -top) </td>
+    <td class="tg-description"> Your trajectory's corresponding topology file. </td>
   </tr>
   <tr>
-    <td class="tg-parameter">Trajectory ID (--trajectoryid, -tid)</td>
-    <td class="tg-description">Name used to identify your protein in the created graphical dashboard.</td>
+    <td class="tg-parameter"> Trajectory ID (--trajectoryid, -tid) </td>
+    <td class="tg-description"> Name used to identify your protein in the created graphical dashboard. </td>
   </tr>
   <tr>
-    <td class="tg-parameter">Experimental SAXS data (--expdata, -exp)</td>
-    <td class="tg-description">Experimental SAXS data of your protein.</td>
+    <td class="tg-parameter"> Experimental SAXS data (--expdata, -exp) </td>
+    <td class="tg-description"> Experimental SAXS data of your protein. </td>
   </tr>
 </tbody>
 </table>

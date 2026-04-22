@@ -17,19 +17,20 @@ To create an interactive graphical dashboard with structural information calcula
 </thead>
 <tbody>
   <tr>
-    <td class="tg-parameter">Trajectory (--trajectory, -trj)</td>
-    <td class="tg-description">Your generated ensemble in trajectory format.</td>
+    <td class="tg-parameter"> Trajectory (--trajectory, -trj) </td>
+    <td class="tg-description"> Your generated ensemble in trajectory format. </td>
   </tr>
   <tr>
-    <td class="tg-parameter">Topology (--topology, -top)</td>
-    <td class="tg-description">Your trajectory's corresponding topology file.</td>
+    <td class="tg-parameter"> Topology (--topology, -top) </td>
+    <td class="tg-description"> Your trajectory's corresponding topology file. </td>
   </tr>
   <tr>
-    <td class="tg-parameter">Trajectory ID (--trajectoryid, -tid)</td>
-    <td class="tg-description">Name used to identify your protein in the created graphical dashboard.</td>
+    <td class="tg-parameter"> Trajectory ID (--trajectoryid, -tid) </td>
+    <td class="tg-description"> Name used to identify your protein in the created graphical dashboard. </td>
   </tr>
 </tbody>
 </table>
+<br>
 
 ````{tabs}
 

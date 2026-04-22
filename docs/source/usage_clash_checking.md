@@ -15,8 +15,8 @@ To check for steric clashes in your conformational ensemble, provide Ensemblify 
 </thead>
 <tbody>
   <tr>
-    <td class="tg-parameter">Ensemble directory (--ensembledir, -e)</td>
-    <td class="tg-description">Directory where your .pdb files are stored.</td>
+    <td class="tg-parameter"> Ensemble directory (--ensembledir, -e) </td>
+    <td class="tg-description"> Directory where your .pdb files are stored. </td>
   </tr>
 </tbody>
 </table>

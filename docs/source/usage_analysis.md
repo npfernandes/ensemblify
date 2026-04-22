@@ -30,7 +30,6 @@ To create an interactive graphical dashboard with structural information calcula
   </tr>
 </tbody>
 </table>
-<br>
 
 ````{tabs}
 

@@ -18,11 +18,11 @@ To fuse disordered sequences with PDB structures into a full-length PDB structur
 <tbody>
   <tr>
     <td class="tg-parameter"> FASTA(s) (--fastas, -f) </td>
-    <td class="tg-description"> FASTA file(s) containing the sequences of all (folded + disordered) protein <br>domains, from N- to C-terminal. Can be provided either in FASTA or Multi-FASTA format. </td>
+    <td class="tg-description"> FASTA file(s) with the sequences of all (folded + disordered) protein domains, from N- to C-terminal.</td>
   </tr>
   <tr>
-    <td class="tg-parameter"> PDB(s) (--pdbs, -p) </td>
-    <td class="tg-description"> PDB file(s) containing the structures of all folded protein domains, <br>from N- to C-terminal. Can also be provided as a single PDB file with multiple MODEL entries. </td>
+    <td class="tg-parameter"> PDB(s) (--pdbs, -p)  </td>
+    <td class="tg-description"> PDB file(s) with the structures of all folded protein domains, from N- to C-terminal. </td>
   </tr>
   <tr>
     <td class="tg-parameter"> Trajectory ID (--id, -i) </td>

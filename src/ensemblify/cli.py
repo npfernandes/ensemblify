@@ -189,7 +189,7 @@ def main():
     parser_generation.add_argument('-p', '--parameters',
                                    type=str, metavar='',
                                    help=('(Optional) Path to parameters file for ensemble '
-                                         'generation (.yml). Incompatible with --suggest-targets.'))
+                                         'generation (.yml). Incompatible with --suggest_targets.'))
 
     parser_generation.add_argument('-st', '--suggest_targets',
                                    default=None, type=str, metavar='',

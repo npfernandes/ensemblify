@@ -68,7 +68,7 @@ Access information about the Ensemblify `generation` module.
 
    options:
       -h, --help              show this help message and exit
-      -p, --parameters        (Optional) Path to parameters file for ensemble generation (.yml). Incompatible with --suggest-targets.
+      -p, --parameters        (Optional) Path to parameters file for ensemble generation (.yml). Incompatible with --suggest_targets.
       -st, --suggest_targets  (Optional) UniProt accession to query MobiDB, TED and AFDB. Incompatible with --parameters.
    ```
 

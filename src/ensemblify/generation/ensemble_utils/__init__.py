@@ -1,4 +1,15 @@
-"""Auxiliary functions for the generation module."""
+"""
+Auxiliary Generation Utilities - ``ensemblify.generation.ensemble_utils``
+=========================================================================
+
+:Author(s): Nuno P. Fernandes
+:Year: 2026
+:Copyright: GNU Public License v3
+
+.. versionadded:: 1.0.0
+
+This module contains auxiliary functions for the ``ensemblify.generation`` module.
+"""
 
 from ensemblify.generation.ensemble_utils.processing_inputs import (
     read_input_parameters,

@@ -939,6 +939,16 @@ def format_alphafold_report(uniprot_accession: str, afdb_data: dict) -> str:
 
 
 def suggest_targets(user_input: str):
+    """Query external databases for information about a given UniProt accession and report
+    on potential targets for ensemble generation.
+    
+    Args:
+        user_input (str):
+            User input to be checked for UniProt accessions and queried against external databases.
+    
+    Raises:
+        AssertionError if no valid UniProt accession is found in the user input.
+    """
 
     # Attempt to extract UniProt accession
     uniprotid_pattern = re.compile(r'[OPQ][0-9][A-Z0-9]{3}[0-9]|'

@@ -3,7 +3,7 @@ Generation - ``ensemblify.generation``
 ======================================
 
 :Author(s): Nuno P. Fernandes
-:Year: 2024
+:Year: 2026
 :Copyright: GNU Public License v3
 
 .. versionadded:: 1.0.0
@@ -35,6 +35,9 @@ Available Functions
 ``generate_ensemble``
     Generate an ensemble of conformations given a parameters file.
 
+``suggest_targets``
+    Suggest protein regions to target for conformational sampling based on information extracted
+    from external protein databases.
 """
 
 from ensemblify.generation.ensemble import generate_ensemble

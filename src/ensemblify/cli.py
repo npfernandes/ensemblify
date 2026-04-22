@@ -1,4 +1,15 @@
-"""Back-end for the Ensemblify Command Line Interface."""
+"""
+Command Line Interface - ``ensemblify.cli``
+==============================================
+
+:Author(s): Nuno P. Fernandes
+:Year: 2026
+:Copyright: GNU Public License v3
+
+.. versionadded:: 1.0.0
+
+Back-end for the Ensemblify Command Line Interface.
+"""
 
 # IMPORTS
 ## Standard Library Imports

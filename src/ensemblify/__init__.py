@@ -3,7 +3,7 @@ Ensemblify - ``ensemblify``
 ===========================
 
 :Author(s): Nuno P. Fernandes
-:Year: 2024
+:Year: 2026
 :Copyright: GNU Public License v3
 
 A Python library for generating and analyzing ensembles of protein structures.
@@ -11,6 +11,8 @@ A Python library for generating and analyzing ensembles of protein structures.
 Main Features
 -------------
 
+- Create full-length protein structures by fusing PDB structures of folded protein domains
+  with disordered regions.
 - Generate protein conformational ensembles by changing flexible regions.
 - Convert generated ensembles to trajectory file format.
 - Calculate theoretical SAXS curves from generated ensembles.
@@ -37,6 +39,8 @@ Use the built-in ``help`` function to view a function or module's docstring:
 Available subpackages
 ---------------------
 
+``modelling``
+    Create full-length protein structures by fusing PDB structures with disordered regions.
 ``generation``
     Generate an ensemble of structures.
 ``conversion``
@@ -55,8 +59,6 @@ Utilities
     View Ensemblify's current general configuration.
 ``update_config()``
     Update Ensemblify's current general configuration.
-``clash_checking.check_steric_clashes()``
-    Check an already generated ensemble for steric clashes, reporting any found.
 
 Citation
 --------

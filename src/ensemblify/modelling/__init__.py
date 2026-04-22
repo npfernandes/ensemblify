@@ -3,7 +3,7 @@ Modelling - ``ensemblify.modelling``
 ======================================
 
 :Author(s): Nuno P. Fernandes
-:Year: 2024
+:Year: 2026
 :Copyright: GNU Public License v3
 
 .. versionadded:: 1.0.0
@@ -35,8 +35,8 @@ Create a full-length PDB structure from ordered and disordered fragments
 The ``ensemblify.modelling.fuse_structures`` function can be used to fuse PDB structures of
 folded protein domains with the sequences of connecting disordered regions.
 For this you need: a list of FASTA files, containing the sequences of all protein domains (folded +
-disordered) to be included in the final fused structure; a list of PDB files, containing the
-structure of folded domains to be fused.
+disordered) to be included in the final fused structure; a list of PDB or PDBx/mmCIF files,
+containing the structure of folded domains to be fused.
 
 Assuming the paths to your (Multi-)FASTA and (Multi-Model)PDB files are assigned to variables named
 FASTAS and PDBS, respectively, you should run:

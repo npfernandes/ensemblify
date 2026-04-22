@@ -3,7 +3,7 @@ Reweighting - ``ensemblify.reweighting``
 ========================================
 
 :Author(s): Nuno P. Fernandes
-:Year: 2024
+:Year: 2026
 :Copyright: GNU Public License v3
 
 .. versionadded:: 1.0.0

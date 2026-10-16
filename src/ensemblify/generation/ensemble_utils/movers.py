@@ -1,17 +1,15 @@
 """Custom Mover classes created from the PyRosetta Mover class."""
 
 # IMPORTS
-## Standard Library Imports
 import math
 
-## Third Party Imports
 import numpy as np
 import pandas as pd
 import pyrosetta
 
-## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.generation.ensemble_utils.movers_utils import get_ss_bounds
+
 
 # CLASSES
 class SetRandomDihedralsMover(pyrosetta.rosetta.protocols.moves.Mover):

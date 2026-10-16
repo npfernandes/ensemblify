@@ -4,13 +4,11 @@ See the THIRD_PARTY_NOTICE_mdreader.txt file for more details.
 """
 
 # IMPORTS
-## Standard Library Imports
 import datetime
 import math
 import multiprocessing
 import sys
 
-## Third Party Imports
 import MDAnalysis as mda
 import numpy as np
 
@@ -41,7 +39,7 @@ def raise_error(exc: Exception, msg: str):
         sys.exit(f'{exc.__name__}: {msg}')
 
 # CLASSES
-class Pool():
+class Pool:
     """MDAnalysis and multiprocessing's map don't play along because of pickling.
     This solution seems to work fine.
     """
@@ -97,7 +95,6 @@ class ThenNow:
         self.new = val
 
 
-# SimpleMDreader Class
 class SimpleMDreader(mda.Universe):
     """An object class inheriting from MDAnalysis.Universe.
     

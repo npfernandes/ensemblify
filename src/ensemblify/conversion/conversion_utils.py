@@ -1,19 +1,17 @@
 """Auxiliary functions for the conversion module."""
 
 # IMPORTS
-## Standard Library Imports
 import glob
 import os
 import random
 import subprocess
 import warnings
 
-## Third Party Imports
 import MDAnalysis as mda
 import numpy as np
 
-## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
+
 
 # FUNCTIONS
 def move_topology_pdb(

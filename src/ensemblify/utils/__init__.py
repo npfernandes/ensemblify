@@ -81,8 +81,8 @@ Available Functions
 """
 
 from ensemblify.utils.misc import (
-    kde,
     get_array_extremum,
+    kde,
     round_to_nearest_multiple,
 )
 from ensemblify.utils.pdb_manipulation import (

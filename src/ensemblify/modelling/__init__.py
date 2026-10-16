@@ -70,7 +70,12 @@ Available Functions
 """
 
 from ensemblify.modelling.constraints import apply_constraints, apply_pae_constraints
-from ensemblify.modelling.fusion import apply_basic_idealize, create_fusion_pose, fuse_structures, pack_sidechains
+from ensemblify.modelling.fusion import (
+    apply_basic_idealize,
+    create_fusion_pose,
+    fuse_structures,
+    pack_sidechains,
+)
 from ensemblify.modelling.objects import setup_minmover, setup_pose
 from ensemblify.modelling.pdb_processing import process_pdb_structure
 

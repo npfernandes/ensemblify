@@ -1,24 +1,21 @@
 """Auxiliary functions to process input parameters file and input structure."""
 
 # IMPORTS
-## Standard Library Imports
 import copy
 import os
 import re
-import requests
 import shutil
 
-## Third Party Imports
+import requests
 import yaml
 
-## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.modelling import fuse_structures
 from ensemblify.modelling.pdb_processing import (
     apply_faspr_single,
     apply_pulchra_single,
+    apply_restore_single,
     apply_rewrite_single,
-    apply_restore_single
 )
 from ensemblify.utils import cif_to_pdb, df_from_pdb, df_to_pdb
 

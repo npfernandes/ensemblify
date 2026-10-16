@@ -1,13 +1,11 @@
 """Auxiliary functions for calculating structural properties data."""
 
 # IMPORTS
-## Standard Library Imports
 import os
 import warnings
 from concurrent.futures import ProcessPoolExecutor
 from functools import reduce
 
-## Third Party Imports
 import MDAnalysis as mda
 import mdtraj
 import numpy as np
@@ -16,9 +14,9 @@ import scipy
 from MDAnalysis.analysis import dihedrals
 from tqdm import tqdm
 
-## Local Imports
 from ensemblify.analysis.third_party.simple_mdreader import SimpleMDreader
 from ensemblify.utils import extract_pdb_info
+
 
 # FUNCTIONS
 def calculate_ramachandran_data(
@@ -75,8 +73,10 @@ def calculate_ramachandran_data(
     elif output_path.endswith('.csv'):
         dihedrals_matrix.to_csv(output_path)
     else:
-        print(('Ramachandran data was not saved to disk, '
-               'output path must be a directory or .csv filepath!'))
+        print(
+            'Ramachandran data was not saved to disk, output path must be a directory or .csv '
+            'filepath!'
+        )
 
     return dihedrals_matrix
 
@@ -217,8 +217,10 @@ def calculate_contact_matrix(
     elif output_path.endswith('.csv'):
         contact_matrix.to_csv(output_path)
     else:
-        print(('Contact matrix was not saved to disk, '
-               'output path must be a directory or .csv filepath!'))
+        print(
+            'Contact matrix was not saved to disk, output path must be a directory or .csv '
+            'filepath!'
+        )
 
     return contact_matrix
 
@@ -346,8 +348,10 @@ def calculate_distance_matrix(
     elif output_path.endswith('.csv'):
         distance_matrix.to_csv(output_path)
     else:
-        print(('Distance matrix was not saved to disk, '
-               'output path must be a directory or .csv filepath!'))
+        print(
+            'Distance matrix was not saved to disk, output path must be a directory or .csv '
+            'filepath!'
+        )
 
     return distance_matrix
 
@@ -415,8 +419,10 @@ def calculate_ss_assignment(
         elif output_path.endswith('.csv'):
             ss_assign.to_csv(output_path)
         else:
-            print(('Secondary structure assignment matrix was not saved to disk, '
-                   'output path must be a directory or .csv filepath!'))
+            print(
+                'Secondary structure assignment matrix was not saved to disk, output path must be '
+                'a directory or .csv filepath!'
+            )
 
     return ss_assign
 
@@ -484,8 +490,10 @@ def calculate_ss_frequency(
     elif output_path.endswith('.csv'):
         frequency.to_csv(output_path)
     else:
-        print(('Secondary structure assignment frequency matrix was not saved to disk, '
-               'output path must be a directory or .csv filepath!'))
+        print(
+            'Secondary structure assignment frequency matrix was not saved to disk, output path '
+            'must be a directory or .csv filepath!'
+        )
 
     return frequency
 
@@ -665,8 +673,10 @@ def calculate_metrics_data(
         elif output_path.endswith('.csv'):
             traj_analysis.to_csv(output_path)
         else:
-            print(('Structural metrics DataFrame was not saved to disk, '
-                   'output path must be a directory or .csv filepath!'))
+            print(
+                'Structural metrics DataFrame was not saved to disk, output path must be a '
+                'directory or .csv filepath!'
+            )
 
     return traj_analysis
 

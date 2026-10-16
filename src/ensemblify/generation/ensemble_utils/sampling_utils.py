@@ -1,7 +1,6 @@
 """Auxiliary functions for setting up the conformational sampling process."""
 
 # IMPORTS
-## Standard Library Imports
 import logging
 import logging.config
 import os
@@ -10,7 +9,6 @@ import sys
 from copy import deepcopy
 from timeit import default_timer as timer
 
-## Third Party Imports
 import pandas as pd
 import pyrosetta
 import pyrosetta.distributed
@@ -18,16 +16,16 @@ import ray
 import yaml
 from tqdm import tqdm
 
-## Local Imports
 from ensemblify.generation.ensemble_utils.functions import (
+    _prep_target,
     derive_constraint_targets,
     get_targets_from_plddt,
-    _prep_target,
     setup_fold_tree,
 )
 from ensemblify.generation.ensemble_utils.samplers import setup_samplers
 from ensemblify.modelling.constraints import apply_constraints, apply_pae_constraints
 from ensemblify.modelling.objects import setup_minmover, setup_pose
+
 
 # FUNCTIONS
 def setup_sampling_logging(sampling_log: str) -> tuple[logging.Logger,str,str]:
@@ -143,7 +141,7 @@ def _check_contained_in(
     """
     elements_in_container = []
     for element in elements:
-        if all([x in container for x in element]):
+        if all(x in container for x in element):
             elements_in_container.append(element)
     return elements_in_container
 

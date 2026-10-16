@@ -1,14 +1,13 @@
 """Auxiliary functions for processing .pdb files."""
 
 # IMPORTS
-## Standard Library Imports
 import logging
 import os
 import subprocess
 
-## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.utils import df_from_pdb, df_to_pdb, extract_pdb_info
+
 
 # FUNCTIONS
 def _setup_logger(pdb: str, log_file: str) -> logging.Logger:

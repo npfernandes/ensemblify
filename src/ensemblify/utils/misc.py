@@ -1,10 +1,11 @@
 """Auxiliary functions with miscellaneous use."""
 
 # IMPORTS
-## Third Party Imports
 import math
+
 import numpy as np
 import scipy
+
 
 # FUNCTIONS
 def kde(

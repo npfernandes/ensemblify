@@ -1,11 +1,10 @@
 """Auxiliary functions for reading and aligning sequences from FASTA or PDB files."""
 
 # IMPORTS
-## Standard Library Imports
 import os
 
-## Third Party Imports
 from Bio import Align
+
 
 # FUNCTIONS
 def get_sequence_from_file(fasta_path: str) -> str:

@@ -42,6 +42,7 @@ Available Functions
 
 from ensemblify.generation.ensemble import generate_ensemble
 from ensemblify.generation.ensemble_utils import suggest_targets
+
 __all__ = [
     'generate_ensemble',
     'suggest_targets'

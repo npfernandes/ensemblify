@@ -1,23 +1,21 @@
 """Auxiliary functions for processing files from sampling output."""
 
 # IMPORTS
-## Standard Library Imports
 import io
 import os
 import re
 import subprocess
 
-## Third Party Imports
 import ray
 
-## Local Imports
 from ensemblify.modelling.pdb_processing import (
     apply_faspr_single,
-    apply_rewrite_single,
     apply_pulchra_single,
-    apply_restore_single
+    apply_restore_single,
+    apply_rewrite_single,
 )
 from ensemblify.utils import cleanup_pdbs, extract_pdb_info
+
 
 # FUNCTIONS
 def check_clashes(

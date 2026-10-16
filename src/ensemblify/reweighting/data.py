@@ -1,7 +1,6 @@
 """Auxiliary functions for reweighting ensembles."""
 
 # IMPORTS
-## Standard Library Imports
 import contextlib
 import glob
 import os
@@ -9,13 +8,11 @@ import subprocess
 from collections.abc import Callable
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-## Third Party Imports
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 from sklearn.linear_model import LinearRegression
+from tqdm import tqdm
 
-## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
 from ensemblify.reweighting.third_party import simple_BME
 

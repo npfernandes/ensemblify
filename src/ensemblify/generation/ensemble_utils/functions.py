@@ -1,15 +1,13 @@
 """Auxiliary functions for sampling."""
 
 # IMPORTS
-## Standard Library Imports
-from collections import deque  
+from collections import deque
 from copy import deepcopy
 
-## Third Party Imports
 import pyrosetta
 
-## Local Imports
 from ensemblify.utils import df_from_pdb
+
 
 # FUNCTIONS
 def get_targets_from_plddt(parameters: dict) -> dict[str,list[int]]:

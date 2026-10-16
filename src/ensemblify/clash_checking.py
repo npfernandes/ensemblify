@@ -12,7 +12,6 @@ Simple module to re-check previously generated ensembles for steric clashes.
 """
 
 # IMPORTS
-## Standard Library Imports
 import glob
 import io
 import os
@@ -20,15 +19,20 @@ import re
 from concurrent.futures import ProcessPoolExecutor
 from subprocess import CalledProcessError
 
-## Third Party Imports
 import yaml
 from tqdm import tqdm
 
-## Local Imports
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.generation.ensemble_utils.processing_inputs import process_input_pdb, register_input_clashes
-from ensemblify.modelling.pdb_processing import apply_pulchra_single, apply_rewrite_single
+from ensemblify.generation.ensemble_utils.processing_inputs import (
+    process_input_pdb,
+    register_input_clashes,
+)
+from ensemblify.modelling.pdb_processing import (
+    apply_pulchra_single,
+    apply_rewrite_single,
+)
 from ensemblify.utils import cleanup_pdbs, extract_pdb_info
+
 
 # FUNCTIONS
 def process_pulchra_output(
@@ -281,7 +285,9 @@ def check_steric_clashes(
         simplified_report.seek(0,0)
         simplified_report.write(f'Total number of clashed pdbs: {clashed_pdbs}\n' + content)
 
-    print(('Ensemble steric clash check has finished. Please check the reports created in the '
-           'clash_checking directory.'))
+    print(
+        'Ensemble steric clash check has finished. Please check the reports created in the '
+        'clash_checking directory.'
+    )
 
     return clash_report, clash_report_detailed

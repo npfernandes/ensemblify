@@ -1,19 +1,16 @@
 """Reweight a conformational ensemble using experimental data."""
 
 # IMPORTS
-## Standard Library Imports
 import glob
 import os
 import shutil
 import subprocess
 import sys
 
-## Third Party Imports
 import numpy as np
 import pandas as pd
 from plotly.offline import get_plotlyjs
 
-## Local Imports
 from ensemblify.analysis import (
     calculate_contact_matrix,
     calculate_distance_matrix,
@@ -24,7 +21,7 @@ from ensemblify.analysis import (
     create_ss_frequency_figure,
 )
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.conversion import traj2saxs, calc_chi2_fit
+from ensemblify.conversion import calc_chi2_fit, traj2saxs
 from ensemblify.reweighting.data import (
     attempt_read_calculated_data,
     attempt_read_reweighting_data,
@@ -35,10 +32,11 @@ from ensemblify.reweighting.data import (
 )
 from ensemblify.reweighting.figures import (
     create_effective_frames_fit_fig,
-    create_rw_saxs_fits_fig,
     create_reweighting_metrics_fig,
+    create_rw_saxs_fits_fig,
 )
 from ensemblify.utils import get_array_extremum, round_to_nearest_multiple
+
 
 # FUNCTIONS
 def reweight_ensemble(
@@ -254,9 +252,9 @@ def reweight_ensemble(
                                                     pepsi_saxs_opt=pepsi_saxs_opt)
 
             else:
-                print((f'No method to automatically back-calculate {data_type} data is currently '
+                print(f'No method to automatically back-calculate {data_type} data is currently '
                        'available. Please provide the file(s) with your calculated experimental '
-                       f'data using the calculated_{data_type}_data parameter.'))
+                       f'data using the calculated_{data_type}_data parameter.')
                 sys.exit(1)
 
             # Add calculated data file to list
@@ -266,8 +264,8 @@ def reweight_ensemble(
         # Reweight ensemble using different theta values
         thetas_array = np.array(thetas)
 
-        print((f'Applying BME reweighting to {trajectory_id} ensemble '
-               f'with theta values {thetas} ...'))
+        print(f'Applying BME reweighting to {trajectory_id} ensemble '
+               f'with theta values {thetas} ...')
         stats, weights = bme_ensemble_reweighting(exp_data=exp_data_BME,
                                                   exp_type=exp_type,
                                                   calc_data=calc_data_BME,

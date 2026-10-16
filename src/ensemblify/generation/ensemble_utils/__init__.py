@@ -14,7 +14,7 @@ This module contains auxiliary functions for the ``ensemblify.generation`` modul
 from ensemblify.generation.ensemble_utils.processing_inputs import (
     read_input_parameters,
     setup_ensemble_gen_params,
-    suggest_targets
+    suggest_targets,
 )
 from ensemblify.generation.ensemble_utils.sampling import run_sampling
 

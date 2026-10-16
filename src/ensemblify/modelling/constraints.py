@@ -1,12 +1,11 @@
 """Auxiliary functions for applying energy restraints (PyRosetta Constraints) to Pose objects."""
 
 # IMPORTS
-## Standard Library Imports
 import json
 
-## Third Party Imports
 import numpy as np
 import pyrosetta
+
 
 # FUNCTIONS
 def make_atom_pair_constraint(

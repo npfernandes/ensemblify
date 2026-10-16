@@ -12,7 +12,6 @@ Back-end for the Ensemblify Command Line Interface.
 """
 
 # IMPORTS
-## Standard Library Imports
 import argparse
 import sys
 

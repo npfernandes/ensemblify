@@ -14,9 +14,14 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 ## Local Imports
-from ensemblify.analysis.colors import PARULA_COLORSCALE, DEFAULT_TRACE_COLOR_PALETTE
+from ensemblify.analysis.colors import DEFAULT_TRACE_COLOR_PALETTE, PARULA_COLORSCALE
 from ensemblify.config import GLOBAL_CONFIG
-from ensemblify.utils import extract_pdb_info, get_array_extremum, kde, round_to_nearest_multiple
+from ensemblify.utils import (
+    extract_pdb_info,
+    get_array_extremum,
+    kde,
+    round_to_nearest_multiple,
+)
 
 # CONSTANTS
 DEFAULT_AXIS = {
@@ -383,8 +388,10 @@ def create_ramachandran_figure(
                                 config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
 
         else:
-            print(('Ramachandran plot was not saved to disk, '
-                    'output path must be a directory or .html filepath!'))
+            print(
+                'Ramachandran plot was not saved to disk, output path must be a directory or .html '
+                'filepath!'
+            )
 
     return rama_fig
 
@@ -545,8 +552,10 @@ def create_contact_map_fig(
                                 config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
 
         else:
-            print(('Contact map was not saved to disk, '
-                   'output path must be a directory or .html filepath!'))
+            print(
+                'Contact map was not saved to disk, output path must be a directory or .html '
+                'filepath!'
+            )
 
     return cmap_fig
 
@@ -722,8 +731,10 @@ def create_distance_matrix_fig(
                                 config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
 
         else:
-            print(('Distance Matrix was not saved to disk, '
-                   'output path must be a directory or .html filepath!'))
+            print(
+                'Distance Matrix was not saved to disk, output path must be a directory or .html '
+                'filepath!'
+            )
 
     return dmatrix_fig
 
@@ -887,8 +898,10 @@ def create_ss_frequency_figure(
             ss_freq_fig.write_html(output_path,
                                    config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
         else:
-            print(('Secondary structure frequency graph was not saved to disk, '
-                   'output path must be a directory or .html filepath!'))
+            print(
+                'Secondary structure frequency graph was not saved to disk, output path must be a '
+                'directory or .html filepath!'
+            )
 
     return ss_freq_fig
 
@@ -1287,8 +1300,10 @@ def create_metrics_fig(
             metrics_fig.write_html(output_path,
                                    config=GLOBAL_CONFIG['PLOTLY_DISPLAY_CONFIG'])
         else:
-            print(('Structural Metrics dashboard was not saved to disk, '
-                   'output path must be a directory or .html filepath!'))
+            print(
+                'Structural Metrics dashboard was not saved to disk, output path must be a '
+                'directory or .html filepath!'
+            )
 
     return metrics_fig
 

@@ -1,19 +1,17 @@
 """Custom Sampler classes to generate protein conformations."""
 
 # IMPORTS
-## Standard Library Imports
 import random
 
-## Third Party Imports
 import numpy as np
 import pandas as pd
 import pyrosetta
 
-## Local Imports
 from ensemblify.generation.ensemble_utils.movers import setup_mover
 
+
 # CLASSES
-class MonteCarloSampler():
+class MonteCarloSampler:
     """Custom MonteCarlo sampler for sampling dihedral angles.
     
     Attributes:

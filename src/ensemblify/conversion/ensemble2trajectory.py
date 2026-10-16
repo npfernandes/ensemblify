@@ -1,16 +1,17 @@
 """Create a trajectory (.xtc) file from an ensemble of .pdb files."""
 
 # IMPORTS
-## Standard Library Imports
 import os
 import subprocess
 
-## Third Party Imports
 import MDAnalysis as mda
 from tqdm import tqdm
 
-## Local Imports
-from ensemblify.conversion.conversion_utils import join_pdbs, move_topology_pdb, _sample_without_topology
+from ensemblify.conversion.conversion_utils import (
+    _sample_without_topology,
+    join_pdbs,
+    move_topology_pdb,
+)
 
 # CONSTANTS
 MOVE_PDB_MSG = 'Moving{}topology .pdb... '

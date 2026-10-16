@@ -1,24 +1,22 @@
 """Auxiliary functions for combining PDB structures with disordered tails/linkers."""
 
 # IMPORTS
-## Standard Library Imports
 import os
 import sys
 
-## Third Party Imports
 import pyrosetta
 
-## Local Imports
 from ensemblify.modelling._alignment import (
-    setup_sequences_structures,
-    perform_global_alignment,
+    extract_indels_mutations,
     parse_alignment,
-    extract_indels_mutations
+    perform_global_alignment,
+    setup_sequences_structures,
 )
-from ensemblify.modelling.objects import setup_pose, setup_minmover
 from ensemblify.modelling.constraints import apply_constraints
+from ensemblify.modelling.objects import setup_minmover, setup_pose
 from ensemblify.modelling.pdb_processing import process_pdb_structure
 from ensemblify.utils import cif_to_pdb
+
 
 # FUNCTIONS
 def apply_basic_idealize(

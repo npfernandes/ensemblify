@@ -1,13 +1,11 @@
 """Auxiliary functions for creating reweighting figures."""
 
 # IMPORTS
-## Third Party Imports
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-## Local Imports
 from ensemblify.utils import kde
 
 # CONSTANTS

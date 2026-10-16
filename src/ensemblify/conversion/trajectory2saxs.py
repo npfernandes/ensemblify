@@ -1,17 +1,15 @@
 """Calculate a set of SAXS curves (.dat) from a trajectory file (.xtc)."""
 
 # IMPORTS
-## Standard Library Imports
 import os
 from concurrent.futures import ProcessPoolExecutor
 
-## Third Party Imports
 import MDAnalysis as mda
 import numpy as np
 from tqdm import tqdm
 
-## Local Imports
-from ensemblify.conversion.conversion_utils import calc_saxs_data, calc_chi2_fit
+from ensemblify.conversion.conversion_utils import calc_chi2_fit, calc_saxs_data
+
 
 # FUNCTIONS
 def traj2saxs(
@@ -20,7 +18,7 @@ def traj2saxs(
     trajectory_id: str,
     exp_saxs_file: str,
     pepsi_saxs_opt: str,
-    ) -> tuple[str, str]:
+    ) -> tuple[str, str, str]:
     """Calculate a set of theoretical SAXS curves from a trajectory file using Pepsi-SAXS.
     
     Calculation is done in chunks distributed across available processor cores.

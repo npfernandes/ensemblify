@@ -11,7 +11,6 @@ Configuration - ``ensemblify.config``
 View and update Ensemblify's global configuration.
 """
 # IMPORTS
-## Standard Library Imports
 import os
 
 # CONSTANTS

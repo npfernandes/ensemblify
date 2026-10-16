@@ -63,15 +63,18 @@ Utilities
 Citation
 --------
 
-When using Ensemblify in published work, please cite
+When using Ensemblify in published work, please cite:
 
-    PUB
+    Nuno P. Fernandes, Tiago Gomes, and Tiago N. Cordeiro, “Ensemblify: A User-Friendly Platform 
+    for Generating and Analyzing Conformational Ensembles of Intrinsically Disordered Proteins and 
+    Regions”, Journal of Molecular Biology, Computation Resources for Molecular Biology, 
+    438(18):169862 (2026) https://doi.org/10.1016/j.jmb.2026.169862
 
 """
 from ensemblify.config import show_config, update_config
 from ensemblify.utils import df_from_pdb, df_to_pdb, extract_pdb_info
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 
 __all__ = ['df_from_pdb',
            'df_to_pdb',

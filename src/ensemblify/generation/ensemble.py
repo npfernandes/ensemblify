@@ -1,12 +1,15 @@
 """Generate an ensemble of conformations from a parameters file."""
 
 # IMPORTS
-## Standard Library Imports
 import os
 import shutil
 
-## Local Imports
-from ensemblify.generation.ensemble_utils import read_input_parameters, run_sampling, setup_ensemble_gen_params
+from ensemblify.generation.ensemble_utils import (
+    read_input_parameters,
+    run_sampling,
+    setup_ensemble_gen_params,
+)
+
 
 # MAIN FUNCTION
 def generate_ensemble(parameters_path: str):

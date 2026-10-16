@@ -1,9 +1,9 @@
 """Auxiliary functions for creating PyRosetta objects."""
 
 # IMPORTS
-## Third Party Imports
 import pyrosetta
-import pyrosetta.distributed.io as io
+from pyrosetta.distributed import io
+
 
 # FUNCTIONS
 def setup_pose(

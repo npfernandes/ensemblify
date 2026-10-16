@@ -1,18 +1,16 @@
 """Analyze a trajectory,topology pair, outputting a graphical dashboard."""
 
 # IMPORTS
-## Standard Library Imports
 import os
 
-## Third Party Imports
 import pandas as pd
 from plotly.offline import get_plotlyjs
 
-## Local Imports
+from ensemblify.analysis.colors import DEFAULT_TRACE_COLOR_PALETTE
 from ensemblify.analysis.data import calculate_analysis_data
 from ensemblify.analysis.figures import create_analysis_figures
-from ensemblify.analysis.colors import DEFAULT_TRACE_COLOR_PALETTE
 from ensemblify.config import GLOBAL_CONFIG
+
 
 # FUNCTIONS
 def analyze_trajectory(

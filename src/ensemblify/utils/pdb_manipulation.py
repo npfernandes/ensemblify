@@ -1,17 +1,16 @@
 """Auxiliary functions to read, manipulate and write .pdb files."""
 
 # IMPORTS
-## Standard Library Imports
 import os
 
-## Third Party Imports
 import pandas as pd
-from Bio.PDB import MMCIFParser, PDBIO, PDBParser
+from Bio.PDB import PDBIO, MMCIFParser, PDBParser
 from Bio.PDB.Atom import Atom
 from Bio.PDB.Chain import Chain
 from Bio.PDB.Model import Model
 from Bio.PDB.Residue import Residue
 from Bio.PDB.Structure import Structure
+
 
 # FUNCTIONS
 def cif_to_pdb(cif_path: str, pdb_path: str) -> None:
